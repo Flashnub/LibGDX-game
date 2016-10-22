@@ -219,16 +219,16 @@ public abstract class Character {
 						(int) ((this.gameplayHitBox.y) / tileHeight));
 				
 				if (topLeftBlock != null)
-					collisionX = ((String)topLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
+					collisionX = ((Boolean)topLeftBlock.getTile().getProperties().get("Impassable")).equals(true);
 					
 				
 				//middle left block
 				if(!collisionX && middleLeftBlock != null)
-					collisionX = ((String)middleLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
+					collisionX = ((Boolean)middleLeftBlock.getTile().getProperties().get("Impassable")).equals(true);
 				
 				//lower left block
 				if(!collisionX && lowerLeftBlock != null )
-					collisionX = ((String)lowerLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
+					collisionX = ((Boolean)lowerLeftBlock.getTile().getProperties().get("Impassable")).equals(true);
 				
 //				this.leftcollisionX = collisionX;
 				
@@ -247,15 +247,15 @@ public abstract class Character {
 				
 				// top right block
 				if (topRightBlock != null)
-					collisionX = ((String)topRightBlock.getTile().getProperties().get("Impassable")).equals("true");
+					collisionX = ((Boolean)topRightBlock.getTile().getProperties().get("Impassable")).equals(true);
 				
 				//middle right block
 				if(!collisionX && middleRightBlock != null)
-					collisionX = ((String)middleRightBlock.getTile().getProperties().get("Impassable")).equals("true");
+					collisionX = ((Boolean)middleRightBlock.getTile().getProperties().get("Impassable")).equals(true);
 				
 				//lower right block
 				if(!collisionX && lowerRightBlock != null)
-					collisionX = ((String)lowerRightBlock.getTile().getProperties().get("Impassable")).equals("true");
+					collisionX = ((Boolean)lowerRightBlock.getTile().getProperties().get("Impassable")).equals(true);
 				
 //				this.rightCollisionX = collisionX;
 			}
@@ -282,15 +282,15 @@ public abstract class Character {
 				Cell bottomRightBlock = collisionLayer.getCell((int) ((this.gameplayHitBox.x + this.gameplayHitBox.width) / tileWidth), (int) ((this.gameplayHitBox.y) / tileHeight));
 				//bottom left block
 				if (bottomLeftBlock != null)
-					collisionY = ((String)bottomLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
+					collisionY = ((Boolean)bottomLeftBlock.getTile().getProperties().get("Impassable")).equals(true);
 					
 				//bottom middle block
 				if(!collisionY && bottomMiddleBlock != null)
-					collisionY = ((String)bottomMiddleBlock.getTile().getProperties().get("Impassable")).equals("true");
+					collisionY = ((Boolean)bottomMiddleBlock.getTile().getProperties().get("Impassable")).equals(true);
 				
 				//bottom right block
 				if(!collisionY && bottomRightBlock != null)
-					collisionY = ((String)bottomRightBlock.getTile().getProperties().get("Impassable")).equals("true");
+					collisionY = ((Boolean)bottomRightBlock.getTile().getProperties().get("Impassable")).equals(true);
 				
 		
 			} 
@@ -301,15 +301,15 @@ public abstract class Character {
 				
 				//top left block
 				if (topLeftBlock != null)
-					collisionY = ((String)topLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
+					collisionY = ((Boolean)topLeftBlock.getTile().getProperties().get("Impassable")).equals(true);
 				
 				//top middle block
 				if(!collisionY && topMiddleBlock != null)
-					collisionY = ((String)topMiddleBlock.getTile().getProperties().get("Impassable")).equals("true");
+					collisionY = ((Boolean)topMiddleBlock.getTile().getProperties().get("Impassable")).equals(true);
 				
 				//top right block
 				if(!collisionY && topRightBlock != null)
-					collisionY = ((String)topRightBlock.getTile().getProperties().get("Impassable")).equals("true");
+					collisionY = ((Boolean)topRightBlock.getTile().getProperties().get("Impassable")).equals(true);
 			}
 			
 			//react to Ycollision
@@ -348,15 +348,15 @@ public abstract class Character {
 					Cell bottomRightBlock = collisionLayer.getCell((int) ((tempGameplayBounds.x + tempGameplayBounds.width) / tileWidth), (int) ((tempGameplayBounds.y) / tileHeight));
 					//bottom left block
 					if (bottomLeftBlock != null)
-						collisionY = ((String)bottomLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
+						collisionY = ((Boolean)bottomLeftBlock.getTile().getProperties().get("Impassable")).equals(true);
 						
 					//bottom middle block
 					if(!collisionY && bottomMiddleBlock != null)
-						collisionY = ((String)bottomMiddleBlock.getTile().getProperties().get("Impassable")).equals("true");
+						collisionY = ((Boolean)bottomMiddleBlock.getTile().getProperties().get("Impassable")).equals(true);
 					
 					//bottom right block
 					if(!collisionY && bottomRightBlock != null)
-						collisionY = ((String)bottomRightBlock.getTile().getProperties().get("Impassable")).equals("true");
+						collisionY = ((Boolean)bottomRightBlock.getTile().getProperties().get("Impassable")).equals(true);
 					
 			
 				} 
@@ -367,15 +367,15 @@ public abstract class Character {
 					
 					//top left block
 					if (topLeftBlock != null)
-						collisionY = ((String)topLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
+						collisionY = ((Boolean)topLeftBlock.getTile().getProperties().get("Impassable")).equals(true);
 					
 					//top middle block
 					if(!collisionY && topMiddleBlock != null)
-						collisionY = ((String)topMiddleBlock.getTile().getProperties().get("Impassable")).equals("true");
+						collisionY = ((Boolean)topMiddleBlock.getTile().getProperties().get("Impassable")).equals(true);
 					
 					//top right block
 					if(!collisionY && topRightBlock != null)
-						collisionY = ((String)topRightBlock.getTile().getProperties().get("Impassable")).equals("true");
+						collisionY = ((Boolean)topRightBlock.getTile().getProperties().get("Impassable")).equals(true);
 				}
 				
 				if (collisionY) {
@@ -417,16 +417,16 @@ public abstract class Character {
 							(int) ((tempGameplayBounds.y) / tileHeight));
 					
 					if (topLeftBlock != null)
-						collisionX = ((String)topLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
+						collisionX = ((Boolean)topLeftBlock.getTile().getProperties().get("Impassable")).equals(true);
 						
 					
 					//middle left block
 					if(!collisionX && middleLeftBlock != null)
-						collisionX = ((String)middleLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
+						collisionX = ((Boolean)middleLeftBlock.getTile().getProperties().get("Impassable")).equals(true);
 					
 					//lower left block
 					if(!collisionX && lowerLeftBlock != null )
-						collisionX = ((String)lowerLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
+						collisionX = ((Boolean)lowerLeftBlock.getTile().getProperties().get("Impassable")).equals(true);
 					
 //					this.leftcollisionX = collisionX;
 					
@@ -445,15 +445,15 @@ public abstract class Character {
 					
 					// top right block
 					if (topRightBlock != null)
-						collisionX = ((String)topRightBlock.getTile().getProperties().get("Impassable")).equals("true");
+						collisionX = ((Boolean)topRightBlock.getTile().getProperties().get("Impassable")).equals(true);
 					
 					//middle right block
 					if(!collisionX && middleRightBlock != null)
-						collisionX = ((String)middleRightBlock.getTile().getProperties().get("Impassable")).equals("true");
+						collisionX = ((Boolean)middleRightBlock.getTile().getProperties().get("Impassable")).equals(true);
 					
 					//lower right block
 					if(!collisionX && lowerRightBlock != null)
-						collisionX = ((String)lowerRightBlock.getTile().getProperties().get("Impassable")).equals("true");
+						collisionX = ((Boolean)lowerRightBlock.getTile().getProperties().get("Impassable")).equals(true);
 					
 //					this.rightCollisionX = collisionX;
 				}

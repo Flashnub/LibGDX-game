@@ -1,0 +1,13 @@
+{
+	"class": com.mygdx.game.assets.EntityUIData,
+	"animations": [
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Idle",
+			"numberOfFrames": 1,
+			"duration": 0.05,
+			"playMode": NORMAL
+		}
+	]
+	"masterAtlasPath": "Sprites/BasicEnemy/textures.atlas"
+}

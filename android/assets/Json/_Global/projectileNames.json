@@ -1,0 +1,9 @@
+{ 
+	"class": com.mygdx.game.constants.Wrappers.ArrayStringWrapper,
+	"array": [
+		{
+			"class": com.mygdx.game.constants.Wrappers.StringWrapper,
+			"value": "Basic"
+		}
+	]
+}

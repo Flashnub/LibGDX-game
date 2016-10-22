@@ -1,0 +1,13 @@
+{
+	"HealthPotion": {
+		"class": com.mygdx.game.model.items.Item,
+		"name": "Health Potion",
+		"desc": "Restores Health",
+		"effects": [
+			{
+				"class": com.mygdx.game.model.effects.HealingEffectSettings,
+				"value": 10
+			}
+		]
+	}
+}

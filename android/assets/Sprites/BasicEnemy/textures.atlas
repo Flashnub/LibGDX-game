@@ -1,0 +1,13 @@
+
+textures.png
+size: 1024,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+BasicEnemy-Idle1
+  rotate: false
+  xy: 2, 2
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1

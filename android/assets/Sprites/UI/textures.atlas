@@ -1,0 +1,55 @@
+
+textures.png
+size: 1024,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+enemy-health-bar
+  rotate: false
+  xy: 2, 63
+  size: 118, 7
+  orig: 118, 7
+  offset: 0, 0
+  index: -1
+enemy-health-bar-background
+  rotate: false
+  xy: 2, 54
+  size: 118, 7
+  orig: 118, 7
+  offset: 0, 0
+  index: -1
+enemy-health-bar-intermediate
+  rotate: false
+  xy: 122, 63
+  size: 118, 7
+  orig: 118, 7
+  offset: 0, 0
+  index: -1
+health-bar
+  rotate: false
+  xy: 2, 136
+  size: 500, 30
+  orig: 500, 30
+  offset: 0, 0
+  index: -1
+health-bar-background
+  rotate: false
+  xy: 2, 104
+  size: 500, 30
+  orig: 500, 30
+  offset: 0, 0
+  index: -1
+health-bar-intermediate
+  rotate: false
+  xy: 2, 72
+  size: 500, 30
+  orig: 500, 30
+  offset: 0, 0
+  index: -1
+text-background
+  rotate: false
+  xy: 2, 2
+  size: 50, 50
+  orig: 50, 50
+  offset: 0, 0
+  index: -1

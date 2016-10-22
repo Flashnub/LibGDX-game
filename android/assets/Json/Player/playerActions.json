@@ -1,0 +1,24 @@
+{
+	"class": com.mygdx.game.model.characters.player.PlayerProperties,
+	"inventory": [],
+	"playerSpecificActions": {
+		"PlayerBlock": {
+			"class": com.mygdx.game.model.actions.ActionSequence,
+			"actionKeys": [
+				{
+					"class": com.mygdx.game.model.actions.ActionSegmentKey,
+					"keys": [
+						{
+							"class": com.mygdx.game.wrappers.StringWrapper,
+							"value": "PlayerBlock"
+						}
+					],
+					"typeOfAction": Ability
+				}
+			]
+			"windUpState": "Idle"
+			"actingState": "Idle"
+			"cooldownState": "Idle"
+		},
+	}
+}

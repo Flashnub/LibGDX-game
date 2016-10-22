@@ -1,0 +1,34 @@
+{
+	"class": com.mygdx.game.assets.EntityUIData,
+	"animations": [
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Idle",
+			"numberOfFrames": 1,
+			"duration": 0.05,
+			"playMode": NORMAL
+		},
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Walk",
+			"numberOfFrames": 7,
+			"duration": 0.06667,
+			"playMode": LOOP
+		},
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Backwalk",
+			"numberOfFrames": 11,
+			"duration": 0.07692,
+			"playMode": LOOP
+		},
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Block",
+			"numberOfFrames": 4,
+			"duration": 0.05,
+			"playMode": NORMAL
+		}
+	]
+	"masterAtlasPath": "Sprites/Player/textures.atlas"
+}

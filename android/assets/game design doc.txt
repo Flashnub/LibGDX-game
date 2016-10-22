@@ -1,0 +1,57 @@
+Game design doc:
+
+2D Metroidvania-style hack and slash with bloodborne/DMC style movement and combat.
+
+Character will have:
+Health - Standard health in games
+
+Vitality - Replenishes over time, but replenishes fully on perfect blocks,
+replenishes on landed attacks. Max amount decreases when casting negative Supers and solving
+conflicts in a non-egalitarian and violent manner. Increases when casting positive Supers 
+and solving conflicts peacefully and through cultivating empathy in NPCs.
+
+Super attacks - Acquired from NPC interactions. Ranges from firing powerful projectiles to
+performing advanced melee attacks. Requires energy to perform. Each super has variable cost of 
+energy levels (I.E. one might cost 3 Energy vs one might cost 6).
+
+Examples:
+
+Negative:
+PS Fear
+PS Despair
+PS Dementia
+
+Neutral:
+PS Hunger
+
+Positive:
+PS Harmony
+PS Companionship
+
+Optimal play strategy: Player repeatedly blocks boss attacks and remains
+in melee range to perform supers + combos.
+
+If player can perfectly block, he/she can refill vitality container and
+theoretically never stop attacking. 
+
+Defensive Mechanics:
+Block
+Perfect Block
+Dash
+Jump
+Jump Dash
+
+Offensive Mechanics:
+Melee Attack
+Ranged Attack - shoots where L. Analog is pointed on release
+Jump attack (Gravity shouldn't occur during this)
+Juggling Attacks (Knock enemies into air or disrupt grav by increasing y velocity to 10)
+2 types of weapons: Juggling + DPS 
+
+Themes:
+Perception is vastly different amongst people, so don't judge so harshly if you don't understand
+Words are often an ineffective tool in conveying feelings and perspectives
+
+Ideas:
+Combos should be based on stagger + damage + weapon speed + hitbox range
+Doing NPC stuff will give you advantages during boss fight (Buffs, additional NPCs, items, strategies, etc.)

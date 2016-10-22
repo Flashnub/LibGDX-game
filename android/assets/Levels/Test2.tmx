@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="60" height="30" tilewidth="30" tileheight="30" nextobjectid="1">
+ <tileset firstgid="1" name="tileset1" tilewidth="30" tileheight="30" tilecount="2" columns="2">
+  <image source="tileset1.png" trans="000000" width="60" height="30"/>
+  <tile id="0">
+   <properties>
+    <property name="Impassable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="Impassable" type="bool" value="false"/>
+    <property name="SpawnPoint" value="BasicEnemy"/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="3" name="tileset2" tilewidth="30" tileheight="30" tilecount="4" columns="2">
+  <image source="tileset2.png" trans="000000" width="60" height="60"/>
+  <tile id="0">
+   <properties>
+    <property name="Impassable" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="Impassable" type="bool" value="false"/>
+    <property name="SpawnPoint" value="Player"/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="Impassable" type="bool" value="false"/>
+   </properties>
+  </tile>
+ </tileset>
+ <layer name="Tile Layer 1" width="60" height="30">
+  <data encoding="base64" compression="zlib">
+   eJzt1rENgDAMRUGLkP1XpmUAh8DnitdaOrvxqKqh+GZ4vNnxZsfbM+et++Pl/YP3/JD3WHTfhN+Vl5f3eW/X7G7Dqj3w8vLy7rbxSpLuXRrMG30=
+  </data>
+ </layer>
+</map>

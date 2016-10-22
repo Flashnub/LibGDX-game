@@ -1,0 +1,21 @@
+{
+	"PlayerAttack": {
+		"class": "com.mygdx.game.model.actions.AttackSettings",
+		"originX": 10,
+		"originY": 0,
+		"width": 200,
+		"height": 150,
+		"sourceEffectSettings": [
+			{
+				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
+				"value": 1
+			}
+		]
+		"targetEffectSettings": [
+			{
+				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
+				"value": 15
+			}
+		]
+	}
+}

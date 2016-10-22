@@ -1,0 +1,45 @@
+{
+	"class": com.mygdx.game.model.characters.CharacterProperties,
+	"maxHealth": 20,
+	"maxWill": 20,
+	"maxStability": 5,
+	"attack": 1,
+	actions: {
+		"PlayerDash": {
+			"class": com.mygdx.game.model.actions.ActionSequence,
+			"actionKeys": [
+				{
+					"class": com.mygdx.game.model.actions.ActionSegmentKey,
+					"keys": [
+						{
+							"class": com.mygdx.game.wrappers.StringWrapper,
+							"value": "PlayerDash"
+						}
+					],
+					"typeOfAction": Ability
+				}
+			]
+			"windUpState": "Idle"
+			"actingState": "Idle"
+			"cooldownState": "Idle"
+		},
+		"PlayerAttack": {
+			"class": com.mygdx.game.model.actions.ActionSequence,
+			"actionKeys": [
+				{
+					"class": com.mygdx.game.model.actions.ActionSegmentKey,
+					"keys": [
+						{
+							"class": com.mygdx.game.wrappers.StringWrapper,
+							"value": "PlayerAttack"
+						}
+					],
+					"typeOfAction": Attack
+				}
+			]
+			"windUpState": "Idle"
+			"actingState": "Idle"
+			"cooldownState": "Idle"
+		}
+	}
+}

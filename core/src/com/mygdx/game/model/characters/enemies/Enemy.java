@@ -1,10 +1,12 @@
 package com.mygdx.game.model.characters.enemies;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.utils.Json;
 import com.mygdx.game.model.characters.EntityUIModel;
 import com.mygdx.game.model.characters.InteractableCharacter;
-import com.mygdx.game.model.characters.ObservableData;
 import com.mygdx.game.model.characters.player.Player;
+import com.mygdx.game.model.characters.player.PlayerProperties;
 
 public class Enemy extends InteractableCharacter{
 	
@@ -21,7 +23,7 @@ public class Enemy extends InteractableCharacter{
 	}
 	
 	public interface PlayerObserver {
-		public void handleObservation(ObservableData data);
+		public void handleObservation(Observation data);
 	}
 
 	
@@ -30,11 +32,16 @@ public class Enemy extends InteractableCharacter{
 		Player player;
 		float pollTime;
 		int pollCount;
+		EnemyAI enemyAI;
+		EnemyProperties enemyProperties;
 
 		public EnemyModel(String characterName, EntityUIModel uiModel) {
 			super(characterName, uiModel);
 			this.pollTime = 0f;
 			this.pollCount = 0;
+			Json json = new Json();
+			enemyProperties = json.fromJson(EnemyProperties.class, Gdx.files.internal("Json/" + characterName + "/playerActions.json"));
+
 		}
 		
 
@@ -66,7 +73,6 @@ public class Enemy extends InteractableCharacter{
 		@Override
 		protected void manageAutomaticStates(float delta, TiledMapTileLayer collisionLayer) {
 			// TODO Auto-generated method stub
-			
 		}
 
 

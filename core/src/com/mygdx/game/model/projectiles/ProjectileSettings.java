@@ -21,6 +21,7 @@ public class ProjectileSettings extends AbilitySettings{
 	private Float gravity;
 	private Vector2 size;
 	private ArrayList<Vector2> possibleOrigins;
+	private Float projectileDuration;
 
 	
 	public ProjectileSettings() {
@@ -39,6 +40,7 @@ public class ProjectileSettings extends AbilitySettings{
 		json.writeValue("gravity", gravity);
 		json.writeValue("size", size);
 		json.writeValue("possibleOrigins", possibleOrigins);
+		json.writeValue("projectileDuration", projectileDuration);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -55,7 +57,17 @@ public class ProjectileSettings extends AbilitySettings{
 		gravity = json.readValue("gravity", Float.class, jsonData);
 		size = json.readValue("size", Vector2.class, jsonData);
 		possibleOrigins = json.readValue("possibleOrigins", ArrayList.class, jsonData);
-
+		Float projectileDuration = json.readValue("projectileDuration", Float.class, jsonData);
+		if (projectileDuration != null) {
+			this.projectileDuration = projectileDuration;
+		}
+		else {
+			this.projectileDuration = 10f;
+		}
+	}
+	
+	public Float getProjectileDuration() {
+		return projectileDuration;
 	}
 
 	public boolean isExplodeOnImpact() {

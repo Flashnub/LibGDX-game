@@ -34,6 +34,15 @@ public class ProjectileAttack extends ActionSegment{
 	}
 	
 	@Override
+	public float getEffectiveRange() {
+		float range = 0f;
+		for (Projectile projectile : projectiles) {
+			
+		}
+		return 0;
+	}
+	
+	@Override
 	public boolean isFinished() {
 		return true;
 	}
@@ -73,5 +82,7 @@ public class ProjectileAttack extends ActionSegment{
 		ProjectileAttack projAttack = new ProjectileAttack(source, target, actionListener, projSettings, this.settings);
 		return projAttack;
 	}
+
+
 
 }

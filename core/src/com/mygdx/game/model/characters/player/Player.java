@@ -82,17 +82,10 @@ public class Player extends Character implements InputProcessor {
 	
 	public class PlayerModel extends CharacterModel{
 	
-		final String blockState = "Block";
-		final String idleState = "Idle";
-		final String walkState = "Walk";
-		final String backWalkState = "Backwalk";
-		
+		final String blockState = "Block";		
 		boolean dashing, canControl, isWalkLeftPressed, isWalkRightPressed, isJumpPressed;
-		final float walkingVelocity = 200;
-		boolean didChangeState;
 	    Array<Integer> applicableKeys;
 	    SpawnPoint spawnPoint;
-	    float injuryTime = 0f;
 	    WorldObject nearbyObject;
 	    static final int allegiance = 0;
 	    PlayerProperties playerProperties;
@@ -116,9 +109,7 @@ public class Player extends Character implements InputProcessor {
 			isWalkLeftPressed = false;
 			isWalkRightPressed = false;
 			isJumpPressed = false;
-			this.setJumpSpeed(700f);
-			this.setGravity(950f);
-			this.acceleration.y = -this.getGravity();
+			this.acceleration.y = -this.getCharacterProperties().getGravity();
 			this.gameplayHitBoxWidthModifier = 0.19f;
 			this.gameplayHitBoxHeightModifier = 0.6f;
 		}
@@ -126,52 +117,17 @@ public class Player extends Character implements InputProcessor {
 
 		@Override
 		protected void manageAutomaticStates(float delta, TiledMapTileLayer collisionLayer) {
-			// TODO Auto-generated method stub
-			if (jumping) {
-				setState(velocity.y >= 0 ? idleState : idleState); //Jump : Fall
-			}
-			else if (dashing) {
+			super.manageAutomaticStates(delta, collisionLayer);
+			
+			 if (dashing) {
 				setState(idleState); //Dash
 			}
-
-			if (this.didChangeState) {
-				this.getUiModel().setAnimationTime(0f);
-				this.didChangeState = false; 
-			}
-			if (this.isImmuneToInjury()) {
-				injuryTime += delta;
-			}
-			if (this.injuryTime > 2f) {
-				this.setImmuneToInjury(false);
-			}
 		}
-		
-		private void jump() {
-	        if (!jumping) {
-	            jumping = true;
-	            this.getVelocity().y = getJumpSpeed();
-	        }
-	    }
 	    
-	    private void stopJump() {
-	    	if (jumping && this.getVelocity().y >= 0) {
-	    		this.getVelocity().y = 0;
-	    	}
-	    }
 
-	    public void landed() {
-	    	if (this.jumping) {
-				this.jumping = false;
-				if (this.getVelocity().x > 0)
-				{
-					setState(walkState);  
-				}
-				else if (this.getVelocity().x < 0) {
-					setState(backWalkState);
-				}
-	    	}
-	    }
 
+
+	    
 	    public void dash(boolean left) {
 	    	if (!jumping) {
 //	    		float velocityX = left ? -500f : 500f;
@@ -324,27 +280,10 @@ public class Player extends Character implements InputProcessor {
 			}
 		}
 		
-		private void walk(boolean left) {
-			this.setFacingLeft(left);
-			this.velocity.x = left ? -walkingVelocity : walkingVelocity;
-			setState(left ? this.backWalkState : this.walkState); //Walk
-		}
-		
+
 		private void actOnObject() {
 			this.getObjectListener().objectToActOn(this.nearbyObject);
 		}
-		
-		@Override public void setState(String state) {
-			super.setState(state);
-			this.didChangeState = true;
-		}
-		
-		@Override
-		public void setImmuneToInjury(boolean isImmuneToInjury) {
-			super.setImmuneToInjury(isImmuneToInjury);
-			injuryTime = 0f;
-		}
-
 
 		@Override
 		public int getAllegiance() {
@@ -354,7 +293,6 @@ public class Player extends Character implements InputProcessor {
 		public WorldObject getNearbyObject() {
 			return nearbyObject;
 		}
-
 
 		public void setNearbyObject(WorldObject nearbyObject) {
 			this.nearbyObject = nearbyObject;

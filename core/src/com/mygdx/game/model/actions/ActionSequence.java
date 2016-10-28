@@ -25,6 +25,7 @@ public class ActionSequence implements Serializable {
 	private ArrayList <ActionSegmentKey> actionKeys;
 	private ArrayDeque <ActionSegment> actions; //Find a way to make characters use these.
 	private ArrayList<ActionSegment> currentActions;
+	private ArrayList <ActionSegment> allActionSegments; //Used for AI calculations
 	private ActionStrategy strategy;
 	private String windUpState;
 	private String actingState;
@@ -66,6 +67,7 @@ public class ActionSequence implements Serializable {
 		currentActions = new ArrayList <ActionSegment>();
 		this.isFinished = false;
 		this.isQueuePopulated = false;
+		allActionSegments = this.getListOfActionsForSequence();
 	}
 	
 	public ActionSequence cloneSequence() {
@@ -121,26 +123,48 @@ public class ActionSequence implements Serializable {
 	private void populateActionQueue() {
 		this.isFinished = false;
 		this.isQueuePopulated = true;
-		for (ActionSegmentKey sequenceKey : actionKeys) {
-			ActionSegment action = null;
-			switch (sequenceKey.getTypeOfAction()) {
-				case Attack:
-					action = new Attack(source, JSONController.attacks.get(sequenceKey.getKeys().get(0).value));
-					break;
-				case Projectile:
-					ArrayList<ProjectileSettings> settings = new ArrayList<ProjectileSettings>();
-					AbilitySettings projAbilitySettings = JSONController.abilities.get(sequenceKey.getKeys().get(0).value);
-					for (int i = 1; i < sequenceKey.getKeys().size(); i++) {
-						settings.add(JSONController.projectiles.get(sequenceKey.getKeys().get(i).value));
-					}
-					action = new ProjectileAttack(source, target, actionListener, settings, projAbilitySettings);
-				case Ability:
-					action = new Ability(source, JSONController.abilities.get(sequenceKey.getKeys().get(0).value));
-			}
+		for (ActionSegmentKey segmentKey : actionKeys) {
+			ActionSegment action = 	this.getActionSegmentForKey(segmentKey);
 			if (action != null) {
 				actions.add(action);
 			}
 		}
+	}
+	
+	private ArrayList <ActionSegment> getListOfActionsForSequence() {
+		ArrayList <ActionSegment> allActionSegments = new ArrayList<ActionSegment> ();
+		for (ActionSegmentKey segmentKey : actionKeys) {
+			ActionSegment action = this.getActionSegmentForKey(segmentKey);
+			allActionSegments.add(action);
+		}
+		return allActionSegments;
+	}
+	
+	public float getEffectiveRange() {
+		float range = 0f;
+		for (ActionSegment actionSegment : allActionSegments) {
+			range += actionSegment.getEffectiveRange();
+		}
+		return range;
+	}
+	
+	private ActionSegment getActionSegmentForKey(ActionSegmentKey seqmentKey) {
+		ActionSegment action = null;
+		switch (seqmentKey.getTypeOfAction()) {
+			case Attack:
+				action = new Attack(source, JSONController.attacks.get(seqmentKey.getKeys().get(0).value));
+				break;
+			case Projectile:
+				ArrayList<ProjectileSettings> settings = new ArrayList<ProjectileSettings>();
+				AbilitySettings projAbilitySettings = JSONController.abilities.get(seqmentKey.getKeys().get(0).value);
+				for (int i = 1; i < seqmentKey.getKeys().size(); i++) {
+					settings.add(JSONController.projectiles.get(seqmentKey.getKeys().get(i).value));
+				}
+				action = new ProjectileAttack(source, target, actionListener, settings, projAbilitySettings);
+			case Ability:
+				action = new Ability(source, JSONController.abilities.get(seqmentKey.getKeys().get(0).value));
+		}
+		return action;
 	}
 
 	public CharacterModel getSource() {

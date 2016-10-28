@@ -1,6 +1,11 @@
 package com.mygdx.game.model.characters.enemies;
 
 import com.mygdx.game.model.characters.CharacterProperties;
+
+import java.util.ArrayList;
+
+import com.mygdx.game.model.actions.ActionSequence;
+import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.characters.enemies.Enemy.EnemyModel;
 
 public class BasicEnemyAI extends EnemyAI {
@@ -11,15 +16,21 @@ public class BasicEnemyAI extends EnemyAI {
 	}
 
 	@Override
-	protected void adaptIfNeeded(float delta) {
-		// TODO Auto-generated method stub
+	protected ObservationBlock createObservationBlockFromCharacter(CharacterModel characterModel) {
+		ObservationBlock observationBlock = super.createObservationBlockFromCharacter(characterModel);
 		
+		return observationBlock;
 	}
 
 	@Override
-	protected void executePattern(float delta) {
+	public void handleObservation(Observation data) {
+		// TODO Auto-generated method stub
+		// From PlayerObserver
+	}
+
+	@Override
+	public void setNextActionSequences() {
 		// TODO Auto-generated method stub
 		
 	}
-
 }

@@ -33,4 +33,10 @@ public class MovementEffectSettings extends EffectSettings {
 		return acceleration;
 	}
 	
+	public float getEstimatedDistance() {
+		float xDistance = (velocity.x * duration) + (0.5f * acceleration.x * duration * duration);
+		float yDistance = (velocity.y * duration) + (0.5f * acceleration.y * duration * duration);
+		
+		return (float) Math.sqrt(((xDistance * xDistance) + (yDistance * yDistance)));
+	}
 }

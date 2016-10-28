@@ -33,4 +33,5 @@ public abstract class ActionSegment {
 	public abstract float getDelayToActivate();
 	public abstract ActionSegment cloneActionSegment();
 	public abstract boolean isFinished();
+	public abstract float getEffectiveRange();
 }

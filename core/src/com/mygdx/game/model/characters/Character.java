@@ -46,18 +46,20 @@ public abstract class Character {
 
 	public abstract class CharacterModel {
 		
-		private final String idleState = "Idle";
+		public final String idleState = "Idle";
+		public final String walkState = "Walk";
+		public final String backWalkState = "Backwalk";
 		
 		String state;
 		int currentHealth, maxHealth, currentWill, maxWill, attack;
 		boolean isImmuneToInjury, attacking;
 		protected boolean jumping;
+		boolean didChangeState;
 		boolean staggering;
 		boolean facingLeft;
+	    public float injuryTime = 0f;
 		String name, uuid; 
 		
-		float gravity = 120f; 
-		float jumpSpeed = 120f; 
 		public float gameplayHitBoxWidthModifier;
 		public float gameplayHitBoxHeightModifier;
 		ActionListener actionListener;
@@ -120,13 +122,29 @@ public abstract class Character {
 				System.out.println(velocity);
 			}
 			//clamp velocity
-			if (this.getVelocity().y > this.jumpSpeed)
-				this.getVelocity().y = this.jumpSpeed;
-			else if (this.getVelocity().y < -this.jumpSpeed)
-				this.getVelocity().y = -this.jumpSpeed;
+			if (this.getVelocity().y > this.properties.jumpSpeed)
+				this.getVelocity().y = this.properties.jumpSpeed;
+			else if (this.getVelocity().y < -this.properties.jumpSpeed)
+				this.getVelocity().y = -this.properties.jumpSpeed;
 				
-//			}
-
+		}
+		
+		protected void manageAutomaticStates(float delta, TiledMapTileLayer collisionLayer) {
+			if (this.didChangeState) {
+				this.getUiModel().setAnimationTime(0f);
+				this.didChangeState = false; 
+			}
+			if (this.isImmuneToInjury()) {
+				injuryTime += delta;
+			}
+			
+			if (this.injuryTime > this.properties.getInjuryImmunityTime()) {
+				this.setImmuneToInjury(false);
+			}
+			
+			if (jumping) {
+				setState(velocity.y >= 0 ? idleState : idleState); //Jump : Fall
+			}
 		}
 		
 		private void handleActionSequences(float delta) {
@@ -184,6 +202,33 @@ public abstract class Character {
 				}
 			}
 			return null;
+		}
+		
+		public void jump() {
+	        if (!jumping) {
+	            jumping = true;
+	            this.getVelocity().y = getJumpSpeed();
+	        }
+	    }
+		
+	    public void stopJump() {
+	    	if (jumping && this.getVelocity().y >= 0) {
+	    		this.getVelocity().y = 0;
+	    	}
+	    }
+	    
+		public void walk(boolean left) {
+			this.setFacingLeft(left);
+			this.velocity.x = left ? -this.properties.getWalkingSpeed() : this.properties.getWalkingSpeed();
+			setState(left ? this.backWalkState : this.walkState); //Walk
+		}
+		
+		public float getJumpSpeed() {
+			return this.properties.jumpSpeed;
+		}
+		
+		public float getWalkSpeed() {
+			return this.properties.walkingSpeed;
 		}
 
 		
@@ -470,9 +515,18 @@ public abstract class Character {
 			return time;
 		}
 		
-		protected abstract void manageAutomaticStates(float delta, TiledMapTileLayer collisionLayer);
-		
-		protected abstract void landed(); 
+	    public void landed() {
+	    	if (this.jumping) {
+				this.jumping = false;
+				if (this.getVelocity().x > 0)
+				{
+					setState(walkState);  
+				}
+				else if (this.getVelocity().x < 0) {
+					setState(backWalkState);
+				}
+	    	}
+	    }
 		
 		public abstract int getAllegiance();
 		
@@ -565,6 +619,7 @@ public abstract class Character {
 
 		public void setState(String state) {
 			this.state = state;
+			this.didChangeState = true;
 		}
 
 		public int getCurrentHealth() {
@@ -639,6 +694,7 @@ public abstract class Character {
 
 		public void setImmuneToInjury(boolean isImmuneToInjury) {
 			this.isImmuneToInjury = isImmuneToInjury;
+			injuryTime = 0f;
 		}
 
 		public boolean isAttacking() {
@@ -671,22 +727,6 @@ public abstract class Character {
 
 		public void setFacingLeft(boolean facingLeft) {
 			this.facingLeft = facingLeft;
-		}
-
-		public float getJumpSpeed() {
-			return jumpSpeed;
-		}
-
-		public void setJumpSpeed(float jumpSpeed) {
-			this.jumpSpeed = jumpSpeed;
-		}
-
-		public float getGravity() {
-			return gravity;
-		}
-
-		public void setGravity(float gravity) {
-			this.gravity = gravity;
 		}
 
 		public EntityUIModel getUiModel() {

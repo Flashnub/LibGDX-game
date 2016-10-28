@@ -265,6 +265,13 @@ public class Projectile {
 		return;
 	}
 	
+	public float getEffectiveRange() {
+		if (this.settings.getProjectileDuration() == null) {
+			return 10f;
+		}
+		return this.settings.getProjectileDuration() * this.projectileSpeed();
+	}
+	
 	protected float projectileSpeed() {
 		return this.settings.getSpeed();
 	}

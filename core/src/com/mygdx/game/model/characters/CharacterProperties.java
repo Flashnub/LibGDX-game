@@ -14,6 +14,10 @@ public class CharacterProperties implements Serializable {
 	float maxWill;
 	float attack;
 	float maxStability;
+	Float gravity;
+	Float walkingSpeed;
+	Float jumpSpeed;
+	Float injuryImmunityTime;
 	HashMap<String, ActionSequence> actions;
 	
 	public CharacterProperties() {
@@ -27,6 +31,10 @@ public class CharacterProperties implements Serializable {
 		json.writeValue("maxWill", maxWill);
 		json.writeValue("attack", attack);
 		json.writeValue("actions", actions);
+		json.writeValue("walkingSpeed", walkingSpeed);
+		json.writeValue("jumpSpeed", jumpSpeed);
+		json.writeValue("gravity", gravity);
+		json.writeValue("injuryImmunityTime", injuryImmunityTime);
 	}
 
 	@Override
@@ -37,6 +45,38 @@ public class CharacterProperties implements Serializable {
 		attack = json.readValue("attack", Float.class, jsonData);
 		maxStability = json.readValue("maxStability", Float.class, jsonData);
 		actions = json.readValue("actions", HashMap.class, jsonData);
+		
+		Float walkingSpeed = json.readValue("walkingSpeed", Float.class, jsonData);
+		if (walkingSpeed != null) {
+			this.walkingSpeed = walkingSpeed;
+		}
+		else {
+			this.walkingSpeed = 200f;
+		}
+		
+		Float jumpSpeed = json.readValue("jumpSpeed", Float.class, jsonData);
+		if (jumpSpeed != null) {
+			this.jumpSpeed = walkingSpeed;
+		}
+		else {
+			this.jumpSpeed = 120f;
+		}
+		
+		Float gravity = json.readValue("gravity", Float.class, jsonData);
+		if (gravity != null) {
+			this.gravity = gravity;
+		}
+		else {
+			this.gravity = 980f;
+		}
+		
+		Float injuryImmunityTime = json.readValue("injuryImmunityTime", Float.class, jsonData);
+		if (injuryImmunityTime != null) {
+			this.injuryImmunityTime = injuryImmunityTime;
+		}
+		else {
+			this.injuryImmunityTime = 2f;
+		}
 	}
 	
 	public CharacterProperties cloneProperties() {
@@ -45,6 +85,8 @@ public class CharacterProperties implements Serializable {
 		properties.maxWill = this.maxWill;
 		properties.maxStability = this.maxStability;
 		properties.attack = this.attack;
+		properties.walkingSpeed = this.walkingSpeed;
+		properties.jumpSpeed = this.jumpSpeed;
 		//iterate through actions.
 		HashMap <String, ActionSequence> clonedActions = new HashMap<String, ActionSequence> ();
 		Iterator<Map.Entry<String, ActionSequence>> iterator = actions.entrySet().iterator();
@@ -53,6 +95,22 @@ public class CharacterProperties implements Serializable {
 			clonedActions.put(pair.getKey(), pair.getValue().cloneSequence());
 		}
 		return properties;
+	}
+
+	public Float getInjuryImmunityTime() {
+		return injuryImmunityTime;
+	}
+
+	public Float getGravity() {
+		return gravity;
+	}
+
+	public Float getWalkingSpeed() {
+		return walkingSpeed;
+	}
+
+	public Float getJumpSpeed() {
+		return jumpSpeed;
 	}
 
 	public float getMaxStability() {

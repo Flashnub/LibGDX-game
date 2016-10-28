@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.Effect;
 import com.mygdx.game.model.effects.EffectSettings;
+import com.mygdx.game.model.effects.MovementEffectSettings;
 import com.mygdx.game.model.effects.EffectInitializer;
 import com.mygdx.game.model.events.ActionListener;
 
@@ -50,6 +51,16 @@ public class Attack extends ActionSegment {
 		}
 	}
 	
+	@Override
+	public float getEffectiveRange() {
+		float range = 0f;
+		for (EffectSettings effectSettings : this.settings.sourceEffectSettings) {
+			if (effectSettings instanceof MovementEffectSettings) {
+				MovementEffectSettings mEffectSettings = (MovementEffectSettings) effectSettings;
+			}
+		}
+		return range;
+	}
 
 	@Override
 	public float getDelayToActivate() {
@@ -61,6 +72,9 @@ public class Attack extends ActionSegment {
 		return currentTime > this.settings.delayToActivate + this.settings.duration;
 	}
 	
+	public Rectangle getAttackHitBox() {
+		return new Rectangle(settings.originX, settings.originY, settings.width, settings.height);
+	}
 	
 	public Attack() {
 		
@@ -89,6 +103,8 @@ public class Attack extends ActionSegment {
 	public void setAllegiance(int allegiance) {
 		this.allegiance = allegiance;
 	}
+
+
 
 
 

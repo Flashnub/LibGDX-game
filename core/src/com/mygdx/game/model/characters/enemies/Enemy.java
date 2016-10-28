@@ -76,15 +76,6 @@ public class Enemy extends InteractableCharacter{
 		}
 
 
-
-		@Override
-		protected void landed() {
-			// TODO Auto-generated method stub
-			
-		}
-
-
-
 		@Override
 		public int getAllegiance() {
 			// TODO Auto-generated method stub

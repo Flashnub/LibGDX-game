@@ -1,8 +1,10 @@
 package com.mygdx.game.model.characters.enemies;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.characters.CharacterProperties;
 import com.mygdx.game.model.characters.enemies.Enemy.EnemyModel;
@@ -15,6 +17,8 @@ public abstract class EnemyAI implements PlayerObserver {
 	float stateTime;
 	EnemyModel source;
 	ArrayList <ObservationBlock> observationBlocks;
+	ArrayList <ActionSequence> possibleActionsToTake;
+	ArrayDeque <ActionSequence> nextActionSequences;
 	CharacterProperties properties;
 	CharacterModel currentTarget;
 	
@@ -22,14 +26,41 @@ public abstract class EnemyAI implements PlayerObserver {
 		this.properties = properties;
 	}
 	
-	protected abstract void adaptIfNeeded(float delta);
-	protected abstract void executePattern(float delta);
-	
-	public void handleObservation(Observation observation) {
+	public void process(WorldModel world, float delta) {
 //		observationBlocks.add(observation);
+		this.pollWorldForObservations(world);
 	}
 	
-	public void pollWorldForObservations(WorldModel world) {
+	public abstract void setNextActionSequences();
+	
+	
+	public void figureOutPossibleMoves(float delta) {
+		ArrayList <ActionSequence> possibleActionsToTake = new ArrayList <ActionSequence>();
+		DistanceObservation distanceObservation = null;
+		for (ObservationBlock observationBlock : this.observationBlocks) {
+			//find closest enemy and shoot.
+			DistanceObservation currentObservation = (DistanceObservation) observationBlock.observations.get(DistanceObservation.classKey);
+			if (distanceObservation == null || (distanceObservation != null && currentObservation.isCloserThanOtherObservation(distanceObservation))) {
+				distanceObservation = currentObservation;
+			}
+		}
+		if (distanceObservation != null) {
+			float rawDistance = distanceObservation.getHypotenuse();
+			//shoot if far, attack if close.
+			
+			for (ActionSequence actionSequence : this.properties.getActions().values()) {
+				if (actionSequence.getEffectiveRange() >= rawDistance) {
+					possibleActionsToTake.add(actionSequence);
+				}
+			}
+		}
+	}
+	
+	public float AILoopRate() {
+		return 0.2f;
+	}
+	
+	protected void pollWorldForObservations(WorldModel world) {
 		observationBlocks.clear();
 		Array <Enemy> enemies = world.getEnemies();
 		Player player = world.getPlayer();
@@ -40,7 +71,7 @@ public abstract class EnemyAI implements PlayerObserver {
 		this.observationBlocks.add(this.createObservationBlockFromCharacter(player.getCharacterData()));
 	}
 	
-	private ObservationBlock createObservationBlockFromCharacter(CharacterModel characterModel) {
+	protected ObservationBlock createObservationBlockFromCharacter(CharacterModel characterModel) {
 		ObservationBlock observationBlock = new ObservationBlock(characterModel);
 		if (characterModel.getAllegiance() != source.getAllegiance()) {
 			//Get Distance.

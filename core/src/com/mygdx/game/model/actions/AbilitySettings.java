@@ -10,7 +10,7 @@ import com.mygdx.game.model.effects.EffectSettings;
 public class AbilitySettings implements Serializable {
 	ArrayList<EffectSettings> sourceEffectSettings;
 	float delayToActivate;
-	float duration;
+	Float duration;
     public boolean isConcurrent;
 	
 	@Override
@@ -52,7 +52,7 @@ public class AbilitySettings implements Serializable {
 		return delayToActivate;
 	}
 
-	public float getDuration() {
+	public Float getDuration() {
 		return duration;
 	}
 	

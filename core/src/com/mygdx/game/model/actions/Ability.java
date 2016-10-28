@@ -53,6 +53,11 @@ public class Ability extends ActionSegment{
 		return this.settings.delayToActivate;
 	}
 
+	@Override
+	public float getEffectiveRange() {
+		return Float.MAX_VALUE;
+	}
+
 
 
 

@@ -1,7 +1,7 @@
 package com.mygdx.game.model.characters.enemies;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Random;
 
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.actions.ActionSequence;
@@ -14,27 +14,55 @@ import com.mygdx.game.model.world.WorldModel;
 
 public abstract class EnemyAI implements PlayerObserver {
 	
-	float stateTime;
+	float currentTime;
 	EnemyModel source;
 	ArrayList <ObservationBlock> observationBlocks;
 	ArrayList <ActionSequence> possibleActionsToTake;
-	ArrayDeque <ActionSequence> nextActionSequences;
+	ArrayList <ActionSequence> nextActionSequences;
 	CharacterProperties properties;
-	CharacterModel currentTarget;
+	public Random rand;
+	float currentLoopRate;
+	WorldModel world;
 	
-	public EnemyAI(CharacterProperties properties, EnemyModel source) {
+	public EnemyAI(CharacterProperties properties, EnemyModel source, WorldModel world) {
 		this.properties = properties;
+		this.source = source;
+		rand = new Random();
+		currentLoopRate = this.AILoopRate();
+		currentTime = 0f; 
+		this.world = world;
+		this.observationBlocks = new ArrayList <ObservationBlock> ();
+		this.possibleActionsToTake = new ArrayList <ActionSequence> ();
+		this.nextActionSequences = new ArrayList <ActionSequence> ();
 	}
 	
-	public void process(WorldModel world, float delta) {
+	public void process(float delta) {
 //		observationBlocks.add(observation);
-		this.pollWorldForObservations(world);
+		currentTime += delta;
+		if (currentTime > currentLoopRate) {
+			this.clearAll();
+			this.currentTime = 0;
+			this.currentLoopRate = this.AILoopRate();
+			this.pollWorldForObservations();
+			this.setNextActionSequences(this.figureOutPossibleMoves());
+			if (nextActionSequences.size() > 0) {
+				for (ActionSequence sequence : nextActionSequences) {
+					source.addActionSequence(sequence);
+				}
+			}
+		}
 	}
 	
-	public abstract void setNextActionSequences();
+	private void clearAll() {
+		this.possibleActionsToTake.clear();
+		this.nextActionSequences.clear();
+		this.observationBlocks.clear();
+	}
+	
+	public abstract void setNextActionSequences(ArrayList <ActionSequence> possibleActionSequences);
 	
 	
-	public void figureOutPossibleMoves(float delta) {
+	public ArrayList <ActionSequence> figureOutPossibleMoves() {
 		ArrayList <ActionSequence> possibleActionsToTake = new ArrayList <ActionSequence>();
 		DistanceObservation distanceObservation = null;
 		for (ObservationBlock observationBlock : this.observationBlocks) {
@@ -49,18 +77,24 @@ public abstract class EnemyAI implements PlayerObserver {
 			//shoot if far, attack if close.
 			
 			for (ActionSequence actionSequence : this.properties.getActions().values()) {
-				if (actionSequence.getEffectiveRange() >= rawDistance) {
-					possibleActionsToTake.add(actionSequence);
+				ActionSequence clonedSequence = actionSequence.cloneSequenceWithSourceAndTarget(this.source, distanceObservation.sourceOfObservation);
+				if (clonedSequence.getEffectiveRange() >= rawDistance) {
+					possibleActionsToTake.add(clonedSequence);
 				}
 			}
 		}
+		return possibleActionsToTake;
 	}
 	
 	public float AILoopRate() {
-		return 0.2f;
+		float loopRate = rand.nextFloat();
+		while (loopRate <= 0.5f) {
+			loopRate = rand.nextFloat();
+		}
+		return loopRate;
 	}
 	
-	protected void pollWorldForObservations(WorldModel world) {
+	protected void pollWorldForObservations() {
 		observationBlocks.clear();
 		Array <Enemy> enemies = world.getEnemies();
 		Player player = world.getPlayer();
@@ -82,7 +116,7 @@ public abstract class EnemyAI implements PlayerObserver {
 			distanceObservation.isBelowTarget = distanceObservation.yDelta <= 0;
 			observationBlock.addObservation(distanceObservation);
 			
-			//Others.
+			//Others.  
 			
 		}
 		return observationBlock;

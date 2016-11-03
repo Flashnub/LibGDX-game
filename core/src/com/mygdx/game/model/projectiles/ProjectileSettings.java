@@ -21,6 +21,7 @@ public class ProjectileSettings extends AbilitySettings{
 	private Float gravity;
 	private Vector2 size;
 	private ArrayList<Vector2> possibleOrigins;
+	private Float angleOfVelocity; //use this to fire projectile in a direction rather than at a target.
 	private Float projectileDuration;
 
 	
@@ -41,6 +42,7 @@ public class ProjectileSettings extends AbilitySettings{
 		json.writeValue("size", size);
 		json.writeValue("possibleOrigins", possibleOrigins);
 		json.writeValue("projectileDuration", projectileDuration);
+		json.writeValue("angleOfVelocity", angleOfVelocity);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -55,8 +57,16 @@ public class ProjectileSettings extends AbilitySettings{
 		name = json.readValue("name", String.class, jsonData);
 		speed = json.readValue("speed", Float.class, jsonData);
 		gravity = json.readValue("gravity", Float.class, jsonData);
+		angleOfVelocity = json.readValue("angleOfVelocity", Float.class, jsonData);
 		size = json.readValue("size", Vector2.class, jsonData);
-		possibleOrigins = json.readValue("possibleOrigins", ArrayList.class, jsonData);
+		ArrayList <Vector2> possibleOrigins = json.readValue("possibleOrigins", ArrayList.class, jsonData);
+		if (possibleOrigins != null) {
+			this.possibleOrigins = possibleOrigins;
+		}
+		else {
+			this.possibleOrigins = new ArrayList<Vector2>();
+			this.possibleOrigins.add(new Vector2(0, 0));
+		}
 		Float projectileDuration = json.readValue("projectileDuration", Float.class, jsonData);
 		if (projectileDuration != null) {
 			this.projectileDuration = projectileDuration;
@@ -113,6 +123,9 @@ public class ProjectileSettings extends AbilitySettings{
 	public ArrayList<Vector2> getPossibleOrigins() {
 		return possibleOrigins;
 	}
-	
+
+	public Float getAngleOfVelocity() {
+		return angleOfVelocity;
+	}
 	
 }

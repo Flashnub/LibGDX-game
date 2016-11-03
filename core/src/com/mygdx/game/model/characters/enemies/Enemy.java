@@ -7,6 +7,7 @@ import com.mygdx.game.model.characters.EntityUIModel;
 import com.mygdx.game.model.characters.InteractableCharacter;
 import com.mygdx.game.model.characters.player.Player;
 import com.mygdx.game.model.characters.player.PlayerProperties;
+import com.mygdx.game.model.world.WorldModel;
 
 public class Enemy extends InteractableCharacter{
 	
@@ -18,8 +19,9 @@ public class Enemy extends InteractableCharacter{
 	//The states will be determined by collected player data.
 	public static final String characterType = "Enemy";
 	
-	public Enemy(String characterName) {
+	public Enemy(String characterName, WorldModel world) {
 		super(characterName);
+		this.setCharacterData(new EnemyModel(characterName, this.getCharacterUIData(), world));
 	}
 	
 	public interface PlayerObserver {
@@ -35,13 +37,13 @@ public class Enemy extends InteractableCharacter{
 		EnemyAI enemyAI;
 		EnemyProperties enemyProperties;
 
-		public EnemyModel(String characterName, EntityUIModel uiModel) {
+		public EnemyModel(String characterName, EntityUIModel uiModel, WorldModel world) {
 			super(characterName, uiModel);
 			this.pollTime = 0f;
 			this.pollCount = 0;
 			Json json = new Json();
-			enemyProperties = json.fromJson(EnemyProperties.class, Gdx.files.internal("Json/" + characterName + "/playerActions.json"));
-
+			enemyProperties = json.fromJson(EnemyProperties.class, Gdx.files.internal("Json/" + characterName + "/enemyProperties.json"));
+			enemyAI = EnemyAIInitializer.initializeAIWithKey(enemyProperties.enemyAIKey, this.getCharacterProperties(), this, world);
 		}
 		
 
@@ -49,6 +51,7 @@ public class Enemy extends InteractableCharacter{
 		@Override
 		public void update(float delta, TiledMapTileLayer collisionLayer) {
 			super.update(delta, collisionLayer);
+			enemyAI.process(delta);
 		}
 		
 		
@@ -75,11 +78,13 @@ public class Enemy extends InteractableCharacter{
 			// TODO Auto-generated method stub
 		}
 
-
 		@Override
 		public int getAllegiance() {
-			// TODO Auto-generated method stub
-			return 0;
+			Integer allegiance = this.getCharacterProperties().getAllegiance();
+			if (allegiance == null) {
+				allegiance = 1;
+			}
+			return allegiance;
 		}
 
 		

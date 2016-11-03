@@ -31,7 +31,15 @@ public class EffectSettings implements Serializable {
 		}
 		else {
 			isInstantaneous = false;
-			duration = json.readValue("duration", Float.class, jsonData);
+			
+			Float duration = json.readValue("duration", Float.class, jsonData);
+			if (duration != null) {
+				this.duration = duration;
+			}
+			else {
+				this.duration = 0.5f;
+			}
+			
 			Float delayToActivate = json.readValue("delayToActivate", Float.class, jsonData);
 			if (delayToActivate != null) {
 				this.delayToActivate = delayToActivate;

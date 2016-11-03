@@ -5,33 +5,19 @@
 	"maxStability": 5,
 	"attack": 1,
 	actions: {
-		"PlayerDash": {
+		"BasicProjectileAttack": {
 			"class": com.mygdx.game.model.actions.ActionSequence,
 			"actionKey": {
 				"class": com.mygdx.game.model.actions.ActionSegmentKey,
 				"key": {
 					"class": com.mygdx.game.wrappers.StringWrapper,
-					"value": "PlayerDash"
+					"value": "BasicProjectileAttack"
 				},
-				"typeOfAction": Ability
+				"typeOfAction": ProjectileAttack
 			}
 			"windUpState": "Idle"
 			"actingState": "Idle"
 			"cooldownState": "Idle"
 		},
-		"PlayerAttack": {
-			"class": com.mygdx.game.model.actions.ActionSequence,
-			"actionKey": {
-				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": {
-					"class": com.mygdx.game.wrappers.StringWrapper,
-					"value": "PlayerAttack"
-				},
-				"typeOfAction": Attack
-			}
-			"windUpState": "Idle"
-			"actingState": "Idle"
-			"cooldownState": "Idle"
-		}
 	}
 }

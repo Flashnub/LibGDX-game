@@ -22,6 +22,7 @@
   </tile>
   <tile id="1">
    <properties>
+    <property name="EntityType" value="Player"/>
     <property name="Impassable" type="bool" value="false"/>
     <property name="SpawnPoint" value="Player"/>
    </properties>
@@ -33,7 +34,9 @@
   </tile>
   <tile id="5">
    <properties>
+    <property name="EntityType" value="Enemy"/>
     <property name="Impassable" type="bool" value="false"/>
+    <property name="SpawnPoint" value="BasicEnemy"/>
    </properties>
   </tile>
  </tileset>

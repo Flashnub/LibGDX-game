@@ -1,12 +1,12 @@
 package com.mygdx.game.model.characters;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Json.Serializable;
 import com.mygdx.game.model.actions.ActionSequence;
+import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.badlogic.gdx.utils.JsonValue;
 
 public class CharacterProperties implements Serializable {
@@ -18,6 +18,8 @@ public class CharacterProperties implements Serializable {
 	Float walkingSpeed;
 	Float jumpSpeed;
 	Float injuryImmunityTime;
+	Integer allegiance;
+	CharacterModel source;
 	HashMap<String, ActionSequence> actions;
 	
 	public CharacterProperties() {
@@ -35,6 +37,7 @@ public class CharacterProperties implements Serializable {
 		json.writeValue("jumpSpeed", jumpSpeed);
 		json.writeValue("gravity", gravity);
 		json.writeValue("injuryImmunityTime", injuryImmunityTime);
+		json.writeValue("allegiance", allegiance);
 	}
 
 	@Override
@@ -59,7 +62,7 @@ public class CharacterProperties implements Serializable {
 			this.jumpSpeed = walkingSpeed;
 		}
 		else {
-			this.jumpSpeed = 120f;
+			this.jumpSpeed = 500f;
 		}
 		
 		Float gravity = json.readValue("gravity", Float.class, jsonData);
@@ -77,6 +80,12 @@ public class CharacterProperties implements Serializable {
 		else {
 			this.injuryImmunityTime = 2f;
 		}
+		
+		Integer allegiance = json.readValue("allegiance", Integer.class, jsonData); 
+		if (allegiance != null) {
+			this.allegiance = allegiance;
+		}
+		
 	}
 	
 	public CharacterProperties cloneProperties() {
@@ -87,14 +96,29 @@ public class CharacterProperties implements Serializable {
 		properties.attack = this.attack;
 		properties.walkingSpeed = this.walkingSpeed;
 		properties.jumpSpeed = this.jumpSpeed;
+		properties.allegiance = this.allegiance;
+		properties.gravity = this.gravity;
+		properties.injuryImmunityTime = this.injuryImmunityTime;
 		//iterate through actions.
 		HashMap <String, ActionSequence> clonedActions = new HashMap<String, ActionSequence> ();
-		Iterator<Map.Entry<String, ActionSequence>> iterator = actions.entrySet().iterator();
-		while (iterator.hasNext()) {
-			Map.Entry<String, ActionSequence> pair = (Map.Entry<String, ActionSequence>) iterator.next();
-			clonedActions.put(pair.getKey(), pair.getValue().cloneSequence());
+		for (Map.Entry<String, ActionSequence> entry : actions.entrySet()) {
+			clonedActions.put(entry.getKey(), entry.getValue().cloneBareSequence());
 		}
+		properties.setActions(clonedActions);
+		properties.setSource(this.source);
+//		Iterator<Map.Entry<String, ActionSequence>> iterator = actions.entrySet().iterator();
+//		while (iterator.hasNext()) {
+//			Map.Entry<String, ActionSequence> pair = (Map.Entry<String, ActionSequence>) iterator.next();
+//			clonedActions.put(pair.getKey(), pair.getValue().cloneSequence());
+//		}
 		return properties;
+	}
+	
+	public void setSource (CharacterModel source) {
+		this.source = source;
+		for (ActionSequence action : actions.values()) {
+			action.setSource(source);
+		}
 	}
 
 	public Float getInjuryImmunityTime() {
@@ -148,7 +172,8 @@ public class CharacterProperties implements Serializable {
 	public void setActions(HashMap<String, ActionSequence> actions) {
 		this.actions = actions;
 	}
-	
-	
-	
+
+	public Integer getAllegiance() {
+		return allegiance;
+	}
 }

@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.characters.EntityUIModel;
 import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.characters.EntityUIDataType;
 import com.mygdx.game.model.effects.Effect;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.utils.MathUtils;
@@ -39,12 +40,12 @@ public class Projectile {
 	private CharacterModel target;
 	private ProjectileSettings settings;
 	
-	public Projectile(String name, CharacterModel target, CharacterModel source, ActionListener actionListener)
+	public Projectile(String name, CharacterModel source, CharacterModel target, ActionListener actionListener)
 	{
 		this.settings = JSONController.projectiles.get(name);
-		this.bounds.x = source.getImageHitBox().x + settings.getPossibleOrigins().get(0).x;
-		this.bounds.y = source.getImageHitBox().y + settings.getPossibleOrigins().get(0).x;
-		this.projectileUIModel = new EntityUIModel(name);
+		this.bounds.x = source.getImageHitBox().x + (source.getImageHitBox().width / 2f) + settings.getPossibleOrigins().get(0).x;
+		this.bounds.y = source.getImageHitBox().y + (source.getImageHitBox().height / 2f) + settings.getPossibleOrigins().get(0).x;
+		this.projectileUIModel = new EntityUIModel(name, EntityUIDataType.PROJECTILE);
 		this.projectileState = this.activeState;
 		this.actionListener = actionListener;
 		this.target = target;
@@ -79,10 +80,10 @@ public class Projectile {
 	//Taken from http://stackoverflow.com/questions/2248876/2d-game-fire-at-a-moving-target-by-predicting-intersection-of-projectile-and-u
 	//Use this for linear traveling projectiles with a reasonably fast projectile speed. 
 	//This shouldn't be used for slow moving or pattern-based projectiles 
-	public Vector2 findInterceptPointWith(CharacterModel character, TiledMapTileLayer collisionLayer) {
-		Vector2 targetPosition = new Vector2(character.getGameplayHitBox().x + character.getGameplayHitBox().width / 2, character.getGameplayHitBox().y + character.getGameplayHitBox().height / 2); 
-		Vector2 targetVelocity = new Vector2(character.getVelocity().x, character.getVelocity().y);
-		Vector2 targetAcceleration = character.getAcceleration();
+	public Vector2 findInterceptPointWith(CharacterModel target, TiledMapTileLayer collisionLayer) {
+		Vector2 targetPosition = new Vector2(target.getGameplayHitBox().x + target.getGameplayHitBox().width / 2, target.getGameplayHitBox().y + target.getGameplayHitBox().height / 2); 
+		Vector2 targetVelocity = new Vector2(target.getVelocity().x, target.getVelocity().y);
+		Vector2 targetAcceleration = target.getAcceleration();
 		
 		Vector2 projectilePosition = new Vector2(bounds.x + (bounds.width / 2), bounds.y + (bounds.height / 2));
 		
@@ -108,13 +109,13 @@ public class Projectile {
 			}
 			if (t > 0) {
 				//YPosition should never be negative.
-				float xTimeTillCollision = character.howLongTillXCollision(t, collisionLayer);
+				float xTimeTillCollision = target.howLongTillXCollision(t, collisionLayer);
 				float xTimeTillAccelStops = Float.MAX_VALUE;
-				if (character.getCurrentMovement() != null) {
-					xTimeTillAccelStops = character.getCurrentMovement().remainingDuration();
+				if (target.getCurrentMovement() != null) {
+					xTimeTillAccelStops = target.getCurrentMovement().remainingDuration();
 				}
 				float xTime = Math.min(xTimeTillCollision, xTimeTillAccelStops);
-				float yTimeTillCollision = character.howLongTillYCollision(t, collisionLayer);
+				float yTimeTillCollision = target.howLongTillYCollision(t, collisionLayer);
 				solution = new Vector2((targetPosition.x) +  ((targetVelocityX * xTime) + (.5f * targetAcceleration.x * xTime * xTime)),
 										(targetPosition.y) + ((targetVelocityY * yTimeTillCollision) + (.5f * targetAcceleration.y * yTimeTillCollision * yTimeTillCollision)));
 			}
@@ -126,22 +127,32 @@ public class Projectile {
 		return solution;
 	}
 	
-	public void determineAndSetVelocity(CharacterModel character, TiledMapTileLayer collisionLayer) {
-		Vector2 expectedPositionOfTarget;
-		if (this.settings.isUseSmartAim() && !this.settings.isTracks()) {
-			expectedPositionOfTarget = this.findInterceptPointWith(character, collisionLayer);
+	public void determineAndSetVelocity(CharacterModel target, TiledMapTileLayer collisionLayer) {
+		if (this.settings.getAngleOfVelocity() != null) {
+			float xVelocity = (float) (this.projectileSpeed() * Math.cos(this.settings.getAngleOfVelocity()));
+			float yVelocity = (float) (this.projectileSpeed() * Math.sin(this.settings.getAngleOfVelocity()));
+			
+			this.velocity.x = xVelocity;
+			this.velocity.y = yVelocity;
 		}
 		else {
-			expectedPositionOfTarget = new Vector2(character.getGameplayHitBox().x + character.getGameplayHitBox().width / 2, character.getGameplayHitBox().y + character.getGameplayHitBox().height / 2);
+			Vector2 expectedPositionOfTarget;
+
+			if (this.settings.isUseSmartAim() && !this.settings.isTracks()) {
+				expectedPositionOfTarget = this.findInterceptPointWith(target, collisionLayer);
+			}
+			else {
+				expectedPositionOfTarget = new Vector2(target.getGameplayHitBox().x + target.getGameplayHitBox().width / 2, target.getGameplayHitBox().y + target.getGameplayHitBox().height / 2);
+			}
+			Vector2 projectilePosition = new Vector2(bounds.x + (bounds.width / 2), bounds.y + (bounds.height / 2));
+			float xDelta = (expectedPositionOfTarget.x - projectilePosition.x);
+			float yDelta = (expectedPositionOfTarget.y - projectilePosition.y);
+			float fullDelta = (float) Math.sqrt((xDelta * xDelta) + (yDelta * yDelta));
+			
+			float time = yDelta / ((yDelta / fullDelta) * this.projectileSpeed());
+			this.velocity.x = (xDelta / fullDelta) * this.projectileSpeed();
+			this.velocity.y = ((yDelta / fullDelta) * this.projectileSpeed()) + (.5f * this.settings.getGravity() * time);
 		}
-		Vector2 projectilePosition = new Vector2(bounds.x + (bounds.width / 2), bounds.y + (bounds.height / 2));
-		float xDelta = (expectedPositionOfTarget.x - projectilePosition.x);
-		float yDelta = (expectedPositionOfTarget.y - projectilePosition.y);
-		float fullDelta = (float) Math.sqrt((xDelta * xDelta) + (yDelta * yDelta));
-		
-		float time = yDelta / ((yDelta / fullDelta) * this.projectileSpeed());
-		this.velocity.x = (xDelta / fullDelta) * this.projectileSpeed();
-		this.velocity.y = ((yDelta / fullDelta) * this.projectileSpeed()) + (.5f * this.settings.getGravity() * time);
 	}
 	
 	protected void movementWithCollisionDetection(float delta, TiledMapTileLayer collisionLayer) {

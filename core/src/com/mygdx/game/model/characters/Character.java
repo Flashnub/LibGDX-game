@@ -5,14 +5,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.UUID;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Json;
+import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.Attack;
+import com.mygdx.game.model.characters.player.Player.PlayerModel;
 import com.mygdx.game.model.effects.Effect;
 import com.mygdx.game.model.effects.MovementEffect;
 import com.mygdx.game.model.events.ActionListener;
@@ -26,7 +26,7 @@ public abstract class Character {
 	
 	
 	public Character(String characterName) {
-		setCharacterUIData(new EntityUIModel(characterName));
+		setCharacterUIData(new EntityUIModel(characterName, EntityUIDataType.CHARACTER));
 	}
 	
 
@@ -51,7 +51,7 @@ public abstract class Character {
 		public final String backWalkState = "Backwalk";
 		
 		String state;
-		int currentHealth, maxHealth, currentWill, maxWill, attack;
+		float currentHealth, maxHealth, currentWill, maxWill, attack;
 		boolean isImmuneToInjury, attacking;
 		protected boolean jumping;
 		boolean didChangeState;
@@ -72,10 +72,14 @@ public abstract class Character {
 		EntityUIModel uiModel;
 		CharacterProperties properties;
 		ArrayList <Effect> currentEffects;
+		ArrayList <Integer> indicesToRemove;
 		ActionSequence currentActionSequence;
 		ArrayDeque <ActionSequence> actionSequences;
 		
 		public CharacterModel(String characterName, EntityUIModel uiModel) {
+			this.currentEffects = new ArrayList <Effect>();
+			this.indicesToRemove = new ArrayList<Integer>();
+			this.actionSequences = new ArrayDeque<ActionSequence>();
 			velocity = new Vector2();
 			acceleration = new Vector2();
 			gameplayHitBox = new Rectangle();
@@ -88,18 +92,20 @@ public abstract class Character {
 			jumping = true;
 			facingLeft = false;
 //			isProcessingMovementEffect = false;
-			setMaxHealth(maxHealth);
-			setMaxWill(maxWill);
-			setAttack(attack);
+
 			UUID id = UUID.randomUUID();
 			this.uuid = id.toString();
 			this.gameplayHitBoxWidthModifier = 0.19f;
 			this.gameplayHitBoxHeightModifier = 0.6f;
 			this.uiModel = uiModel;
-			Json json = new Json();
-			this.properties = json.fromJson(CharacterProperties.class, Gdx.files.internal("Json/" + characterName + "/properties.json"));
-			this.currentEffects = new ArrayList <Effect>();
-			this.actionSequences = new ArrayDeque<ActionSequence>();
+			this.properties = JSONController.loadCharacterProperties(characterName);
+			this.properties.setSource(this);
+			setMaxHealth(properties.getMaxHealth());
+			setCurrentHealth(properties.getMaxHealth());
+			setMaxWill(properties.getMaxWill());
+			setCurrentWill(properties.getMaxWill());
+			setAttack(properties.getAttack());
+			acceleration.y = -properties.getGravity();
 		}
 		
 		public void update(float delta, TiledMapTileLayer collisionLayer) {
@@ -124,8 +130,8 @@ public abstract class Character {
 			//clamp velocity
 			if (this.getVelocity().y > this.properties.jumpSpeed)
 				this.getVelocity().y = this.properties.jumpSpeed;
-			else if (this.getVelocity().y < -this.properties.jumpSpeed)
-				this.getVelocity().y = -this.properties.jumpSpeed;
+//			else if (this.getVelocity().y < -this.properties.jumpSpeed)
+//				this.getVelocity().y = -this.properties.jumpSpeed;
 				
 		}
 		
@@ -162,16 +168,28 @@ public abstract class Character {
 		
 		
 		public void addActionSequence (ActionSequence sequence) {
-			sequence.setSource(this);
+//			sequence.setSource(this);
 			actionSequences.add(sequence);
 		}
 		
 		private void handleEffects(float delta) {
-			boolean movementEffect = false;
+			this.indicesToRemove.clear();
+//			//process existing effects.
+//			for (int i = 0; i < currentEffects.size(); i++) {
+//				Effect effect = currentEffects.get(i);
+//				boolean isFinished = effect.process(this, delta);
+//				if (isFinished) {
+//					indicesToRemove.add(i);
+//				}
+//			}
+//			//Remove finished effects
+//			for (int i = 0; i < indicesToRemove.size(); i++) {
+//				currentEffects.remove(indicesToRemove.get(i));
+//			}
+			
 			for(Iterator<Effect> iterator = this.currentEffects.iterator(); iterator.hasNext();) {
 				Effect effect = iterator.next();
 				boolean isFinished = effect.process(this, delta);
-				movementEffect = (effect instanceof MovementEffect && !isFinished) || movementEffect;
 				if (isFinished) {
 					effect.completion(this);
 					iterator.remove();
@@ -220,7 +238,9 @@ public abstract class Character {
 		public void walk(boolean left) {
 			this.setFacingLeft(left);
 			this.velocity.x = left ? -this.properties.getWalkingSpeed() : this.properties.getWalkingSpeed();
-			setState(left ? this.backWalkState : this.walkState); //Walk
+			if (this instanceof PlayerModel) {
+				setState(left ? this.backWalkState : this.walkState); //Walk
+			}
 		}
 		
 		public float getJumpSpeed() {
@@ -566,11 +586,11 @@ public abstract class Character {
 //			}
 //		}
 		
-		public void addToCurrentHealth(int value) {
+		public void addToCurrentHealth(float value) {
 			this.setCurrentHealth(value + this.currentHealth);
 		}
 		
-		public void removeFromCurrentHealth(int value) {
+		public void removeFromCurrentHealth(float value) {
 			this.setCurrentHealth(this.currentHealth - value);
 		}
 
@@ -622,45 +642,45 @@ public abstract class Character {
 			this.didChangeState = true;
 		}
 
-		public int getCurrentHealth() {
+		public float getCurrentHealth() {
 			return currentHealth;
 		}
 
-		public void setCurrentHealth(int currentHealth) {
+		public void setCurrentHealth(float currentHealth) {
 			this.currentHealth = Math.min(Math.max(0, currentHealth), this.maxHealth);
 		}
 
-		public int getMaxHealth() {
+		public float getMaxHealth() {
 			return maxHealth;
 		}
 
-		public void setMaxHealth(int maxHealth) {
+		public void setMaxHealth(float maxHealth) {
 			this.maxHealth = maxHealth;
 			this.currentHealth = maxHealth;
 		}
 
-		public int getCurrentWill() {
+		public float getCurrentWill() {
 			return currentWill;
 		}
 
-		public void setCurrentWill(int currentWill) {
+		public void setCurrentWill(float currentWill) {
 			this.currentWill = currentWill;
 		}
 
-		public int getMaxWill() {
+		public float getMaxWill() {
 			return maxWill;
 		}
 
-		public void setMaxWill(int maxWill) {
+		public void setMaxWill(float maxWill) {
 			this.maxWill = maxWill;
 			this.currentWill = maxWill;
 		}
 
-		public int getAttack() {
+		public float getAttack() {
 			return attack;
 		}
 
-		public void setAttack(int attack) {
+		public void setAttack(float attack) {
 			this.attack = attack;
 		}
 

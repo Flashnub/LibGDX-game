@@ -1,0 +1,12 @@
+{
+	"BasicProjectileAttack": {
+		"class": com.mygdx.game.model.actions.ProjectileAttackSettings,
+		"abilitySettingKey": "BasicProjectileAttack",
+		"projectileSettingKeys": [
+			{
+				"class": com.mygdx.game.wrappers.StringWrapper,
+				"value": "Basic"
+			}
+		]
+	}
+}

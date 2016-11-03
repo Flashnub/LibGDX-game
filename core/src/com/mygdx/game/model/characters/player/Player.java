@@ -109,7 +109,6 @@ public class Player extends Character implements InputProcessor {
 			isWalkLeftPressed = false;
 			isWalkRightPressed = false;
 			isJumpPressed = false;
-			this.acceleration.y = -this.getCharacterProperties().getGravity();
 			this.gameplayHitBoxWidthModifier = 0.19f;
 			this.gameplayHitBoxHeightModifier = 0.6f;
 		}
@@ -154,7 +153,7 @@ public class Player extends Character implements InputProcessor {
 //	    				mover.acceleration.x = 0;
 //	    			}
 //	    		});
-	    		ActionSequence dashAction = this.getCharacterProperties().getActions().get("PlayerDash").cloneSequence();
+	    		ActionSequence dashAction = this.getCharacterProperties().getActions().get("PlayerDash").cloneSequenceWithSourceAndTarget(this, null);
 //	    		for (Movement movement : dashAction.getMovements()) {
 //	    			this.getTempMovementActions().add(movement);
 //	    		}

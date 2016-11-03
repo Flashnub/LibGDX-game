@@ -9,16 +9,16 @@ import com.mygdx.game.model.effects.EffectSettings;
 
 public class AbilitySettings implements Serializable {
 	ArrayList<EffectSettings> sourceEffectSettings;
-	float delayToActivate;
+	Float windUpTime;
+	Float cooldownTime;
 	Float duration;
-    public boolean isConcurrent;
 	
 	@Override
 	public void write(Json json) {
 		json.writeValue("sourceEffectSettings", sourceEffectSettings);
-		json.writeValue("delayToActivate", delayToActivate);
+		json.writeValue("windUpTime", windUpTime);
+		json.writeValue("cooldownTime", cooldownTime);
 		json.writeValue("duration", duration);		
-		json.writeValue("isConcurrent", isConcurrent);		
 	}
 	
 	@Override
@@ -31,30 +31,37 @@ public class AbilitySettings implements Serializable {
 		else {
 			this.duration = 0.5f;
 		}
-		Float delayToActivate = json.readValue("delayToActivate", Float.class, jsonData);
-		if (delayToActivate != null) {
-			this.delayToActivate = delayToActivate;
+		Float windUpTime = json.readValue("windUpTime", Float.class, jsonData);
+		if (windUpTime != null) {
+			this.windUpTime = windUpTime;
 		}
 		else {
-			this.delayToActivate = 0f;
+			this.windUpTime = 0f;
+		}
+		Float cooldownTime = json.readValue("cooldownTime", Float.class, jsonData);
+		if (cooldownTime != null) {
+			this.cooldownTime = cooldownTime;
+		}
+		else {
+			this.cooldownTime = 0f;
 		}
 		sourceEffectSettings = json.readValue("sourceEffectSettings", ArrayList.class, jsonData);
-		Boolean concurrency = json.readValue("isConcurrent", Boolean.class, jsonData);
-		if (concurrency != null) {
-			isConcurrent = concurrency;
-		}
-		else {
-			isConcurrent = false;
-		}
 	}
 
 	public float getDelayToActivate() {
-		return delayToActivate;
+		return windUpTime;
 	}
 
 	public Float getDuration() {
 		return duration;
 	}
-	
+
+	public Float getWindUpTime() {
+		return windUpTime;
+	}
+
+	public Float getCooldownTime() {
+		return cooldownTime;
+	}
 	
 }

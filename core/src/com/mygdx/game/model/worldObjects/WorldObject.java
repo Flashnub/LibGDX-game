@@ -6,6 +6,7 @@ import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.model.characters.EntityUIDataType;
 import com.mygdx.game.model.characters.EntityUIModel;
 import com.mygdx.game.model.world.WorldModel;
 
@@ -29,7 +30,7 @@ public abstract class WorldObject {
 	String state;
 	
 	public WorldObject(String name, MapProperties properties) {
-		itemUIModel = new EntityUIModel(name);
+		itemUIModel = new EntityUIModel(name, EntityUIDataType.WORLDOBJECT);
 		bounds = new Rectangle(0, 0, this.getDimensions().x, this.getDimensions().y);
 		uuid = UUID.randomUUID().toString();
 		shouldDeleteOnActivation = false;

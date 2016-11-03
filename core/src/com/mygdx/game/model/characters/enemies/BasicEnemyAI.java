@@ -7,11 +7,12 @@ import java.util.ArrayList;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.characters.enemies.Enemy.EnemyModel;
+import com.mygdx.game.model.world.WorldModel;
 
 public class BasicEnemyAI extends EnemyAI {
 
-	public BasicEnemyAI(CharacterProperties properties, EnemyModel source) {
-		super(properties, source);
+	public BasicEnemyAI(CharacterProperties properties, EnemyModel source, WorldModel world) {
+		super(properties, source, world);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -29,8 +30,22 @@ public class BasicEnemyAI extends EnemyAI {
 	}
 
 	@Override
-	public void setNextActionSequences() {
+	public void setNextActionSequences(ArrayList<ActionSequence> possibleActionSequences) {
 		// TODO Auto-generated method stub
-		
+		ArrayList <ActionSequence> actualActionSequences = new ArrayList <ActionSequence> ();
+		for (ActionSequence sequence : possibleActionSequences) {
+			float randomFloat = rand.nextFloat();
+			if (randomFloat > 0.5) {
+				actualActionSequences.add(sequence);
+			}
+		}
+		if (actualActionSequences.size() > 0) {
+			ActionSequence actionSequence = actualActionSequences.get(rand.nextInt(actualActionSequences.size()));
+			this.nextActionSequences.add(actionSequence);
+		}
+		else { 
+			//walk towards or away nearest enemy
+			source.walk(rand.nextBoolean());
+		}
 	}
 }

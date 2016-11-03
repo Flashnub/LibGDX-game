@@ -8,13 +8,11 @@ import com.mygdx.game.model.events.ActionListener;
 
 public class Ability extends ActionSegment{
 	AbilitySettings settings;
-	CharacterModel source;
 
 	public Ability(CharacterModel source, AbilitySettings settings) {
 		super();
 		this.settings = settings;
 		this.source = source;
-		this.isConcurrent = settings.isConcurrent;
 	}
 	
 	@Override
@@ -33,24 +31,18 @@ public class Ability extends ActionSegment{
 	}
 
 	@Override
-	public ActionSegment cloneActionSegment() {
-		Ability ability = new Ability (source, settings);
-		return ability;
-	}
-
-	@Override
 	public boolean isFinished() {
-		return currentTime > this.settings.delayToActivate + this.settings.duration;
+		return currentTime > this.settings.windUpTime + this.settings.duration;
 	}
 
 	@Override
-	public CharacterModel getSource() {
-		return source;
+	public float getWindUpTime() {
+		return this.settings.windUpTime;
 	}
-
-	@Override
-	public float getDelayToActivate() {
-		return this.settings.delayToActivate;
+	
+	@Override 
+	public float getWindUpPlusActionTime() {
+		return this.settings.windUpTime + this.settings.duration;
 	}
 
 	@Override
@@ -58,7 +50,11 @@ public class Ability extends ActionSegment{
 		return Float.MAX_VALUE;
 	}
 
-
+	@Override
+	public ActionSegment cloneActionSegmentWithSourceAndTarget(CharacterModel source, CharacterModel target) {
+		Ability ability = new Ability (source, settings);
+		return ability;
+	}
 
 
 }

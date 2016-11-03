@@ -23,37 +23,15 @@ public class EntityUIModel {
 	private EntityUIData entityUIData;
 	private TextureRegion currentFrame;
 	private float animationTime = 0f;
-	private String characterName;
+	private String entityName;
 		
-	public EntityUIModel(String name) {
-		loadSprites(name);
-		this.characterName = name;
+	public EntityUIModel(String name, EntityUIDataType type) {
+		loadSprites(name, type);
+		this.entityName = name;
 	}
 		
-	private void loadSprites(String name) {
-//		for (CharacterUIData uiData : CharacterUIData.values()) {
-//			if (uiData.toString().equals(name)) {
-//				this.entityUIData = uiData;
-//				break;
-//			}
-//		}
-//		if (entityUIData == null) {
-//			for (ProjectileUIData uiData : ProjectileUIData.values()) {
-//				if (uiData.toString().equals(name)) {
-//					this.entityUIData = uiData;
-//					break;
-//				}
-//			}
-//		}
-//		if (entityUIData == null) {
-//			for (WorldObjectUIData uiData : WorldObjectUIData.values()) {
-//				if (uiData.toString().equals(name)) {
-//					this.entityUIData = uiData;
-//					break;
-//				}
-//			}
-//		}
-		this.entityUIData = JSONController.loadUIDataFromJSONForEntity(name);
+	private void loadSprites(String name, EntityUIDataType type) {
+		this.entityUIData = JSONController.loadUIDataFromJSONForEntity(name, type);
 			
 		loadAnimations(name);
 	}
@@ -88,7 +66,7 @@ public class EntityUIModel {
 	}
 		
 	public void setCurrentFrame(CharacterModel model, float delta) {
-		String animationString = SpriteUtils.animationStringWithState(this.characterName, model.state, model.isFacingLeft());
+		String animationString = SpriteUtils.animationStringWithState(this.entityName, model.state, model.isFacingLeft());
 		Animation currentAnimation = animations.get(animationString);
 		
 		this.animationTime += delta;
@@ -99,7 +77,7 @@ public class EntityUIModel {
 	}
 	
 	public void setCurrentFrame(Projectile projectile, float delta) {
-		String animationString = SpriteUtils.animationStringWithState(this.characterName, projectile.getProjectileState(), projectile.isFacingLeft());
+		String animationString = SpriteUtils.animationStringWithState(this.entityName, projectile.getProjectileState(), projectile.isFacingLeft());
 		Animation currentAnimation = animations.get(animationString);
 			
 		this.animationTime += delta;
@@ -110,7 +88,7 @@ public class EntityUIModel {
 	}
 	
 	public void setCurrentFrame(WorldObject object, float delta) {
-		String animationString = SpriteUtils.animationStringWithState(this.characterName, object.getState());
+		String animationString = SpriteUtils.animationStringWithState(this.entityName, object.getState());
 		Animation currentAnimation = animations.get(animationString);
 			
 		this.animationTime += delta;

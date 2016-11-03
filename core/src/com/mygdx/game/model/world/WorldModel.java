@@ -55,7 +55,7 @@ public class WorldModel implements ActionListener, ObjectListener{
     			Cell tile = collisionLayer.getCell(x, y);
     			if (tile.getTile().getProperties().containsKey(kSpawnPoint)) {
     				String entityName = (String) tile.getTile().getProperties().get(kSpawnPoint);
-    				String entityType = (String) tile.getTile().getProperties().get(kSpawnPoint);
+    				String entityType = (String) tile.getTile().getProperties().get(kEntityType);
     				Character character = getCharacterFromString(entityName, entityType); 
     				if (character != null) {
         				if (character instanceof Player) {
@@ -88,12 +88,14 @@ public class WorldModel implements ActionListener, ObjectListener{
     }
     
     private Character getCharacterFromString(String name, String characterType) {
-    	 switch(characterType) {
-    	 	case Player.characterType: 
-    	 		return new Player();
-    	 	case Enemy.characterType:
-    	 		return new Enemy(name);
-    	 }
+    	if (characterType != null) {
+    		switch(characterType) {
+    			case Player.characterType: 
+    				return new Player();
+    			case Enemy.characterType:
+    				return new Enemy(name, this);
+    		}
+    	}
     	 return null;
     }
     
@@ -121,7 +123,8 @@ public class WorldModel implements ActionListener, ObjectListener{
         	float timeForAction = accumulatedTime <= MAX_TIMESTEP ? accumulatedTime : MAX_TIMESTEP;
     		player.act(timeForAction, collisionLayer);
     		this.checkIfPlayerIsNearObjects();
-    		for (Character enemy : enemies) {
+    		for (int i = 0; i < enemies.size; i++) {
+    			Character enemy = enemies.get(i);
     			enemy.act(timeForAction, collisionLayer);
     		}
     		accumulatedTime -= timeForAction;

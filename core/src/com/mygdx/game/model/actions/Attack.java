@@ -11,29 +11,33 @@ import com.mygdx.game.model.events.ActionListener;
 public class Attack extends ActionSegment {
 	 
 	Rectangle hitBox;
-	CharacterModel source;
 	int allegiance;
-	AttackSettings settings;
+	AttackSettings attackSettings;
+	CharacterModel target;
 	
-	public Attack(CharacterModel source, AttackSettings settings) {
+	public Attack(CharacterModel source, CharacterModel target, AttackSettings settings) {
 		super();
 		this.source = source;
 		this.allegiance = source.getAllegiance();
-		this.settings = settings;
-		this.isConcurrent = settings.isConcurrent;
-		this.hitBox = new Rectangle(settings.originX, settings.originY, settings.width, settings.height);
+		this.attackSettings = settings;
+		if (source.isFacingLeft()) {
+			this.hitBox = new Rectangle(source.getGameplayHitBox().x + settings.originX - 10, source.getGameplayHitBox().y + settings.originY, -settings.width, settings.height);
+		}
+		else {
+			this.hitBox = new Rectangle(source.getGameplayHitBox().x + settings.originX + 10, source.getGameplayHitBox().y + settings.originY, settings.width, settings.height);
+		}
 	}
 	
 	public void processAttackOnCharacter(CharacterModel target) {
-		for (EffectSettings effectSettings : this.settings.targetEffectSettings) {
+		for (EffectSettings effectSettings : this.attackSettings.targetEffectSettings) {
 			Effect effect = EffectInitializer.initializeEffect(effectSettings);
 			target.addEffect(effect);
 		}
 	}
 	
 	@Override
-	public ActionSegment cloneActionSegment() {
-		Attack attack = new Attack(source, settings);
+	public ActionSegment cloneActionSegmentWithSourceAndTarget(CharacterModel source, CharacterModel target) {
+		Attack attack = new Attack(source, target, attackSettings);
 		return attack;
 	}
 	
@@ -45,7 +49,7 @@ public class Attack extends ActionSegment {
 	@Override
 	public void sourceProcess(CharacterModel source) {
 		super.sourceProcess(source);
-		for (EffectSettings effectSettings : settings.sourceEffectSettings) {
+		for (EffectSettings effectSettings : attackSettings.sourceEffectSettings) {
 			Effect effect = EffectInitializer.initializeEffect(effectSettings);
 			source.addEffect(effect);
 		}
@@ -54,38 +58,36 @@ public class Attack extends ActionSegment {
 	@Override
 	public float getEffectiveRange() {
 		float range = 0f;
-		for (EffectSettings effectSettings : this.settings.sourceEffectSettings) {
+		for (EffectSettings effectSettings : this.attackSettings.sourceEffectSettings) {
 			if (effectSettings instanceof MovementEffectSettings) {
 				MovementEffectSettings mEffectSettings = (MovementEffectSettings) effectSettings;
+				range += mEffectSettings.getEstimatedDistance();
 			}
 		}
-		return range;
+		return range + hitBox.width;
 	}
 
 	@Override
-	public float getDelayToActivate() {
-		return this.settings.delayToActivate;
+	public float getWindUpTime() {
+		return this.attackSettings.windUpTime;
 	}
 	
+	@Override 
+	public float getWindUpPlusActionTime() {
+		return this.attackSettings.windUpTime + this.attackSettings.duration;
+	}
+
 	
 	public boolean isFinished() {
-		return currentTime > this.settings.delayToActivate + this.settings.duration;
+		return currentTime > this.attackSettings.windUpTime + this.attackSettings.duration;
 	}
 	
 	public Rectangle getAttackHitBox() {
-		return new Rectangle(settings.originX, settings.originY, settings.width, settings.height);
+		return new Rectangle(attackSettings.originX, attackSettings.originY, attackSettings.width, attackSettings.height);
 	}
 	
-	public Attack() {
-		
-	}
-
 	public Rectangle getHitBox() {
 		return hitBox;
-	}
-
-	public CharacterModel getSource() {
-		return source;
 	}
 
 	public int getAllegiance() {
@@ -103,11 +105,5 @@ public class Attack extends ActionSegment {
 	public void setAllegiance(int allegiance) {
 		this.allegiance = allegiance;
 	}
-
-
-
-
-
-
 
 }

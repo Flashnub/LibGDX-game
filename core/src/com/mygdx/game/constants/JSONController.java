@@ -7,7 +7,9 @@ import com.badlogic.gdx.utils.Json;
 import com.mygdx.game.assets.EntityUIData;
 import com.mygdx.game.model.actions.AbilitySettings;
 import com.mygdx.game.model.actions.AttackSettings;
+import com.mygdx.game.model.actions.ProjectileAttackSettings;
 import com.mygdx.game.model.characters.CharacterProperties;
+import com.mygdx.game.model.characters.EntityUIDataType;
 import com.mygdx.game.model.items.Item;
 import com.mygdx.game.model.projectiles.ProjectileSettings;
 
@@ -21,6 +23,7 @@ public class JSONController {
     public static HashMap<String, CharacterProperties> characterProperties = new HashMap<String, CharacterProperties>();
     public static HashMap<String, Item> items = loadItemsFromJSON();
     public static HashMap<String, EntityUIData> uiDatas = new HashMap<String, EntityUIData>();
+    public static HashMap<String, ProjectileAttackSettings> projectileAttacks = loadProjectileAttacksFromJSON();
   
 	 
 	@SuppressWarnings("unchecked")
@@ -44,6 +47,13 @@ public class JSONController {
         HashMap<String, ProjectileSettings> settings = json.fromJson(HashMap.class, Gdx.files.internal(globalFilePath + "projectiles.json"));
         return settings;
     }
+	
+	@SuppressWarnings("unchecked")
+    private static HashMap<String, ProjectileAttackSettings> loadProjectileAttacksFromJSON() {
+        Json json = new Json();
+        HashMap<String, ProjectileAttackSettings> settings = json.fromJson(HashMap.class, Gdx.files.internal(globalFilePath + "projectileAttacks.json"));
+        return settings;
+    }
     
 	@SuppressWarnings("unchecked")
     private static HashMap<String, Item> loadItemsFromJSON() {
@@ -52,10 +62,22 @@ public class JSONController {
         return items;
     }
     
-    public static EntityUIData loadUIDataFromJSONForEntity(String name) {
+    public static EntityUIData loadUIDataFromJSONForEntity(String name, EntityUIDataType dataType) {
         if (!uiDatas.containsKey(name)) {
             Json json = new Json();
-        	EntityUIData uiData = json.fromJson(EntityUIData.class, Gdx.files.internal(jsonFilePath + name + "/UIData.json"));
+            String filePath = "";
+            switch (dataType) {
+            case CHARACTER:
+            	filePath = jsonFilePath + name + "/UIData.json";
+            	break;
+            case WORLDOBJECT:
+            	filePath = jsonFilePath + "WorldObjects/" + name + "UIData.json";
+            	break;
+            case PROJECTILE:
+            	filePath = jsonFilePath + "Projectiles/" + name + "UIData.json";
+            	break;
+            }
+        	EntityUIData uiData = json.fromJson(EntityUIData.class, Gdx.files.internal(filePath));
         	uiDatas.put(name, uiData);
         	return uiData;
         }

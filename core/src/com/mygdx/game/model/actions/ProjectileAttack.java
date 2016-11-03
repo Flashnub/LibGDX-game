@@ -14,22 +14,34 @@ import com.mygdx.game.model.projectiles.ProjectileSettings;
 public class ProjectileAttack extends ActionSegment{
 	
 	ArrayList<Projectile> projectiles;
-	CharacterModel source;
+	ActionSegment potentialAbility;
 	CharacterModel target;
 	ActionListener actionListener;
-	AbilitySettings settings;
+	ProjectileAttackSettings projAttackSettings;
 	
-	public ProjectileAttack(CharacterModel source, CharacterModel target, ActionListener actionListener, ArrayList<ProjectileSettings> projectileSettingsKeys, AbilitySettings settings) {
-		super();
+	public ProjectileAttack() {
+		
+	}
+	
+	public ProjectileAttack(CharacterModel source, CharacterModel target, ActionListener actionListener, ProjectileAttackSettings settings) {
 		this.source = source;
 		this.target = target;
 		this.actionListener = actionListener;
 		projectiles = new ArrayList<Projectile>();
-		this.settings = settings;
-		this.isConcurrent = settings.isConcurrent;
-		for (ProjectileSettings projSettings : projectileSettingsKeys) {
+		this.projAttackSettings = settings;
+		for (ProjectileSettings projSettings : settings.getProjectileSettings()) {
 			Projectile projectile = new Projectile(projSettings.getName(), source, target, actionListener);
 			projectiles.add(projectile);
+		}
+		if (settings.getAbilitySettings() != null) {
+			if (settings.getAbilitySettings() instanceof AbilitySettings) {
+				potentialAbility = new Ability(source, settings.getAbilitySettings());
+			}
+			else if (settings.getAbilitySettings() instanceof AttackSettings) {
+				AttackSettings atkSettings = (AttackSettings) settings.getAbilitySettings();
+				Attack attack = new Attack(source, target, atkSettings);
+				potentialAbility = attack;
+			}
 		}
 	}
 	
@@ -37,9 +49,9 @@ public class ProjectileAttack extends ActionSegment{
 	public float getEffectiveRange() {
 		float range = 0f;
 		for (Projectile projectile : projectiles) {
-			
+			range += projectile.getEffectiveRange();
 		}
-		return 0;
+		return range;
 	}
 	
 	@Override
@@ -47,42 +59,74 @@ public class ProjectileAttack extends ActionSegment{
 		return true;
 	}
 	
-	@Override
-	public CharacterModel getSource() {
-		return source;
+	@Override 
+	public float getWindUpPlusActionTime() {
+		return this.projAttackSettings.getAbilitySettings().windUpTime + this.projAttackSettings.getAbilitySettings().duration;
 	}
-
+	
 	@Override
-	public float getDelayToActivate() {
-		return this.settings.delayToActivate;
+	public float getWindUpTime() {
+		return this.projAttackSettings.getAbilitySettings().windUpTime;
 	}
 	
 	@Override
 	public void sendActionToListener(ActionListener actionListener) {
-		for (Projectile projectile : projectiles) {
-			actionListener.processProjectile(projectile);
+//		for (Projectile projectile : projectiles) {
+//			actionListener.processProjectile(projectile);
+//		}
+		if (this.potentialAbility instanceof Attack) {
+			actionListener.processAttack((Attack) this.potentialAbility);
 		}
 	}
 
 	@Override
 	public void sourceProcess(CharacterModel source) {
 		super.sourceProcess(source);
-		for (EffectSettings effectSettings : settings.sourceEffectSettings) {
-			Effect effect = EffectInitializer.initializeEffect(effectSettings);
-			source.addEffect(effect);
+		if (this.potentialAbility != null) {
+//			for (EffectSettings effectSettings : projAttackSettings.getAbilitySettings().sourceEffectSettings) {
+//				Effect effect = EffectInitializer.initializeEffect(effectSettings);
+//				source.addEffect(effect);
+//			}
+			this.potentialAbility.sourceProcess(source);
+		}
+		for (Projectile projectile : projectiles) {
+			this.actionListener.addProjectile(projectile);
 		}
 	}
 
 	@Override
-	public ActionSegment cloneActionSegment() {
-		ArrayList <ProjectileSettings> projSettings = new ArrayList<ProjectileSettings>();
-		for (Projectile projectile : projectiles) {
-			projSettings.add(projectile.getSettings());
+	public ActionSegment cloneActionSegmentWithSourceAndTarget(CharacterModel source, CharacterModel target) {
+		ProjectileAttack projAttack = new ProjectileAttack();
+		projAttack.source = source;
+		projAttack.target = target;
+		projAttack.actionListener = actionListener;
+		projectiles = new ArrayList<Projectile>();
+		projAttack.projAttackSettings = projAttackSettings;
+		for (ProjectileSettings projSettings : projAttackSettings.getProjectileSettings()) {
+			Projectile projectile = new Projectile(projSettings.getName(), source, target, actionListener);
+			projectiles.add(projectile);
 		}
-		ProjectileAttack projAttack = new ProjectileAttack(source, target, actionListener, projSettings, this.settings);
+		if (projAttackSettings.getAbilitySettings() != null) {
+			if (projAttackSettings.getAbilitySettings() instanceof AbilitySettings) {
+				projAttack.potentialAbility = new Ability(source, projAttackSettings.getAbilitySettings());
+			}
+			else if (projAttackSettings.getAbilitySettings() instanceof AttackSettings) {
+				AttackSettings atkSettings = (AttackSettings) projAttackSettings.getAbilitySettings();
+				Attack attack = new Attack(source, target, atkSettings);
+				projAttack.potentialAbility = attack;
+			}
+		}
+
+		
 		return projAttack;
 	}
 
+	public void setTarget(CharacterModel target) {
+		this.target = target;
+		for (Projectile projectile : projectiles) {
+			projectile.setTarget(target);
+		}
+	}
 
 
 }

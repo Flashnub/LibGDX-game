@@ -43,4 +43,13 @@
 			}
 		]
 	}
+	"BasicProjectileAttack": {
+		"class": "com.mygdx.game.model.actions.AbilitySettings",
+		"sourceEffectSettings": [
+			{
+				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
+				"value": 15
+			}
+		]
+	}
 }

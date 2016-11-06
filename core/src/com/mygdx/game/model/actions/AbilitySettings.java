@@ -9,14 +9,14 @@ import com.mygdx.game.model.effects.EffectSettings;
 
 public class AbilitySettings implements Serializable {
 	ArrayList<EffectSettings> sourceEffectSettings;
-	Float windUpTime;
+	Float windupTime;
 	Float cooldownTime;
 	Float duration;
 	
 	@Override
 	public void write(Json json) {
 		json.writeValue("sourceEffectSettings", sourceEffectSettings);
-		json.writeValue("windUpTime", windUpTime);
+		json.writeValue("windupTime", windupTime);
 		json.writeValue("cooldownTime", cooldownTime);
 		json.writeValue("duration", duration);		
 	}
@@ -31,12 +31,12 @@ public class AbilitySettings implements Serializable {
 		else {
 			this.duration = 0.5f;
 		}
-		Float windUpTime = json.readValue("windUpTime", Float.class, jsonData);
-		if (windUpTime != null) {
-			this.windUpTime = windUpTime;
+		Float windupTime = json.readValue("windUpTime", Float.class, jsonData);
+		if (windupTime != null) {
+			this.windupTime = windupTime;
 		}
 		else {
-			this.windUpTime = 0f;
+			this.windupTime = 0f;
 		}
 		Float cooldownTime = json.readValue("cooldownTime", Float.class, jsonData);
 		if (cooldownTime != null) {
@@ -48,16 +48,12 @@ public class AbilitySettings implements Serializable {
 		sourceEffectSettings = json.readValue("sourceEffectSettings", ArrayList.class, jsonData);
 	}
 
-	public float getDelayToActivate() {
-		return windUpTime;
-	}
-
 	public Float getDuration() {
 		return duration;
 	}
 
 	public Float getWindUpTime() {
-		return windUpTime;
+		return windupTime;
 	}
 
 	public Float getCooldownTime() {

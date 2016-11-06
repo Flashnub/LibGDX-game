@@ -4,15 +4,16 @@
 		"name": "Basic",
 		"explodeOnImpact": true,
 		"useSmartAim": true,
-		"gravity": 300,
+		"gravity": 0,
 		"tracks": false,
 		"bounces": false,
 		"hasCollisionDetection": false,
 		"speed": 300,
 		"duration": 9,
-		"effects": [
+		"angleOfVelocity": 0,
+		"targetEffects": [
 			{
-				"class": com.mygdx.game.model.effects.HealthRemovalEffect,
+				"class": com.mygdx.game.model.effects.DamageEffectSettings,
 				"value": 2
 			}
 		]

@@ -15,9 +15,9 @@
 				},
 				"typeOfAction": ProjectileAttack
 			}
-			"windUpState": "Idle"
+			"windupState": "Triangle"
 			"actingState": "Idle"
-			"cooldownState": "Idle"
+			"cooldownState": "Circle"
 		},
 	}
 }

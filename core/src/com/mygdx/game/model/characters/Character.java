@@ -76,6 +76,9 @@ public abstract class Character {
 		ActionSequence currentActionSequence;
 		ArrayDeque <ActionSequence> actionSequences;
 		
+		//Debug
+		float stateTime;
+		
 		public CharacterModel(String characterName, EntityUIModel uiModel) {
 			this.currentEffects = new ArrayList <Effect>();
 			this.indicesToRemove = new ArrayList<Integer>();
@@ -92,8 +95,10 @@ public abstract class Character {
 			jumping = true;
 			facingLeft = false;
 //			isProcessingMovementEffect = false;
+			stateTime = 0f;
 
 			UUID id = UUID.randomUUID();
+			this.name = characterName;
 			this.uuid = id.toString();
 			this.gameplayHitBoxWidthModifier = 0.19f;
 			this.gameplayHitBoxHeightModifier = 0.6f;
@@ -115,6 +120,9 @@ public abstract class Character {
 			this.handleEffects(delta);
 			this.handleActionSequences(delta);
 //			System.out.println(imageHitBox.x + " " + imageHitBox.y + " " + imageHitBox.width + " " + imageHitBox.height);
+			
+			//Debug
+			this.stateTime += delta;
 		}
 		
 		public void move(float delta, TiledMapTileLayer collisionLayer) {
@@ -124,9 +132,6 @@ public abstract class Character {
 			this.gameplayHitBox.width = this.getImageHitBox().width * gameplayHitBoxWidthModifier;
 			this.gameplayHitBox.height = this.getImageHitBox().height * gameplayHitBoxHeightModifier;
 
-			if (currentActionSequence != null) {
-				System.out.println(velocity);
-			}
 			//clamp velocity
 			if (this.getVelocity().y > this.properties.jumpSpeed)
 				this.getVelocity().y = this.properties.jumpSpeed;
@@ -222,6 +227,10 @@ public abstract class Character {
 			return null;
 		}
 		
+		public boolean isTargetToLeft(CharacterModel target) {
+			return this.gameplayHitBox.x > target.gameplayHitBox.x; 
+		}
+		
 		public void jump() {
 	        if (!jumping) {
 	            jumping = true;
@@ -241,6 +250,11 @@ public abstract class Character {
 			if (this instanceof PlayerModel) {
 				setState(left ? this.backWalkState : this.walkState); //Walk
 			}
+		}
+		
+		public void stopWalk() {
+			this.velocity.x = 0;
+//			setState(this.idleState);
 		}
 		
 		public float getJumpSpeed() {
@@ -593,6 +607,10 @@ public abstract class Character {
 		public void removeFromCurrentHealth(float value) {
 			this.setCurrentHealth(this.currentHealth - value);
 		}
+		
+		public boolean isProcessingAction() {
+			return this.currentActionSequence != null;
+		}
 
 
 		//-------------GETTERS/SETTERS------------//
@@ -638,8 +656,11 @@ public abstract class Character {
 		}
 
 		public void setState(String state) {
+//			System.out.println(this.name + "'s state: " + this.state);
+//			System.out.println("Time spent in state: " + this.stateTime);
 			this.state = state;
 			this.didChangeState = true;
+			this.stateTime = 0f;
 		}
 
 		public float getCurrentHealth() {
@@ -715,6 +736,10 @@ public abstract class Character {
 		public void setImmuneToInjury(boolean isImmuneToInjury) {
 			this.isImmuneToInjury = isImmuneToInjury;
 			injuryTime = 0f;
+		}
+		
+		public ActionListener getActionListener() {
+			return actionListener;
 		}
 
 		public boolean isAttacking() {

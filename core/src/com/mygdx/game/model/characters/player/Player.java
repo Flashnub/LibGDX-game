@@ -153,7 +153,7 @@ public class Player extends Character implements InputProcessor {
 //	    				mover.acceleration.x = 0;
 //	    			}
 //	    		});
-	    		ActionSequence dashAction = this.getCharacterProperties().getActions().get("PlayerDash").cloneSequenceWithSourceAndTarget(this, null);
+	    		ActionSequence dashAction = this.getCharacterProperties().getActions().get("PlayerDash").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener());
 //	    		for (Movement movement : dashAction.getMovements()) {
 //	    			this.getTempMovementActions().add(movement);
 //	    		}

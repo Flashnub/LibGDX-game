@@ -35,15 +35,16 @@ public class BasicEnemyAI extends EnemyAI {
 		ArrayList <ActionSequence> actualActionSequences = new ArrayList <ActionSequence> ();
 		for (ActionSequence sequence : possibleActionSequences) {
 			float randomFloat = rand.nextFloat();
-			if (randomFloat > 0.5) {
+			if (randomFloat < 0.1) {
 				actualActionSequences.add(sequence);
 			}
 		}
 		if (actualActionSequences.size() > 0) {
+			this.source.stopWalk();
 			ActionSequence actionSequence = actualActionSequences.get(rand.nextInt(actualActionSequences.size()));
 			this.nextActionSequences.add(actionSequence);
 		}
-		else { 
+		else if (!this.source.isProcessingAction()){ 
 			//walk towards or away nearest enemy
 			source.walk(rand.nextBoolean());
 		}

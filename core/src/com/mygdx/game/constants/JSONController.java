@@ -71,10 +71,10 @@ public class JSONController {
             	filePath = jsonFilePath + name + "/UIData.json";
             	break;
             case WORLDOBJECT:
-            	filePath = jsonFilePath + "WorldObjects/" + name + "UIData.json";
+            	filePath = jsonFilePath + "WorldObjects/" + name + "/UIData.json";
             	break;
             case PROJECTILE:
-            	filePath = jsonFilePath + "Projectiles/" + name + "UIData.json";
+            	filePath = jsonFilePath + "Projectiles/" + name + "/UIData.json";
             	break;
             }
         	EntityUIData uiData = json.fromJson(EntityUIData.class, Gdx.files.internal(filePath));

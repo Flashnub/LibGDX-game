@@ -49,6 +49,10 @@ public class Attack extends ActionSegment {
 	@Override
 	public void sourceProcess(CharacterModel source) {
 		super.sourceProcess(source);
+		sourceProcessWithoutSuper(source);
+	}
+	
+	public void sourceProcessWithoutSuper(CharacterModel source) {
 		for (EffectSettings effectSettings : attackSettings.sourceEffectSettings) {
 			Effect effect = EffectInitializer.initializeEffect(effectSettings);
 			source.addEffect(effect);
@@ -69,17 +73,17 @@ public class Attack extends ActionSegment {
 
 	@Override
 	public float getWindUpTime() {
-		return this.attackSettings.windUpTime;
+		return this.attackSettings.windupTime;
 	}
 	
 	@Override 
 	public float getWindUpPlusActionTime() {
-		return this.attackSettings.windUpTime + this.attackSettings.duration;
+		return this.attackSettings.windupTime + this.attackSettings.duration;
 	}
-
 	
-	public boolean isFinished() {
-		return currentTime > this.attackSettings.windUpTime + this.attackSettings.duration;
+	@Override
+	public float getTotalTime() {
+		return this.attackSettings.windupTime + this.attackSettings.duration + this.attackSettings.cooldownTime;
 	}
 	
 	public Rectangle getAttackHitBox() {
@@ -105,5 +109,7 @@ public class Attack extends ActionSegment {
 	public void setAllegiance(int allegiance) {
 		this.allegiance = allegiance;
 	}
+
+
 
 }

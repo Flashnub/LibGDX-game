@@ -26,7 +26,6 @@ public class MovementEffect extends Effect {
 		
 		target.acceleration.x = this.mSettings.acceleration.x;
 		target.acceleration.y = this.mSettings.acceleration.y;
-		System.out.println("Movement IP");
 	}
 	
 	@Override
@@ -34,8 +33,6 @@ public class MovementEffect extends Effect {
 		target.acceleration.x = oldAccel.x;
 		target.acceleration.y = oldAccel.y;
 		
-		System.out.println("Movement completion");
-		System.out.println(oldAccel);
 	}
 	
 	public Vector2 getOldAccel() {

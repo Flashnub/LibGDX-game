@@ -48,8 +48,11 @@
 		"sourceEffectSettings": [
 			{
 				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
-				"value": 15
+				"value": 0
 			}
-		]
+		],
+		"windupTime": 1,
+		"cooldownTime": 1,
+		"duration": 1
 	}
 }

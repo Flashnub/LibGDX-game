@@ -54,20 +54,21 @@ public class ProjectileAttack extends ActionSegment{
 		return range;
 	}
 	
-	@Override
-	public boolean isFinished() {
-		return true;
-	}
-	
 	@Override 
 	public float getWindUpPlusActionTime() {
-		return this.projAttackSettings.getAbilitySettings().windUpTime + this.projAttackSettings.getAbilitySettings().duration;
+		return this.projAttackSettings.getAbilitySettings().windupTime + this.projAttackSettings.getAbilitySettings().duration;
 	}
 	
 	@Override
 	public float getWindUpTime() {
-		return this.projAttackSettings.getAbilitySettings().windUpTime;
+		return this.projAttackSettings.getAbilitySettings().windupTime;
 	}
+	
+	@Override
+	public float getTotalTime() {
+		return this.projAttackSettings.getAbilitySettings().windupTime + this.projAttackSettings.getAbilitySettings().cooldownTime + this.projAttackSettings.getAbilitySettings().duration;
+	}
+
 	
 	@Override
 	public void sendActionToListener(ActionListener actionListener) {
@@ -82,12 +83,12 @@ public class ProjectileAttack extends ActionSegment{
 	@Override
 	public void sourceProcess(CharacterModel source) {
 		super.sourceProcess(source);
+		sourceProcessWithoutSuper(source);
+	}
+	
+	public void sourceProcessWithoutSuper(CharacterModel source) {
 		if (this.potentialAbility != null) {
-//			for (EffectSettings effectSettings : projAttackSettings.getAbilitySettings().sourceEffectSettings) {
-//				Effect effect = EffectInitializer.initializeEffect(effectSettings);
-//				source.addEffect(effect);
-//			}
-			this.potentialAbility.sourceProcess(source);
+			this.potentialAbility.sourceProcessWithoutSuper(source);
 		}
 		for (Projectile projectile : projectiles) {
 			this.actionListener.addProjectile(projectile);
@@ -127,6 +128,5 @@ public class ProjectileAttack extends ActionSegment{
 			projectile.setTarget(target);
 		}
 	}
-
 
 }

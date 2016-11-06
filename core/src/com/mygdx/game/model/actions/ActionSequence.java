@@ -26,7 +26,7 @@ public class ActionSequence implements Serializable {
 	private ActionSegment action;
 //	private ActionSegment sampleAction;
 	private ActionStrategy strategy;
-	private String windUpState;
+	private String windupState;
 	private String actingState;
 	private String cooldownState;
 	private CharacterModel source;
@@ -42,9 +42,9 @@ public class ActionSequence implements Serializable {
 		// TODO Auto-generated method stub
 		json.writeValue("actionKey", actionKey);
 		json.writeValue("strategy", strategy);
-		json.writeValue("windUpState", windUpState);
-		json.writeValue("actingState", windUpState);
-		json.writeValue("cooldownState", windUpState);
+		json.writeValue("windupState", windupState);
+		json.writeValue("actingState", windupState);
+		json.writeValue("cooldownState", windupState);
 
 	}
 
@@ -54,16 +54,17 @@ public class ActionSequence implements Serializable {
 		actionKey = json.readValue("actionKey", ActionSegmentKey.class, jsonData);
 		strategy = json.readValue("strategy", ActionStrategy.class, jsonData);
 //		nextActionKey = json.readValue("nextActionKey", String.class, jsonData);
-		windUpState = json.readValue("windUpState", String.class, jsonData);
+		windupState = json.readValue("windupState", String.class, jsonData);
 		actingState = json.readValue("actingState", String.class, jsonData);
 		cooldownState = json.readValue("cooldownState", String.class, jsonData);
 //		actionKey = json.readValue("actionKey", String.class, jsonData);
 	}
 	
-	public ActionSequence cloneSequenceWithSourceAndTarget(CharacterModel source, CharacterModel target) {
+	public ActionSequence cloneSequenceWithSourceAndTarget(CharacterModel source, CharacterModel target, ActionListener actionListener) {
 		ActionSequence sequence = cloneBareSequence();
 		sequence.source = source;
 		sequence.target = target;
+		sequence.actionListener = actionListener;
 		sequence.createActionFromSettings();
 		return sequence;
 	}
@@ -72,7 +73,7 @@ public class ActionSequence implements Serializable {
 		ActionSequence sequence = new ActionSequence();
 		sequence.actionKey = this.actionKey;
 		sequence.strategy = this.strategy;
-		sequence.windUpState = this.windUpState;
+		sequence.windupState = this.windupState;
 		sequence.actingState = this.actingState;
 		sequence.cooldownState = this.cooldownState;
 		return sequence;
@@ -97,7 +98,7 @@ public class ActionSequence implements Serializable {
 		this.action.didChangeState = false;
 		switch (action.getActionState()) {
 			case WINDUP:
-				return this.windUpState;
+				return this.windupState;
 			case ACTION:
 				return this.actingState;
 			case COOLDOWN:
@@ -153,7 +154,7 @@ public class ActionSequence implements Serializable {
 	}
 
 	public String getWindUpState() {
-		return windUpState;
+		return windupState;
 	}
 
 	public String getActingState() {

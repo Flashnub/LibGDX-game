@@ -6,6 +6,13 @@ filter: Nearest,Nearest
 repeat: none
 Basic-Active1
   rotate: false
+  xy: 2, 24
+  size: 20, 20
+  orig: 20, 20
+  offset: 0, 0
+  index: -1
+Basic-Preactive1
+  rotate: false
   xy: 2, 2
   size: 20, 20
   orig: 20, 20

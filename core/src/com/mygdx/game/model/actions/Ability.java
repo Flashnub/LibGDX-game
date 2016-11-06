@@ -24,6 +24,10 @@ public class Ability extends ActionSegment{
 	@Override
 	public void sourceProcess(CharacterModel source) {
 		super.sourceProcess(source);
+		sourceProcessWithoutSuper(source);
+	}
+	
+	public void sourceProcessWithoutSuper(CharacterModel source) {
 		for (EffectSettings effectSettings : settings.sourceEffectSettings) {
 			Effect effect = EffectInitializer.initializeEffect(effectSettings);
 			source.addEffect(effect);
@@ -31,18 +35,13 @@ public class Ability extends ActionSegment{
 	}
 
 	@Override
-	public boolean isFinished() {
-		return currentTime > this.settings.windUpTime + this.settings.duration;
-	}
-
-	@Override
 	public float getWindUpTime() {
-		return this.settings.windUpTime;
+		return this.settings.windupTime;
 	}
 	
 	@Override 
 	public float getWindUpPlusActionTime() {
-		return this.settings.windUpTime + this.settings.duration;
+		return this.settings.windupTime + this.settings.duration;
 	}
 
 	@Override
@@ -54,6 +53,11 @@ public class Ability extends ActionSegment{
 	public ActionSegment cloneActionSegmentWithSourceAndTarget(CharacterModel source, CharacterModel target) {
 		Ability ability = new Ability (source, settings);
 		return ability;
+	}
+
+	@Override
+	public float getTotalTime() {
+		return this.settings.windupTime + this.settings.duration + this.settings.cooldownTime;
 	}
 
 

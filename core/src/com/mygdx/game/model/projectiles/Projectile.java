@@ -11,6 +11,8 @@ import com.mygdx.game.model.characters.EntityUIModel;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.characters.EntityUIDataType;
 import com.mygdx.game.model.effects.Effect;
+import com.mygdx.game.model.effects.EffectInitializer;
+import com.mygdx.game.model.effects.EffectSettings;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.utils.MathUtils;
 
@@ -37,6 +39,7 @@ public class Projectile {
 	private String projectileState;
 	private String uuid;
 	private ActionListener actionListener;
+	private CharacterModel source;
 	private CharacterModel target;
 	private ProjectileSettings settings;
 	
@@ -48,9 +51,11 @@ public class Projectile {
 		this.projectileUIModel = new EntityUIModel(name, EntityUIDataType.PROJECTILE);
 		this.projectileState = this.activeState;
 		this.actionListener = actionListener;
+		this.source = source;
 		this.target = target;
 		UUID id = UUID.randomUUID();
 		this.uuid = id.toString();
+		this.allegiance = source.getAllegiance();
 	}
 	
 	public Projectile() {
@@ -129,8 +134,11 @@ public class Projectile {
 	
 	public void determineAndSetVelocity(CharacterModel target, TiledMapTileLayer collisionLayer) {
 		if (this.settings.getAngleOfVelocity() != null) {
-			float xVelocity = (float) (this.projectileSpeed() * Math.cos(this.settings.getAngleOfVelocity()));
-			float yVelocity = (float) (this.projectileSpeed() * Math.sin(this.settings.getAngleOfVelocity()));
+			boolean isTargetToLeft = source.isTargetToLeft(target);
+			float angleOfVelocity = isTargetToLeft ? 180f - this.settings.getAngleOfVelocity() : this.settings.getAngleOfVelocity();
+			float angleInRadians = (float) Math.toRadians(angleOfVelocity);
+			float xVelocity = (float) (this.projectileSpeed() * Math.cos(angleInRadians));
+			float yVelocity = (float) (this.projectileSpeed() * Math.sin(angleInRadians));
 			
 			this.velocity.x = xVelocity;
 			this.velocity.y = yVelocity;
@@ -290,7 +298,8 @@ public class Projectile {
 	//If characterModel is null, projectile expires.
 	public void processExpirationOrHit(CharacterModel characterModel){
 		if (characterModel != null) {
-			for (Effect effect : settings.getTargetEffects()) {
+			for (EffectSettings effectSettings : settings.getTargetEffects()) {
+				Effect effect = EffectInitializer.initializeEffect(effectSettings);
 				characterModel.addEffect(effect);
 			}
 			characterModel.setImmuneToInjury(true);

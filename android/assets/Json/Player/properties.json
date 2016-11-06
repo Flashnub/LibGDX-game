@@ -29,7 +29,7 @@
 				},
 				"typeOfAction": Attack
 			}
-			"windUpState": "Idle"
+			"windupState": "Idle"
 			"actingState": "Idle"
 			"cooldownState": "Idle"
 		}

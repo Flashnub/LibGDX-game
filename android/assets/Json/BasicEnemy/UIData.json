@@ -8,6 +8,20 @@
 			"duration": 0.05,
 			"playMode": NORMAL
 		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Circle",
+			"numberOfFrames": 1,
+			"duration": 0.05,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Triangle",
+			"numberOfFrames": 1,
+			"duration": 0.05,
+			"playMode": NORMAL
+		}
 	]
 	"masterAtlasPath": "Sprites/BasicEnemy/textures.atlas"
 }

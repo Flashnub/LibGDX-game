@@ -101,16 +101,23 @@ public class WorldModel implements ActionListener, ObjectListener{
     
     private WorldObject getObjectFromString(String typeOfObject, MapProperties properties) {
     	WorldObject worldObject = null;
-    	if (typeOfObject != null) {
-    		try {
-				Class <?> type = Class.forName("com.mygdx.game.model.worldObjects." + typeOfObject);
-				Constructor <?> constructor = type.getConstructor(String.class, MapProperties.class);
-				worldObject = (WorldObject) constructor.newInstance(typeOfObject, properties);
-			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-//				e.printStackTrace();
+    	if (properties != null) {
+    		Integer uuid = (Integer) properties.get(WorldObject.WorldObjUUIDKey);
+			boolean isAlreadyActivated = ((PlayerModel)player.getCharacterData()).isUUIDInSave(uuid);
+			if (isAlreadyActivated && typeOfObject != null) {
+				boolean shouldAddAnyway = WorldObject.shouldAddIfActivated(typeOfObject);
+				if (shouldAddAnyway) {
+					try {
+						Class <?> type = Class.forName("com.mygdx.game.model.worldObjects." + typeOfObject);
+						Constructor <?> constructor = type.getConstructor(String.class, MapProperties.class, ObjectListener.class);
+						worldObject = (WorldObject) constructor.newInstance(typeOfObject, properties, this);
+
+					} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+//						e.printStackTrace();
+					}
+				}
 			}
     	}
-
     	return worldObject;
     }
   //--------------Level METHODS====================//
@@ -232,6 +239,7 @@ public class WorldModel implements ActionListener, ObjectListener{
 	public void addObjectToWorld(WorldObject object) {
 		// TODO Auto-generated method stub
 		if (object != null && objects != null && !objects.contains(object, true)) {
+			//check if player has activated this object already.
 			objects.add(object);
 		}
 		for (WorldListener listener : worldListeners) {
@@ -241,13 +249,19 @@ public class WorldModel implements ActionListener, ObjectListener{
 
 	@Override
 	public void objectToActOn(WorldObject object) {
-		if (object != null && object.shouldDeleteOnActivation() && objects != null && objects.contains(object, true)) {
-			objects.removeValue(object, true);
-		}
 		for (WorldListener listener : worldListeners) {
 			listener.handlePlayerInteractionWithObject(object);
 		}		
+		object.activateObjectOnWorld(this);
 	}
+	
+	@Override
+	public void deleteObjectFromWorld(WorldObject object) {
+		if (object != null && objects != null && objects.contains(object, true)) {
+			objects.removeValue(object, true);
+		}
+	}
+
 
 	
 	private void checkIfAttackLands(Character character, Attack attack) {
@@ -293,6 +307,7 @@ public class WorldModel implements ActionListener, ObjectListener{
 			}
 		}
 	}
+
 
 
 

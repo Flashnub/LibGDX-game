@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Json;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.characters.Character;
 import com.mygdx.game.model.characters.EntityUIModel;
+import com.mygdx.game.model.characters.player.GameSave.UUIDType;
 import com.mygdx.game.model.world.SpawnPoint;
 import com.mygdx.game.model.worldObjects.WorldObject;
 
@@ -89,11 +90,15 @@ public class Player extends Character implements InputProcessor {
 	    WorldObject nearbyObject;
 	    static final int allegiance = 0;
 	    PlayerProperties playerProperties;
+	    GameSave gameSave;
 
 		public PlayerModel(String characterName, EntityUIModel uiModel) {
 			super(characterName, uiModel);
 			Json json = new Json();
+			GameSave gameSave = json.fromJson(GameSave.class, Gdx.files.internal("Saves/gameSave.json"));
+			this.gameSave = gameSave;
 			playerProperties = json.fromJson(PlayerProperties.class, Gdx.files.internal("Json/Player/playerActions.json"));
+			playerProperties.populateWith(gameSave);
 			applicableKeys = new Array<Integer>();
 			applicableKeys.add(Keys.W);
 			applicableKeys.add(Keys.A);
@@ -123,9 +128,13 @@ public class Player extends Character implements InputProcessor {
 			}
 		}
 	    
+		public boolean isUUIDInSave(Integer UUID) {
+			return gameSave.isUUIDInSave(UUID);
+		}
 
-
-
+		public void addUUIDToSave(Integer UUID, UUIDType uuidType) {
+			gameSave.addUUIDToSave(UUID, uuidType);
+		}
 	    
 	    public void dash(boolean left) {
 	    	if (!jumping) {

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Json.Serializable;
-import com.mygdx.game.model.items.ItemDrop;
+import com.mygdx.game.model.worldObjects.ItemDrop;
 import com.badlogic.gdx.utils.JsonValue;
 
 public class EnemyProperties implements Serializable {

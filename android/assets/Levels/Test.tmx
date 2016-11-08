@@ -9,7 +9,9 @@
   </tile>
   <tile id="1">
    <properties>
+    <property name="EntityType" value="WorldItem"/>
     <property name="Impassable" type="bool" value="false"/>
+    <property name="SpawnPoint" value="WorldItem"/>
    </properties>
   </tile>
  </tileset>
@@ -34,15 +36,13 @@
   </tile>
   <tile id="5">
    <properties>
-    <property name="EntityType" value="Enemy"/>
     <property name="Impassable" type="bool" value="false"/>
-    <property name="SpawnPoint" value="BasicEnemy"/>
    </properties>
   </tile>
  </tileset>
  <layer name="Tile Layer 1" width="60" height="30">
   <data encoding="base64" compression="zlib">
-   eJzt0TEOACAMw8CKgsT/X8wPmCPXw+2x0lXVwjtw9rLZy2Yvm71s9rLZy2Yvm71/O2DzpH/XsN70f29Ao//O7ZUkZXlrph64
+   eJzt0TEKwDAMBEFhx5D/vzg/cGMUjvUW0wotN6tqCm/B2ctmL5u9bPay2ctmL5u9bPbuPQE/37TvaOo9vZuqe983oPHP3jS390qSsnxPth61
   </data>
  </layer>
 </map>

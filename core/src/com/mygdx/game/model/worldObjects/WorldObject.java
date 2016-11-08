@@ -8,37 +8,47 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.model.characters.EntityUIDataType;
 import com.mygdx.game.model.characters.EntityUIModel;
+import com.mygdx.game.model.events.ObjectListener;
 import com.mygdx.game.model.world.WorldModel;
 
 public abstract class WorldObject {
 	
-//	public enum WorldObjectState implements State {
-//		Idle;
-//
-//		@Override
-//		public String getState() {
-//			return toString();
-//		}
-//	}
-	
 	final String idleState = "Idle";
+	public static final String WorldObjUUIDKey = "WorldObjUUIDKey";
+	private final String WorldObjUIKey = "WorldObjUIKey";
 	
 	Rectangle bounds;
 	EntityUIModel itemUIModel;
-	String uuid;
-	boolean shouldDeleteOnActivation;
+	Integer uuid;
+	boolean isActivated;
 	String state;
+	ObjectListener listener;
 	
-	public WorldObject(String name, MapProperties properties) {
-		itemUIModel = new EntityUIModel(name, EntityUIDataType.WORLDOBJECT);
+	public WorldObject(String typeOfObject, MapProperties properties, ObjectListener listener) {
+		itemUIModel = new EntityUIModel((String) properties.get(WorldObjUIKey), EntityUIDataType.WORLDOBJECT);
 		bounds = new Rectangle(0, 0, this.getDimensions().x, this.getDimensions().y);
-		uuid = UUID.randomUUID().toString();
-		shouldDeleteOnActivation = false;
+		this.uuid = (Integer) properties.get(WorldObjUUIDKey);
+		this.listener = listener;
 		state = idleState;
 	}
 	
+	public static boolean shouldAddIfActivated(String typeOfObject) {
+		switch (typeOfObject) {
+		case "WorldItem":
+			return false;
+		case "WorldLever":
+			return true;
+		}
+		return false;
+	}
+	public abstract boolean shouldDeleteIfActivated();
 	public abstract Vector2 getDimensions();
-	public abstract void activateObjectOnWorld(WorldModel world);
+	public void activateObjectOnWorld(WorldModel world) {
+		this.isActivated = true;
+		if (shouldDeleteIfActivated()) {
+			listener.deleteObjectFromWorld(this);
+		}
+	}
 	
 	@Override
 	public boolean equals(Object other){ 
@@ -52,7 +62,7 @@ public abstract class WorldObject {
 		itemUIModel.setCurrentFrame(this, delta);
 	}
 
-	public String getUuid() {
+	public Integer getUuid() {
 		return uuid;
 	}
 
@@ -68,12 +78,4 @@ public abstract class WorldObject {
 		return state;
 	}
 
-	public boolean shouldDeleteOnActivation() {
-		return shouldDeleteOnActivation;
-	}
-
-	public void setShouldDeleteOnActivation(boolean shouldDeleteOnActivation) {
-		this.shouldDeleteOnActivation = shouldDeleteOnActivation;
-	}
-		
 }

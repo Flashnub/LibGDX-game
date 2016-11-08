@@ -4,5 +4,6 @@ import com.mygdx.game.model.worldObjects.WorldObject;
 
 public interface ObjectListener {
 	void addObjectToWorld(WorldObject object);
+	void deleteObjectFromWorld(WorldObject object);
 	void objectToActOn(WorldObject object);
 }

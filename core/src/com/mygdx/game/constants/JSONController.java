@@ -10,8 +10,8 @@ import com.mygdx.game.model.actions.AttackSettings;
 import com.mygdx.game.model.actions.ProjectileAttackSettings;
 import com.mygdx.game.model.characters.CharacterProperties;
 import com.mygdx.game.model.characters.EntityUIDataType;
-import com.mygdx.game.model.items.Item;
 import com.mygdx.game.model.projectiles.ProjectileSettings;
+import com.mygdx.game.model.worldObjects.Item;
 
 public class JSONController {
     private static String jsonFilePath = "Json/";

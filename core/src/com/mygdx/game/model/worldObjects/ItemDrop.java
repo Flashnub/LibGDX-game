@@ -1,4 +1,4 @@
-package com.mygdx.game.model.items;
+package com.mygdx.game.model.worldObjects;
 
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Json.Serializable;

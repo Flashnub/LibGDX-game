@@ -55,7 +55,6 @@ public class EntityUIModel {
 					rightFrame.flip(true, false);
 					rightAnimationFrames.add(rightFrame);
 				}
-
 				Animation leftAnimation = new Animation(animationData.getDuration(), leftAnimationFrames, animationData.getPlayMode());
 				Animation rightAnimation = new Animation(animationData.getDuration(), rightAnimationFrames, animationData.getPlayMode());
 
@@ -87,8 +86,8 @@ public class EntityUIModel {
 		projectile.getImageHitBox().height = currentFrame.getRegionHeight();
 	}
 	
-	public void setCurrentFrame(WorldObject object, float delta) {
-		String animationString = SpriteUtils.animationStringWithState(this.entityName, object.getState());
+	public boolean setCurrentFrame(WorldObject object, float delta) {
+		String animationString = SpriteUtils.animationStringWithState(this.entityName, object.getState(), object.isFacingLeft());
 		Animation currentAnimation = animations.get(animationString);
 			
 		this.animationTime += delta;
@@ -96,6 +95,12 @@ public class EntityUIModel {
 		
 		object.getBounds().width = currentFrame.getRegionWidth();
 		object.getBounds().height = currentFrame.getRegionHeight();
+		
+		return this.isFinishedCurrentAnimation(currentAnimation);
+	}
+	
+	private boolean isFinishedCurrentAnimation(Animation currentAnimation) {
+		return this.animationTime > currentAnimation.getAnimationDuration();
 	}
 
 	public TextureRegion getCurrentFrame() {

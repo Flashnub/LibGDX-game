@@ -16,8 +16,8 @@
 				"typeOfAction": Ability
 			}
 			"windUpState": "Idle"
-			"actingState": "Idle"
-			"cooldownState": "Idle"
+			"actingState": "Walk"
+			"cooldownState": "Block"
 		},
 		"PlayerAttack": {
 			"class": com.mygdx.game.model.actions.ActionSequence,

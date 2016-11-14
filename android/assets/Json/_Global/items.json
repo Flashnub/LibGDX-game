@@ -1,6 +1,6 @@
 {
 	"HealthPotion": {
-		"class": com.mygdx.game.model.items.Item,
+		"class": com.mygdx.game.model.worldObjects.Item,
 		"name": "Health Potion",
 		"desc": "Restores Health",
 		"effects": [

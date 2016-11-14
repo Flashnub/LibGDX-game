@@ -2,10 +2,12 @@ package com.mygdx.game.model.characters.player;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
+import com.mygdx.game.constants.SaveController;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.characters.Character;
 import com.mygdx.game.model.characters.EntityUIModel;
@@ -95,7 +97,14 @@ public class Player extends Character implements InputProcessor {
 		public PlayerModel(String characterName, EntityUIModel uiModel) {
 			super(characterName, uiModel);
 			Json json = new Json();
-			GameSave gameSave = json.fromJson(GameSave.class, Gdx.files.internal("Saves/gameSave.json"));
+			GameSave gameSave;
+			FileHandle fileHandle = Gdx.files.local("Saves/currentSave.json");
+			if (fileHandle.exists()) {
+				gameSave = json.fromJson(GameSave.class, fileHandle);
+			}
+			else {
+				gameSave = GameSave.testSave();
+			}
 			this.gameSave = gameSave;
 			playerProperties = json.fromJson(PlayerProperties.class, Gdx.files.internal("Json/Player/playerActions.json"));
 			playerProperties.populateWith(gameSave);
@@ -138,35 +147,7 @@ public class Player extends Character implements InputProcessor {
 	    
 	    public void dash(boolean left) {
 	    	if (!jumping) {
-//	    		float velocityX = left ? -500f : 500f;
-//	    		float velocityY = this.velocity.y;
-//	    		float accelerationX = left ? 1000f : -1000f;
-//	    		float accelerationY = this.acceleration.y;
-//	    		float duration = 0.5f;
-//	    		
-//	    		Movement movement = new Movement();
-//	    		movement.setVelocity(new Vector2(velocityX, velocityY));
-//	    		movement.setAcceleration(new Vector2(accelerationX, accelerationY));
-//	    		movement.setDuration(duration);
-//	    		movement.setDelayToActivate(0.5f);
-//	    		movement.setFunction(new MovementFunction() {
-//	    			@Override 
-//	    			public void process(CharacterModel mover, Movement movement, float delta) {
-//	    				super.process(mover, movement, delta);
-//	    			}
-//	    			
-//	    			@Override
-//	    			public void completion(CharacterModel mover, Movement movement) {
-//	    				super.completion(mover, movement);
-//	    				mover.velocity.x = 0;
-//	    				mover.acceleration.x = 0;
-//	    			}
-//	    		});
 	    		ActionSequence dashAction = this.getCharacterProperties().getActions().get("PlayerDash").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener());
-//	    		for (Movement movement : dashAction.getMovements()) {
-//	    			this.getTempMovementActions().add(movement);
-//	    		}
-//	    		this.setCurrentMovementAction(this.getTempMovementActions().poll());
 	    		this.addActionSequence(dashAction);
 	    	}
 	    }
@@ -186,36 +167,9 @@ public class Player extends Character implements InputProcessor {
 	    }
 	    
 	    private void attack() {
-//	    	this.setState(PlayerState.Block);
-//	    	Rectangle attackHitBox = new Rectangle();
-//	    	attackHitBox.x = this.gameplayHitBox.x + this.gameplayHitBox.width;
-//	    	attackHitBox.y = this.gameplayHitBox.y;
-//	    	attackHitBox.width = 400;
-//	    	attackHitBox.height = this.gameplayHitBox.height + 80;
-//	    	
-//	    	int allegiance = this.getAllegiance();
-////	    	AttackFunction function = new AttackFunction() {
-////	    		public void process(CharacterModel target) {
-////	    	    	int damage = 2;
-////	    	    	target.setCurrentHealth(target.getCurrentHealth() - damage);
-////	    	    	target.velocity.x += 10;
-////	    		}
-////	    	};
-//	    	//Lambda Expression - Java 8
-////	    	AttackFunction function = (target) -> {
-////	    		
-////	    	};
-//	    	
-//	    	Attack attack = new Attack();
-//	    	attack.setAllegiance(allegiance);
-//	    	attack.setFunction(function);
-//	    	attack.setSource(this);
-//	    	attack.setHitBox(attackHitBox);
     		ActionSequence attackAction = this.getCharacterProperties().getActions().get("PlayerAttack");
     		this.addActionSequence(attackAction);
-
-	    	
-//	    	this.getAttackListener().processAttack(attack);
+   	
 	    }
 	    
 		public boolean handleKeyDown (int keyCode)
@@ -308,6 +262,10 @@ public class Player extends Character implements InputProcessor {
 
 		public PlayerProperties getPlayerProperties() {
 			return playerProperties;
+		}
+
+		public GameSave getGameSave() {
+			return gameSave;
 		}
 		
 	}

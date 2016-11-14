@@ -10,14 +10,27 @@ public class SaveController {
 	public GameSave currentGameSave;
 	public int saveIndex;
 	
-	public SaveController(GameSave gameSave) {
-		this.currentGameSave = gameSave;
+	public SaveController() {
+		
 	}
 	
 	
 	public void save() {
 		FileHandle fileHandle = Gdx.files.local("Saves/currentSave.json");
-		Json json = new Json(OutputType.json);
-		json.toJson(currentGameSave, GameSave.class, fileHandle);
+		Json json = new Json();
+		String jsonString = json.prettyPrint(currentGameSave);
+		fileHandle.writeString(jsonString, false);
 	}
+
+
+	public GameSave getCurrentGameSave() {
+		return currentGameSave;
+	}
+
+
+	public void setCurrentGameSave(GameSave currentGameSave) {
+		this.currentGameSave = currentGameSave;
+	}
+	
+	
 }

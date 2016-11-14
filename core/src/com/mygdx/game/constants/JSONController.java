@@ -12,6 +12,7 @@ import com.mygdx.game.model.characters.CharacterProperties;
 import com.mygdx.game.model.characters.EntityUIDataType;
 import com.mygdx.game.model.projectiles.ProjectileSettings;
 import com.mygdx.game.model.worldObjects.Item;
+import com.mygdx.game.model.worldObjects.LeverSettings;
 
 public class JSONController {
     private static String jsonFilePath = "Json/";
@@ -61,7 +62,7 @@ public class JSONController {
 	    HashMap <String, Item> items = json.fromJson(HashMap.class, Gdx.files.internal(globalFilePath + "items.json"));
         return items;
     }
-    
+
     public static EntityUIData loadUIDataFromJSONForEntity(String name, EntityUIDataType dataType) {
         if (!uiDatas.containsKey(name)) {
             Json json = new Json();
@@ -93,4 +94,6 @@ public class JSONController {
 		}
 		return characterProperties.get(characterName).cloneProperties();
 	}
+	
+
 }

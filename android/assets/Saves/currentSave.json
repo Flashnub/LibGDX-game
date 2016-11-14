@@ -1,0 +1,14 @@
+{
+objectsInteractedHistory: [
+	{
+		class: java.lang.Integer
+		value: 300
+	}
+	{
+		class: java.lang.Integer
+		value: 200
+	}
+]
+acquiredItemsHistory: []
+inventoryItemKeys: []
+}

@@ -7,6 +7,7 @@ import com.mygdx.game.model.characters.player.GameSave.UUIDType;
 import com.mygdx.game.model.characters.player.Player;
 import com.mygdx.game.model.characters.player.Player.PlayerModel;
 import com.mygdx.game.model.events.ObjectListener;
+import com.mygdx.game.model.events.SaveListener;
 import com.mygdx.game.model.world.WorldModel;
 
 public class WorldItem extends WorldObject {
@@ -26,8 +27,8 @@ public class WorldItem extends WorldObject {
 	public static String name = "WorldItem";
 	Item item;
 	
-	public WorldItem(String name, MapProperties properties, ObjectListener objListener) {
-		super(name, properties, objListener);
+	public WorldItem(String name, MapProperties properties, ObjectListener objListener, SaveListener saveListener) {
+		super(name, properties, objListener, saveListener);
 		this.item = JSONController.items.get(properties.get(typeName));
 	}
 	
@@ -36,17 +37,21 @@ public class WorldItem extends WorldObject {
 		Player player = world.getPlayer();
 		PlayerModel model = (PlayerModel) player.getCharacterData();
 		model.getPlayerProperties().getInventory().add(item);
-		model.addUUIDToSave(this.uuid, UUIDType.ITEM);
 		super.activateObjectOnWorld(world);
 	}
 
 	@Override
-	public Vector2 getDimensions() {
-		return new Vector2(60, 60);
+	public boolean shouldDeleteIfActivated() {
+		return true;
+	}
+
+	@Override
+	public boolean shouldHaveCollisionDetection() {
+		return false;
 	}
 	
 	@Override
-	public boolean shouldDeleteIfActivated() {
-		return true;
+	public UUIDType getUUIDType() {
+		return UUIDType.ITEM;
 	}
 }

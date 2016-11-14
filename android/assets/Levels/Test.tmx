@@ -9,9 +9,11 @@
   </tile>
   <tile id="1">
    <properties>
-    <property name="EntityType" value="WorldItem"/>
     <property name="Impassable" type="bool" value="false"/>
     <property name="SpawnPoint" value="WorldItem"/>
+    <property name="WorldObjUIKey" value="Item"/>
+    <property name="WorldObjUUIDKey" type="int" value="100"/>
+    <property name="itemName" value="HealthPotion"/>
    </properties>
   </tile>
  </tileset>

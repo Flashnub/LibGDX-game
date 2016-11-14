@@ -45,10 +45,12 @@ public class GameSave implements Serializable{
 	public void addUUIDToSave(Integer UUID, UUIDType uuidType) {
 		switch (uuidType) {
 		case OBJECT:
-			objectsInteractedHistory.add(UUID);
+			if (!objectsInteractedHistory.contains(UUID, false))
+				objectsInteractedHistory.add(UUID);
 			break;
-		case ITEM:
-			acquiredItemsHistory.add(UUID);
+		case ITEM:			
+			if (!acquiredItemsHistory.contains(UUID, false))
+				acquiredItemsHistory.add(UUID);
 			break;
 		}
 	}
@@ -65,5 +67,11 @@ public class GameSave implements Serializable{
 		return inventoryItemKeys;
 	}
 	
-	
+	public static GameSave testSave() {
+		GameSave gameSave = new GameSave();
+		gameSave.acquiredItemsHistory = new Array<Integer>();
+		gameSave.inventoryItemKeys = new Array<String>();
+		gameSave.objectsInteractedHistory = new Array<Integer>();
+		return gameSave;
+	}
 }

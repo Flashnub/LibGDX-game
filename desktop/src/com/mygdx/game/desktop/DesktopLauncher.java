@@ -55,8 +55,18 @@ public class DesktopLauncher {
         
         parentOutputDir = "Sprites/WorldObjects/";
         parentInputDir = "Sprites/WorldObjects/";
-        TexturePacker.process(settings, parentInputDir, parentOutputDir, "textures");
+    	ArrayList <String> objectNames = new ArrayList<String>();
+    	objectNames.add("Item");
+    	objectNames.add("Lever");
+    	objectNames.add("Gate");
 
+    	for (String objectName : objectNames) {
+        	String inputDir = parentInputDir + objectName;
+        	String outputDir = parentOutputDir + objectName;
+        	
+            TexturePacker.process(settings, inputDir, outputDir, "textures");
+    	}
+    	
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.width = 800;
 		config.height = 600;

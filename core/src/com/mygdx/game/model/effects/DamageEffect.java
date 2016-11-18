@@ -18,7 +18,7 @@ public class DamageEffect extends Effect{
 		if (dSettings.isInstantaneous) {
 			target.removeFromCurrentHealth(dSettings.value);
 		}
-		else if (isActive){
+		else if (isActive && !isFinished){
 			target.removeFromCurrentHealth((int) (dSettings.value * (delta / dSettings.duration)));
 		}
 		return isFinished;

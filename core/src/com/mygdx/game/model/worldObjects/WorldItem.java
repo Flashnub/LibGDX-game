@@ -1,7 +1,7 @@
 package com.mygdx.game.model.worldObjects;
 
 import com.badlogic.gdx.maps.MapProperties;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Rectangle;
 import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.characters.player.GameSave.UUIDType;
 import com.mygdx.game.model.characters.player.Player;
@@ -14,14 +14,6 @@ public class WorldItem extends WorldObject {
 	
 	private final String typeName = "itemName";
 
-//	public enum ItemState implements State{
-//		Fading;
-//
-//		@Override
-//		public String getState() {
-//			return toString();
-//		}
-//	}
 	final String fadingState = "Fading";
 	
 	public static String name = "WorldItem";
@@ -36,7 +28,7 @@ public class WorldItem extends WorldObject {
 	public void activateObjectOnWorld(WorldModel world) {
 		Player player = world.getPlayer();
 		PlayerModel model = (PlayerModel) player.getCharacterData();
-		model.getPlayerProperties().getInventory().add(item);
+		model.addItemToInventory(item);
 		super.activateObjectOnWorld(world);
 	}
 
@@ -46,12 +38,22 @@ public class WorldItem extends WorldObject {
 	}
 
 	@Override
-	public boolean shouldHaveCollisionDetection() {
+	public boolean shouldCollideWithCharacter() {
 		return false;
 	}
 	
 	@Override
 	public UUIDType getUUIDType() {
 		return UUIDType.ITEM;
+	}
+
+	@Override
+	public boolean shouldMove() {
+		return true;
+	}
+
+	@Override
+	public boolean handleAdditionCollisionLogic(Rectangle tempGameplayBounds) {
+		return false;
 	}
 }

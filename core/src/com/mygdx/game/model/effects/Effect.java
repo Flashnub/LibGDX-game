@@ -14,7 +14,7 @@ public abstract class Effect {
 	}
 	
 	public enum EffectType {
-		MOVEMENT, DAMAGE, HEALING
+		MOVEMENT, DAMAGE, HEALING, ITEMGIVE
 	}
 	
 	

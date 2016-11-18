@@ -5,20 +5,23 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
-import com.mygdx.game.constants.SaveController;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.characters.Character;
 import com.mygdx.game.model.characters.EntityUIModel;
 import com.mygdx.game.model.characters.player.GameSave.UUIDType;
 import com.mygdx.game.model.world.SpawnPoint;
+import com.mygdx.game.model.worldObjects.Item;
 import com.mygdx.game.model.worldObjects.WorldObject;
 
 public class Player extends Character implements InputProcessor {
 
 	public static final String characterName = "Player";
 	public static final String characterType = "Player";
+	public static final int allegiance = 1;
+
 	
 	public Player() {
 		super(characterName);
@@ -90,7 +93,6 @@ public class Player extends Character implements InputProcessor {
 	    Array<Integer> applicableKeys;
 	    SpawnPoint spawnPoint;
 	    WorldObject nearbyObject;
-	    static final int allegiance = 0;
 	    PlayerProperties playerProperties;
 	    GameSave gameSave;
 
@@ -144,10 +146,15 @@ public class Player extends Character implements InputProcessor {
 		public void addUUIDToSave(Integer UUID, UUIDType uuidType) {
 			gameSave.addUUIDToSave(UUID, uuidType);
 		}
+		
+		public void addItemToInventory(Item item) {
+			this.getPlayerProperties().getInventory().add(item);
+			//Eventually add HUD code to reflect receiving item.
+		}
 	    
 	    public void dash(boolean left) {
 	    	if (!jumping) {
-	    		ActionSequence dashAction = this.getCharacterProperties().getActions().get("PlayerDash").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener());
+	    		ActionSequence dashAction = this.getCharacterProperties().getActions().get("PlayerDash").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());
 	    		this.addActionSequence(dashAction);
 	    	}
 	    }
@@ -237,7 +244,7 @@ public class Player extends Character implements InputProcessor {
 		
 		private void checkIfNeedToStopWalk() {
 			if (!isWalkLeftPressed && !isWalkRightPressed) {
-				this.velocity.x = 0;
+				this.getVelocity().x = 0;
 				setState(this.idleState);
 			}
 		}
@@ -249,7 +256,7 @@ public class Player extends Character implements InputProcessor {
 
 		@Override
 		public int getAllegiance() {
-			return PlayerModel.allegiance;
+			return Player.allegiance;
 		}
 
 		public WorldObject getNearbyObject() {
@@ -267,7 +274,11 @@ public class Player extends Character implements InputProcessor {
 		public GameSave getGameSave() {
 			return gameSave;
 		}
-		
+
+		@Override
+		public boolean handleAdditionCollisionLogic(Rectangle tempGameplayBounds) {
+			return this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds);
+		}
 	}
 
 	

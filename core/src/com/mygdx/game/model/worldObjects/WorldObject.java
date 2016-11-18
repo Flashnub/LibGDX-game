@@ -2,8 +2,8 @@ package com.mygdx.game.model.worldObjects;
 
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.model.characters.CollisionCheck;
+import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.characters.EntityUIDataType;
 import com.mygdx.game.model.characters.EntityUIModel;
 import com.mygdx.game.model.characters.player.GameSave.UUIDType;
@@ -11,33 +11,33 @@ import com.mygdx.game.model.events.ObjectListener;
 import com.mygdx.game.model.events.SaveListener;
 import com.mygdx.game.model.world.WorldModel;
 
-public abstract class WorldObject {
+public abstract class WorldObject extends EntityModel {
 	
 	final String deactivatedState = "Deactivated";
 	final String activatingState = "Activating";
 	final String activatedState = "Activated";
 	public static final String WorldObjUUIDKey = "UUID";
 	private final String WorldObjUIKey = "UIKey";
-	static float defaultGravity = 980f;
+	static float defaultGravity = 300f;
+	public static int allegiance = 0;
 	
-	Rectangle bounds;
 	EntityUIModel itemUIModel;
 	Integer uuid;
 	boolean isActivated, isFacingLeft, didChangeState;
 	String state;
-	ObjectListener objListener;
 	SaveListener saveListener;
-	Vector2 acceleration;
-	Vector2 velocity;
+	ObjectListener objListener;
 	
 	public WorldObject(String typeOfObject, MapProperties properties, ObjectListener objListener, SaveListener saveListener) {
+		super();
 		isFacingLeft = false;
 		didChangeState = false;
 		itemUIModel = new EntityUIModel((String) properties.get(WorldObjUIKey), EntityUIDataType.WORLDOBJECT);
-		bounds = new Rectangle(0, 0, 0, 0);
 		this.uuid = (Integer) properties.get(WorldObjUUIDKey);
-		this.objListener = objListener;
+		this.setObjListener(objListener);
 		this.saveListener = saveListener;
+		this.acceleration.y = -defaultGravity;
+		this.gameplayHitBox = this.imageHitBox;
 		state = deactivatedState;
 	}
 	
@@ -52,12 +52,14 @@ public abstract class WorldObject {
 		return false;
 	}
 	public abstract boolean shouldDeleteIfActivated();
-	public abstract boolean shouldHaveCollisionDetection();
+	public abstract boolean shouldMove();
+	public abstract boolean shouldCollideWithCharacter();
 	public abstract UUIDType getUUIDType();
+	
 	public void activateObjectOnWorld(WorldModel world) {
 		this.setState(this.activatingState);
 		if (shouldDeleteIfActivated()) {
-			objListener.deleteObjectFromWorld(this);
+			this.getObjListener().deleteObjectFromWorld(this);
 		}
 		saveListener.addUUIDToSave(this.uuid, this.getUUIDType());
 		saveListener.triggerSave();
@@ -67,11 +69,27 @@ public abstract class WorldObject {
 		this.setState(this.activatedState);
 		this.isActivated = true;
 		if (shouldDeleteIfActivated()) {
-			objListener.deleteObjectFromWorld(this);
+			this.getObjListener().deleteObjectFromWorld(this);
 		}
 	}
 	
-	public void update(float delta) {
+	public void movementWithCollisionDetection(float delta, TiledMapTileLayer collisionLayer) {
+		if (this.shouldMove()) {
+			CollisionCheck collisionX = this.checkForXCollision(delta, collisionLayer, this.velocity.x, true);
+			if (collisionX.isDoesCollide()) {
+				this.getVelocity().x = 0;
+				this.getAcceleration().x = 0;
+			}
+			CollisionCheck collisionY = this.checkForYCollision(delta, collisionLayer, this.velocity.y, true);
+			if (collisionY.isDoesCollide()) {
+				this.getVelocity().y = 0;
+			}
+		}
+	}
+	
+	public void update(float delta, TiledMapTileLayer collisionLayer) {
+		this.setGameplaySize(delta, collisionLayer);
+		this.movementWithCollisionDetection(delta, collisionLayer);
 		if (this.didChangeState) {
 			this.itemUIModel.setAnimationTime(0f);
 			this.didChangeState = false; 
@@ -92,10 +110,6 @@ public abstract class WorldObject {
 	}
 	public Integer getUuid() {
 		return uuid;
-	}
-
-	public Rectangle getBounds() {
-		return bounds;
 	}
 
 	public EntityUIModel getItemUIModel() {
@@ -119,6 +133,19 @@ public abstract class WorldObject {
 			this.state = state;
 			this.didChangeState = true;
 		}
+	}
+
+	public ObjectListener getObjListener() {
+		return objListener;
+	}
+
+	public void setObjListener(ObjectListener objListener) {
+		this.objListener = objListener;
+	}
+	
+	@Override
+	public int getAllegiance() {
+		return WorldObject.allegiance;
 	}
 
 }

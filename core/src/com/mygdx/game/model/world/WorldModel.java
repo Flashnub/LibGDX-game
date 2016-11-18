@@ -5,7 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.maps.MapProperties;
-import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.Rectangle;
@@ -13,20 +12,21 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.constants.SaveController;
 import com.mygdx.game.model.actions.Attack;
 import com.mygdx.game.model.characters.Character;
+import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.characters.enemies.Enemy;
 import com.mygdx.game.model.characters.enemies.Enemy.EnemyModel;
 import com.mygdx.game.model.characters.player.GameSave.UUIDType;
 import com.mygdx.game.model.characters.player.Player;
 import com.mygdx.game.model.characters.player.Player.PlayerModel;
 import com.mygdx.game.model.events.ActionListener;
+import com.mygdx.game.model.events.CollisionChecker;
 import com.mygdx.game.model.events.ObjectListener;
 import com.mygdx.game.model.events.SaveListener;
 import com.mygdx.game.model.projectiles.Projectile;
 import com.mygdx.game.model.worldObjects.WorldObject;
-import com.mygdx.game.utils.CellWrapper;
 
 
-public class WorldModel implements ActionListener, ObjectListener, SaveListener{
+public class WorldModel implements ActionListener, ObjectListener, SaveListener, CollisionChecker{
 
     private final float MAX_TIMESTEP = 1 / 300f;
     private float accumulatedTime = 0f;
@@ -89,7 +89,8 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener{
 					player.getCharacterData().imageHitBox.y = collisionLayer.getTileHeight() * y;
 					player.getCharacterData().gameplayHitBox.y = .2f*(collisionLayer.getTileWidth() * y);
 					player.getCharacterData().setActionListener(this);
-					player.getCharacterData().setItemListener(this);
+					player.getCharacterData().setObjectListener(this);
+					player.getCharacterData().setCollisionChecker(this);
 					Gdx.input.setInputProcessor(player);
 					this.saveController.setCurrentGameSave(((PlayerModel) player.getCharacterData()).getGameSave());
 				}
@@ -102,12 +103,13 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener{
     }
     
     private void makeWorldObjectFromTile(Cell tile, int x, int y) {
-    	if (tile.getTile().getProperties().containsKey(kSpawnPoint)) {
+    	MapProperties properties = tile.getTile().getProperties();
+    	if (properties.containsKey(kSpawnPoint) && (!properties.containsKey(kEntityType) || (!properties.get(kEntityType).equals(Enemy.characterType) && !properties.get(kEntityType).equals(Player.characterType)))) {
 			String entityName = (String) tile.getTile().getProperties().get(kSpawnPoint);
 			WorldObject object = getObjectFromString(entityName, tile.getTile().getProperties());
 			if (object != null) {
-				object.getBounds().x = collisionLayer.getTileWidth() * x;
-				object.getBounds().y = collisionLayer.getTileHeight() * y;
+				object.getImageHitBox().x = collisionLayer.getTileWidth() * x;
+				object.getImageHitBox().y = collisionLayer.getTileHeight() * y;
 				this.addObjectToWorld(object);
 			}
     	}
@@ -132,7 +134,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener{
     
     private WorldObject getObjectFromString(String typeOfObject, MapProperties properties) {
     	WorldObject worldObject = null;
-    	if (properties != null && !typeOfObject.equals(Player.characterType) && !typeOfObject.equals(Enemy.characterType)) {
+    	if (properties != null) {
     		Integer uuid = (Integer) properties.get(WorldObject.WorldObjUUIDKey);
 			boolean isAlreadyActivated = ((PlayerModel)player.getCharacterData()).isUUIDInSave(uuid);
 			if (typeOfObject != null) {
@@ -170,11 +172,13 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener{
     		}
     		accumulatedTime -= timeForAction;
         }
-		for (Projectile projectile : projectiles) {
+		for (int i = 0; i < projectiles.size; i++) {
+			Projectile projectile = projectiles.get(i);
 			projectile.update(delta, collisionLayer);
 		}
-		for (WorldObject object : objects) {
-			object.update(delta);
+		for (int i = 0; i < objects.size; i++) {
+			WorldObject object = objects.get(i);
+			object.update(delta, collisionLayer);
 		}
     }
 
@@ -193,7 +197,8 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener{
 		enemies.add(enemy);
 		((EnemyModel) enemy.getCharacterData()).setPlayer(player);
 		((EnemyModel) enemy.getCharacterData()).setActionListener(this);
-		((EnemyModel) enemy.getCharacterData()).setItemListener(this);
+		((EnemyModel) enemy.getCharacterData()).setObjectListener(this);
+		((EnemyModel) enemy.getCharacterData()).setCollisionChecker(this);
 		for (WorldListener listener : worldListeners) {
 			listener.handleAddedEnemy(enemy);
 		}
@@ -294,28 +299,86 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener{
 		}
 		return false;
 	}
-
+	
+//	@Override
+//	public boolean doTilesCollideWithObjects(Array<CellWrapper> nearbyTiles, TiledMapTileLayer collisionLayer) {
+//		boolean isColliding = false;
+//		for (int i = 0; i < nearbyTiles.size; i++) {
+//			CellWrapper cell = nearbyTiles.get(i);
+//			Rectangle tileBounds = new Rectangle(cell.getOrigin().x, cell.getOrigin().y, 
+//				collisionLayer.getTileWidth(), collisionLayer.getTileHeight());
+//			for (WorldObject object : this.objects) {
+//				if (object.shouldCollideWithPlayer() && object.getImageHitBox().overlaps(tileBounds)) {
+//					isColliding = true;
+//				}
+//			}
+//		}
+//		return isColliding;
+//	}
+	
 	@Override
-	public boolean doTilesCollideWithObjects(Array<CellWrapper> nearbyTiles, TiledMapTileLayer collisionLayer) {
+	public boolean checkIfEntityCollidesWithOthers(EntityModel entity, Rectangle tempGameplayBounds) {
 		boolean isColliding = false;
-		for (int i = 0; i < nearbyTiles.size; i++) {
-			CellWrapper cell = nearbyTiles.get(i);
-			Rectangle tileBounds = new Rectangle(cell.getOrigin().x, cell.getOrigin().y, 
-				collisionLayer.getTileWidth(), collisionLayer.getTileHeight());
-			for (WorldObject object : this.objects) {
-				if (object.shouldHaveCollisionDetection() && object.getBounds().overlaps(tileBounds)) {
+		if (entity.getAllegiance() == Player.allegiance) {
+			for (Enemy enemy : this.enemies) {
+				if (enemy.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds)) {
 					isColliding = true;
+					break;
+				}
+			}
+			if (!isColliding) {
+				for (WorldObject object : this.objects) {
+					if (object.shouldCollideWithCharacter() && object.getGameplayHitBox().overlaps(tempGameplayBounds)) {
+						isColliding = true;
+						break;
+					}
+				}
+			}
+
+		}
+		else if (entity.getAllegiance() == WorldObject.allegiance) {
+			isColliding = player.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds);
+			if (!isColliding) {
+				for (Enemy enemy : this.enemies) {
+					if (enemy.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds)) {
+						isColliding = true;
+						break;
+					}
+				}
+			}
+		}
+		else {
+			isColliding = player.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds);
+			if (!isColliding) {
+				for (WorldObject object : this.objects) {
+					if (object.shouldCollideWithCharacter() && object.getGameplayHitBox().overlaps(tempGameplayBounds)) {
+						isColliding = true;
+						break;
+					}
 				}
 			}
 		}
 		return isColliding;
 	}
 
+	@Override
+	public boolean checkIfEntityCollidesWithObjects(EntityModel entity, Rectangle tempGameplayBounds) {
+		boolean isColliding = false;
+		for (WorldObject object : this.objects) {
+			if (object.shouldCollideWithCharacter() && object.getGameplayHitBox().overlaps(tempGameplayBounds)) {
+				isColliding = true;
+				break;
+			}
+		}
+		return isColliding;
+	}
+
+
 	
 	private void checkIfPlayerIsNearObjects() {
 		nearbyObjects.clear();
 		for (WorldObject object : this.objects) {
-			if (object.getBounds().overlaps(player.getCharacterData().getImageHitBox())) {
+			if (object.getImageHitBox().overlaps(player.getCharacterData().getImageHitBox())) {
 				nearbyObjects.add(object);
 			}
 		}
@@ -372,5 +435,8 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener{
 		model.addUUIDToSave(UUID, type);
 
 	}
+
+
+
 
 }

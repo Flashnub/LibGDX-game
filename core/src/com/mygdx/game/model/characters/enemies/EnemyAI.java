@@ -77,7 +77,7 @@ public abstract class EnemyAI implements PlayerObserver {
 			//shoot if far, attack if close.
 			
 			for (ActionSequence actionSequence : this.properties.getActions().values()) {
-				ActionSequence clonedSequence = actionSequence.cloneSequenceWithSourceAndTarget(this.source, distanceObservation.sourceOfObservation, world);
+				ActionSequence clonedSequence = actionSequence.cloneSequenceWithSourceAndTarget(this.source, distanceObservation.sourceOfObservation, world, world);
 				if (clonedSequence.getEffectiveRange() >= rawDistance) {
 					possibleActionsToTake.add(clonedSequence);
 				}

@@ -126,10 +126,10 @@ public class WorldRenderer implements CoordinatesHelper{
 	    private void drawWorldObjects(SpriteBatch batch) {
 	    	for (WorldObject object : worldModel.getObjects()) {
 		    	batch.draw(object.getItemUIModel().getCurrentFrame(), 
-		    			object.getBounds().x,
-		    			object.getBounds().y,  
-		    			object.getBounds().width, 
-		    			object.getBounds().height);
+		    			object.getImageHitBox().x,
+		    			object.getImageHitBox().y,  
+		    			object.getImageHitBox().width, 
+		    			object.getImageHitBox().height);
 	    	}
 	    }
 

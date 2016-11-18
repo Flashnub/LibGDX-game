@@ -2,14 +2,14 @@ package com.mygdx.game.model.characters.enemies;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Json;
 import com.mygdx.game.model.characters.EntityUIModel;
-import com.mygdx.game.model.characters.InteractableCharacter;
+import com.mygdx.game.model.characters.Character;
 import com.mygdx.game.model.characters.player.Player;
-import com.mygdx.game.model.characters.player.PlayerProperties;
 import com.mygdx.game.model.world.WorldModel;
 
-public class Enemy extends InteractableCharacter{
+public class Enemy extends Character{
 	
 	//An enemy will always monitor the player and collect
 	//various data about them. They will also have abstract
@@ -29,7 +29,7 @@ public class Enemy extends InteractableCharacter{
 	}
 
 	
-	public class EnemyModel extends InteractableCharacterModel  {
+	public class EnemyModel extends CharacterModel  {
 		
 		Player player;
 		float pollTime;
@@ -82,11 +82,17 @@ public class Enemy extends InteractableCharacter{
 		public int getAllegiance() {
 			Integer allegiance = this.getCharacterProperties().getAllegiance();
 			if (allegiance == null) {
-				allegiance = 1;
+				allegiance = 2;
 			}
 			return allegiance;
 		}
 
+
+
+		@Override
+		public boolean handleAdditionCollisionLogic(Rectangle tempGameplayBounds) {
+			return this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds);
+		}
 		
 	}
 

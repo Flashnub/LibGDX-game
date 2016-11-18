@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.events.ActionListener;
+import com.mygdx.game.model.events.CollisionChecker;
 
 public class ActionSequence implements Serializable {
 	
@@ -32,6 +33,7 @@ public class ActionSequence implements Serializable {
 	private CharacterModel source;
 	private CharacterModel target;
 	private ActionListener actionListener;
+	private CollisionChecker collisionChecker;
 	
 	public ActionSequence() {
 
@@ -54,17 +56,32 @@ public class ActionSequence implements Serializable {
 		actionKey = json.readValue("actionKey", ActionSegmentKey.class, jsonData);
 		strategy = json.readValue("strategy", ActionStrategy.class, jsonData);
 //		nextActionKey = json.readValue("nextActionKey", String.class, jsonData);
-		windupState = json.readValue("windupState", String.class, jsonData);
+		String windupState = json.readValue("windupState", String.class, jsonData);
+		String cooldownState = json.readValue("cooldownState", String.class, jsonData);
 		actingState = json.readValue("actingState", String.class, jsonData);
-		cooldownState = json.readValue("cooldownState", String.class, jsonData);
+		
+		if (windupState != null) {
+			this.windupState = windupState;
+		}
+		else {
+			this.windupState = actingState;
+		}
+		
+		if (cooldownState != null) {
+			this.cooldownState = cooldownState;
+		}
+		else {
+			this.cooldownState = actingState;
+		}
 //		actionKey = json.readValue("actionKey", String.class, jsonData);
 	}
 	
-	public ActionSequence cloneSequenceWithSourceAndTarget(CharacterModel source, CharacterModel target, ActionListener actionListener) {
+	public ActionSequence cloneSequenceWithSourceAndTarget(CharacterModel source, CharacterModel target, ActionListener actionListener, CollisionChecker collisionChecker) {
 		ActionSequence sequence = cloneBareSequence();
 		sequence.source = source;
 		sequence.target = target;
 		sequence.actionListener = actionListener;
+		sequence.collisionChecker = collisionChecker;
 		sequence.createActionFromSettings();
 		return sequence;
 	}
@@ -136,7 +153,7 @@ public class ActionSequence implements Serializable {
 				action = new Attack(source, target, JSONController.attacks.get(segmentKey.getKey().value));
 				break;
 			case ProjectileAttack:
-				action = new ProjectileAttack(source, target, actionListener, JSONController.projectileAttacks.get(segmentKey.getKey().value));
+				action = new ProjectileAttack(source, target, actionListener, collisionChecker, JSONController.projectileAttacks.get(segmentKey.getKey().value));
 				break;
 			case Ability:
 				action = new Ability(source, JSONController.abilities.get(segmentKey.getKey().value));

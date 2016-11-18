@@ -81,7 +81,9 @@ public class EntityUIModel {
 			
 		this.animationTime += delta;
 		currentFrame = currentAnimation.getKeyFrame(this.animationTime);
-		
+		if (currentFrame == null) {
+			System.out.println("null frame");
+		}
 		projectile.getImageHitBox().width = currentFrame.getRegionWidth();
 		projectile.getImageHitBox().height = currentFrame.getRegionHeight();
 	}
@@ -93,8 +95,8 @@ public class EntityUIModel {
 		this.animationTime += delta;
 		currentFrame = currentAnimation.getKeyFrame(this.animationTime);
 		
-		object.getBounds().width = currentFrame.getRegionWidth();
-		object.getBounds().height = currentFrame.getRegionHeight();
+		object.getImageHitBox().width = currentFrame.getRegionWidth();
+		object.getImageHitBox().height = currentFrame.getRegionHeight();
 		
 		return this.isFinishedCurrentAnimation(currentAnimation);
 	}

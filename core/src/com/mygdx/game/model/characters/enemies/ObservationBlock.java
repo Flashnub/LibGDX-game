@@ -1,6 +1,5 @@
 package com.mygdx.game.model.characters.enemies;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.mygdx.game.model.characters.Character.CharacterModel;

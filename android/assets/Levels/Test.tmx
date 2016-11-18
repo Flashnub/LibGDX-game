@@ -11,8 +11,8 @@
    <properties>
     <property name="Impassable" type="bool" value="false"/>
     <property name="SpawnPoint" value="WorldItem"/>
-    <property name="WorldObjUIKey" value="Item"/>
-    <property name="WorldObjUUIDKey" type="int" value="100"/>
+    <property name="UIKey" value="Item"/>
+    <property name="UUID" type="int" value="100"/>
     <property name="itemName" value="HealthPotion"/>
    </properties>
   </tile>
@@ -38,7 +38,9 @@
   </tile>
   <tile id="5">
    <properties>
+    <property name="EntityType" value="Enemy"/>
     <property name="Impassable" type="bool" value="false"/>
+    <property name="SpawnPoint" value="BasicEnemy"/>
    </properties>
   </tile>
  </tileset>

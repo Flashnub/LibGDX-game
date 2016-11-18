@@ -2,7 +2,6 @@ package com.mygdx.game.model.characters.player;
 
 import java.util.HashMap;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Json.Serializable;
@@ -19,13 +18,11 @@ public class PlayerProperties implements Serializable{
     
 	@Override
 	public void write(Json json) {
-		// TODO Auto-generated method stub
 		json.writeValue("playerActions", playerSpecificActions);
 	}
 	@Override
 	@SuppressWarnings("unchecked")
 	public void read(Json json, JsonValue jsonData) {
-		// TODO Auto-generated method stub
 		playerSpecificActions = json.readValue("playerActions", HashMap.class, jsonData);
 	}
 	

@@ -7,6 +7,8 @@ import com.mygdx.game.model.effects.Effect;
 import com.mygdx.game.model.effects.EffectInitializer;
 import com.mygdx.game.model.effects.EffectSettings;
 import com.mygdx.game.model.events.ActionListener;
+import com.mygdx.game.model.events.CollisionChecker;
+import com.mygdx.game.model.events.ObjectListener;
 import com.mygdx.game.model.projectiles.Projectile;
 import com.mygdx.game.model.projectiles.ProjectileSettings;
 
@@ -17,20 +19,21 @@ public class ProjectileAttack extends ActionSegment{
 	ActionSegment potentialAbility;
 	CharacterModel target;
 	ActionListener actionListener;
+	CollisionChecker collisionChecker;
 	ProjectileAttackSettings projAttackSettings;
 	
 	public ProjectileAttack() {
 		
 	}
 	
-	public ProjectileAttack(CharacterModel source, CharacterModel target, ActionListener actionListener, ProjectileAttackSettings settings) {
+	public ProjectileAttack(CharacterModel source, CharacterModel target, ActionListener actionListener, CollisionChecker collisionChecker, ProjectileAttackSettings settings) {
 		this.source = source;
 		this.target = target;
 		this.actionListener = actionListener;
 		projectiles = new ArrayList<Projectile>();
 		this.projAttackSettings = settings;
 		for (ProjectileSettings projSettings : settings.getProjectileSettings()) {
-			Projectile projectile = new Projectile(projSettings.getName(), source, target, actionListener);
+			Projectile projectile = new Projectile(projSettings.getName(), source, target, actionListener, collisionChecker);
 			projectiles.add(projectile);
 		}
 		if (settings.getAbilitySettings() != null) {
@@ -80,12 +83,6 @@ public class ProjectileAttack extends ActionSegment{
 		}
 	}
 
-	@Override
-	public void sourceProcess(CharacterModel source) {
-		super.sourceProcess(source);
-		sourceProcessWithoutSuper(source);
-	}
-	
 	public void sourceProcessWithoutSuper(CharacterModel source) {
 		if (this.potentialAbility != null) {
 			this.potentialAbility.sourceProcessWithoutSuper(source);
@@ -101,10 +98,11 @@ public class ProjectileAttack extends ActionSegment{
 		projAttack.source = source;
 		projAttack.target = target;
 		projAttack.actionListener = actionListener;
+		projAttack.collisionChecker = collisionChecker;
 		projectiles = new ArrayList<Projectile>();
 		projAttack.projAttackSettings = projAttackSettings;
 		for (ProjectileSettings projSettings : projAttackSettings.getProjectileSettings()) {
-			Projectile projectile = new Projectile(projSettings.getName(), source, target, actionListener);
+			Projectile projectile = new Projectile(projSettings.getName(), source, target, actionListener, collisionChecker);
 			projectiles.add(projectile);
 		}
 		if (projAttackSettings.getAbilitySettings() != null) {

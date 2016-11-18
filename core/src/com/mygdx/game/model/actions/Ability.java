@@ -21,12 +21,6 @@ public class Ability extends ActionSegment{
 		
 	}
 	
-	@Override
-	public void sourceProcess(CharacterModel source) {
-		super.sourceProcess(source);
-		sourceProcessWithoutSuper(source);
-	}
-	
 	public void sourceProcessWithoutSuper(CharacterModel source) {
 		for (EffectSettings effectSettings : settings.sourceEffectSettings) {
 			Effect effect = EffectInitializer.initializeEffect(effectSettings);

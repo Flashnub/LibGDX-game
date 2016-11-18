@@ -4,13 +4,12 @@
 		"name": "Basic",
 		"explodeOnImpact": true,
 		"useSmartAim": true,
-		"gravity": 0,
+		"gravity": 200,
 		"tracks": false,
 		"bounces": false,
-		"hasCollisionDetection": false,
+		"hasCollisionDetection": true,
 		"speed": 300,
 		"duration": 9,
-		"angleOfVelocity": 0,
 		"targetEffects": [
 			{
 				"class": com.mygdx.game.model.effects.DamageEffectSettings,

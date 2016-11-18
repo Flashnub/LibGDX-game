@@ -22,6 +22,7 @@ public abstract class ActionSegment {
 	public void sourceProcess(CharacterModel source) {
 		hasProcessedSource = true;
 		this.setActionState(ActionState.ACTION);
+		sourceProcessWithoutSuper(source);
 	}
 	
 	
@@ -61,9 +62,6 @@ public abstract class ActionSegment {
 		if (this.actionState != state) {
 			System.out.println("Action State" + state);
 			System.out.println("Action time:" + this.currentTime);
-			if (this.currentTime == null) {
-				System.out.println();
-			}
 			this.didChangeState = true;
 			this.actionState = state;
 		}

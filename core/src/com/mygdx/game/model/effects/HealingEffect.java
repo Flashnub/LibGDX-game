@@ -18,7 +18,7 @@ public class HealingEffect extends Effect {
 		if (hSettings.isInstantaneous) {
 			target.addToCurrentHealth(hSettings.value);
 		}
-		else if (isActive){
+		else if (isActive && !isFinished){
 			target.addToCurrentHealth((int) (hSettings.value * (delta / hSettings.duration)));
 		}
 		return isFinished;

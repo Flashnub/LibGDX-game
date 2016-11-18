@@ -12,7 +12,6 @@ import com.mygdx.game.model.characters.CharacterProperties;
 import com.mygdx.game.model.characters.EntityUIDataType;
 import com.mygdx.game.model.projectiles.ProjectileSettings;
 import com.mygdx.game.model.worldObjects.Item;
-import com.mygdx.game.model.worldObjects.LeverSettings;
 
 public class JSONController {
     private static String jsonFilePath = "Json/";

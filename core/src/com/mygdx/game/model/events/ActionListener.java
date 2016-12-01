@@ -1,6 +1,7 @@
 package com.mygdx.game.model.events;
 
 import com.mygdx.game.model.actions.Attack;
+import com.mygdx.game.model.actions.nonhostile.DialogueAction;
 import com.mygdx.game.model.projectiles.Projectile;
 
 public interface ActionListener {

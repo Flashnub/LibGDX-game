@@ -10,6 +10,14 @@ public class ActionSegmentKey implements Serializable{
 	StringWrapper key;
 	ActionType typeOfAction;
 	
+	public ActionSegmentKey() {
+		
+	}
+	
+	public ActionSegmentKey(StringWrapper key, ActionType typeOfAction) {
+		this.key = key;
+		this.typeOfAction = typeOfAction;
+	}
 
 	@Override
 	public void write(Json json) {

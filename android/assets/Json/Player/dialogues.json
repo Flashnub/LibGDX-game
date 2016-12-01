@@ -1,0 +1,18 @@
+{
+	"normalDialogues": {
+		"Test1": {
+			"class": com.mygdx.game.model.actions.nonhostile.NormalDialogueSettings,
+			"writtenDialogue": "Hello",
+		}
+	
+	}
+	"conditionalDialogues": [
+		{
+			"class": com.mygdx.game.model.actions.nonhostile.InjuryDialogueSettings,
+			"writtenDialogue": "Ouch",
+			"minimumRatio": 0.5,
+			"maximumRatio": 0.6
+		}
+	]
+	
+}

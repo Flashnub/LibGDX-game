@@ -5,11 +5,11 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Json;
 import com.mygdx.game.model.characters.EntityUIModel;
-import com.mygdx.game.model.characters.Character;
+import com.mygdx.game.model.characters.NPCCharacter;
 import com.mygdx.game.model.characters.player.Player;
 import com.mygdx.game.model.world.WorldModel;
 
-public class Enemy extends Character{
+public class Enemy extends NPCCharacter{
 	
 	//An enemy will always monitor the player and collect
 	//various data about them. They will also have abstract
@@ -20,7 +20,7 @@ public class Enemy extends Character{
 	public static final String characterType = "Enemy";
 	
 	public Enemy(String characterName, WorldModel world) {
-		super(characterName);
+		super(characterName, world.getDialogueController());
 		this.setCharacterData(new EnemyModel(characterName, this.getCharacterUIData(), world));
 	}
 	
@@ -29,7 +29,7 @@ public class Enemy extends Character{
 	}
 
 	
-	public class EnemyModel extends CharacterModel  {
+	public class EnemyModel extends NPCCharacterModel  {
 		
 		Player player;
 		float pollTime;
@@ -44,6 +44,7 @@ public class Enemy extends Character{
 			Json json = new Json();
 			enemyProperties = json.fromJson(EnemyProperties.class, Gdx.files.internal("Json/" + characterName + "/enemyProperties.json"));
 			enemyAI = EnemyAIInitializer.initializeAIWithKey(enemyProperties.enemyAIKey, this.getCharacterProperties(), this, world);
+			this.setCurrentlyInteractable(false);
 		}
 		
 

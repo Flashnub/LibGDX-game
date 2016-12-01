@@ -1,5 +1,7 @@
 package com.mygdx.game.model.characters.player;
 
+import java.util.HashMap;
+
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Json.Serializable;
@@ -13,6 +15,7 @@ public class GameSave implements Serializable{
 
 	Array <Integer> objectsInteractedHistory;
 	Array <Integer> acquiredItemsHistory;
+	HashMap <String, Integer> npcChapterIndices;
 	Array <String> inventoryItemKeys;
 	
 	public GameSave() {
@@ -25,6 +28,7 @@ public class GameSave implements Serializable{
 		json.writeValue("objectsInteractedHistory", objectsInteractedHistory);
 		json.writeValue("acquiredItemsHistory", acquiredItemsHistory);
 		json.writeValue("inventoryItemKeys", inventoryItemKeys);
+		json.writeValue("npcChapterIndices", npcChapterIndices);
 
 	}
 
@@ -35,7 +39,14 @@ public class GameSave implements Serializable{
 		objectsInteractedHistory = json.readValue("objectsInteractedHistory", Array.class, jsonData);
 		acquiredItemsHistory = json.readValue("acquiredItemsHistory", Array.class, jsonData);
 		inventoryItemKeys = json.readValue("inventoryItemKeys", Array.class, jsonData);
-
+		npcChapterIndices = json.readValue("npcChapterIndices", HashMap.class, jsonData);
+	}
+	
+	public Integer chapterIndexForNPCUUID(String UUID) {
+		if (this.npcChapterIndices.containsKey(UUID)) {
+			return npcChapterIndices.get(UUID);
+		}
+		return 0;
 	}
 	
 	public boolean isUUIDInSave(Integer UUID) {

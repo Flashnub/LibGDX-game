@@ -11,6 +11,7 @@ public class EnemyProperties implements Serializable {
 	
 	String enemyAIKey;
     ArrayList<ItemDrop> drops;
+    boolean shouldDeleteOnDeath;
 
 	@Override
 	public void write(Json json) {

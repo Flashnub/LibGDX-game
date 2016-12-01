@@ -12,6 +12,7 @@ import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.characters.Character;
 import com.mygdx.game.model.characters.EntityUIModel;
 import com.mygdx.game.model.characters.player.GameSave.UUIDType;
+import com.mygdx.game.model.world.DialogueController;
 import com.mygdx.game.model.world.SpawnPoint;
 import com.mygdx.game.model.worldObjects.Item;
 import com.mygdx.game.model.worldObjects.WorldObject;
@@ -21,6 +22,7 @@ public class Player extends Character implements InputProcessor {
 	public static final String characterName = "Player";
 	public static final String characterType = "Player";
 	public static final int allegiance = 1;
+	public static final String DialogueUUID = "Player";
 
 	
 	public Player() {
@@ -94,7 +96,10 @@ public class Player extends Character implements InputProcessor {
 	    SpawnPoint spawnPoint;
 	    WorldObject nearbyObject;
 	    PlayerProperties playerProperties;
+	    DialogueDatabase dialogues;
+	    DialogueController dialogueController;
 	    GameSave gameSave;
+	    boolean isTalking;
 
 		public PlayerModel(String characterName, EntityUIModel uiModel) {
 			super(characterName, uiModel);
@@ -110,6 +115,7 @@ public class Player extends Character implements InputProcessor {
 			this.gameSave = gameSave;
 			playerProperties = json.fromJson(PlayerProperties.class, Gdx.files.internal("Json/Player/playerActions.json"));
 			playerProperties.populateWith(gameSave);
+			dialogues = json.fromJson(DialogueDatabase.class, Gdx.files.internal("Json/Player/dialogues.json"));
 			applicableKeys = new Array<Integer>();
 			applicableKeys.add(Keys.W);
 			applicableKeys.add(Keys.A);
@@ -150,6 +156,11 @@ public class Player extends Character implements InputProcessor {
 		public void addItemToInventory(Item item) {
 			this.getPlayerProperties().getInventory().add(item);
 			//Eventually add HUD code to reflect receiving item.
+		}
+		
+		public void dialogueAction(String uuid) {
+			ActionSequence sequence = ActionSequence.createSequenceWithDialog(this.dialogues.getDialogueForUUID(uuid), this, null, dialogueController);
+			this.addActionSequence(sequence);
 		}
 	    
 	    public void dash(boolean left) {
@@ -274,6 +285,21 @@ public class Player extends Character implements InputProcessor {
 		public GameSave getGameSave() {
 			return gameSave;
 		}
+		
+		public boolean isTalking() {
+			return isTalking;
+		}
+
+
+		public void setTalking(boolean isTalking) {
+			this.isTalking = isTalking;
+		}
+
+
+		public DialogueDatabase getDialogues() {
+			return dialogues;
+		}
+
 
 		@Override
 		public boolean handleAdditionCollisionLogic(Rectangle tempGameplayBounds) {

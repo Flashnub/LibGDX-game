@@ -71,8 +71,8 @@ public abstract class Character {
 		CharacterProperties properties;
 		ArrayList <Effect> currentEffects;
 		ArrayList <Integer> indicesToRemove;
-		ActionSequence currentActionSequence;
-		ArrayDeque <ActionSequence> actionSequences;
+		ArrayList <ActionSequence> currentActionSequences;
+		ArrayDeque <ActionSequence> activeActionSequences;
 		
 		//Debug
 		float stateTime;
@@ -80,7 +80,7 @@ public abstract class Character {
 		public CharacterModel(String characterName, EntityUIModel uiModel) {
 			this.currentEffects = new ArrayList <Effect>();
 			this.indicesToRemove = new ArrayList<Integer>();
-			this.actionSequences = new ArrayDeque<ActionSequence>();
+			this.activeActionSequences = new ArrayDeque<ActionSequence>();
 			setState(idleState);
 			isImmuneToInjury = false;
 			attacking = false;
@@ -153,22 +153,37 @@ public abstract class Character {
 		}
 		
 		private void handleActionSequences(float delta) {
-			if (this.currentActionSequence != null) {
-				currentActionSequence.process(delta, actionListener);
-				if (this.currentActionSequence.isFinished()) {
-					currentActionSequence = null;
+			if (this.currentActionSequences != null) {
+				for (ActionSequence actionSequence : currentActionSequences) {
+					actionSequence.process(delta, actionListener);
+					if (actionSequence.isFinished()) {
+						this.currentActionSequences.remove(actionSequence);
+					}
 				}
+
 			}
-			else if (actionSequences.peek() != null) {
-				this.currentActionSequence = actionSequences.poll();
+			if (activeActionSequences.peek() != null && !isProcessingActiveSequences()) {
+				this.currentActionSequences.add(activeActionSequences.poll());
 			}
 			
 		}
 		
+		boolean isProcessingActiveSequences() {
+			boolean isProcessingActive = false;
+			for (ActionSequence actionSequence : this.currentActionSequences) {
+				isProcessingActive = isProcessingActive || actionSequence.isActive();
+			}
+			return isProcessingActive;
+		}
 		
 		public void addActionSequence (ActionSequence sequence) {
 //			sequence.setSource(this);
-			actionSequences.add(sequence);
+			if (sequence.isActive()) {
+				activeActionSequences.add(sequence);
+			}
+			else {
+				currentActionSequences.add(sequence);
+			}
 		}
 		
 		private void handleEffects(float delta) {
@@ -259,241 +274,6 @@ public abstract class Character {
 			return this.properties.walkingSpeed;
 		}
 
-		
-		public void clearActionSequencesWithNewSequence(ActionSequence sequence) {
-			actionSequences.clear();
-			this.currentActionSequence = sequence;
-		}
-		
-//		public CollisionCheck checkForXCollision(float maxTime, TiledMapTileLayer collisionLayer, float xVelocity, boolean shouldMove) {
-//			float tileWidth = collisionLayer.getTileWidth();
-//			float tileHeight = collisionLayer.getTileHeight();
-//			
-//			boolean collisionX = false;
-//			float time = 0f;
-//			
-//			Rectangle tempImageBounds = new Rectangle(this.imageHitBox);
-//			Rectangle tempGameplayBounds = new Rectangle(this.gameplayHitBox);
-//			Array <CellWrapper> tilesToCheckForWorldObjects = new Array<CellWrapper>();
-//			float tempVelocity = xVelocity;
-//			float delta;
-//			if (maxTime > 1 / 300f) {
-//				delta = 1 / 300f;
-//			}
-//			else {
-//				delta = maxTime;
-//			}
-//			while (time < maxTime) {
-//				time += delta;
-//				tempVelocity += this.acceleration.x * delta;
-//				tempImageBounds.setX(tempImageBounds.getX() + tempVelocity * delta);
-//				tempGameplayBounds.setX(tempImageBounds.getX() + tempImageBounds.getWidth() * .4f);
-//				
-//
-//				if (this.getVelocity().x < 0) {
-//					//left blocks
-//					int topLeftXIndex = ((int) (tempGameplayBounds.x / tileWidth));
-//					int topLeftYIndex = ((int) ((tempGameplayBounds.y + tempGameplayBounds.height) / tileHeight));
-//
-//					Cell topLeftBlock = collisionLayer.getCell(topLeftXIndex, topLeftYIndex);
-//					
-//					int middleLeftXIndex = ((int) (tempGameplayBounds.x / tileWidth));
-//					int middleLeftYIndex = ((int) ((tempGameplayBounds.y + tempGameplayBounds.height / 2) / tileHeight));
-//					
-//					Cell middleLeftBlock = collisionLayer.getCell(middleLeftXIndex, middleLeftYIndex);
-//					
-//					int lowerLeftXIndex = ((int) (tempGameplayBounds.x / tileWidth));
-//					int lowerLeftYIndex = ((int) ((tempGameplayBounds.y) / tileHeight));
-//					
-//					Cell lowerLeftBlock = collisionLayer.getCell(lowerLeftXIndex, lowerLeftYIndex);
-//					
-//					if (topLeftBlock != null)
-//						collisionX = ((Boolean)topLeftBlock.getTile().getProperties().get("Impassable")).equals(true);
-//						
-//					
-//					//middle left block
-//					if(!collisionX && middleLeftBlock != null)
-//						collisionX = ((Boolean)middleLeftBlock.getTile().getProperties().get("Impassable")).equals(true);
-//					
-//					//lower left block
-//					if(!collisionX && lowerLeftBlock != null )
-//						collisionX = ((Boolean)lowerLeftBlock.getTile().getProperties().get("Impassable")).equals(true);
-//					
-//					tilesToCheckForWorldObjects.add(new CellWrapper(topLeftBlock, new Vector2(topLeftXIndex * tileWidth, topLeftYIndex * tileHeight)));
-//					tilesToCheckForWorldObjects.add(new CellWrapper(middleLeftBlock, new Vector2(middleLeftXIndex * tileWidth, middleLeftYIndex * tileHeight)));
-//					tilesToCheckForWorldObjects.add(new CellWrapper(lowerLeftBlock, new Vector2(lowerLeftXIndex * tileWidth, lowerLeftYIndex * tileHeight)));
-//
-////					this.leftcollisionX = collisionX;
-//					
-//				}
-//				else if (this.getVelocity().x > 0) {
-//					//right blocks
-//					int topRightXIndex = (int) ((tempGameplayBounds.x + tempGameplayBounds.width) / tileWidth);
-//					int topRightYIndex = (int) ((tempGameplayBounds.y + tempGameplayBounds.height) / tileHeight);
-//					
-//					Cell topRightBlock = collisionLayer.getCell(topRightXIndex, topRightYIndex);
-//					
-//					int middleRightXIndex = (int) ((tempGameplayBounds.x + tempGameplayBounds.width) / tileWidth);
-//					int middleRightYIndex = (int) ((tempGameplayBounds.y + tempGameplayBounds.height / 2) / tileHeight);
-//					
-//					Cell middleRightBlock = collisionLayer.getCell(middleRightXIndex, middleRightYIndex);
-//					
-//					int lowerRightXIndex = (int) ((tempGameplayBounds.x + tempGameplayBounds.width) / tileWidth);
-//					int lowerRightYIndex = (int) ((tempGameplayBounds.y) / tileHeight);
-//					
-//					Cell lowerRightBlock = collisionLayer.getCell(lowerRightXIndex, lowerRightYIndex);
-//					
-//					// top right block
-//					if (topRightBlock != null)
-//						collisionX = ((Boolean)topRightBlock.getTile().getProperties().get("Impassable")).equals(true);
-//					
-//					//middle right block
-//					if(!collisionX && middleRightBlock != null)
-//						collisionX = ((Boolean)middleRightBlock.getTile().getProperties().get("Impassable")).equals(true);
-//					
-//					//lower right block
-//					if(!collisionX && lowerRightBlock != null)
-//						collisionX = ((Boolean)lowerRightBlock.getTile().getProperties().get("Impassable")).equals(true);
-//					
-////					this.rightCollisionX = collisionX;
-//					tilesToCheckForWorldObjects.add(new CellWrapper(topRightBlock, new Vector2(topRightXIndex * tileWidth, topRightYIndex * tileHeight)));
-//					tilesToCheckForWorldObjects.add(new CellWrapper(middleRightBlock, new Vector2(middleRightXIndex * tileWidth, middleRightYIndex * tileHeight)));
-//					tilesToCheckForWorldObjects.add(new CellWrapper(lowerRightBlock, new Vector2(lowerRightXIndex * tileWidth, lowerRightYIndex * tileHeight)));
-//				}
-//				
-//				collisionX = collisionX || this.objectListener.doTilesCollideWithObjects(tilesToCheckForWorldObjects, collisionLayer);
-//				if (collisionX)
-//				{
-//					break;
-//				}
-//				else {
-//					tilesToCheckForWorldObjects.clear();
-//				}
-//			}
-//			//move on x axis
-//			if (shouldMove && !collisionX) {
-//				this.gameplayHitBox.x = tempGameplayBounds.x;
-//				this.imageHitBox.x = tempImageBounds.x;
-//			}
-//			//react to X collision
-//			return new CollisionCheck(collisionX, time);
-//		}
-//		
-//		public CollisionCheck checkForYCollision(float maxTime, TiledMapTileLayer collisionLayer, float yVelocity, boolean shouldMove) {
-//			float tileWidth = collisionLayer.getTileWidth();
-//			float tileHeight = collisionLayer.getTileHeight();
-//			
-//			boolean collisionY = false;
-//			float time = 0f;
-//			
-//			Rectangle tempImageBounds = new Rectangle(this.imageHitBox);
-//			Rectangle tempGameplayBounds = new Rectangle(this.gameplayHitBox);
-//			Array <CellWrapper> tilesToCheckForWorldObjects = new Array<CellWrapper>();
-//			float tempVelocity = yVelocity;
-//			float delta;
-//			if (maxTime > 1 / 300f) {
-//				delta = 1 / 300f;
-//			}
-//			else {
-//				delta = maxTime;
-//			}
-//			while (time < maxTime) {
-//				
-//				time += delta;
-//				
-//				tempVelocity += this.acceleration.y * delta;
-//				
-//				tempImageBounds.setY(tempImageBounds.getY() + tempVelocity * delta);
-//				tempGameplayBounds.setY(tempImageBounds.getY() + tempImageBounds.getHeight() * .2f);
-//				
-//
-//				if (this.getVelocity().y < 0) {
-//					int bottomLeftXIndex = (int) (tempGameplayBounds.x / tileWidth);
-//					int bottomLeftYIndex = (int) ((tempGameplayBounds.y) / tileHeight);
-//					
-//					Cell bottomLeftBlock = collisionLayer.getCell(bottomLeftXIndex, bottomLeftYIndex);
-//					
-//					int bottomMiddleXIndex = (int) ((tempGameplayBounds.x + tempGameplayBounds.width / 2) / tileWidth);
-//					int bottomMiddleYIndex = (int) (tempGameplayBounds.y / tileHeight);
-//					
-//					Cell bottomMiddleBlock = collisionLayer.getCell(bottomMiddleXIndex, bottomMiddleYIndex);
-//					
-//					int bottomRightXIndex = (int) ((tempGameplayBounds.x + tempGameplayBounds.width) / tileWidth);
-//					int bottomRightYIndex = (int) (tempGameplayBounds.y / tileHeight);
-//					
-//					Cell bottomRightBlock = collisionLayer.getCell(bottomRightXIndex, bottomRightYIndex);
-//					//bottom left block
-//					if (bottomLeftBlock != null)
-//						collisionY = ((Boolean)bottomLeftBlock.getTile().getProperties().get("Impassable")).equals(true);
-//						
-//					//bottom middle block
-//					if(!collisionY && bottomMiddleBlock != null)
-//						collisionY = ((Boolean)bottomMiddleBlock.getTile().getProperties().get("Impassable")).equals(true);
-//					
-//					//bottom right block
-//					if(!collisionY && bottomRightBlock != null)
-//						collisionY = ((Boolean)bottomRightBlock.getTile().getProperties().get("Impassable")).equals(true);
-//					
-//					tilesToCheckForWorldObjects.add(new CellWrapper(bottomLeftBlock, new Vector2(bottomLeftXIndex * tileWidth, bottomLeftYIndex * tileHeight)));
-//					tilesToCheckForWorldObjects.add(new CellWrapper(bottomMiddleBlock, new Vector2(bottomMiddleXIndex * tileWidth, bottomMiddleYIndex * tileHeight)));
-//					tilesToCheckForWorldObjects.add(new CellWrapper(bottomRightBlock, new Vector2(bottomRightXIndex * tileWidth, bottomRightYIndex * tileHeight)));
-//			
-//				} 
-//				else if (this.getVelocity().y > 0) {
-//					
-//					int topLeftXIndex = (int) (tempGameplayBounds.x / tileWidth);
-//					int topLeftYIndex = (int) ((tempGameplayBounds.y + tempGameplayBounds.height) / tileHeight);
-//					
-//					Cell topLeftBlock = collisionLayer.getCell(topLeftXIndex, topLeftYIndex);
-//					
-//					int topMiddleXIndex = (int) ((tempGameplayBounds.x + tempGameplayBounds.width / 2) / tileWidth);
-//					int topMiddleYIndex = (int) ((tempGameplayBounds.y + tempGameplayBounds.height) / tileHeight);
-//					
-//					Cell topMiddleBlock = collisionLayer.getCell(topMiddleXIndex, topMiddleYIndex);
-//					
-//					int topRightXIndex = (int) ((tempGameplayBounds.x + tempGameplayBounds.width) / tileWidth);
-//					int topRightYIndex = (int) ((tempGameplayBounds.y + tempGameplayBounds.height) / tileHeight);
-//					
-//					Cell topRightBlock = collisionLayer.getCell(topRightXIndex, topRightYIndex);
-//					
-//					//top left block
-//					if (topLeftBlock != null)
-//						collisionY = ((Boolean)topLeftBlock.getTile().getProperties().get("Impassable")).equals(true);
-//					
-//					//top middle block
-//					if(!collisionY && topMiddleBlock != null)
-//						collisionY = ((Boolean)topMiddleBlock.getTile().getProperties().get("Impassable")).equals(true);
-//					
-//					//top right block
-//					if(!collisionY && topRightBlock != null)
-//						collisionY = ((Boolean)topRightBlock.getTile().getProperties().get("Impassable")).equals(true);
-//					
-//					tilesToCheckForWorldObjects.add(new CellWrapper(topLeftBlock, new Vector2(topLeftXIndex * tileWidth, topLeftYIndex * tileHeight)));
-//					tilesToCheckForWorldObjects.add(new CellWrapper(topMiddleBlock, new Vector2(topMiddleXIndex * tileWidth, topMiddleYIndex * tileHeight)));
-//					tilesToCheckForWorldObjects.add(new CellWrapper(topRightBlock, new Vector2(topRightXIndex * tileWidth, topRightYIndex * tileHeight)));
-//				}
-//				collisionY = collisionY || this.objectListener.doTilesCollideWithObjects(tilesToCheckForWorldObjects, collisionLayer);
-//				
-//				if (collisionY)
-//				{
-//					break;
-//				}
-//				else {
-//					tilesToCheckForWorldObjects.clear();
-//				}
-//			}
-//			//move on x axis
-////			this.getImageHitBox().setX(this.getImageHitBox().getX() + this.getVelocity().x * delta);
-////			this.getGameplayHitBox().setX(this.getImageHitBox().getX() + (this.getImageHitBox().getWidth() * .4f));
-//			if (shouldMove && !collisionY) {
-//				this.gameplayHitBox.y = tempGameplayBounds.y;
-//				this.imageHitBox.y = tempImageBounds.y;
-//			}
-//
-//			//react to X collision
-//			return new CollisionCheck(collisionY, time);
-//		}
-		
 		protected void movementWithCollisionDetection(float delta, TiledMapTileLayer collisionLayer) {
 		//logic for collision detection
 			CollisionCheck collisionX = this.checkForXCollision(delta, collisionLayer, this.velocity.x, true);
@@ -556,23 +336,7 @@ public abstract class Character {
 		public float getHealthRatio() {
 			return ((float)this.getCurrentHealth()) / ((float)this.getMaxHealth());
 		}
-		
-//		public void interruptMovementAction(Movement newMovement) {
-//			if (newMovement != null) {
-//				this.completeMovementAction();
-//			}
-//			this.currentMovementAction = newMovement;
-//
-//		}
-//		
-//		private void completeMovementAction() {
-//			if (this.currentMovementAction != null && this.isProcessingMovementEffect) {
-//				this.currentMovementAction.completion(this);
-//				this.isProcessingMovementEffect = false;
-//				this.currentMovementAction = this.tempMovementActions.poll();
-//			}
-//		}
-		
+	
 		public void addToCurrentHealth(float value) {
 			this.setCurrentHealth(value + this.currentHealth);
 		}
@@ -582,7 +346,7 @@ public abstract class Character {
 		}
 		
 		public boolean isProcessingAction() {
-			return this.currentActionSequence != null;
+			return this.isProcessingActiveSequences();
 		}
 
 
@@ -599,15 +363,6 @@ public abstract class Character {
 		public float getGameplayHitBoxHeightModifier() {
 			return gameplayHitBoxHeightModifier;
 		}
-
-//		public boolean isProcessingMovementAction() {
-//			return isProcessingMovementEffect;
-//		}
-//
-//		public void setProcessingMovementAction(boolean isProcessingMovementAction) {
-//			this.isProcessingMovementEffect = isProcessingMovementAction;
-//		}
-		
 		
 
 		public String getUuid() {

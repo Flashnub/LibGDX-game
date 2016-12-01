@@ -87,7 +87,7 @@ public class CharacterProperties implements Serializable {
 		}
 		
 	}
-	
+
 	public CharacterProperties cloneProperties() {
 		CharacterProperties properties = new CharacterProperties();
 		properties.maxHealth = this.maxHealth;

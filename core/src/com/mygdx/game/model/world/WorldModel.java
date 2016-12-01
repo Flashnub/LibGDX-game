@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
@@ -13,6 +14,8 @@ import com.mygdx.game.constants.SaveController;
 import com.mygdx.game.model.actions.Attack;
 import com.mygdx.game.model.characters.Character;
 import com.mygdx.game.model.characters.EntityModel;
+import com.mygdx.game.model.characters.NPCCharacter;
+import com.mygdx.game.model.characters.NPCCharacter.NPCCharacterModel;
 import com.mygdx.game.model.characters.enemies.Enemy;
 import com.mygdx.game.model.characters.enemies.Enemy.EnemyModel;
 import com.mygdx.game.model.characters.player.GameSave.UUIDType;
@@ -20,6 +23,7 @@ import com.mygdx.game.model.characters.player.Player;
 import com.mygdx.game.model.characters.player.Player.PlayerModel;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.CollisionChecker;
+import com.mygdx.game.model.events.DialogueListener;
 import com.mygdx.game.model.events.ObjectListener;
 import com.mygdx.game.model.events.SaveListener;
 import com.mygdx.game.model.projectiles.Projectile;
@@ -39,9 +43,14 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     Array <SpawnPoint> spawns;
     Array <WorldObject> objects;
     Array <WorldObject> nearbyObjects;
+    Array <NPCCharacter> npcCharacters;
+    Array <NPCCharacter> nearbyNPCs;
     Player player;
     Array <WorldListener> worldListeners;
+    Array <DialogueListener> dialogueListeners;
     SaveController saveController;
+    DialogueController dialogueController;
+    InputMultiplexer inputHandlers;
     
     public WorldModel(TiledMapTileLayer collisionLayer) {
     	enemies = new Array<Enemy>();   
@@ -49,11 +58,15 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     	worldListeners = new Array<WorldListener>();
     	objects = new Array <WorldObject>();
     	nearbyObjects = new Array <WorldObject>();
+    	npcCharacters = new Array <NPCCharacter>();
+    	nearbyNPCs = new Array <NPCCharacter>();
     	this.collisionLayer = collisionLayer;
-    	this.saveController = new SaveController();
+    	saveController = new SaveController();
     	
 //    	System.out.println("Width: " + collisionLayer.getTileWidth() + "Height: " + collisionLayer.getTileHeight());
+    	inputHandlers = new InputMultiplexer();
     	searchForTiles(collisionLayer);
+    	dialogueController = new DialogueController(this.player, this.npcCharacters, this.enemies);
     }
     
     private void searchForCharacters(TiledMapTileLayer collisionLayer) {
@@ -91,12 +104,16 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 					player.getCharacterData().setActionListener(this);
 					player.getCharacterData().setObjectListener(this);
 					player.getCharacterData().setCollisionChecker(this);
-					Gdx.input.setInputProcessor(player);
+					this.inputHandlers.addProcessor(player);
 					this.saveController.setCurrentGameSave(((PlayerModel) player.getCharacterData()).getGameSave());
 				}
 				else if (character instanceof Enemy){
 					Enemy enemy = (Enemy) character;
 					this.addEnemy(enemy, collisionLayer.getTileWidth() * x,  collisionLayer.getTileHeight() * y);
+				}
+				else if (character instanceof NPCCharacter) {
+					NPCCharacter npc = (NPCCharacter) character;
+					this.addNPC(npc, collisionLayer.getTileWidth() * x, collisionLayer.getTileHeight() * y);
 				}
 			}
     	}
@@ -127,6 +144,8 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     				return new Player();
     			case Enemy.characterType:
     				return new Enemy(name, this);
+    			case NPCCharacter.characterType: 
+    				return new NPCCharacter(name, dialogueController);
     		}
     	}
     	 return null;
@@ -202,6 +221,17 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 		for (WorldListener listener : worldListeners) {
 			listener.handleAddedEnemy(enemy);
 		}
+	}
+	
+	private void addNPC(NPCCharacter npc, float xPosition, float yPosition) {
+		npc.getCharacterData().imageHitBox.x = xPosition;
+		npc.getCharacterData().gameplayHitBox.x = .4f*xPosition;
+		npc.getCharacterData().imageHitBox.y = yPosition;
+		npc.getCharacterData().gameplayHitBox.y = .2f*yPosition;
+		npcCharacters.add(npc);
+		((NPCCharacterModel) npc.getCharacterData()).setActionListener(this);
+		((NPCCharacterModel) npc.getCharacterData()).setObjectListener(this);
+		((NPCCharacterModel) npc.getCharacterData()).setCollisionChecker(this);
 	}
 
 	@Override
@@ -398,6 +428,14 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 			}
 		}
 	}
+	
+	@Override
+	public void addUUIDToSave(Integer UUID, UUIDType type) {
+		// TODO Auto-generated method stub
+		PlayerModel model = (PlayerModel) player.getCharacterData();
+		model.addUUIDToSave(UUID, type);
+
+	}
 
 	@Override
 	public void triggerSave() {
@@ -428,13 +466,11 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 		return objects;
 	}
 
-	@Override
-	public void addUUIDToSave(Integer UUID, UUIDType type) {
-		// TODO Auto-generated method stub
-		PlayerModel model = (PlayerModel) player.getCharacterData();
-		model.addUUIDToSave(UUID, type);
-
+	public DialogueController getDialogueController() {
+		return dialogueController;
 	}
+
+
 
 
 

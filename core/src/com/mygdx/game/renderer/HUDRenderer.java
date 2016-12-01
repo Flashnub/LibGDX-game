@@ -9,6 +9,7 @@ import com.mygdx.game.model.world.WorldListener;
 import com.mygdx.game.model.world.WorldModel;
 import com.mygdx.game.model.worldObjects.WorldObject;
 import com.mygdx.game.views.ButtonPromptOverlay;
+import com.mygdx.game.views.DialogueView;
 import com.mygdx.game.views.ResourceBar;
 import com.mygdx.game.views.ResourceBar.ResourceBarType;
 
@@ -18,6 +19,7 @@ public class HUDRenderer implements WorldListener{
 	WorldModel worldModel;
 	ObjectMap <String, ResourceBar> enemyHealthBars;
 	ButtonPromptOverlay prompt;
+	DialogueView dialogueView;
 	CoordinatesHelper helper;
 	
 	public HUDRenderer(WorldModel worldModel, CoordinatesHelper helper) {
@@ -25,11 +27,14 @@ public class HUDRenderer implements WorldListener{
 		this.enemyHealthBars = new ObjectMap <String, ResourceBar>();
 		this.helper = helper;
 		this.prompt = new ButtonPromptOverlay();
+		this.dialogueView = new DialogueView();
 	    stage = new Stage(new ScreenViewport());
 	    ResourceBar healthBar = new ResourceBar(ResourceBarType.PlayerHealth, worldModel.getPlayer(), helper);
 	    stage.addActor(healthBar);
 	    stage.addActor(prompt);
+	    stage.addActor(dialogueView);
 		worldModel.addWorldListener(this);
+		worldModel.getDialogueController().addDialogueListener(dialogueView);
 	}
 	
     public void render (float delta) {

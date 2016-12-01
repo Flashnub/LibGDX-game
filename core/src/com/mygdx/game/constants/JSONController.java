@@ -3,6 +3,7 @@ package com.mygdx.game.constants;
 import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
 import com.mygdx.game.assets.EntityUIData;
 import com.mygdx.game.model.actions.AbilitySettings;
@@ -10,6 +11,7 @@ import com.mygdx.game.model.actions.AttackSettings;
 import com.mygdx.game.model.actions.ProjectileAttackSettings;
 import com.mygdx.game.model.characters.CharacterProperties;
 import com.mygdx.game.model.characters.EntityUIDataType;
+import com.mygdx.game.model.characters.NPCProperties;
 import com.mygdx.game.model.projectiles.ProjectileSettings;
 import com.mygdx.game.model.worldObjects.Item;
 
@@ -24,6 +26,7 @@ public class JSONController {
     public static HashMap<String, Item> items = loadItemsFromJSON();
     public static HashMap<String, EntityUIData> uiDatas = new HashMap<String, EntityUIData>();
     public static HashMap<String, ProjectileAttackSettings> projectileAttacks = loadProjectileAttacksFromJSON();
+    public static HashMap<String, NPCProperties> npcProperties = new HashMap<String, NPCProperties>();
   
 	 
 	@SuppressWarnings("unchecked")
@@ -89,10 +92,31 @@ public class JSONController {
 	public static CharacterProperties loadCharacterProperties(String characterName) {
 		if (!characterProperties.containsKey(characterName)) {
 	        Json json = new Json();
-			characterProperties.put(characterName, json.fromJson(CharacterProperties.class, Gdx.files.internal(jsonFilePath + characterName + "/properties.json")));		
+	        CharacterProperties properties = json.fromJson(CharacterProperties.class, Gdx.files.internal(jsonFilePath + characterName + "/properties.json"));
+	        if (properties != null) {
+				characterProperties.put(characterName, properties);		
+	        }
 		}
-		return characterProperties.get(characterName).cloneProperties();
+		CharacterProperties properties = characterProperties.get(characterName);
+		if (properties != null) {
+			properties = properties.cloneProperties();
+		}
+		return properties;
 	}
 	
+	public static NPCProperties loadNPCProperties(String characterName) {
+		if (!npcProperties.containsKey(characterName)) {
+	        Json json = new Json();
+			FileHandle fileHandle = Gdx.files.local(jsonFilePath + characterName + "/NPCProperties.json");
+			if (fileHandle.exists()) {
+		        NPCProperties properties = json.fromJson(NPCProperties.class, Gdx.files.internal(jsonFilePath + characterName + "/NPCProperties.json"));
+		        if (properties != null) {
+			        npcProperties.put(characterName, properties);		
+		        }
+			}
 
+		}
+		return npcProperties.get(characterName);
+	}
+	
 }

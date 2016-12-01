@@ -4,18 +4,23 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Json.Serializable;
 import com.badlogic.gdx.utils.JsonValue;
 import com.mygdx.game.constants.JSONController;
+import com.mygdx.game.model.actions.nonhostile.DialogueAction;
+import com.mygdx.game.model.actions.nonhostile.DialogueSettings;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.CollisionChecker;
+import com.mygdx.game.model.events.DialogueListener;
+import com.mygdx.game.model.world.DialogueController;
+import com.mygdx.game.wrappers.StringWrapper;
 
 public class ActionSequence implements Serializable {
 	
 	enum ActionStrategy {
-		RangedOffensive, RangedHeal, MeleeOffensive
+		RangedOffensive, RangedHeal, MeleeOffensive, Story
 	}
 	
 	enum ActionType {
-		Attack, ProjectileAttack, Ability
+		Attack, ProjectileAttack, Ability, Dialogue, Gesture, ItemGift
 	}
 	
 //	private ArrayList <ActionSegmentKey> actionKeys;
@@ -30,18 +35,49 @@ public class ActionSequence implements Serializable {
 	private String windupState;
 	private String actingState;
 	private String cooldownState;
+	private boolean isActive;
 	private CharacterModel source;
 	private CharacterModel target;
 	private ActionListener actionListener;
 	private CollisionChecker collisionChecker;
+	private DialogueController dialogueController;
 	
 	public ActionSequence() {
 
 	}
+	
+//	public ActionSequence(ActionType type) {
+//		actionKey = new ActionSegmentKey(new StringWrapper(type.toString()), type);
+//		if (type.equals(ActionType.Dialogue) || type.equals(ActionType.StatelessDialogue)) {
+//			//Create default dialogue action and store it in char properties?
+//			//Or make static void to create dialogue Action with DialogueSettings to create them on demand?
+//		}
+//	}
+//	
+	public static ActionSequence createSequenceWithDialog(DialogueSettings settings, CharacterModel source, CharacterModel target, DialogueController dialogueController) {
+		ActionSequence sequence = new ActionSequence();
+		boolean hasState = settings.getActingState().equals(DialogueSettings.defaultState);
+		sequence.actionKey = new ActionSegmentKey(
+				new StringWrapper(hasState ? DialogueSettings.defaultState : DialogueSettings.stateless),
+				ActionType.Dialogue);
+		sequence.isActive = hasState;
+		sequence.strategy = ActionStrategy.Story;
+
+		sequence.windupState = settings.getWindupState();
+		sequence.actingState = settings.getActingState();
+		sequence.cooldownState = settings.getCooldownState();
+		
+		sequence.source = source;
+		sequence.target = target;
+		sequence.dialogueController = dialogueController;
+		
+		sequence.createActionFromSettings(settings);
+		
+		return sequence;
+	}
 
 	@Override
 	public void write(Json json) {
-		// TODO Auto-generated method stub
 		json.writeValue("actionKey", actionKey);
 		json.writeValue("strategy", strategy);
 		json.writeValue("windupState", windupState);
@@ -52,7 +88,6 @@ public class ActionSequence implements Serializable {
 
 	@Override
 	public void read(Json json, JsonValue jsonData) {
-		// TODO Auto-generated method stub
 		actionKey = json.readValue("actionKey", ActionSegmentKey.class, jsonData);
 		strategy = json.readValue("strategy", ActionStrategy.class, jsonData);
 //		nextActionKey = json.readValue("nextActionKey", String.class, jsonData);
@@ -74,6 +109,13 @@ public class ActionSequence implements Serializable {
 			this.cooldownState = actingState;
 		}
 //		actionKey = json.readValue("actionKey", String.class, jsonData);
+		Boolean isActive = json.readValue("isPassive", Boolean.class, jsonData);
+		if (isActive != null) {
+			this.isActive = isActive;
+		}
+		else {
+			this.isActive = true;
+		}
 	}
 	
 	public ActionSequence cloneSequenceWithSourceAndTarget(CharacterModel source, CharacterModel target, ActionListener actionListener, CollisionChecker collisionChecker) {
@@ -82,7 +124,7 @@ public class ActionSequence implements Serializable {
 		sequence.target = target;
 		sequence.actionListener = actionListener;
 		sequence.collisionChecker = collisionChecker;
-		sequence.createActionFromSettings();
+		sequence.createActionFromSettings(null);
 		return sequence;
 	}
 	
@@ -103,6 +145,9 @@ public class ActionSequence implements Serializable {
 	public boolean canUseTarget() {
 		switch(actionKey.typeOfAction) {
 			case Ability:
+			case Dialogue:
+			case Gesture:
+			case ItemGift:
 				return false;
 			case Attack:
 			case ProjectileAttack:
@@ -127,13 +172,13 @@ public class ActionSequence implements Serializable {
 	
 	public void process(float delta, ActionListener actionListener) {
 		this.action.update(delta, actionListener);
-		if (action.didChangeState) {
+		if (action.didChangeState && this.isActive) {
 			source.setState(this.getCurrentActionState());
 		}
 	}
 	
-	private void createActionFromSettings() {
-		ActionSegment action = 	this.getActionSegmentForKey(this.actionKey);
+	private void createActionFromSettings(DialogueSettings potentialDialogue) {
+		ActionSegment action = 	this.getActionSegmentForKey(this.actionKey, potentialDialogue);
 		if (action != null) {
 			this.action = action;
 		}
@@ -146,7 +191,7 @@ public class ActionSequence implements Serializable {
 		return action.getEffectiveRange();
 	}
 	
-	private ActionSegment getActionSegmentForKey(ActionSegmentKey segmentKey) {
+	private ActionSegment getActionSegmentForKey(ActionSegmentKey segmentKey, DialogueSettings potentialDialogue) {
 		ActionSegment action = null;
 		switch (segmentKey.getTypeOfAction()) {
 			case Attack:
@@ -157,6 +202,13 @@ public class ActionSequence implements Serializable {
 				break;
 			case Ability:
 				action = new Ability(source, JSONController.abilities.get(segmentKey.getKey().value));
+				break;
+			case Dialogue:
+				action = new DialogueAction(potentialDialogue, this.dialogueController, source, target);
+				break;
+			case Gesture:
+				break;
+			case ItemGift:
 				break;
 		}
 		return action;
@@ -180,6 +232,10 @@ public class ActionSequence implements Serializable {
 
 	public String getCooldownState() {
 		return cooldownState;
+	}
+
+	public boolean isActive() {
+		return isActive;
 	}
 
 }

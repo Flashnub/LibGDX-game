@@ -9,6 +9,9 @@ public abstract class ActionSegment {
 		WINDUP, ACTION, COOLDOWN
 	}
 	
+	public static int StoryPriority = 1;
+	public static int CombatPriority = 2;
+	
 	Float currentTime;
 	boolean hasProcessedSource;
 	boolean didChangeState;
@@ -70,6 +73,11 @@ public abstract class ActionSegment {
 	public boolean isFinished() {
 		return currentTime >= this.getTotalTime();
 	}
+	
+	public int getPriority() {
+		return ActionSegment.CombatPriority;
+	}
+
 	
 	public abstract void sendActionToListener(ActionListener actionListener);
 	public abstract void sourceProcessWithoutSuper(CharacterModel source);

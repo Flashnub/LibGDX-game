@@ -1,0 +1,25 @@
+{
+	"class": com.mydx.game.model.characters,
+	"UUID": "BasicNPC",
+	"storyDialogues": {
+		{
+			"class": com.mygdx.game.model.actions.nonhostile.DialogueIndex,
+			"dialogueIndex": 0,
+			"chapterIndex": 0
+		}:
+		{
+			"class": com.mygdx.game.model.actions.nonhostile.NormalDialogueSettings,
+			"writtenDialogue": "Hello",
+			"UUIDForNextDialogue": "Test1",
+			"UUIDForNextCharacterToTalk": "Player"
+		}
+		
+	},
+	"conditionalDialogues": [
+	
+	],
+	"externalConditionalDialogues": {
+	
+	}
+	
+}

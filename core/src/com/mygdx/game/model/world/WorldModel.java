@@ -65,8 +65,10 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     	
 //    	System.out.println("Width: " + collisionLayer.getTileWidth() + "Height: " + collisionLayer.getTileHeight());
     	inputHandlers = new InputMultiplexer();
+    	Gdx.input.setInputProcessor(inputHandlers);
+    	dialogueController = new DialogueController();
     	searchForTiles(collisionLayer);
-    	dialogueController = new DialogueController(this.player, this.npcCharacters, this.enemies);
+    	dialogueController.setEntities(player, npcCharacters, enemies);
     }
     
     private void searchForCharacters(TiledMapTileLayer collisionLayer) {
@@ -121,7 +123,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     
     private void makeWorldObjectFromTile(Cell tile, int x, int y) {
     	MapProperties properties = tile.getTile().getProperties();
-    	if (properties.containsKey(kSpawnPoint) && (!properties.containsKey(kEntityType) || (!properties.get(kEntityType).equals(Enemy.characterType) && !properties.get(kEntityType).equals(Player.characterType)))) {
+    	if (properties.containsKey(kSpawnPoint) && (!properties.containsKey(kEntityType) || (!properties.get(kEntityType).equals(Enemy.characterType) && !properties.get(kEntityType).equals(Player.characterType) && !properties.get(kEntityType).equals(NPCCharacter.characterType)))) {
 			String entityName = (String) tile.getTile().getProperties().get(kSpawnPoint);
 			WorldObject object = getObjectFromString(entityName, tile.getTile().getProperties());
 			if (object != null) {
@@ -185,9 +187,14 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
         	float timeForAction = accumulatedTime <= MAX_TIMESTEP ? accumulatedTime : MAX_TIMESTEP;
     		player.act(timeForAction, collisionLayer);
     		this.checkIfPlayerIsNearObjects();
+    		this.checkIfPlayerIsNearNPCs();
     		for (int i = 0; i < enemies.size; i++) {
     			Character enemy = enemies.get(i);
     			enemy.act(timeForAction, collisionLayer);
+    		}
+    		for (int i = 0; i < npcCharacters.size; i++) {
+    			Character npc = npcCharacters.get(i);
+    			npc.act(timeForAction, collisionLayer);
     		}
     		accumulatedTime -= timeForAction;
         }
@@ -199,6 +206,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 			WorldObject object = objects.get(i);
 			object.update(delta, collisionLayer);
 		}
+		this.dialogueController.update(delta);
     }
 
 	public void deleteEnemy(Enemy enemy) {
@@ -285,6 +293,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 		if (object != null && objects != null && !objects.contains(object, true)) {
 			//check if player has activated this object already.
 			objects.add(object);
+			object.setCollisionChecker(this);
 		}
 		for (WorldListener listener : worldListeners) {
 			listener.handleAddedObjectToWorld(object);
@@ -420,6 +429,22 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 		}
 	}
 	
+	private void checkIfPlayerIsNearNPCs() {
+		this.nearbyNPCs.clear();
+		for (NPCCharacter character : this.npcCharacters) {
+			if (character.getCharacterData().getImageHitBox().overlaps(player.getCharacterData().getImageHitBox())) {
+				nearbyNPCs.add(character);
+			}
+		}
+		if (nearbyNPCs.size > 0) {
+			((PlayerModel) player.getCharacterData()).setNearbyNPC(nearbyNPCs.get(0));
+		}
+		for (WorldListener listener : worldListeners) {
+			listener.updateWithNearbyNPCs(this.nearbyNPCs);
+		}
+		
+	}
+	
 	public void addWorldListener(WorldListener listener) {
 		if (!worldListeners.contains(listener, true)) {
 			worldListeners.add(listener);
@@ -468,6 +493,10 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 
 	public DialogueController getDialogueController() {
 		return dialogueController;
+	}
+
+	public Array<NPCCharacter> getNpcCharacters() {
+		return npcCharacters;
 	}
 
 

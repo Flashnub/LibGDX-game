@@ -12,18 +12,14 @@ public class DamageEffect extends Effect{
 		}
 	}
 
-	@Override
-	public boolean process(CharacterModel target, float delta) {
-		boolean isFinished = super.process(target, delta);
+	protected void processDuringActive(CharacterModel target, float delta) {
 		if (dSettings.isInstantaneous) {
 			target.removeFromCurrentHealth(dSettings.value);
 		}
-		else if (isActive && !isFinished){
+		else {
 			target.removeFromCurrentHealth((int) (dSettings.value * (delta / dSettings.duration)));
 		}
-		return isFinished;
 	}
-
 
 
 

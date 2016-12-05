@@ -109,7 +109,7 @@ public class ActionSequence implements Serializable {
 			this.cooldownState = actingState;
 		}
 //		actionKey = json.readValue("actionKey", String.class, jsonData);
-		Boolean isActive = json.readValue("isPassive", Boolean.class, jsonData);
+		Boolean isActive = json.readValue("isActive", Boolean.class, jsonData);
 		if (isActive != null) {
 			this.isActive = isActive;
 		}
@@ -135,6 +135,7 @@ public class ActionSequence implements Serializable {
 		sequence.windupState = this.windupState;
 		sequence.actingState = this.actingState;
 		sequence.cooldownState = this.cooldownState;
+		sequence.isActive = this.isActive;
 		return sequence;
 	}
 	

@@ -4,15 +4,13 @@
 		"sourceEffectSettings": [
 			{
 				"class": "com.mygdx.game.model.effects.MovementEffectSettings",
-				"duration": 2,
-				"delayToActivate": 0,
+				"duration": 1,
+				"delayToActivate": 0.3,
 				"isInstantaneous": false,
 				"value": 0,
-				"windupTime": 1,
-				"cooldownTime": 1,
 				"velocity": {
 					"class": "com.badlogic.gdx.math.Vector2",
-					"x": 500,
+					"x": 200,
 					"y": 0
 				}
 				"acceleration": {

@@ -16,8 +16,9 @@ public class MovementEffect extends Effect {
 		}
 	}
 
-	
-	public void initialProcess(CharacterModel target) {
+	@Override
+	protected void initialProcess(CharacterModel target) {
+		super.initialProcess(target);
 		target.getVelocity().x = this.mSettings.velocity.x;
 		target.getVelocity().y = this.mSettings.velocity.y;	
 		
@@ -29,10 +30,10 @@ public class MovementEffect extends Effect {
 	}
 	
 	@Override
-	public void completion(CharacterModel target) {
+	protected void completion(CharacterModel target) {
+		super.completion(target);
 		target.acceleration.x = oldAccel.x;
 		target.acceleration.y = oldAccel.y;
-		
 	}
 	
 	public Vector2 getOldAccel() {

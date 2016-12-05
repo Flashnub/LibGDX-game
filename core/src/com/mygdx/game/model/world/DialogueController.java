@@ -16,6 +16,7 @@ public class DialogueController implements InputProcessor{
 	Array <NPCCharacter> npcCharacters;
 	Player player;
 	Array <DialogueListener> listeners;
+	Array <String> conditionalDialogueUUIDs;
 	float currentTime;
 	float dialogueRenderTime;
 	int currentCharacterIndex;
@@ -23,8 +24,17 @@ public class DialogueController implements InputProcessor{
 	boolean isProcessingDialogue;
 	
 	
-	public DialogueController(Player player, Array <NPCCharacter> npcCharacters, Array <Enemy> enemies) {
+	public DialogueController() {
+		this.listeners = new Array <DialogueListener>();
+		this.conditionalDialogueUUIDs = new Array <String>();
+		this.currentTime = 0f;
+		this.currentCharacterIndex = 0;
+		this.isProcessingDialogue = false;
+	}
+	
+	public void setEntities(Player player, Array<NPCCharacter> npcCharacters, Array<Enemy> enemies) {
 		this.player = player;
+		((PlayerModel)this.player.getCharacterData()).setDialogueController(this);
 		this.npcCharacters = new Array <NPCCharacter>();
 		for (NPCCharacter character : npcCharacters) {
 			this.npcCharacters.add(character);
@@ -32,10 +42,6 @@ public class DialogueController implements InputProcessor{
 		for (Enemy enemy : enemies) {
 			this.npcCharacters.add(enemy);
 		}
-		this.listeners = new Array <DialogueListener>();
-		this.currentTime = 0f;
-		this.currentCharacterIndex = 0;
-		this.isProcessingDialogue = false;
 	}
 	
 	
@@ -50,12 +56,12 @@ public class DialogueController implements InputProcessor{
 			
 			dialogueRenderTime += delta;
 			if (dialogueRenderTime * currentDialogue.getSpeed() >= 1) {
-				currentCharacterIndex += 1;
 				this.setCurrentTextToDisplay(
 						this.currentDialogue.getWrittenDialogue().substring(0, currentCharacterIndex), 
 						this.currentDialogue.getFontName(),
 						this.currentDialogue.getFontColor(),
 						!this.isProcessingDialogue);
+				currentCharacterIndex += 1;
 				dialogueRenderTime = 0f; //Need to figure out a better way to handle this
 			}
 			if (!this.isProcessingDialogue) {

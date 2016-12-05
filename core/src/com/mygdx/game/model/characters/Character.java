@@ -81,6 +81,7 @@ public abstract class Character {
 			this.currentEffects = new ArrayList <Effect>();
 			this.indicesToRemove = new ArrayList<Integer>();
 			this.activeActionSequences = new ArrayDeque<ActionSequence>();
+			this.currentActionSequences = new ArrayList <ActionSequence>();
 			setState(idleState);
 			isImmuneToInjury = false;
 			attacking = false;
@@ -91,8 +92,8 @@ public abstract class Character {
 			stateTime = 0f;
 
 			UUID id = UUID.randomUUID();
-			this.name = characterName;
 			this.uuid = id.toString();
+			this.name = characterName;
 			this.gameplayHitBoxWidthModifier = 0.19f;
 			this.gameplayHitBoxHeightModifier = 0.6f;
 			this.uiModel = uiModel;
@@ -154,15 +155,18 @@ public abstract class Character {
 		
 		private void handleActionSequences(float delta) {
 			if (this.currentActionSequences != null) {
-				for (ActionSequence actionSequence : currentActionSequences) {
+				Iterator <ActionSequence> iterator = currentActionSequences.iterator();
+				while (iterator.hasNext()) {
+					ActionSequence actionSequence = iterator.next();
 					actionSequence.process(delta, actionListener);
 					if (actionSequence.isFinished()) {
-						this.currentActionSequences.remove(actionSequence);
+						iterator.remove();
 					}
 				}
 
 			}
 			if (activeActionSequences.peek() != null && !isProcessingActiveSequences()) {
+				System.out.println("Polling action");
 				this.currentActionSequences.add(activeActionSequences.poll());
 			}
 			
@@ -178,6 +182,7 @@ public abstract class Character {
 		
 		public void addActionSequence (ActionSequence sequence) {
 //			sequence.setSource(this);
+			System.out.println("Add action");
 			if (sequence.isActive()) {
 				activeActionSequences.add(sequence);
 			}
@@ -205,7 +210,6 @@ public abstract class Character {
 				Effect effect = iterator.next();
 				boolean isFinished = effect.process(this, delta);
 				if (isFinished) {
-					effect.completion(this);
 					iterator.remove();
 				}
 			}
@@ -213,7 +217,6 @@ public abstract class Character {
 		}
 		
 		public void addEffect(Effect effect) {
-			effect.initialProcess(this);
 			if (effect instanceof MovementEffect) {
 				MovementEffect mEffect = ((MovementEffect) effect);
 				for (Effect currentEffect : currentEffects) {

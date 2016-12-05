@@ -16,7 +16,7 @@ import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.events.DialogueListener;
 
 public class NPCProperties implements Serializable {
-	HashMap <DialogueIndex, Array<NormalDialogueSettings>> storyDialogues;
+	HashMap <String, NormalDialogueSettings> storyDialogues;
 	Array <ConditionalDialogueSettings> conditionalDialogues;
 	HashMap <String, NormalDialogueSettings> externalConditionalDialogues;
 	DialogueIndex currentIndex;
@@ -27,7 +27,6 @@ public class NPCProperties implements Serializable {
 		json.writeValue("storyDialogues", storyDialogues);
 		json.writeValue("conditionalDialogues", conditionalDialogues);
 		json.writeValue("externalConditionalDialogues", externalConditionalDialogues);
-
 		json.writeValue("UUID", UUID);
 	}
 
@@ -35,17 +34,22 @@ public class NPCProperties implements Serializable {
 	@SuppressWarnings("unchecked")
 	public void read(Json json, JsonValue jsonData) {
 		storyDialogues = json.readValue("storyDialogues", HashMap.class, jsonData);
-		conditionalDialogues = json.readValue("additionalDialogues", Array.class, jsonData);
+		conditionalDialogues = json.readValue("conditionalDialogues", Array.class, jsonData);
 		externalConditionalDialogues = json.readValue("externalConditionalDialogues", HashMap.class, jsonData);
 		UUID = json.readValue("UUID", String.class, jsonData);
 		currentIndex = new DialogueIndex(0, 0);
 	}
 		
 	public DialogueSettings getNextStoryDialogue() {
-		Array<NormalDialogueSettings> chapterDialogues = storyDialogues.get(currentIndex.getChapterIndex());
-		DialogueSettings dialogue = chapterDialogues.get(currentIndex.getDialogueIndex());
-		if (currentIndex.getDialogueIndex() < chapterDialogues.size - 1) {
-			currentIndex.setDialogueIndex(currentIndex.getDialogueIndex() + 1);
+		DialogueSettings dialogue = storyDialogues.get(currentIndex.toString());
+		for (String key : storyDialogues.keySet()) {
+			DialogueIndex index = new DialogueIndex(key);
+			if (index.getChapterIndex() == this.currentIndex.getChapterIndex() 
+			 && index.getDialogueIndex() > this.currentIndex.getDialogueIndex())
+			{
+				currentIndex.setDialogueIndex(currentIndex.getDialogueIndex() + 1);
+				break;
+			}
 		}
 		return dialogue;
 	}
@@ -66,7 +70,7 @@ public class NPCProperties implements Serializable {
 		}
 	}
 
-	public HashMap<DialogueIndex, Array<NormalDialogueSettings>> getNormalDialogues() {
+	public HashMap<String, NormalDialogueSettings> getNormalDialogues() {
 		return storyDialogues;
 	}
 

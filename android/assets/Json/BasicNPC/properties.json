@@ -1,0 +1,10 @@
+{
+	"class": com.mygdx.game.model.characters.CharacterProperties,
+	"maxHealth": 20,
+	"maxWill": 20,
+	"maxStability": 5,
+	"attack": 1,
+	actions: {
+
+	}
+}

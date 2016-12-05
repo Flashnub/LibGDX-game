@@ -2,9 +2,11 @@ package com.mygdx.game.model.characters;
 
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.nonhostile.ConditionalDialogueSettings;
+import com.mygdx.game.model.characters.enemies.Enemy.EnemyModel;
 import com.mygdx.game.model.characters.player.GameSave;
 import com.mygdx.game.model.characters.player.Player;
 import com.mygdx.game.model.events.DialogueListener;
@@ -17,6 +19,7 @@ public class NPCCharacter extends Character{
 	
 	public NPCCharacter(String characterName, DialogueController controller) {
 		super(characterName);
+		this.setCharacterData(new NPCCharacterModel(characterName, this.getCharacterUIData()));
 		((NPCCharacterModel)this.getCharacterData()).setController(controller);
 	}
 	
@@ -25,6 +28,7 @@ public class NPCCharacter extends Character{
 		NPCProperties npcProperties;
 		boolean isCurrentlyInteractable;
 		DialogueController controller;
+	    Array <String> processedCondtionalDialogueUUIDs;
 		
 		public NPCCharacterModel(String characterName, EntityUIModel uiModel) {
 			super(characterName, uiModel);
@@ -33,6 +37,7 @@ public class NPCCharacter extends Character{
 				npcProperties.setSource(this);
 			}
 			this.isCurrentlyInteractable = true;
+			this.processedCondtionalDialogueUUIDs = new Array <String> ();
 		}
 
 		@Override
@@ -52,9 +57,12 @@ public class NPCCharacter extends Character{
 		}
 		
 		private void checkForDialoguesToHandle() {
-			for (ConditionalDialogueSettings dialogueSettings : npcProperties.getConditionalDialogues()){
-				if (dialogueSettings.conditionsMet()) {
-					controller.handleDialogue(dialogueSettings);
+			if (npcProperties != null) {
+				for (ConditionalDialogueSettings dialogue : npcProperties.getConditionalDialogues()){
+					if (!this.processedCondtionalDialogueUUIDs.contains(dialogue.getUUID(), true) && dialogue.conditionsMet()) {
+						controller.handleDialogue(dialogue);
+						this.processedCondtionalDialogueUUIDs.add(dialogue.getUUID());
+					}
 				}
 			}
 		}
@@ -62,6 +70,7 @@ public class NPCCharacter extends Character{
 		private void processDialogueRequest(CharacterModel target) {
 			//Make ActionSequence for dialogue.
 			ActionSequence dialogueAction = ActionSequence.createSequenceWithDialog(npcProperties.getNextStoryDialogue(), this, target, this.controller);
+			System.out.println("Adding dialogue");
 			this.addActionSequence(dialogueAction);
 
 		}

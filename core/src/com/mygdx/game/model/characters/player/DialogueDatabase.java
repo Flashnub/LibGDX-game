@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.mygdx.game.model.actions.nonhostile.ConditionalDialogueSettings;
 import com.mygdx.game.model.actions.nonhostile.DialogueSettings;
 import com.mygdx.game.model.actions.nonhostile.NormalDialogueSettings;
+import com.mygdx.game.model.characters.Character.CharacterModel;
 
 public class DialogueDatabase implements Serializable{
 	HashMap <String, NormalDialogueSettings> normalDialogues;
@@ -34,5 +35,9 @@ public class DialogueDatabase implements Serializable{
 		return normalDialogues.get(string);
 	}
 
-	
+	public void setSource (CharacterModel source) {
+		for (ConditionalDialogueSettings dialogue : conditionalDialogues) {
+			dialogue.setSource(source);
+		}
+	}
 }

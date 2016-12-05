@@ -30,7 +30,7 @@ public class DialogueView extends Actor implements DialogueListener{
 		dialogueLabelStyle = new LabelStyle();
 		this.setFontWithString(DialogueSettings.defaultFontName, DialogueSettings.defaultFontColor);
 		dialogueLabel = new Label("", dialogueLabelStyle);
-		dialogueLabel.setWrap(true);
+		dialogueLabel.setWrap(false);
 		dialogueLabel.setAlignment(Align.center);
 		this.setVisible(false);
 		background = this.getBackgroundSprite();
@@ -45,15 +45,15 @@ public class DialogueView extends Actor implements DialogueListener{
 	public void layoutWithViewPort(Viewport viewPort, Batch batch) {
 		if (this.isVisible()) {
 			this.setX(0f);
-			this.setY(viewPort.getScreenHeight());
+			this.setY(0f);
 			this.setWidth(viewPort.getScreenWidth());
 			this.setHeight(viewPort.getScreenHeight() * 0.3f);
 			batch.draw(background, this.getX(), this.getY(), this.getWidth(), this.getHeight());
 			
 			float prefHeight = dialogueLabel.getPrefHeight();
 			float prefWidth = dialogueLabel.getPrefWidth();
-			float prefOriginX = (this.getWidth() - prefWidth) / 2;
-			float prefOriginY = this.getY() - ((this.getHeight() - prefHeight) / 2);
+			float prefOriginX = this.getX() + (this.getWidth() - prefWidth) / 2;
+			float prefOriginY = this.getY() + ((this.getHeight() - prefHeight) / 2);
 			currentFont.draw(batch, this.currentText, prefOriginX, prefOriginY);
 		}
 	}
@@ -80,6 +80,7 @@ public class DialogueView extends Actor implements DialogueListener{
 		}
 		this.setFontWithString(fontName,fontColor);
 		this.currentText = dialogueText;
+		this.dialogueLabel.setText(currentText);
 	}
 	
 	private void fadeInDialogueView() {
@@ -91,12 +92,12 @@ public class DialogueView extends Actor implements DialogueListener{
 	}
 	
 	private void setFontWithString(String fontName, String fontColorName) {
-		if (!this.currentFontString.equals(fontName)) {
+		if (this.currentFontString == null || !this.currentFontString.equals(fontName)) {
 			this.currentFontString = fontName;
 			this.currentFont = HUDUtils.HUDSkin.getFont(fontName);
 			this.dialogueLabelStyle.font = this.currentFont;
 		}
-		if (!this.currentFontColorString.equals(fontColorName)) {
+		if (this.currentFontColorString == null || !this.currentFontColorString.equals(fontColorName)) {
 			this.currentFontColorString = fontColorName;
 			this.currentFontColor = HUDUtils.HUDSkin.getColor(fontColorName);
 			this.dialogueLabelStyle.fontColor = this.currentFontColor;

@@ -17,16 +17,15 @@ public class ItemEffect extends Effect {
 	}
 	
 	@Override
-	public boolean process(CharacterModel target, float delta) {
-		boolean isFinished = super.process(target, delta);
+	protected void processDuringActive(CharacterModel target, float delta) {
 		if (target instanceof PlayerModel) {
 			PlayerModel pTarget = (PlayerModel) target;
-			if (!hasAlreadyAdded && (itemEffectSettings.isInstantaneous || (isActive && !isFinished))) {
+			if (!hasAlreadyAdded && (itemEffectSettings.isInstantaneous || (isActive))) {
 				pTarget.addItemToInventory(itemEffectSettings.item);
 				hasAlreadyAdded = true;
 			}
 		}
-		return isFinished;
 	}
+	
 
 }

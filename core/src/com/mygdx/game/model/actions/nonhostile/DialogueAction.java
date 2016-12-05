@@ -28,9 +28,11 @@ public class DialogueAction extends ActionSegment {
 
 	@Override
 	public void sourceProcessWithoutSuper(CharacterModel source) {
-		for (EffectSettings effectSettings : dialogue.targetEffects) {
-			Effect effect = EffectInitializer.initializeEffect(effectSettings);
-			target.addEffect(effect);
+		if (dialogue.targetEffects != null) {
+			for (EffectSettings effectSettings : dialogue.targetEffects) {
+				Effect effect = EffectInitializer.initializeEffect(effectSettings);
+				target.addEffect(effect);
+			}
 		}
 		dialogueController.handleDialogue(this.dialogue);
 	}

@@ -11,18 +11,15 @@ public class HealingEffect extends Effect {
 			this.hSettings = (HealingEffectSettings) settings;
 		}
 	}
-
+	
 	@Override
-	public boolean process(CharacterModel target, float delta) {
-		boolean isFinished = super.process(target, delta);
+	protected void processDuringActive(CharacterModel target, float delta) {
 		if (hSettings.isInstantaneous) {
 			target.addToCurrentHealth(hSettings.value);
 		}
-		else if (isActive && !isFinished){
+		else {
 			target.addToCurrentHealth((int) (hSettings.value * (delta / hSettings.duration)));
 		}
-		return isFinished;
 	}
-
 
 }

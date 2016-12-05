@@ -84,6 +84,7 @@ public class WorldRenderer implements CoordinatesHelper{
 	        
 	        gameBatch.setProjectionMatrix(camera.combined);
 	        gameBatch.begin();
+	        drawNPCs(gameBatch);
 	        drawPlayer(gameBatch);
 	        drawEnemies(gameBatch);
 	        drawProjectiles(gameBatch);
@@ -99,6 +100,17 @@ public class WorldRenderer implements CoordinatesHelper{
 	    			player.getCharacterData().getImageHitBox().y,  
 	    			Math.round(player.getCharacterData().getImageHitBox().width), 
 	    			Math.round(player.getCharacterData().getImageHitBox().height));
+	    }
+	    
+	    private void drawNPCs(SpriteBatch batch) {
+	    	for (Character npc : worldModel.getNpcCharacters()) {
+		    	batch.draw(npc.getCharacterUIData().getCurrentFrame(), 
+		    			npc.getCharacterData().getImageHitBox().x,  
+		    			npc.getCharacterData().getImageHitBox().y,  
+		    			npc.getCharacterData().getImageHitBox().width, 
+		    			npc.getCharacterData().getImageHitBox().height);
+	    	}
+	    	
 	    }
 	    
 	    private void drawEnemies(SpriteBatch batch) {

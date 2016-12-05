@@ -9,7 +9,10 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.mygdx.game.model.actions.ActionSequence;
+import com.mygdx.game.model.actions.nonhostile.ConditionalDialogueSettings;
 import com.mygdx.game.model.characters.Character;
+import com.mygdx.game.model.characters.NPCCharacter;
+import com.mygdx.game.model.characters.NPCCharacter.NPCCharacterModel;
 import com.mygdx.game.model.characters.EntityUIModel;
 import com.mygdx.game.model.characters.player.GameSave.UUIDType;
 import com.mygdx.game.model.world.DialogueController;
@@ -93,8 +96,10 @@ public class Player extends Character implements InputProcessor {
 		final String blockState = "Block";		
 		boolean dashing, canControl, isWalkLeftPressed, isWalkRightPressed, isJumpPressed;
 	    Array<Integer> applicableKeys;
+	    Array <String> processedCondtionalDialogueUUIDs;
 	    SpawnPoint spawnPoint;
 	    WorldObject nearbyObject;
+	    NPCCharacter nearbyNPC;
 	    PlayerProperties playerProperties;
 	    DialogueDatabase dialogues;
 	    DialogueController dialogueController;
@@ -116,6 +121,8 @@ public class Player extends Character implements InputProcessor {
 			playerProperties = json.fromJson(PlayerProperties.class, Gdx.files.internal("Json/Player/playerActions.json"));
 			playerProperties.populateWith(gameSave);
 			dialogues = json.fromJson(DialogueDatabase.class, Gdx.files.internal("Json/Player/dialogues.json"));
+			dialogues.setSource(this);
+			this.processedCondtionalDialogueUUIDs = new Array <String>();
 			applicableKeys = new Array<Integer>();
 			applicableKeys.add(Keys.W);
 			applicableKeys.add(Keys.A);
@@ -125,6 +132,7 @@ public class Player extends Character implements InputProcessor {
 			applicableKeys.add(Keys.E);
 			applicableKeys.add(Keys.R);
 			applicableKeys.add(Keys.Z);
+			applicableKeys.add(Keys.X);
 			applicableKeys.add(Keys.SPACE);
 			dashing = false;
 			canControl = false;
@@ -135,6 +143,11 @@ public class Player extends Character implements InputProcessor {
 			this.gameplayHitBoxHeightModifier = 0.6f;
 		}
 		
+		@Override
+		public void update(float delta, TiledMapTileLayer collisionLayer) {
+			super.update(delta, collisionLayer);
+			this.handleConditionalDialogues();
+		}
 
 		@Override
 		protected void manageAutomaticStates(float delta, TiledMapTileLayer collisionLayer) {
@@ -142,6 +155,18 @@ public class Player extends Character implements InputProcessor {
 			
 			 if (dashing) {
 				setState(idleState); //Dash
+			}
+		}
+		
+		private void handleConditionalDialogues() {
+			if (dialogues != null) {
+				for (ConditionalDialogueSettings dialogue : this.dialogues.conditionalDialogues)
+				{
+					if (!this.processedCondtionalDialogueUUIDs.contains(dialogue.getUUID(), true) && dialogue.conditionsMet()) {
+						dialogueController.handleDialogue(dialogue);
+						this.processedCondtionalDialogueUUIDs.add(dialogue.getUUID());
+					}
+				}
 			}
 		}
 	    
@@ -219,6 +244,9 @@ public class Player extends Character implements InputProcessor {
 			case Keys.R:
 				actOnObject();
 				break;
+			case Keys.X:
+				this.processNPCRequest();
+				break;
 			default:
 				break;
 			}
@@ -264,6 +292,12 @@ public class Player extends Character implements InputProcessor {
 		private void actOnObject() {
 			this.getObjectListener().objectToActOn(this.nearbyObject);
 		}
+		
+		private void processNPCRequest() {
+			if (this.nearbyNPC != null) {
+				((NPCCharacterModel) this.nearbyNPC.getCharacterData()).dialogueAction(this);
+			}
+		}
 
 		@Override
 		public int getAllegiance() {
@@ -276,6 +310,10 @@ public class Player extends Character implements InputProcessor {
 
 		public void setNearbyObject(WorldObject nearbyObject) {
 			this.nearbyObject = nearbyObject;
+		}
+		
+		public void setNearbyNPC(NPCCharacter npc) {
+			this.nearbyNPC = npc;
 		}
 
 		public PlayerProperties getPlayerProperties() {
@@ -305,6 +343,13 @@ public class Player extends Character implements InputProcessor {
 		public boolean handleAdditionCollisionLogic(Rectangle tempGameplayBounds) {
 			return this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds);
 		}
+
+
+		public void setDialogueController(DialogueController dialogueController) {
+			this.dialogueController = dialogueController;
+		}
+		
+		
 	}
 
 	

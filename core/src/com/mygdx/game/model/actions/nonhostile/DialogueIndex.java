@@ -8,6 +8,12 @@ public class DialogueIndex {
 		this.dialogueIndex = dialogueIndex;
 		this.chapterIndex = chapterIndex;
 	}
+	
+	public DialogueIndex(String index) {
+		String[] indices = index.split("-");
+		this.chapterIndex = new Integer(indices[0]).intValue();
+		this.dialogueIndex = new Integer(indices[1]).intValue();
+	}
 
 	public int getDialogueIndex() {
 		return dialogueIndex;
@@ -25,5 +31,9 @@ public class DialogueIndex {
 		this.chapterIndex = chapterIndex;
 	}
 	
+	@Override
+	public String toString() {
+		return chapterIndex + "-" + dialogueIndex;  
+	}
 	
 }

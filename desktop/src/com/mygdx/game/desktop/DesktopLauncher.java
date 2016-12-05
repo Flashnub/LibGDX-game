@@ -26,6 +26,7 @@ public class DesktopLauncher {
         ArrayList <String> characterNames = new ArrayList<String>();
         characterNames.add("Player");
         characterNames.add("BasicEnemy");
+        characterNames.add("BasicNPC");
     	
     	for (String characterName : characterNames) {
         	String inputDir = parentInputDir + characterName;

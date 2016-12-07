@@ -14,6 +14,7 @@ public class ProjectileAttackSettings implements Serializable{
 	ArrayList <StringWrapper> projectileSettingKeys;
 	AbilitySettings abilitySettings;
 	ArrayList <ProjectileSettings> projectileSettings;
+	float projectilesOverTime;
 	
 	public ProjectileAttackSettings() {
 		
@@ -34,6 +35,14 @@ public class ProjectileAttackSettings implements Serializable{
 		projectileSettings = new ArrayList <ProjectileSettings>();
 		for (StringWrapper key : projectileSettingKeys) {
 			projectileSettings.add(JSONController.projectiles.get(key.value));
+		}
+		
+		Float projectilesOverTime = json.readValue("projectilesOverTime", Float.class, jsonData);
+		if (projectilesOverTime != null) {
+			this.projectilesOverTime = projectilesOverTime.floatValue(); 
+		}
+		else {
+			this.projectilesOverTime = Float.MAX_VALUE;
 		}
 	}
 

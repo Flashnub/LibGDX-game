@@ -10,6 +10,7 @@ public class EffectSettings implements Serializable {
 	Float duration;
 	Boolean isInstantaneous;
 	float delayToActivate;
+	Boolean isPermanent;
 	EffectType type;
 	
 	@Override
@@ -24,16 +25,21 @@ public class EffectSettings implements Serializable {
 	@Override
 	public void read(Json json, JsonValue jsonData) {
 		isInstantaneous = json.readValue("isInstantaneous", Boolean.class, jsonData);
-		if (isInstantaneous == null || isInstantaneous == true) {
+		if (isInstantaneous == null || isInstantaneous.booleanValue() == true) {
 			isInstantaneous = true;
 			duration = 0f;
 			delayToActivate = 0f;
+			isPermanent = false;
 		}
 		else {
 			isInstantaneous = false;
-			
+			Boolean isPermanent = json.readValue("isPermanent", Boolean.class, jsonData);
 			Float duration = json.readValue("duration", Float.class, jsonData);
-			if (duration != null) {
+			if (isPermanent != null && isPermanent.booleanValue()) {
+				this.duration = Float.MAX_VALUE;
+				this.isPermanent = true;
+			}
+			else if (duration != null) {
 				this.duration = duration;
 			}
 			else {

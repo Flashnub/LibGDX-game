@@ -1,6 +1,7 @@
 package com.mygdx.game.model.actions;
 
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.Effect;
 import com.mygdx.game.model.effects.EffectSettings;
@@ -14,6 +15,7 @@ public class Attack extends ActionSegment {
 	int allegiance;
 	AttackSettings attackSettings;
 	CharacterModel target;
+	Array <Effect> sourceEffects;
 	
 	public Attack(CharacterModel source, CharacterModel target, AttackSettings settings) {
 		super();
@@ -50,6 +52,7 @@ public class Attack extends ActionSegment {
 		for (EffectSettings effectSettings : attackSettings.sourceEffectSettings) {
 			Effect effect = EffectInitializer.initializeEffect(effectSettings);
 			source.addEffect(effect);
+			sourceEffects.add(effect);
 		}
 	}
 	
@@ -77,7 +80,17 @@ public class Attack extends ActionSegment {
 	
 	@Override
 	public float getTotalTime() {
+		if (this.forceInterrupt) {
+			return this.attackSettings.windupTime + this.stateTime + this.attackSettings.cooldownTime;
+		}
 		return this.attackSettings.windupTime + this.attackSettings.duration + this.attackSettings.cooldownTime;
+	}
+	
+	@Override
+	public void interruptionBlock() {
+		for(Effect effect : this.sourceEffects) {
+			effect.setForceInterrupt(true);
+		}
 	}
 	
 	public Rectangle getAttackHitBox() {

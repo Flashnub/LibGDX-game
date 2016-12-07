@@ -25,6 +25,8 @@ public class DialogueView extends Actor implements DialogueListener{
 	Color currentFontColor;
 	float textSpeed;
 	TextureRegion background;
+	float xOrigin;
+	float yOrigin;
 	
 	public DialogueView() {
 		dialogueLabelStyle = new LabelStyle();
@@ -50,11 +52,7 @@ public class DialogueView extends Actor implements DialogueListener{
 			this.setHeight(viewPort.getScreenHeight() * 0.3f);
 			batch.draw(background, this.getX(), this.getY(), this.getWidth(), this.getHeight());
 			
-			float prefHeight = dialogueLabel.getPrefHeight();
-			float prefWidth = dialogueLabel.getPrefWidth();
-			float prefOriginX = this.getX() + (this.getWidth() - prefWidth) / 2;
-			float prefOriginY = this.getY() + ((this.getHeight() - prefHeight) / 2);
-			currentFont.draw(batch, this.currentText, prefOriginX, prefOriginY);
+			currentFont.draw(batch, this.currentText, this.xOrigin, this.yOrigin);
 		}
 	}
 	
@@ -73,13 +71,18 @@ public class DialogueView extends Actor implements DialogueListener{
 	}
 	
 	@Override
-	public void updateDialogueText(String dialogueText, String fontName, String fontColor, boolean newDialogue) {
+	public void updateDialogueText(String dialogueText, String fontName, String fontColor, boolean newDialogue, String fullText) {
 		// TODO Auto-generated method stub
 		if (!this.isVisible()) {
 			fadeInDialogueView();
 		}
 		this.setFontWithString(fontName,fontColor);
 		this.currentText = dialogueText;
+		dialogueLabel.setText(fullText);
+		if (newDialogue) {
+			this.xOrigin = (this.getStage().getViewport().getScreenWidth() - dialogueLabel.getPrefWidth()) / 2;
+			this.yOrigin = ((this.getStage().getViewport().getScreenHeight() * 0.3f) - dialogueLabel.getPrefHeight()) / 2;
+		}
 		this.dialogueLabel.setText(currentText);
 	}
 	

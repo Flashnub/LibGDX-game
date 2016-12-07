@@ -1,5 +1,6 @@
 package com.mygdx.game.model.actions;
 
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.Effect;
 import com.mygdx.game.model.effects.EffectSettings;
@@ -8,11 +9,13 @@ import com.mygdx.game.model.events.ActionListener;
 
 public class Ability extends ActionSegment{
 	AbilitySettings settings;
-
+	Array <Effect> sourceEffects;
+	
 	public Ability(CharacterModel source, AbilitySettings settings) {
 		super();
 		this.settings = settings;
 		this.source = source;
+		this.sourceEffects = new Array <Effect>();
 	}
 	
 	@Override
@@ -25,6 +28,7 @@ public class Ability extends ActionSegment{
 		for (EffectSettings effectSettings : settings.sourceEffectSettings) {
 			Effect effect = EffectInitializer.initializeEffect(effectSettings);
 			source.addEffect(effect);
+			sourceEffects.add(effect);
 		}
 	}
 
@@ -51,8 +55,19 @@ public class Ability extends ActionSegment{
 
 	@Override
 	public float getTotalTime() {
+		if (this.forceInterrupt) {
+			return this.settings.windupTime + this.stateTime + this.settings.cooldownTime;
+		}
 		return this.settings.windupTime + this.settings.duration + this.settings.cooldownTime;
 	}
+
+	@Override
+	public void interruptionBlock() {
+		for(Effect effect : this.sourceEffects) {
+			effect.setForceInterrupt(true);
+		}
+	}
+
 
 
 }

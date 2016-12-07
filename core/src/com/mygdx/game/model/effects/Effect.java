@@ -7,6 +7,7 @@ public abstract class Effect {
 	Boolean isActive;
 	boolean hasProcessedInitial;
 	boolean hasProcessedCompletion;
+	boolean forceInterrupt;
 	float currentTime;
 	
 	public Effect(EffectSettings settings) {
@@ -14,6 +15,7 @@ public abstract class Effect {
 		this.isActive = false;
 		this.hasProcessedInitial = false;
 		this.hasProcessedCompletion = false;
+		this.forceInterrupt = false;
 		this.settings = settings;
 	}
 	
@@ -44,7 +46,7 @@ public abstract class Effect {
 		if ((currentTime > settings.delayToActivate && currentTime < settings.duration + settings.delayToActivate) || settings.isInstantaneous) {
 			this.processDuringActive(target, delta);
 		}
-		if ((currentTime >= (settings.duration + settings.delayToActivate) || settings.isInstantaneous) && !this.hasProcessedCompletion) {
+		if ((currentTime >= (settings.duration + settings.delayToActivate) || settings.isInstantaneous || this.forceInterrupt) && !this.hasProcessedCompletion) {
 			isFinished = true;
 			this.completion(target);
 		}
@@ -66,39 +68,9 @@ public abstract class Effect {
 		return currentTime;
 	}
 
-//	@Override
-//	public void write(Json json) {
-//		json.writeValue("isInstantaneous", isInstantaneous);
-//		json.writeValue("duration", duration);
-//		json.writeValue("delayToActivate", delayToActivate);
-//		json.writeValue("value", value);
-//	}
-//	
-//	
-//	@Override
-//	public void read(Json json, JsonValue jsonData) {
-//		isInstantaneous = json.readValue("isInstantaneous", Boolean.class, jsonData);
-//		if (isInstantaneous == null || isInstantaneous == true) {
-//			isInstantaneous = true;
-//			duration = 0f;
-//			delayToActivate = 0f;
-//		}
-//		else {
-//			isInstantaneous = false;
-//			duration = json.readValue("duration", Float.class, jsonData);
-//			Float delayToActivate = json.readValue("delayToActivate", Float.class, jsonData);
-//			if (delayToActivate != null) {
-//				this.delayToActivate = delayToActivate;
-//			}
-//			else 
-//			{
-//				this.delayToActivate = 0f;
-//			}
-//		}
-//		value = json.readValue("value", Integer.class, jsonData);
-//		
-//		currentTime = 0f;
-//		this.isActive = false;
-//	}
-//	
+	public void setForceInterrupt(boolean forceInterrupt) {
+		this.forceInterrupt = forceInterrupt;
+	}
+
+	
 }

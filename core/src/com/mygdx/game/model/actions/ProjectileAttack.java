@@ -2,13 +2,11 @@ package com.mygdx.game.model.actions;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.Effect;
-import com.mygdx.game.model.effects.EffectInitializer;
-import com.mygdx.game.model.effects.EffectSettings;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.CollisionChecker;
-import com.mygdx.game.model.events.ObjectListener;
 import com.mygdx.game.model.projectiles.Projectile;
 import com.mygdx.game.model.projectiles.ProjectileSettings;
 
@@ -21,12 +19,15 @@ public class ProjectileAttack extends ActionSegment{
 	ActionListener actionListener;
 	CollisionChecker collisionChecker;
 	ProjectileAttackSettings projAttackSettings;
+	float projectileIterateTime;
+	Array <Effect> sourceEffects;
 	
 	public ProjectileAttack() {
 		
 	}
 	
 	public ProjectileAttack(CharacterModel source, CharacterModel target, ActionListener actionListener, CollisionChecker collisionChecker, ProjectileAttackSettings settings) {
+		super();
 		this.source = source;
 		this.target = target;
 		this.actionListener = actionListener;
@@ -46,6 +47,8 @@ public class ProjectileAttack extends ActionSegment{
 				potentialAbility = attack;
 			}
 		}
+		this.projectileIterateTime = 0f;
+		this.sourceEffects = new Array <Effect>();
 	}
 	
 	@Override
@@ -69,20 +72,36 @@ public class ProjectileAttack extends ActionSegment{
 	
 	@Override
 	public float getTotalTime() {
+		if (this.forceInterrupt) {
+			return this.projAttackSettings.getAbilitySettings().windupTime + this.stateTime + this.projAttackSettings.getAbilitySettings().cooldownTime;
+		}
 		return this.projAttackSettings.getAbilitySettings().windupTime + this.projAttackSettings.getAbilitySettings().cooldownTime + this.projAttackSettings.getAbilitySettings().duration;
 	}
 
+	@Override 
+	public void update(float delta, ActionListener actionListener) {
+		super.update(delta, actionListener);
+		if (this.getActionState().equals(ActionState.ACTION)) {
+			this.projectileIterateTime += delta;
+		}
+	}
 	
 	@Override
 	public void sendActionToListener(ActionListener actionListener) {
 //		for (Projectile projectile : projectiles) {
 //			actionListener.processProjectile(projectile);
 //		}
+		if (this.projectileIterateTime > this.projAttackSettings.projectilesOverTime) {
+			for (Projectile projectile : projectiles) {
+				this.actionListener.addProjectile(projectile);
+			}
+			this.projectileIterateTime = 0f;
+		}
 		if (this.potentialAbility instanceof Attack) {
 			actionListener.processAttack((Attack) this.potentialAbility);
 		}
 	}
-
+	
 	public void sourceProcessWithoutSuper(CharacterModel source) {
 		if (this.potentialAbility != null) {
 			this.potentialAbility.sourceProcessWithoutSuper(source);
@@ -124,6 +143,13 @@ public class ProjectileAttack extends ActionSegment{
 		this.target = target;
 		for (Projectile projectile : projectiles) {
 			projectile.setTarget(target);
+		}
+	}
+	
+	@Override
+	public void interruptionBlock() {
+		for(Effect effect : this.sourceEffects) {
+			effect.setForceInterrupt(true);
 		}
 	}
 

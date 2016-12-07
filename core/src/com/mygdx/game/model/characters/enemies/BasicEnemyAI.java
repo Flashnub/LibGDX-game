@@ -32,21 +32,24 @@ public class BasicEnemyAI extends EnemyAI {
 	@Override
 	public void setNextActionSequences(ArrayList<ActionSequence> possibleActionSequences) {
 		// TODO Auto-generated method stub
-		ArrayList <ActionSequence> actualActionSequences = new ArrayList <ActionSequence> ();
-		for (ActionSequence sequence : possibleActionSequences) {
-			float randomFloat = rand.nextFloat();
-			if (randomFloat < 0.9) {
-				actualActionSequences.add(sequence);
+		if (!this.source.isActionLock()) {
+			ArrayList <ActionSequence> actualActionSequences = new ArrayList <ActionSequence> ();
+			for (ActionSequence sequence : possibleActionSequences) {
+				float randomFloat = rand.nextFloat();
+				if (randomFloat < 0.9) {
+					actualActionSequences.add(sequence);
+				}
+			}
+			if (actualActionSequences.size() > 0) {
+				this.source.stopWalk();
+				ActionSequence actionSequence = actualActionSequences.get(rand.nextInt(actualActionSequences.size()));
+				this.nextActionSequences.add(actionSequence);
+			}
+			else if (!this.source.isProcessingActiveSequences()){ 
+				//walk towards or away nearest enemy
+				source.walk(rand.nextBoolean());
 			}
 		}
-		if (actualActionSequences.size() > 0) {
-			this.source.stopWalk();
-			ActionSequence actionSequence = actualActionSequences.get(rand.nextInt(actualActionSequences.size()));
-			this.nextActionSequences.add(actionSequence);
-		}
-		else if (!this.source.isProcessingAction()){ 
-			//walk towards or away nearest enemy
-			source.walk(rand.nextBoolean());
-		}
+
 	}
 }

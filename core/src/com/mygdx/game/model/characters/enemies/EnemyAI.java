@@ -64,22 +64,24 @@ public abstract class EnemyAI implements PlayerObserver {
 	
 	public ArrayList <ActionSequence> figureOutPossibleMoves() {
 		ArrayList <ActionSequence> possibleActionsToTake = new ArrayList <ActionSequence>();
-		DistanceObservation distanceObservation = null;
-		for (ObservationBlock observationBlock : this.observationBlocks) {
-			//find closest enemy and shoot.
-			DistanceObservation currentObservation = (DistanceObservation) observationBlock.observations.get(DistanceObservation.classKey);
-			if (distanceObservation == null || (distanceObservation != null && currentObservation.isCloserThanOtherObservation(distanceObservation))) {
-				distanceObservation = currentObservation;
+		if (!this.source.isActionLock()) {
+			DistanceObservation distanceObservation = null;
+			for (ObservationBlock observationBlock : this.observationBlocks) {
+				//find closest enemy and shoot.
+				DistanceObservation currentObservation = (DistanceObservation) observationBlock.observations.get(DistanceObservation.classKey);
+				if (distanceObservation == null || (distanceObservation != null && currentObservation.isCloserThanOtherObservation(distanceObservation))) {
+					distanceObservation = currentObservation;
+				}
 			}
-		}
-		if (distanceObservation != null) {
-			float rawDistance = distanceObservation.getHypotenuse();
-			//shoot if far, attack if close.
-			
-			for (ActionSequence actionSequence : this.properties.getActions().values()) {
-				ActionSequence clonedSequence = actionSequence.cloneSequenceWithSourceAndTarget(this.source, distanceObservation.sourceOfObservation, world, world);
-				if (clonedSequence.getEffectiveRange() >= rawDistance) {
-					possibleActionsToTake.add(clonedSequence);
+			if (distanceObservation != null) {
+				float rawDistance = distanceObservation.getHypotenuse();
+				//shoot if far, attack if close.
+				
+				for (ActionSequence actionSequence : this.properties.getActions().values()) {
+					ActionSequence clonedSequence = actionSequence.cloneSequenceWithSourceAndTarget(this.source, distanceObservation.sourceOfObservation, world, world);
+					if (clonedSequence.getEffectiveRange() >= rawDistance) {
+						possibleActionsToTake.add(clonedSequence);
+					}
 				}
 			}
 		}

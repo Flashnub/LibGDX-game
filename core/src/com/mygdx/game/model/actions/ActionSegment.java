@@ -5,7 +5,7 @@ import com.mygdx.game.model.events.ActionListener;
 
 public abstract class ActionSegment {
 	
-	enum ActionState {
+	public enum ActionState {
 		WINDUP, ACTION, COOLDOWN
 	}
 	
@@ -15,17 +15,23 @@ public abstract class ActionSegment {
 	Float currentTime;
 	boolean hasProcessedSource;
 	boolean didChangeState;
+	boolean forceRemove; //Used for ending actions involuntarily (Removes from processing)
+	boolean forceInterrupt; //Used for ending actions voluntarily (puts into cooldown state)
 	CharacterModel source;
 	ActionState actionState;
+	float stateTime;
 	
 	public ActionSegment() {
-		
+		forceRemove = false;
+		forceInterrupt = false;
+		stateTime = 0f;
 	}
 
 	public void sourceProcess(CharacterModel source) {
 		hasProcessedSource = true;
 		this.setActionState(ActionState.ACTION);
 		sourceProcessWithoutSuper(source);
+		source.lockControls();
 	}
 	
 	
@@ -34,7 +40,11 @@ public abstract class ActionSegment {
 			this.currentTime = 0f;
 		}
 		this.currentTime += delta;
-		if (currentTime >= this.getWindUpPlusActionTime()) {
+		this.stateTime += delta;
+		if (currentTime >= this.getWindUpPlusActionTime() || this.forceInterrupt) {
+			if (forceInterrupt) {
+				this.interruptionBlock();
+			}
 			this.setActionState(ActionState.COOLDOWN);
 		}
 		else if (currentTime >= this.getWindUpTime()) {
@@ -46,12 +56,12 @@ public abstract class ActionSegment {
 		else if (this.actionState != ActionState.WINDUP){
 			this.setActionState(ActionState.WINDUP);
 		}
-
+		source.shouldUnlockControls(this);
 	}	
 	
 	public void setSource(CharacterModel source) {
 		this.source = source;
-	}
+	} 
 	
 	public CharacterModel getSource() {
 		return this.source; 
@@ -62,7 +72,7 @@ public abstract class ActionSegment {
 	}
 	
 	public void setActionState(ActionState state) {
-		if (this.actionState != state) {
+		if (this.actionState != state && !forceRemove) {
 			System.out.println("Action State" + state);
 			System.out.println("Action time:" + this.currentTime);
 			this.didChangeState = true;
@@ -71,7 +81,7 @@ public abstract class ActionSegment {
 	}
 	
 	public boolean isFinished() {
-		return currentTime >= this.getTotalTime();
+		return currentTime >= this.getTotalTime() || forceRemove;
 	}
 	
 	public int getPriority() {
@@ -86,4 +96,6 @@ public abstract class ActionSegment {
 	public abstract float getTotalTime();
 	public abstract ActionSegment cloneActionSegmentWithSourceAndTarget(CharacterModel source, CharacterModel target);
 	public abstract float getEffectiveRange();
+	public abstract void interruptionBlock();
+//	public abstract boolean canBeInterrupted();
 }

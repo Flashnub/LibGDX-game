@@ -8,6 +8,8 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
+import com.mygdx.game.model.actions.ActionSegment;
+import com.mygdx.game.model.actions.ActionSegment.ActionState;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.nonhostile.ConditionalDialogueSettings;
 import com.mygdx.game.model.characters.Character;
@@ -212,7 +214,14 @@ public class Player extends Character implements InputProcessor {
 	    private void attack() {
     		ActionSequence attackAction = this.getCharacterProperties().getActions().get("PlayerAttack");
     		this.addActionSequence(attackAction);
-   	
+	    }
+	    
+	    @Override
+	    public void shouldUnlockControls(ActionSegment segment) {
+	    	if (segment.getActionState().equals(ActionState.COOLDOWN))
+	    	{
+	    		this.setActionLock(false);
+	    	}
 	    }
 	    
 		public boolean handleKeyDown (int keyCode)
@@ -283,8 +292,7 @@ public class Player extends Character implements InputProcessor {
 		
 		private void checkIfNeedToStopWalk() {
 			if (!isWalkLeftPressed && !isWalkRightPressed) {
-				this.getVelocity().x = 0;
-				setState(this.idleState);
+				this.stopWalk();
 			}
 		}
 		

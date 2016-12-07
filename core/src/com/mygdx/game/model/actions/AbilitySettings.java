@@ -12,6 +12,7 @@ public class AbilitySettings implements Serializable {
 	Float windupTime;
 	Float cooldownTime;
 	Float duration;
+	boolean isPermanent;
 	
 	@Override
 	public void write(Json json) {
@@ -24,12 +25,19 @@ public class AbilitySettings implements Serializable {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void read(Json json, JsonValue jsonData) {
+		Boolean isPermanent = json.readValue("isPermanent", Boolean.class, jsonData);
 		Float duration = json.readValue("duration", Float.class, jsonData);
-		if (duration != null) {
+		if (isPermanent != null && isPermanent.booleanValue()) {
+			this.duration = Float.MAX_VALUE;
+			this.isPermanent = isPermanent.booleanValue();
+		}
+		else if (duration != null) {
 			this.duration = duration;
+			this.isPermanent = false;
 		}
 		else {
 			this.duration = 0.5f;
+			this.isPermanent = false;
 		}
 		Float windupTime = json.readValue("windUpTime", Float.class, jsonData);
 		if (windupTime != null) {
@@ -58,6 +66,10 @@ public class AbilitySettings implements Serializable {
 
 	public Float getCooldownTime() {
 		return cooldownTime;
+	}
+
+	public boolean isPermanent() {
+		return isPermanent;
 	}
 	
 }

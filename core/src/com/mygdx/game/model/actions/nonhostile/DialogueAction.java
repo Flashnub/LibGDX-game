@@ -15,6 +15,7 @@ public class DialogueAction extends ActionSegment {
 	CharacterModel target;
 	
 	public DialogueAction(DialogueSettings dialogue, DialogueController dialogueController, CharacterModel source, CharacterModel target) {
+		super();
 		this.setSource(source);
 		this.dialogue = dialogue;
 		this.dialogueController = dialogueController;
@@ -66,4 +67,10 @@ public class DialogueAction extends ActionSegment {
 	public int getPriority() {
 		return ActionSegment.StoryPriority;
 	}
+
+	@Override
+	public void interruptionBlock() {
+		//Do nothing.
+	}
+
 }

@@ -35,12 +35,17 @@ public class ActionSequence implements Serializable {
 	private String windupState;
 	private String actingState;
 	private String cooldownState;
+	private String leftWindupState;
+	private String leftActingState;
+	private String leftCooldownState;
+	private boolean useLeft;
 	private boolean isActive;
 	private CharacterModel source;
 	private CharacterModel target;
 	private ActionListener actionListener;
 	private CollisionChecker collisionChecker;
 	private DialogueController dialogueController;
+	
 	
 	public ActionSequence() {
 
@@ -66,6 +71,10 @@ public class ActionSequence implements Serializable {
 		sequence.windupState = settings.getWindupState();
 		sequence.actingState = settings.getActingState();
 		sequence.cooldownState = settings.getCooldownState();
+		sequence.leftWindupState = sequence.windupState;
+		sequence.leftActingState = sequence.actingState;
+		sequence.leftCooldownState = sequence.cooldownState;
+		sequence.useLeft = source.isFacingLeft();
 		
 		sequence.source = source;
 		sequence.target = target;
@@ -93,6 +102,10 @@ public class ActionSequence implements Serializable {
 //		nextActionKey = json.readValue("nextActionKey", String.class, jsonData);
 		String windupState = json.readValue("windupState", String.class, jsonData);
 		String cooldownState = json.readValue("cooldownState", String.class, jsonData);
+		String leftWindupState = json.readValue("leftWindupState", String.class, jsonData);
+		String leftActingState = json.readValue("leftActingState", String.class, jsonData);
+		String leftCooldownState = json.readValue("leftCooldownState", String.class, jsonData);
+		
 		actingState = json.readValue("actingState", String.class, jsonData);
 		
 		if (windupState != null) {
@@ -102,12 +115,34 @@ public class ActionSequence implements Serializable {
 			this.windupState = actingState;
 		}
 		
+		if (leftWindupState != null) {
+			this.leftWindupState = leftWindupState;
+		}
+		else {
+			this.leftWindupState = this.windupState;
+		}
+		
 		if (cooldownState != null) {
 			this.cooldownState = cooldownState;
 		}
 		else {
 			this.cooldownState = actingState;
 		}
+		
+		if (leftActingState != null) {
+			this.leftActingState = leftActingState;
+		}
+		else {
+			this.leftActingState = this.actingState;
+		}
+		
+		if (leftCooldownState != null) {
+			this.leftCooldownState = leftCooldownState;
+		}
+		else {
+			this.leftCooldownState = this.cooldownState;
+		}
+		
 //		actionKey = json.readValue("actionKey", String.class, jsonData);
 		Boolean isActive = json.readValue("isActive", Boolean.class, jsonData);
 		if (isActive != null) {
@@ -124,6 +159,7 @@ public class ActionSequence implements Serializable {
 		sequence.target = target;
 		sequence.actionListener = actionListener;
 		sequence.collisionChecker = collisionChecker;
+		sequence.useLeft = source.isFacingLeft();
 		sequence.createActionFromSettings(null);
 		return sequence;
 	}
@@ -135,8 +171,19 @@ public class ActionSequence implements Serializable {
 		sequence.windupState = this.windupState;
 		sequence.actingState = this.actingState;
 		sequence.cooldownState = this.cooldownState;
+		sequence.leftWindupState = this.leftWindupState;
+		sequence.leftActingState = this.leftActingState;
+		sequence.leftCooldownState = this.leftCooldownState;
 		sequence.isActive = this.isActive;
 		return sequence;
+	}
+	
+	public void forceFinish() {
+		this.action.forceRemove = true;
+	}
+	
+	public void forceInterrupt() {
+		this.action.forceInterrupt = true;
 	}
 	
 	public boolean isFinished() {
@@ -161,13 +208,13 @@ public class ActionSequence implements Serializable {
 		this.action.didChangeState = false;
 		switch (action.getActionState()) {
 			case WINDUP:
-				return this.windupState;
+				return this.useLeft ? this.leftWindupState : this.windupState;
 			case ACTION:
-				return this.actingState;
+				return this.useLeft ? this.leftActingState : this.actingState;
 			case COOLDOWN:
-				return this.cooldownState;
+				return this.useLeft ? this.leftCooldownState : this.cooldownState;
 			default:
-				return this.actingState;
+				return this.useLeft ? this.leftActingState : this.actingState;
 		}
 	}
 	
@@ -213,6 +260,14 @@ public class ActionSequence implements Serializable {
 				break;
 		}
 		return action;
+	}
+	
+	public ActionSegmentKey getActionKey() {
+		return actionKey;
+	}
+
+	public ActionSegment getAction() {
+		return this.action;
 	}
 
 	public CharacterModel getSource() {

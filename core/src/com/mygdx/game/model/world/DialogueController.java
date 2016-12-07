@@ -60,17 +60,18 @@ public class DialogueController implements InputProcessor{
 						this.currentDialogue.getWrittenDialogue().substring(0, currentCharacterIndex), 
 						this.currentDialogue.getFontName(),
 						this.currentDialogue.getFontColor(),
-						!this.isProcessingDialogue);
+						!this.isProcessingDialogue,
+						this.currentDialogue.getWrittenDialogue());
 				currentCharacterIndex += 1;
 				dialogueRenderTime = 0f; //Need to figure out a better way to handle this
+				if (!this.isProcessingDialogue) {
+					this.isProcessingDialogue = true;
+				}
 			}
-			if (!this.isProcessingDialogue) {
-				this.isProcessingDialogue = true;
-			}
+
 		}
 		else if (this.hasDialogue() && this.isFinishedPlacingDialogue()) {
 			float currentTime = this.currentTime - (this.currentDialogue.getTimeToDisplayDialogue() + this.currentDialogue.getWindupTime());
-			this.isProcessingDialogue = false;
 			if (currentTime >= this.currentDialogue.getCooldownTime()) {
 				//Get rid of current dialogue and move on to next one if there is one.
 				moveToNextDialogue();
@@ -82,7 +83,7 @@ public class DialogueController implements InputProcessor{
 		this.currentCharacterIndex = 0;
 		this.currentTime = 0f;
 		this.dialogueRenderTime = 0f;
-
+		this.isProcessingDialogue = false;
 	}
 	
 	public void handleDialogue(DialogueSettings dialogue) {
@@ -135,9 +136,9 @@ public class DialogueController implements InputProcessor{
 
 	}
 	
-	private void setCurrentTextToDisplay(String textToDisplay, String fontName, String fontColor, boolean newDialogue) {
+	private void setCurrentTextToDisplay(String textToDisplay, String fontName, String fontColor, boolean newDialogue, String fullText) {
 		for (DialogueListener listener : listeners) {
-			listener.updateDialogueText(textToDisplay, fontName, fontColor, newDialogue);
+			listener.updateDialogueText(textToDisplay, fontName, fontColor, newDialogue, fullText);
 		}
 	}
 	

@@ -19,14 +19,16 @@ public class MovementEffect extends Effect {
 	@Override
 	protected void initialProcess(CharacterModel target) {
 		super.initialProcess(target);
-		target.getVelocity().x = this.mSettings.velocity.x;
+		target.getVelocity().x = target.isFacingLeft() ? -this.mSettings.velocity.x : this.mSettings.velocity.x;
 		target.getVelocity().y = this.mSettings.velocity.y;	
 		
 		oldAccel.x = target.acceleration.x;
 		oldAccel.y = target.acceleration.y;
 		
-		target.acceleration.x = this.mSettings.acceleration.x;
-		target.acceleration.y = this.mSettings.acceleration.y;
+		target.acceleration.x = target.isFacingLeft() ? -this.mSettings.acceleration.x : this.mSettings.acceleration.x;
+		if (!this.mSettings.useGravity) {
+			target.acceleration.y = this.mSettings.acceleration.y;
+		}
 	}
 	
 	@Override
@@ -34,6 +36,8 @@ public class MovementEffect extends Effect {
 		super.completion(target);
 		target.acceleration.x = oldAccel.x;
 		target.acceleration.y = oldAccel.y;
+		
+		target.velocity.x = mSettings.finishVelocityX;
 	}
 	
 	public Vector2 getOldAccel() {
@@ -42,6 +46,10 @@ public class MovementEffect extends Effect {
 
 	public void setOldAccel(Vector2 oldAccel) {
 		this.oldAccel = oldAccel;
+	}
+	
+	public Vector2 getMaxVelocity() {
+		return mSettings.maxVelocity;
 	}
 
 }

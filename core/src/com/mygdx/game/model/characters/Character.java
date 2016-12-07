@@ -9,6 +9,8 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.constants.JSONController;
+import com.mygdx.game.model.actions.ActionSegment;
+import com.mygdx.game.model.actions.ActionSegment.ActionState;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.Attack;
 import com.mygdx.game.model.characters.player.Player.PlayerModel;
@@ -55,6 +57,7 @@ public abstract class Character {
 		boolean didChangeState;
 		boolean staggering;
 		boolean facingLeft;
+		boolean actionLocked;
 	    public float injuryTime = 0f;
 		String name, uuid; 
 		
@@ -71,8 +74,8 @@ public abstract class Character {
 		CharacterProperties properties;
 		ArrayList <Effect> currentEffects;
 		ArrayList <Integer> indicesToRemove;
-		ArrayList <ActionSequence> currentActionSequences;
-		ArrayDeque <ActionSequence> activeActionSequences;
+		ArrayList <ActionSequence> processingActionSequences;
+		ArrayDeque <ActionSequence> nextActiveActionSequences;
 		
 		//Debug
 		float stateTime;
@@ -80,14 +83,15 @@ public abstract class Character {
 		public CharacterModel(String characterName, EntityUIModel uiModel) {
 			this.currentEffects = new ArrayList <Effect>();
 			this.indicesToRemove = new ArrayList<Integer>();
-			this.activeActionSequences = new ArrayDeque<ActionSequence>();
-			this.currentActionSequences = new ArrayList <ActionSequence>();
+			this.nextActiveActionSequences = new ArrayDeque<ActionSequence>();
+			this.processingActionSequences = new ArrayList <ActionSequence>();
 			setState(idleState);
 			isImmuneToInjury = false;
 			attacking = false;
 			staggering = false;
 			jumping = true;
 			facingLeft = false;
+			actionLocked = false;
 //			isProcessingMovementEffect = false;
 			stateTime = 0f;
 
@@ -132,7 +136,17 @@ public abstract class Character {
 				this.getVelocity().y = this.properties.jumpSpeed;
 //			else if (this.getVelocity().y < -this.properties.jumpSpeed)
 //				this.getVelocity().y = -this.properties.jumpSpeed;
-				
+			if (this.getCurrentMovement() != null)
+			{
+				float xVelocityMax = this.getCurrentMovement().getMaxVelocity().x;
+				if (this.velocity.x > xVelocityMax) {
+					this.velocity.x = xVelocityMax;
+				}
+				else if (this.velocity.x < -xVelocityMax) {
+					this.velocity.x = -xVelocityMax;
+				}
+			}
+				 
 		}
 		
 		protected void manageAutomaticStates(float delta, TiledMapTileLayer collisionLayer) {
@@ -147,15 +161,14 @@ public abstract class Character {
 			if (this.injuryTime > this.properties.getInjuryImmunityTime()) {
 				this.setImmuneToInjury(false);
 			}
-			
 			if (jumping) {
 				setState(velocity.y >= 0 ? idleState : idleState); //Jump : Fall
 			}
 		}
 		
 		private void handleActionSequences(float delta) {
-			if (this.currentActionSequences != null) {
-				Iterator <ActionSequence> iterator = currentActionSequences.iterator();
+			if (this.processingActionSequences != null) {
+				Iterator <ActionSequence> iterator = processingActionSequences.iterator();
 				while (iterator.hasNext()) {
 					ActionSequence actionSequence = iterator.next();
 					actionSequence.process(delta, actionListener);
@@ -165,16 +178,15 @@ public abstract class Character {
 				}
 
 			}
-			if (activeActionSequences.peek() != null && !isProcessingActiveSequences()) {
-				System.out.println("Polling action");
-				this.currentActionSequences.add(activeActionSequences.poll());
+			if (nextActiveActionSequences.peek() != null && !isProcessingActiveSequences()) {
+				this.processingActionSequences.add(nextActiveActionSequences.poll());
 			}
 			
 		}
 		
-		boolean isProcessingActiveSequences() {
+		public boolean isProcessingActiveSequences() {
 			boolean isProcessingActive = false;
-			for (ActionSequence actionSequence : this.currentActionSequences) {
+			for (ActionSequence actionSequence : this.processingActionSequences) {
 				isProcessingActive = isProcessingActive || actionSequence.isActive();
 			}
 			return isProcessingActive;
@@ -182,30 +194,18 @@ public abstract class Character {
 		
 		public void addActionSequence (ActionSequence sequence) {
 //			sequence.setSource(this);
-			System.out.println("Add action");
-			if (sequence.isActive()) {
-				activeActionSequences.add(sequence);
+			if (sequence.isActive() && !actionLocked) {
+				finishActiveAction();
+				nextActiveActionSequences.add(sequence);
 			}
-			else {
-				currentActionSequences.add(sequence);
+			else if (!sequence.isActive()){
+				processingActionSequences.add(sequence);
 			}
 		}
 		
 		private void handleEffects(float delta) {
 			this.indicesToRemove.clear();
 //			//process existing effects.
-//			for (int i = 0; i < currentEffects.size(); i++) {
-//				Effect effect = currentEffects.get(i);
-//				boolean isFinished = effect.process(this, delta);
-//				if (isFinished) {
-//					indicesToRemove.add(i);
-//				}
-//			}
-//			//Remove finished effects
-//			for (int i = 0; i < indicesToRemove.size(); i++) {
-//				currentEffects.remove(indicesToRemove.get(i));
-//			}
-			
 			for(Iterator<Effect> iterator = this.currentEffects.iterator(); iterator.hasNext();) {
 				Effect effect = iterator.next();
 				boolean isFinished = effect.process(this, delta);
@@ -213,7 +213,6 @@ public abstract class Character {
 					iterator.remove();
 				}
 			}
-//			this.isProcessingMovementEffect = movementEffect;
 		}
 		
 		public void addEffect(Effect effect) {
@@ -230,6 +229,16 @@ public abstract class Character {
 			currentEffects.add(effect);
 		}
 		
+		public void lockControls() {
+			this.actionLocked = true;
+		}
+		
+		public void shouldUnlockControls(ActionSegment action) {
+			if (action.isFinished()) {
+				this.actionLocked = false;
+			}
+		}
+		
 		public MovementEffect getCurrentMovement() {
 			for (Effect effect : this.currentEffects) {
 				if (effect instanceof MovementEffect) {
@@ -244,7 +253,7 @@ public abstract class Character {
 		}
 		
 		public void jump() {
-	        if (!jumping) {
+	        if (!jumping && !actionLocked) {
 	            jumping = true;
 	            this.getVelocity().y = getJumpSpeed();
 	        }
@@ -257,16 +266,27 @@ public abstract class Character {
 	    }
 	    
 		public void walk(boolean left) {
-			this.setFacingLeft(left);
-			this.velocity.x = left ? -this.properties.getWalkingSpeed() : this.properties.getWalkingSpeed();
-			if (this instanceof PlayerModel) {
-				setState(left ? this.backWalkState : this.walkState); //Walk
+			if (!this.actionLocked) {
+				this.setFacingLeft(left);
+//	    		ActionSequence walkAction = this.getCharacterProperties().getActions().get("Walk").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());
+//	    		this.addActionSequence(walkAction);
+				this.velocity.x = left ? -this.properties.getWalkingSpeed() : this.properties.getWalkingSpeed();
+				if (this instanceof PlayerModel) {
+					setState(left ? this.backWalkState : this.walkState); //Walk
+				}
 			}
 		}
 		
 		public void stopWalk() {
+//			for (ActionSequence sequence : getProcessingActionSequences()) {
+//				if (sequence.getActionKey().getKey().value.equals("Walk")) {
+//					sequence.forceInterrupt();
+//				}
+//			}
 			this.velocity.x = 0;
-//			setState(this.idleState);
+			if (this instanceof PlayerModel) {
+				setState(this.idleState);
+			}
 		}
 		
 		public float getJumpSpeed() {
@@ -279,6 +299,9 @@ public abstract class Character {
 
 		protected void movementWithCollisionDetection(float delta, TiledMapTileLayer collisionLayer) {
 		//logic for collision detection
+			if (Math.abs(this.acceleration.x) > 0) {
+				System.out.print("");
+			}
 			CollisionCheck collisionX = this.checkForXCollision(delta, collisionLayer, this.velocity.x, true);
 			if (collisionX.doesCollide) {
 				this.getVelocity().x = 0;
@@ -320,8 +343,24 @@ public abstract class Character {
 	    }
 		
 		
-		public void onDeath() {
-			
+		public void finishActiveAction() {
+			for (int i = 0; i < this.processingActionSequences.size(); i++) {
+				ActionSequence sequence = this.processingActionSequences.get(i);
+				if (sequence.isActive()) {
+					sequence.forceFinish();
+					break;
+				}
+			}
+		}
+		
+		public void interruptActiveAction() {
+			for (int i = 0; i < this.processingActionSequences.size(); i++) {
+				ActionSequence sequence = this.processingActionSequences.get(i);
+				if (sequence.isActive()) {
+					sequence.forceInterrupt();
+					break;
+				}
+			}
 		}
 		
 		public void shouldProjectileHit(Projectile projectile) {
@@ -348,15 +387,22 @@ public abstract class Character {
 			this.setCurrentHealth(this.currentHealth - value);
 		}
 		
-		public boolean isProcessingAction() {
-			return this.isProcessingActiveSequences();
-		}
-
-
 		//-------------GETTERS/SETTERS------------//
 		
 		public String getState() {
 			return state;
+		}
+
+		public ArrayList<ActionSequence> getProcessingActionSequences() {
+			return processingActionSequences;
+		}
+
+		public boolean isActionLock() {
+			return actionLocked;
+		}
+
+		public void setActionLock(boolean actionLock) {
+			this.actionLocked = actionLock;
 		}
 
 		public float getGameplayHitBoxWidthModifier() {

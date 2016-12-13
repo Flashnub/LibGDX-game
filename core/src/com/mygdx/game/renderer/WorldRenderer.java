@@ -10,6 +10,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.model.characters.Character;
 import com.mygdx.game.model.characters.player.Player;
@@ -79,6 +80,9 @@ public class WorldRenderer implements CoordinatesHelper{
 		        		projectile.getImageHitBox().y, 
 		        		projectile.getImageHitBox().width, 
 		        		projectile.getImageHitBox().height);
+	        }
+	        for (Rectangle rectangle : worldModel.getAdditionalRectangles()) {
+	        	debugRenderer.rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
 	        }
 	        debugRenderer.end();
 	        

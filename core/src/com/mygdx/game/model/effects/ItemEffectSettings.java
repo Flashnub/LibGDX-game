@@ -21,5 +21,13 @@ public class ItemEffectSettings extends EffectSettings {
 		this.type = EffectType.ITEMGIVE;
 		this.item = json.readValue("item", Item.class, jsonData);
 	}
+	
+	@Override
+	public ItemEffectSettings deepCopy() {
+		ItemEffectSettings copy = new ItemEffectSettings();
+		this.setBaseFieldsForSettings(copy);
+		copy.item = this.item;
+		return copy;
+	}
 
 }

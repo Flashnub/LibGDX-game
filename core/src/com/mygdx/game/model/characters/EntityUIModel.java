@@ -44,13 +44,16 @@ public class EntityUIModel {
 			for (AnimationData animationData : entityUIData.getAnimations()) {
 				Array <TextureRegion> leftAnimationFrames = new Array<TextureRegion>();
 				Array <TextureRegion> rightAnimationFrames = new Array<TextureRegion>();
-					
+				
+//				if (animationData.getName().equals("Active")) {
 				System.out.println(animationData.getName());
+//				}
 					
 				for (int i = 0; i < animationData.getNumberOfFrames(); i++) {
-					leftAnimationFrames.add(playerAtlas.findRegion(SpriteUtils.animationStringWithData(name, animationData, i+1)));
+					TextureRegion leftFrame = playerAtlas.findRegion(SpriteUtils.animationStringWithData(name, animationData, i+1));
+					leftAnimationFrames.add(leftFrame);
 					
-					TextureRegion rightFrame = playerAtlas.findRegion(SpriteUtils.animationStringWithData(name, animationData, i+1));
+					TextureRegion rightFrame = new TextureRegion(leftFrame);
 
 					rightFrame.flip(true, false);
 					rightAnimationFrames.add(rightFrame);

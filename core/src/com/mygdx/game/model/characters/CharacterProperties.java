@@ -14,6 +14,7 @@ public class CharacterProperties implements Serializable {
 	float maxWill;
 	float attack;
 	float maxStability;
+	float staggerAllowanceTime;
 	Float gravity;
 	Float walkingSpeed;
 	Float jumpSpeed;
@@ -62,7 +63,7 @@ public class CharacterProperties implements Serializable {
 			this.jumpSpeed = walkingSpeed;
 		}
 		else {
-			this.jumpSpeed = 500f;
+			this.jumpSpeed = 700f;
 		}
 		
 		Float gravity = json.readValue("gravity", Float.class, jsonData);
@@ -79,6 +80,14 @@ public class CharacterProperties implements Serializable {
 		}
 		else {
 			this.injuryImmunityTime = 2f;
+		}
+		
+		Float staggerAllowanceTime = json.readValue("staggerAllowanceTime", Float.class, jsonData);
+		if (staggerAllowanceTime != null) {
+			this.staggerAllowanceTime = staggerAllowanceTime;
+		}
+		else {
+			this.staggerAllowanceTime = 5f;
 		}
 		
 		Integer allegiance = json.readValue("allegiance", Integer.class, jsonData); 

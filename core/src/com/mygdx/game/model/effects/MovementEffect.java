@@ -8,8 +8,8 @@ public class MovementEffect extends Effect {
 	Vector2 oldAccel;
 	MovementEffectSettings mSettings;	
 	
-	public MovementEffect(EffectSettings settings) {
-		super(settings);
+	public MovementEffect(EffectSettings settings, EffectDataRetriever retriever) {
+		super(settings, retriever);
 		oldAccel = new Vector2();
 		if (settings instanceof MovementEffectSettings) {
 			this.mSettings = (MovementEffectSettings) settings;
@@ -22,8 +22,16 @@ public class MovementEffect extends Effect {
 		target.getVelocity().x = target.isFacingLeft() ? -this.mSettings.velocity.x : this.mSettings.velocity.x;
 		target.getVelocity().y = this.mSettings.velocity.y;	
 		
-		oldAccel.x = target.acceleration.x;
-		oldAccel.y = target.acceleration.y;
+		MovementEffect targetMovement = target.getCurrentMovement();
+		if (targetMovement != null && !targetMovement.equals(this)) {
+			oldAccel.x = targetMovement.oldAccel.x;
+			oldAccel.y = targetMovement.oldAccel.y;
+		}
+		else {
+			oldAccel.x = target.acceleration.x;
+			oldAccel.y = target.acceleration.y;
+		}
+
 		
 		target.acceleration.x = target.isFacingLeft() ? -this.mSettings.acceleration.x : this.mSettings.acceleration.x;
 		if (!this.mSettings.useGravity) {
@@ -37,7 +45,9 @@ public class MovementEffect extends Effect {
 		target.acceleration.x = oldAccel.x;
 		target.acceleration.y = oldAccel.y;
 		
-		target.velocity.x = mSettings.finishVelocityX;
+		if (Math.abs(target.velocity.x) < 2f) {
+			target.velocity.x = 0;
+		}
 	}
 	
 	public Vector2 getOldAccel() {

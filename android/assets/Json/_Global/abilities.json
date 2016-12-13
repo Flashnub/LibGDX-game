@@ -43,6 +43,29 @@
 			}
 		]
 	}
+	"Stagger": {
+		"class": "com.mygdx.game.model.actions.AbilitySettings",
+		"duration": 2,
+		"sourceEffectSettings": [
+			{
+				"class": "com.mygdx.game.model.effects.MovementEffectSettings",
+				"duration": .5,
+				"delayToActivate": 0.3,
+				"isInstantaneous": false,
+				"value": 0,
+				"velocity": {
+					"class": "com.badlogic.gdx.math.Vector2",
+					"x": 50,
+					"y": 0
+				}
+				"acceleration": {
+					"class": "com.badlogic.gdx.math.Vector2",
+					"x": -100,
+					"y": 0
+				}
+			}
+		]
+	}
 	"BasicProjectileAttack": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
 		"sourceEffectSettings": [

@@ -5,6 +5,7 @@ import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.Effect;
 import com.mygdx.game.model.effects.EffectInitializer;
 import com.mygdx.game.model.effects.EffectSettings;
+import com.mygdx.game.model.effects.MovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.DialogueListener;
 import com.mygdx.game.model.world.DialogueController;
@@ -23,7 +24,7 @@ public class DialogueAction extends ActionSegment {
 	}
 	
 	@Override
-	public void sendActionToListener(ActionListener actionListener) {
+	public void sendActionToListener(ActionListener actionListener, float delta) {
 		// Do nothing.
 	}
 
@@ -31,7 +32,7 @@ public class DialogueAction extends ActionSegment {
 	public void sourceProcessWithoutSuper(CharacterModel source) {
 		if (dialogue.targetEffects != null) {
 			for (EffectSettings effectSettings : dialogue.targetEffects) {
-				Effect effect = EffectInitializer.initializeEffect(effectSettings);
+				Effect effect = EffectInitializer.initializeEffect(effectSettings, this);
 				target.addEffect(effect);
 			}
 		}
@@ -71,6 +72,11 @@ public class DialogueAction extends ActionSegment {
 	@Override
 	public void interruptionBlock() {
 		//Do nothing.
+	}
+
+	@Override
+	public MovementEffectSettings getReplacementMovement() {
+		return null;
 	}
 
 }

@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.Json;
 import com.mygdx.game.model.actions.ActionSegment;
 import com.mygdx.game.model.actions.ActionSegment.ActionState;
 import com.mygdx.game.model.actions.ActionSequence;
+import com.mygdx.game.model.actions.ActionSequence.ActionType;
 import com.mygdx.game.model.actions.nonhostile.ConditionalDialogueSettings;
 import com.mygdx.game.model.characters.Character;
 import com.mygdx.game.model.characters.NPCCharacter;
@@ -135,6 +136,7 @@ public class Player extends Character implements InputProcessor {
 			applicableKeys.add(Keys.R);
 			applicableKeys.add(Keys.Z);
 			applicableKeys.add(Keys.X);
+			applicableKeys.add(Keys.TAB); 
 			applicableKeys.add(Keys.SPACE);
 			dashing = false;
 			canControl = false;
@@ -212,16 +214,51 @@ public class Player extends Character implements InputProcessor {
 	    }
 	    
 	    private void attack() {
-    		ActionSequence attackAction = this.getCharacterProperties().getActions().get("PlayerAttack");
-    		this.addActionSequence(attackAction);
+	    	if (!this.isProcessingActiveSequences() || this.isAbleToEnqueueAction()) {
+	    		ActionSequence followup = this.getFollowupSequence();
+	    	 	ActionSequence nextAction;
+	    	 	if (followup != null) {
+	    	 		nextAction =  this.getCharacterProperties().getActions().get(followup.getActionKey().getKey().value).cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());;
+	    	 	}
+	    	 	else if (this.jumping){
+	    	 		nextAction = this.getCharacterProperties().getActions().get("Aerial1").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());
+	    	 	}
+	    	 	else if (this.isLockDirection()) {
+	    	 		nextAction = this.getCharacterProperties().getActions().get("Launch").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());;
+	    	 	}
+	    	 	else {
+	    	 		nextAction = this.getCharacterProperties().getActions().get("PlayerAttack").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());
+	    	 	}
+	    		this.addActionSequence(nextAction);
+	    	}
+	   
+	    }
+	    
+
+	       	
+	    private ActionSequence getFollowupSequence() {
+    	 	for (ActionSequence action : this.getProcessingActionSequences()) {
+	    		if (action.isActive() 
+	    		&& action.getActionKey().getTypeOfAction().equals(ActionType.Attack)
+	    		&& action.getNextActionKey() != null) {
+	    			ActionSequence followingAttack = this.getCharacterProperties().getActions().get(action.getNextActionKey().getKey().value).cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());;
+	    			return followingAttack;
+	    		}
+	    	}
+	    	return null;
 	    }
 	    
 	    @Override
-	    public void shouldUnlockControls(ActionSegment segment) {
-	    	if (segment.getActionState().equals(ActionState.COOLDOWN))
+	    public void shouldUnlockControls(ActionSequence action) {
+	    	if ((action.getAction().getActionState().equals(ActionState.COOLDOWN) && action.isActive()) || action.getAction().isFinished())
 	    	{
 	    		this.setActionLock(false);
 	    	}
+	    }
+	    
+	    @Override
+		public boolean isAbleToEnqueueAction() {
+	    	return this.getCurrentActiveActionSeq() != null && !this.getCurrentActiveActionSeq().getAction().getActionState().equals(ActionState.WINDUP);
 	    }
 	    
 		public boolean handleKeyDown (int keyCode)
@@ -256,6 +293,9 @@ public class Player extends Character implements InputProcessor {
 			case Keys.X:
 				this.processNPCRequest();
 				break;
+			case Keys.TAB:
+				this.lockDirection();
+				break;
 			default:
 				break;
 			}
@@ -282,6 +322,9 @@ public class Player extends Character implements InputProcessor {
 				break;
 			case Keys.SPACE:
 				stopJump();
+				break;
+			case Keys.TAB:
+				unlockDirection();
 				break;
 			default:
 				break;

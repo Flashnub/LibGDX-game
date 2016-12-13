@@ -5,8 +5,8 @@ import com.mygdx.game.model.characters.Character.CharacterModel;
 public class DamageEffect extends Effect{
 	DamageEffectSettings dSettings;
 	
-	public DamageEffect(EffectSettings settings) {
-		super(settings);
+	public DamageEffect(EffectSettings settings, EffectDataRetriever retriever) {
+		super(settings, retriever);
 		if (settings instanceof DamageEffectSettings) {
 			this.dSettings = (DamageEffectSettings) settings;
 		}

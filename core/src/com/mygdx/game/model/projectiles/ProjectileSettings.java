@@ -3,6 +3,7 @@ package com.mygdx.game.model.projectiles;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.mygdx.game.model.actions.AbilitySettings;
 import com.mygdx.game.model.effects.Effect;
@@ -29,6 +30,32 @@ public class ProjectileSettings extends AbilitySettings{
 	private Float windupTime;
 	private Float cooldownTime;
 
+	public ProjectileSettings deepCopy() {
+		ProjectileSettings copy = new ProjectileSettings();
+		copy.explodeOnImpact = this.explodeOnImpact;
+		copy.bounces = this.bounces;
+		copy.tracks = this.tracks;
+		copy.useSmartAim = this.useSmartAim;
+		copy.hasCollisionDetection = this.hasCollisionDetection;
+		copy.name = this.name;
+		copy.speed = this.speed;
+		copy.windupSpeed = this.windupSpeed;
+		copy.cooldownSpeed = this.cooldownSpeed;
+		copy.gravity = this.gravity;
+		copy.size = this.size;
+		copy.possibleOrigins = this.possibleOrigins;
+		copy.angleOfVelocity = this.angleOfVelocity;
+		copy.projectileDuration = this.projectileDuration;
+		copy.windupTime = this.windupTime;
+		copy.cooldownTime = this.cooldownTime;
+		
+		Array <EffectSettings> newTargetEffects = new Array <EffectSettings>();
+		for(EffectSettings eSettings : targetEffects) {
+			newTargetEffects.add(eSettings.deepCopy());
+		}
+		
+		return copy;
+	}
 	
 	public ProjectileSettings() {
 		

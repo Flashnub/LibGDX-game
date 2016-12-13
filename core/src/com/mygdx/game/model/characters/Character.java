@@ -10,12 +10,12 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.actions.ActionSegment;
-import com.mygdx.game.model.actions.ActionSegment.ActionState;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.Attack;
 import com.mygdx.game.model.characters.player.Player.PlayerModel;
 import com.mygdx.game.model.effects.Effect;
 import com.mygdx.game.model.effects.MovementEffect;
+import com.mygdx.game.model.effects.MovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.ObjectListener;
 import com.mygdx.game.model.projectiles.Projectile;
@@ -24,6 +24,10 @@ public abstract class Character {
 	
 	private EntityUIModel characterUIData;
 	private CharacterModel characterData;
+	
+	enum Direction {
+		LEFT, RIGHT, NaN;
+	}
 	
 	public Character(String characterName) {
 		setCharacterUIData(new EntityUIModel(characterName, EntityUIDataType.CHARACTER));
@@ -51,15 +55,19 @@ public abstract class Character {
 		public final String backWalkState = "Backwalk";
 		
 		String state;
-		float currentHealth, maxHealth, currentWill, maxWill, attack;
-		boolean isImmuneToInjury, attacking;
+		float currentHealth, maxHealth, currentWill, maxWill, attack, currentStability, maxStability;
+		boolean isImmuneToInjury, attacking, directionLock;
 		protected boolean jumping;
+		boolean walking;
 		boolean didChangeState;
 		boolean staggering;
 		boolean facingLeft;
 		boolean actionLocked;
 	    public float injuryTime = 0f;
+	    float staggerTime;
 		String name, uuid; 
+		Direction lockedFacingDirection;
+		
 		
 //		public float gameplayHitBoxWidthModifier;
 //		public float gameplayHitBoxHeightModifier;
@@ -91,9 +99,13 @@ public abstract class Character {
 			staggering = false;
 			jumping = true;
 			facingLeft = false;
+			lockedFacingDirection = Direction.RIGHT;
 			actionLocked = false;
+			walking = false;
+			directionLock = false;
 //			isProcessingMovementEffect = false;
 			stateTime = 0f;
+			staggerTime = 0f;
 
 			UUID id = UUID.randomUUID();
 			this.uuid = id.toString();
@@ -108,6 +120,8 @@ public abstract class Character {
 			setMaxWill(properties.getMaxWill());
 			setCurrentWill(properties.getMaxWill());
 			setAttack(properties.getAttack());
+			setMaxStability(properties.getMaxStability());
+			setCurrentStability(properties.getMaxStability(), null);
 			acceleration.y = -properties.getGravity();
 		}
 		
@@ -161,8 +175,11 @@ public abstract class Character {
 			if (this.injuryTime > this.properties.getInjuryImmunityTime()) {
 				this.setImmuneToInjury(false);
 			}
-			if (jumping) {
-				setState(velocity.y >= 0 ? idleState : idleState); //Jump : Fall
+//			if (jumping) {
+//				setState(velocity.y >= 0 ? idleState : idleState); //Jump : Fall
+//			}
+			if (!jumping && !walking && !this.isProcessingActiveSequences()) {
+				setState(idleState);
 			}
 		}
 		
@@ -185,22 +202,34 @@ public abstract class Character {
 		}
 		
 		public boolean isProcessingActiveSequences() {
-			boolean isProcessingActive = false;
+			return this.getCurrentActiveActionSeq() != null;
+		}
+		
+		public ActionSequence getCurrentActiveActionSeq() {
 			for (ActionSequence actionSequence : this.processingActionSequences) {
-				isProcessingActive = isProcessingActive || actionSequence.isActive();
+				if (actionSequence.isActive()) {
+					return actionSequence;
+				}
 			}
-			return isProcessingActive;
+			return null;
 		}
 		
 		public void addActionSequence (ActionSequence sequence) {
 //			sequence.setSource(this);
 			if (sequence.isActive() && !actionLocked) {
-				finishActiveAction();
+				forceEndForActiveAction(); //necessary? No action should be there if not actionLocked.
+				nextActiveActionSequences.add(sequence);
+			}
+			else if (sequence.isActive() && isAbleToEnqueueAction()) {
 				nextActiveActionSequences.add(sequence);
 			}
 			else if (!sequence.isActive()){
 				processingActionSequences.add(sequence);
 			}
+		}
+		
+		public boolean isAbleToEnqueueAction() {
+			return !this.isProcessingActiveSequences();
 		}
 		
 		private void handleEffects(float delta) {
@@ -216,16 +245,6 @@ public abstract class Character {
 		}
 		
 		public void addEffect(Effect effect) {
-			if (effect instanceof MovementEffect) {
-				MovementEffect mEffect = ((MovementEffect) effect);
-				for (Effect currentEffect : currentEffects) {
-					if (currentEffect instanceof MovementEffect) {
-						mEffect.setOldAccel(((MovementEffect) currentEffect).getOldAccel());
-						currentEffects.remove(currentEffect);
-						break;
-					}
-				}
-			}
 			currentEffects.add(effect);
 		}
 		
@@ -233,7 +252,7 @@ public abstract class Character {
 			this.actionLocked = true;
 		}
 		
-		public void shouldUnlockControls(ActionSegment action) {
+		public void shouldUnlockControls(ActionSequence action) {
 			if (action.isFinished()) {
 				this.actionLocked = false;
 			}
@@ -247,6 +266,43 @@ public abstract class Character {
 			}
 			return null;
 		}
+		
+		private void setWalkingStatesIfNeeded() {
+			if (this.walking) {
+				if (this.directionLock) {
+					if (this.velocity.x >= 0 && this.lockedFacingDirection.equals(Direction.LEFT)) {
+		    			this.setState(backWalkState);
+		    		}
+		    		else if (this.velocity.x < 0 && this.lockedFacingDirection.equals(Direction.LEFT)) {
+		    			this.setState(walkState);
+		    		}
+		    		else if (this.velocity.x >= 0 && this.lockedFacingDirection.equals(Direction.RIGHT)) {
+		    			this.setState(walkState);
+		    		}
+		    		else if (this.velocity.x < 0 && this.lockedFacingDirection.equals(Direction.RIGHT)) {
+		    			this.setState(backWalkState);
+		    		}
+				}
+				else {
+					this.setState(walkState);
+				}
+			}
+			
+		}
+		
+	    public void lockDirection() {
+	    	this.directionLock = true;
+	    	this.lockedFacingDirection = this.isFacingLeft() ? Direction.LEFT : Direction.RIGHT;
+	    	//change walk if necessary
+	    	this.setWalkingStatesIfNeeded();
+	    }
+	    
+	    public void unlockDirection() {
+	    	this.directionLock = false;
+	    	this.lockedFacingDirection = Direction.NaN; 
+	    	//change walk if necessary
+	    	this.setWalkingStatesIfNeeded();
+	    }
 		
 		public boolean isTargetToLeft(CharacterModel target) {
 			return this.gameplayHitBox.x > target.gameplayHitBox.x; 
@@ -268,12 +324,17 @@ public abstract class Character {
 		public void walk(boolean left) {
 			if (!this.actionLocked) {
 				this.setFacingLeft(left);
+				this.walking = true;
 //	    		ActionSequence walkAction = this.getCharacterProperties().getActions().get("Walk").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());
 //	    		this.addActionSequence(walkAction);
 				this.velocity.x = left ? -this.properties.getWalkingSpeed() : this.properties.getWalkingSpeed();
-				if (this instanceof PlayerModel) {
-					setState(left ? this.backWalkState : this.walkState); //Walk
-				}
+//				if (this instanceof PlayerModel) {
+//				setState(this.directionLock && 
+//					(left && this.lockedFacingDirection.equals(Direction.RIGHT) 
+//					|| !left && this.lockedFacingDirection.equals(Direction.LEFT))  
+//					? this.backWalkState : this.walkState); //Walk
+//				}
+				this.setWalkingStatesIfNeeded();
 			}
 		}
 		
@@ -284,6 +345,7 @@ public abstract class Character {
 //				}
 //			}
 			this.velocity.x = 0;
+			this.walking = false;
 			if (this instanceof PlayerModel) {
 				setState(this.idleState);
 			}
@@ -299,9 +361,6 @@ public abstract class Character {
 
 		protected void movementWithCollisionDetection(float delta, TiledMapTileLayer collisionLayer) {
 		//logic for collision detection
-			if (Math.abs(this.acceleration.x) > 0) {
-				System.out.print("");
-			}
 			CollisionCheck collisionX = this.checkForXCollision(delta, collisionLayer, this.velocity.x, true);
 			if (collisionX.doesCollide) {
 				this.getVelocity().x = 0;
@@ -331,36 +390,47 @@ public abstract class Character {
 		
 	    public void landed() {
 	    	if (this.jumping) {
+	    		this.forceEndForActiveAction();
 				this.jumping = false;
-				if (this.getVelocity().x > 0)
-				{
-					setState(walkState);  
-				}
-				else if (this.getVelocity().x < 0) {
-					setState(backWalkState);
-				}
+				this.setWalkingStatesIfNeeded();
+//				if (this.getVelocity().x > 0)
+//				{
+//					setState(walkState);  
+//				}
+//				else if (this.getVelocity().x < 0) {
+//					setState(backWalkState);
+//				}
 	    	}
 	    }
 		
 		
-		public void finishActiveAction() {
+		public void forceEndForActiveAction() {
 			for (int i = 0; i < this.processingActionSequences.size(); i++) {
 				ActionSequence sequence = this.processingActionSequences.get(i);
 				if (sequence.isActive()) {
-					sequence.forceFinish();
+					sequence.forceEnd();
 					break;
 				}
 			}
 		}
 		
-		public void interruptActiveAction() {
+		public void forceCooldownForActiveAction() {
 			for (int i = 0; i < this.processingActionSequences.size(); i++) {
 				ActionSequence sequence = this.processingActionSequences.get(i);
 				if (sequence.isActive()) {
-					sequence.forceInterrupt();
+					sequence.forceCooldownState();
 					break;
 				}
 			}
+		}
+		
+		private void staggerAction(MovementEffectSettings potentialMovementSettings) {
+			this.forceEndForActiveAction();
+//    		ActionSequence staggerAction = this.getCharacterProperties().getActions().get("Stagger").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());
+			ActionSequence staggerAction = ActionSequence.createStaggerSequence(this, potentialMovementSettings);
+    		this.addActionSequence(staggerAction);
+    		this.setCurrentStability(this.maxStability, null);
+
 		}
 		
 		public void shouldProjectileHit(Projectile projectile) {
@@ -387,10 +457,48 @@ public abstract class Character {
 			this.setCurrentHealth(this.currentHealth - value);
 		}
 		
+		public void removeFromCurrentStability(float value, MovementEffectSettings replacementMovement) {
+			this.setCurrentStability(this.currentStability - value, replacementMovement);
+		}
+		
+		public void addToCurrentStability(float value) {
+			this.setCurrentStability(value + this.currentStability, null);
+		}
+		
 		//-------------GETTERS/SETTERS------------//
+		
+		
 		
 		public String getState() {
 			return state;
+		}
+
+		public boolean isLockDirection() {
+			return directionLock;
+		}
+
+		public float getCurrentStability() {
+			return currentStability;
+		}
+
+		public ArrayDeque<ActionSequence> getNextActiveActionSequences() {
+			return nextActiveActionSequences;
+		}
+
+		public void setCurrentStability(float currentStability, MovementEffectSettings potentialMovement) {
+			float realStability = Math.max(0, currentStability);
+			this.currentStability = Math.min(realStability, this.maxStability);
+			if (realStability == 0) {
+				staggerAction(potentialMovement);
+			}
+		}
+
+		public float getMaxStability() {
+			return maxStability;
+		}
+
+		public void setMaxStability(float maxStability) {
+			this.maxStability = maxStability;
 		}
 
 		public ArrayList<ActionSequence> getProcessingActionSequences() {
@@ -464,7 +572,7 @@ public abstract class Character {
 		}
 
 		public void setCurrentWill(float currentWill) {
-			this.currentWill = currentWill;
+			this.currentWill = Math.min(Math.max(0, currentWill), this.maxWill);
 		}
 
 		public float getMaxWill() {
@@ -550,7 +658,9 @@ public abstract class Character {
 		}
 
 		public void setFacingLeft(boolean facingLeft) {
-			this.facingLeft = facingLeft;
+			if (!this.directionLock) {
+				this.facingLeft = facingLeft;
+			}
 		}
 
 		public EntityUIModel getUiModel() {

@@ -7,6 +7,8 @@ import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.actions.nonhostile.DialogueAction;
 import com.mygdx.game.model.actions.nonhostile.DialogueSettings;
 import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.effects.EffectSettings;
+import com.mygdx.game.model.effects.MovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.CollisionChecker;
 import com.mygdx.game.model.events.DialogueListener;
@@ -19,18 +21,14 @@ public class ActionSequence implements Serializable {
 		RangedOffensive, RangedHeal, MeleeOffensive, Story
 	}
 	
-	enum ActionType {
-		Attack, ProjectileAttack, Ability, Dialogue, Gesture, ItemGift
+	public enum ActionType {
+		Attack, ProjectileAttack, Ability, Dialogue, Gesture, ItemGift, Stagger
 	}
 	
-//	private ArrayList <ActionSegmentKey> actionKeys;
-//	private ArrayDeque <ActionSegment> actions; //Find a way to make characters use these.
-//	private ArrayList<ActionSegment> currentActions;
-//	private ArrayList <ActionSegment> allActionSegments; //Used for AI calculations
-//	private ArrayList <Integer> indicesToRemove;
+
 	private ActionSegmentKey actionKey;
+	private ActionSegmentKey nextActionKey;
 	private ActionSegment action;
-//	private ActionSegment sampleAction;
 	private ActionStrategy strategy;
 	private String windupState;
 	private String actingState;
@@ -80,8 +78,32 @@ public class ActionSequence implements Serializable {
 		sequence.target = target;
 		sequence.dialogueController = dialogueController;
 		
-		sequence.createActionFromSettings(settings);
+		sequence.createActionFromSettings(settings, null);
 		
+		return sequence;
+	}
+	
+	static final String staggerKey = "Stagger";
+	
+	public static ActionSequence createStaggerSequence(CharacterModel source, MovementEffectSettings overridingMovement) {
+		ActionSequence sequence = new ActionSequence();
+		sequence.actionKey = new ActionSegmentKey(new StringWrapper(ActionSequence.staggerKey), ActionType.Stagger);
+		sequence.isActive = true;
+		sequence.strategy = ActionStrategy.Story;
+		
+		sequence.windupState = "StaggerWindup";
+		sequence.actingState = "Stagger";
+		sequence.cooldownState = "StaggerCooldown";
+		
+		sequence.leftWindupState = sequence.windupState;
+		sequence.leftActingState = sequence.actingState;
+		sequence.leftCooldownState = sequence.cooldownState;
+		sequence.useLeft = source.isFacingLeft();
+		
+		sequence.source = source;
+		
+		sequence.createActionFromSettings(null, overridingMovement);
+			
 		return sequence;
 	}
 
@@ -99,7 +121,7 @@ public class ActionSequence implements Serializable {
 	public void read(Json json, JsonValue jsonData) {
 		actionKey = json.readValue("actionKey", ActionSegmentKey.class, jsonData);
 		strategy = json.readValue("strategy", ActionStrategy.class, jsonData);
-//		nextActionKey = json.readValue("nextActionKey", String.class, jsonData);
+		nextActionKey = json.readValue("nextActionKey", ActionSegmentKey.class, jsonData);
 		String windupState = json.readValue("windupState", String.class, jsonData);
 		String cooldownState = json.readValue("cooldownState", String.class, jsonData);
 		String leftWindupState = json.readValue("leftWindupState", String.class, jsonData);
@@ -143,7 +165,6 @@ public class ActionSequence implements Serializable {
 			this.leftCooldownState = this.cooldownState;
 		}
 		
-//		actionKey = json.readValue("actionKey", String.class, jsonData);
 		Boolean isActive = json.readValue("isActive", Boolean.class, jsonData);
 		if (isActive != null) {
 			this.isActive = isActive;
@@ -160,13 +181,14 @@ public class ActionSequence implements Serializable {
 		sequence.actionListener = actionListener;
 		sequence.collisionChecker = collisionChecker;
 		sequence.useLeft = source.isFacingLeft();
-		sequence.createActionFromSettings(null);
+		sequence.createActionFromSettings(null, null);
 		return sequence;
 	}
 	
 	public ActionSequence cloneBareSequence() {
 		ActionSequence sequence = new ActionSequence();
 		sequence.actionKey = this.actionKey;
+		sequence.nextActionKey = this.nextActionKey;
 		sequence.strategy = this.strategy;
 		sequence.windupState = this.windupState;
 		sequence.actingState = this.actingState;
@@ -178,12 +200,12 @@ public class ActionSequence implements Serializable {
 		return sequence;
 	}
 	
-	public void forceFinish() {
-		this.action.forceRemove = true;
+	public void forceEnd() {
+		this.action.forceEnd = true;
 	}
 	
-	public void forceInterrupt() {
-		this.action.forceInterrupt = true;
+	public void forceCooldownState() {
+		this.action.forceCooldownState = true;
 	}
 	
 	public boolean isFinished() {
@@ -196,6 +218,7 @@ public class ActionSequence implements Serializable {
 			case Dialogue:
 			case Gesture:
 			case ItemGift:
+			case Stagger:
 				return false;
 			case Attack:
 			case ProjectileAttack:
@@ -220,18 +243,23 @@ public class ActionSequence implements Serializable {
 	
 	public void process(float delta, ActionListener actionListener) {
 		this.action.update(delta, actionListener);
-		if (action.didChangeState && this.isActive) {
-			source.setState(this.getCurrentActionState());
+		if (this.isActive) {
+			source.shouldUnlockControls(this);
+			if (action.didChangeState) {
+				source.setState(this.getCurrentActionState());
+
+			}
 		}
 	}
 	
-	private void createActionFromSettings(DialogueSettings potentialDialogue) {
-		ActionSegment action = 	this.getActionSegmentForKey(this.actionKey, potentialDialogue);
+	private void createActionFromSettings(DialogueSettings potentialDialogue, MovementEffectSettings replacementMovement) {
+		ActionSegment action = 	this.getActionSegmentForKey(this.actionKey, potentialDialogue, replacementMovement);
 		if (action != null) {
 			this.action = action;
 		}
 	}
 	
+
 	public float getEffectiveRange() {
 //		for (ActionSegment actionSegment : allActionSegments) {
 //			range += actionSegment.getEffectiveRange();
@@ -239,17 +267,20 @@ public class ActionSequence implements Serializable {
 		return action.getEffectiveRange();
 	}
 	
-	private ActionSegment getActionSegmentForKey(ActionSegmentKey segmentKey, DialogueSettings potentialDialogue) {
+	private ActionSegment getActionSegmentForKey(ActionSegmentKey segmentKey, DialogueSettings potentialDialogue, MovementEffectSettings replacementMovement) {
 		ActionSegment action = null;
 		switch (segmentKey.getTypeOfAction()) {
 			case Attack:
-				action = new Attack(source, target, JSONController.attacks.get(segmentKey.getKey().value));
+				action = new Attack(source, JSONController.attacks.get(segmentKey.getKey().value));
 				break;
 			case ProjectileAttack:
 				action = new ProjectileAttack(source, target, actionListener, collisionChecker, JSONController.projectileAttacks.get(segmentKey.getKey().value));
 				break;
 			case Ability:
 				action = new Ability(source, JSONController.abilities.get(segmentKey.getKey().value));
+				break;
+			case Stagger:
+				action = new Ability(source, JSONController.abilities.get(segmentKey.getKey().value), replacementMovement);
 				break;
 			case Dialogue:
 				action = new DialogueAction(potentialDialogue, this.dialogueController, source, target);
@@ -264,6 +295,10 @@ public class ActionSequence implements Serializable {
 	
 	public ActionSegmentKey getActionKey() {
 		return actionKey;
+	}
+	
+	public ActionSegmentKey getNextActionKey() {
+		return nextActionKey;
 	}
 
 	public ActionSegment getAction() {

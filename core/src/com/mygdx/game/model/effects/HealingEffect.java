@@ -5,8 +5,8 @@ import com.mygdx.game.model.characters.Character.CharacterModel;
 public class HealingEffect extends Effect {
 	HealingEffectSettings hSettings;
 	
-	public HealingEffect(EffectSettings settings) {
-		super(settings);
+	public HealingEffect(EffectSettings settings, EffectDataRetriever retriever) {
+		super(settings, retriever);
 		if (settings instanceof DamageEffectSettings) {
 			this.hSettings = (HealingEffectSettings) settings;
 		}

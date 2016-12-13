@@ -8,8 +8,8 @@ public class ItemEffect extends Effect {
 	ItemEffectSettings itemEffectSettings;
 	boolean hasAlreadyAdded;
 
-	public ItemEffect(EffectSettings settings) {
-		super(settings);
+	public ItemEffect(EffectSettings settings, EffectDataRetriever retriever) {
+		super(settings, retriever);
 		if (settings instanceof ItemEffectSettings) {
 			this.itemEffectSettings = (ItemEffectSettings) settings;
 		}

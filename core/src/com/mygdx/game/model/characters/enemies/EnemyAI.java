@@ -64,7 +64,7 @@ public abstract class EnemyAI implements PlayerObserver {
 	
 	public ArrayList <ActionSequence> figureOutPossibleMoves() {
 		ArrayList <ActionSequence> possibleActionsToTake = new ArrayList <ActionSequence>();
-		if (!this.source.isActionLock()) {
+		if (!this.source.isActionLock() && !this.source.isProcessingActiveSequences()) {
 			DistanceObservation distanceObservation = null;
 			for (ObservationBlock observationBlock : this.observationBlocks) {
 				//find closest enemy and shoot.

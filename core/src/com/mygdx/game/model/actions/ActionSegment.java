@@ -1,9 +1,11 @@
 package com.mygdx.game.model.actions;
 
 import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.effects.EffectDataRetriever;
+import com.mygdx.game.model.effects.MovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
 
-public abstract class ActionSegment {
+public abstract class ActionSegment implements EffectDataRetriever {
 	
 	public enum ActionState {
 		WINDUP, ACTION, COOLDOWN
@@ -15,15 +17,15 @@ public abstract class ActionSegment {
 	Float currentTime;
 	boolean hasProcessedSource;
 	boolean didChangeState;
-	boolean forceRemove; //Used for ending actions involuntarily (Removes from processing)
-	boolean forceInterrupt; //Used for ending actions voluntarily (puts into cooldown state)
+	boolean forceEnd; //Used for ending actions involuntarily (Removes from processing)
+	boolean forceCooldownState; //Used for ending actions voluntarily (puts into cooldown state)
 	CharacterModel source;
 	ActionState actionState;
 	float stateTime;
 	
 	public ActionSegment() {
-		forceRemove = false;
-		forceInterrupt = false;
+		forceEnd = false;
+		forceCooldownState = false;
 		stateTime = 0f;
 	}
 
@@ -31,7 +33,7 @@ public abstract class ActionSegment {
 		hasProcessedSource = true;
 		this.setActionState(ActionState.ACTION);
 		sourceProcessWithoutSuper(source);
-		source.lockControls();
+
 	}
 	
 	
@@ -41,8 +43,8 @@ public abstract class ActionSegment {
 		}
 		this.currentTime += delta;
 		this.stateTime += delta;
-		if (currentTime >= this.getWindUpPlusActionTime() || this.forceInterrupt) {
-			if (forceInterrupt) {
+		if (currentTime >= this.getWindUpPlusActionTime() || this.forceCooldownState) {
+			if (forceCooldownState) {
 				this.interruptionBlock();
 			}
 			this.setActionState(ActionState.COOLDOWN);
@@ -51,12 +53,14 @@ public abstract class ActionSegment {
 			if (!this.hasProcessedSource) {
 				sourceProcess(getSource());
 			}
-			sendActionToListener(actionListener);
+			sendActionToListener(actionListener, delta);
 		}
 		else if (this.actionState != ActionState.WINDUP){
 			this.setActionState(ActionState.WINDUP);
+			if (!source.isActionLock()) {
+				source.lockControls();
+			}
 		}
-		source.shouldUnlockControls(this);
 	}	
 	
 	public void setSource(CharacterModel source) {
@@ -72,7 +76,7 @@ public abstract class ActionSegment {
 	}
 	
 	public void setActionState(ActionState state) {
-		if (this.actionState != state && !forceRemove) {
+		if (this.actionState != state && !forceEnd) {
 			System.out.println("Action State" + state);
 			System.out.println("Action time:" + this.currentTime);
 			this.didChangeState = true;
@@ -81,7 +85,7 @@ public abstract class ActionSegment {
 	}
 	
 	public boolean isFinished() {
-		return currentTime >= this.getTotalTime() || forceRemove;
+		return currentTime >= this.getTotalTime() || forceEnd;
 	}
 	
 	public int getPriority() {
@@ -89,7 +93,7 @@ public abstract class ActionSegment {
 	}
 
 	
-	public abstract void sendActionToListener(ActionListener actionListener);
+	public abstract void sendActionToListener(ActionListener actionListener, float delta);
 	public abstract void sourceProcessWithoutSuper(CharacterModel source);
 	public abstract float getWindUpTime();
 	public abstract float getWindUpPlusActionTime();

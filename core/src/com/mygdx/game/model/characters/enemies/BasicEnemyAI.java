@@ -40,7 +40,7 @@ public class BasicEnemyAI extends EnemyAI {
 					actualActionSequences.add(sequence);
 				}
 			}
-			if (actualActionSequences.size() > 0) {
+			if (actualActionSequences.size() > 0 && !!this.source.isProcessingActiveSequences()) {
 				this.source.stopWalk();
 				ActionSequence actionSequence = actualActionSequences.get(rand.nextInt(actualActionSequences.size()));
 				this.nextActionSequences.add(actionSequence);

@@ -14,14 +14,18 @@ public class Attack extends ActionSegment {
 	Rectangle hitBox;
 	int allegiance;
 	AttackSettings attackSettings;
-	CharacterModel target;
 	Array <Effect> sourceEffects;
+	Array <CharacterModel> alreadyHitCharacters;
+	float hitTime;
 	
-	public Attack(CharacterModel source, CharacterModel target, AttackSettings settings) {
+	public Attack(CharacterModel source, AttackSettings settings) {
 		super();
 		this.source = source;
 		this.allegiance = source.getAllegiance();
-		this.attackSettings = settings;
+		this.attackSettings = settings.deepCopy();
+		this.sourceEffects = new Array <Effect>();
+		this.alreadyHitCharacters = new Array<CharacterModel>();
+		this.hitTime = 0f;
 		if (source.isFacingLeft()) {
 			this.hitBox = new Rectangle(source.getGameplayHitBox().x + settings.originX - 10, source.getGameplayHitBox().y + settings.originY, -settings.width, settings.height);
 		}
@@ -31,26 +35,36 @@ public class Attack extends ActionSegment {
 	}
 	
 	public void processAttackOnCharacter(CharacterModel target) {
-		for (EffectSettings effectSettings : this.attackSettings.targetEffectSettings) {
-			Effect effect = EffectInitializer.initializeEffect(effectSettings);
-			target.addEffect(effect);
+		if (!this.alreadyHitCharacters.contains(target, true)) {
+			for (EffectSettings effectSettings : this.attackSettings.targetEffectSettings) {
+				Effect effect = EffectInitializer.initializeEffect(effectSettings, this);
+				target.addEffect(effect);
+			}
+			this.alreadyHitCharacters.add(target);
 		}
+
 	}
 	
 	@Override
 	public ActionSegment cloneActionSegmentWithSourceAndTarget(CharacterModel source, CharacterModel target) {
-		Attack attack = new Attack(source, target, attackSettings);
+		Attack attack = new Attack(source, attackSettings);
 		return attack;
 	}
 	
 	@Override
-	public void sendActionToListener(ActionListener actionListener) {
+	public void sendActionToListener(ActionListener actionListener, float delta) {
+		hitTime += delta;
+		if (hitTime > this.attackSettings.hitRate) {
+			this.alreadyHitCharacters.clear();
+			this.hitTime = 0f;
+		}
+		//Need to limit this to X hits per attack.
 		actionListener.processAttack(this);
 	}
 	
 	public void sourceProcessWithoutSuper(CharacterModel source) {
 		for (EffectSettings effectSettings : attackSettings.sourceEffectSettings) {
-			Effect effect = EffectInitializer.initializeEffect(effectSettings);
+			Effect effect = EffectInitializer.initializeEffect(effectSettings, this);
 			source.addEffect(effect);
 			sourceEffects.add(effect);
 		}
@@ -80,7 +94,7 @@ public class Attack extends ActionSegment {
 	
 	@Override
 	public float getTotalTime() {
-		if (this.forceInterrupt) {
+		if (this.forceCooldownState) {
 			return this.attackSettings.windupTime + this.stateTime + this.attackSettings.cooldownTime;
 		}
 		return this.attackSettings.windupTime + this.attackSettings.duration + this.attackSettings.cooldownTime;
@@ -93,10 +107,15 @@ public class Attack extends ActionSegment {
 		}
 	}
 	
-	public Rectangle getAttackHitBox() {
-		return new Rectangle(attackSettings.originX, attackSettings.originY, attackSettings.width, attackSettings.height);
-	}
-	
+//	public MovementEffectSettings getTargetMovement() {
+//		for(EffectSettings effectSettings : attackSettings.targetEffectSettings) {
+//			if (effectSettings instanceof MovementEffectSettings) {
+//				return (MovementEffectSettings) effectSettings;
+//			}
+//		}
+//		return null;
+//	}
+
 	public Rectangle getHitBox() {
 		return hitBox;
 	}
@@ -117,6 +136,15 @@ public class Attack extends ActionSegment {
 		this.allegiance = allegiance;
 	}
 
-
+	@Override
+	public MovementEffectSettings getReplacementMovement() {
+		MovementEffectSettings mSettings = null;
+		for (EffectSettings settings : this.attackSettings.targetEffectSettings) {
+			if (settings instanceof MovementEffectSettings) {
+				mSettings = (MovementEffectSettings) settings;
+			}
+		}
+		return mSettings;
+	}
 
 }

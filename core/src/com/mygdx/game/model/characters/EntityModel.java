@@ -200,10 +200,6 @@ public abstract class EntityModel {
 				increment = tempMaxTime;
 			}
 			
-			if (Math.abs(this.acceleration.x) > 0) {
-				System.out.print("");
-			}
-			
 			tempVelocity += this.acceleration.x * increment;
 			tempImageBounds.setX(tempImageBounds.getX() + tempVelocity * increment);
 			if (this instanceof CharacterModel) {

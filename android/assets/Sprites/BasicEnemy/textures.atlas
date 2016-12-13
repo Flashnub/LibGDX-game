@@ -11,9 +11,30 @@ BasicEnemy-Circle1
   orig: 100, 200
   offset: 0, 0
   index: -1
+BasicEnemy-Stagger1
+  rotate: false
+  xy: 2, 204
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
 BasicEnemy-Idle1
   rotate: false
   xy: 2, 2
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+BasicEnemy-StaggerCooldown1
+  rotate: false
+  xy: 104, 204
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+BasicEnemy-StaggerWindup1
+  rotate: false
+  xy: 104, 204
   size: 100, 200
   orig: 100, 200
   offset: 0, 0

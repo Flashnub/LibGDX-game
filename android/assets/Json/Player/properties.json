@@ -29,9 +29,73 @@
 				},
 				"typeOfAction": Attack
 			}
+			"nextActionKey": {
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": {
+					"class": com.mygdx.game.wrappers.StringWrapper,
+					"value": "PlayerAttack2"
+				},
+				"typeOfAction": Attack
+			}
+			"windupState": "Walk"
+			"actingState": "Backwalk"
+			"cooldownState": "Walk"
+		},
+		"PlayerAttack2": {
+			"class": com.mygdx.game.model.actions.ActionSequence,
+			"actionKey": {
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": {
+					"class": com.mygdx.game.wrappers.StringWrapper,
+					"value": "PlayerAttack2"
+				},
+				"typeOfAction": Attack
+			}
+			"windupState": "Idle"
+			"actingState": "Block"
+			"cooldownState": "Idle"
+		}
+		"Launch": {
+			"class": com.mygdx.game.model.actions.ActionSequence,
+			"actionKey": {
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": {
+					"class": com.mygdx.game.wrappers.StringWrapper,
+					"value": "Launch"
+				},
+				"typeOfAction": Attack
+			}
 			"windupState": "Idle"
 			"actingState": "Idle"
 			"cooldownState": "Idle"
+		}
+		"Aerial1": {
+			"class": com.mygdx.game.model.actions.ActionSequence,
+			"actionKey": {
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": {
+					"class": com.mygdx.game.wrappers.StringWrapper,
+					"value": "Aerial1"
+				},
+				"typeOfAction": Attack
+			}
+			"windupState": "Idle"
+			"actingState": "Walk"
+			"cooldownState": "Backwalk"
+		}
+		"Aerial2": {
+			"class": com.mygdx.game.model.actions.ActionSequence,
+			"actionKey": {
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": {
+					"class": com.mygdx.game.wrappers.StringWrapper,
+					"value": "Aerial2"
+				},
+				"typeOfAction": Attack
+			}
+			"windupState": "Backwalk"
+			"actingState": "Idle"
+			"cooldownState": "Block"
 		}
 	}
 }

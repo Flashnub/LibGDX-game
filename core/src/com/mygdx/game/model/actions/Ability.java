@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.Effect;
 import com.mygdx.game.model.effects.EffectSettings;
+import com.mygdx.game.model.effects.MovementEffectSettings;
 import com.mygdx.game.model.effects.EffectInitializer;
 import com.mygdx.game.model.events.ActionListener;
 
@@ -13,20 +14,25 @@ public class Ability extends ActionSegment{
 	
 	public Ability(CharacterModel source, AbilitySettings settings) {
 		super();
-		this.settings = settings;
+		this.settings = settings.deepCopy();
 		this.source = source;
 		this.sourceEffects = new Array <Effect>();
 	}
 	
+	public Ability(CharacterModel source, AbilitySettings settings, MovementEffectSettings replacementMovement) {
+		this(source, settings);
+		this.settings.replaceMovementIfNecessary(replacementMovement);
+	}
+	
 	@Override
-	public void sendActionToListener(ActionListener actionListener) {
+	public void sendActionToListener(ActionListener actionListener, float delta) {
 		// Do nothing.
 		
 	}
 	
 	public void sourceProcessWithoutSuper(CharacterModel source) {
 		for (EffectSettings effectSettings : settings.sourceEffectSettings) {
-			Effect effect = EffectInitializer.initializeEffect(effectSettings);
+			Effect effect = EffectInitializer.initializeEffect(effectSettings, this);
 			source.addEffect(effect);
 			sourceEffects.add(effect);
 		}
@@ -55,7 +61,7 @@ public class Ability extends ActionSegment{
 
 	@Override
 	public float getTotalTime() {
-		if (this.forceInterrupt) {
+		if (this.forceCooldownState) {
 			return this.settings.windupTime + this.stateTime + this.settings.cooldownTime;
 		}
 		return this.settings.windupTime + this.settings.duration + this.settings.cooldownTime;
@@ -68,6 +74,9 @@ public class Ability extends ActionSegment{
 		}
 	}
 
-
+	@Override
+	public MovementEffectSettings getReplacementMovement() {
+		return null;
+	}
 
 }

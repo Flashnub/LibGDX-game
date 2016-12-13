@@ -9,18 +9,20 @@ public abstract class Effect {
 	boolean hasProcessedCompletion;
 	boolean forceInterrupt;
 	float currentTime;
+	EffectDataRetriever retriever;
 	
-	public Effect(EffectSettings settings) {
+	public Effect(EffectSettings settings, EffectDataRetriever retriever) {
 		currentTime = 0f;
 		this.isActive = false;
 		this.hasProcessedInitial = false;
 		this.hasProcessedCompletion = false;
 		this.forceInterrupt = false;
 		this.settings = settings;
+		this.retriever = retriever;
 	}
 	
 	public enum EffectType {
-		MOVEMENT, DAMAGE, HEALING, ITEMGIVE
+		MOVEMENT, DAMAGE, HEALING, ITEMGIVE, STABILITYDMG
 	}
 	
 	

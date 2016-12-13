@@ -8,7 +8,6 @@ import com.mygdx.game.model.effects.Effect.EffectType;
 
 public class MovementEffectSettings extends EffectSettings {	
 	Vector2 maxVelocity;
-	float finishVelocityX;
 	Vector2 velocity;
 	Vector2 acceleration;
 	boolean useGravity;
@@ -44,13 +43,6 @@ public class MovementEffectSettings extends EffectSettings {
 		}
 		maxVelocity = new Vector2(maxVelocityX, maxVelocityY);
 		
-		Float finishVelocityX = json.readValue("finishVelocityX", Float.class, jsonData);
-		if (finishVelocityX == null) {
-			finishVelocityX = 0f;
-		}
-
-		
-		this.finishVelocityX = finishVelocityX;
 		this.type = EffectType.MOVEMENT;
 		
 		
@@ -73,5 +65,16 @@ public class MovementEffectSettings extends EffectSettings {
 		float yDistance = (velocity.y * duration) + (0.5f * acceleration.y * duration * duration);
 		
 		return (float) Math.sqrt(((xDistance * xDistance) + (yDistance * yDistance)));
+	}
+	
+	@Override
+	public MovementEffectSettings deepCopy() {
+		MovementEffectSettings copy = new MovementEffectSettings();
+		this.setBaseFieldsForSettings(copy);
+		copy.velocity = this.velocity;
+		copy.acceleration = this.acceleration;
+		copy.maxVelocity = this.maxVelocity;
+		copy.useGravity = this.useGravity;
+		return copy;
 	}
 }

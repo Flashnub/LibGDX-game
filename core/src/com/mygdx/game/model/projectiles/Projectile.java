@@ -12,13 +12,15 @@ import com.mygdx.game.model.characters.CollisionCheck;
 import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.characters.EntityUIDataType;
 import com.mygdx.game.model.effects.Effect;
+import com.mygdx.game.model.effects.EffectDataRetriever;
 import com.mygdx.game.model.effects.EffectInitializer;
 import com.mygdx.game.model.effects.EffectSettings;
+import com.mygdx.game.model.effects.MovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.CollisionChecker;
 import com.mygdx.game.utils.MathUtils;
 
-public class Projectile extends EntityModel{
+public class Projectile extends EntityModel implements EffectDataRetriever{
 //	
 //	public enum ProjectileState implements State {
 //		Active, Preactive;
@@ -342,7 +344,7 @@ public class Projectile extends EntityModel{
 	public void processExpirationOrHit(CharacterModel characterModel){
 		if (characterModel != null) {
 			for (EffectSettings effectSettings : settings.getTargetEffects()) {
-				Effect effect = EffectInitializer.initializeEffect(effectSettings);
+				Effect effect = EffectInitializer.initializeEffect(effectSettings, this);
 				characterModel.addEffect(effect);
 			}
 			characterModel.setImmuneToInjury(true);
@@ -427,5 +429,16 @@ public class Projectile extends EntityModel{
 	public boolean handleAdditionCollisionLogic(Rectangle tempGameplayBounds) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public MovementEffectSettings getReplacementMovement() {
+		MovementEffectSettings mSettings = null;
+		for (EffectSettings settings : this.settings.getTargetEffects()) {
+			if (settings instanceof MovementEffectSettings) {
+				mSettings = (MovementEffectSettings) settings;
+			}
+		}
+		return mSettings;
 	}
 }

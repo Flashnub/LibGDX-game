@@ -3,8 +3,11 @@
 		"class": "com.mygdx.game.model.actions.AttackSettings",
 		"originX": 10,
 		"originY": 0,
-		"width": 200,
+		"width": 100,
 		"height": 150,
+		"windupTime": 0.3,
+		"duration": 0.2,
+		"cooldownTime": 0.3,
 		"sourceEffectSettings": [
 			{
 				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
@@ -14,7 +17,169 @@
 		"targetEffectSettings": [
 			{
 				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
-				"value": 15
+				"value": 2
+			}
+			{
+				"class": "com.mygdx.game.model.effects.StabilityDamageEffectSettings",
+				"value": 10
+			}
+		]
+	}
+	"PlayerAttack2": {
+		"class": "com.mygdx.game.model.actions.AttackSettings",
+		"originX": 10,
+		"originY": 0,
+		"width": 100,
+		"height": 150,
+		"windupTime": 0.3,
+		"duration": 0.2,
+		"cooldownTime": 0.3,
+		"sourceEffectSettings": [
+			{
+				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
+				"value": 1
+			}
+		]
+		"targetEffectSettings": [
+			{
+				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
+				"value": 2
+			}
+			{
+				"class": "com.mygdx.game.model.effects.StabilityDamageEffectSettings",
+				"value": 10
+			}
+		]
+	}
+	"Launch": {
+		"class": "com.mygdx.game.model.actions.AttackSettings",
+		"originX": 10,
+		"originY": 0,
+		"width": 100,
+		"height": 150,
+		"windupTime": 0.3,
+		"duration": 0.2,
+		"cooldownTime": 0.3,
+		"sourceEffectSettings": [
+			{
+				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
+				"value": 1
+			}
+		]
+		"targetEffectSettings": [
+			{
+				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
+				"value": 2
+			}
+			{
+				"class": "com.mygdx.game.model.effects.MovementEffectSettings",
+				"duration": 0.5,
+				"delayToActivate": 0,
+				"isInstantaneous": false,
+				"useGravity": false,
+				"value": 0,
+				"velocity": {
+					"class": "com.badlogic.gdx.math.Vector2",
+					"x": 0,
+					"y": 500
+				}
+				"acceleration": {
+					"class": "com.badlogic.gdx.math.Vector2",
+					"x": 0,
+					"y": -980
+				}
+			}
+			{
+				"class": "com.mygdx.game.model.effects.StabilityDamageEffectSettings",
+				"value": 10
+			}
+		]
+	}
+	"Aerial1": {
+		"class": "com.mygdx.game.model.actions.AttackSettings",
+		"originX": 10,
+		"originY": 0,
+		"width": 200,
+		"height": 150,
+		"windupTime": 0.3,
+		"duration": 0.2,
+		"cooldownTime": 0.3,
+		"sourceEffectSettings": [
+			{
+				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
+				"value": 1
+			}
+			{
+				"class": "com.mygdx.game.model.effects.MovementEffectSettings",
+				"duration": 0.5,
+				"delayToActivate": 0,
+				"useGravity": false,
+				"isInstantaneous": false,
+				"value": 0,
+				"velocity": {
+					"class": "com.badlogic.gdx.math.Vector2",
+					"x": 0,
+					"y": -20
+				}
+				"acceleration": {
+					"class": "com.badlogic.gdx.math.Vector2",
+					"x": 0,
+					"y": -100
+				}
+			}
+		]
+		"targetEffectSettings": [
+			{
+				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
+				"value": 2
+			}
+			{
+				"class": "com.mygdx.game.model.effects.StabilityDamageEffectSettings",
+				"value": 10
+			}
+		]
+	}
+	"Aerial2": {
+		"class": "com.mygdx.game.model.actions.AttackSettings",
+		"originX": 10,
+		"originY": 0,
+		"width": 50,
+		"height": 200,
+		"windupTime": 0.3,
+		"duration": 0.2,
+		"cooldownTime": 0.3,
+		"sourceEffectSettings": [
+			{
+				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
+				"value": 1
+			}
+			{
+				"class": "com.mygdx.game.model.effects.MovementEffectSettings",
+				"duration": 0.5,
+				"delayToActivate": 0,
+				"isInstantaneous": false,
+				"useGravity": false,
+				"value": 0,
+				"velocity": {
+					"class": "com.badlogic.gdx.math.Vector2",
+					"x": 0,
+					"y": -20
+				}
+				"acceleration": {
+					"class": "com.badlogic.gdx.math.Vector2",
+					"x": 0,
+					"y": -100
+				}
+			}
+		]
+		"targetEffectSettings": [
+			{
+				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
+				"value": 2
+			}
+			{
+				"class": "com.mygdx.game.model.effects.StabilityDamageEffectSettings",
+				"value": 10
 			}
 		]
 	}

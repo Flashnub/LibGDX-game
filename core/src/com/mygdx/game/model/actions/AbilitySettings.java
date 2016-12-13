@@ -1,14 +1,17 @@
 package com.mygdx.game.model.actions;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Json.Serializable;
 import com.badlogic.gdx.utils.JsonValue;
 import com.mygdx.game.model.effects.EffectSettings;
+import com.mygdx.game.model.effects.MovementEffectSettings;
 
 public class AbilitySettings implements Serializable {
-	ArrayList<EffectSettings> sourceEffectSettings;
+	Array<EffectSettings> sourceEffectSettings;
 	Float windupTime;
 	Float cooldownTime;
 	Float duration;
@@ -53,7 +56,7 @@ public class AbilitySettings implements Serializable {
 		else {
 			this.cooldownTime = 0f;
 		}
-		sourceEffectSettings = json.readValue("sourceEffectSettings", ArrayList.class, jsonData);
+		sourceEffectSettings = json.readValue("sourceEffectSettings", Array.class, jsonData);
 	}
 
 	public Float getDuration() {
@@ -70,6 +73,38 @@ public class AbilitySettings implements Serializable {
 
 	public boolean isPermanent() {
 		return isPermanent;
+	}
+		
+	public void replaceMovementIfNecessary(MovementEffectSettings movementSettings) {
+		if (movementSettings != null) {
+			Iterator <EffectSettings> iterator = this.sourceEffectSettings.iterator();
+			boolean hasMovement = false;
+			while (iterator.hasNext()) {
+				EffectSettings settings = iterator.next();
+				if (settings instanceof MovementEffectSettings) {
+					iterator.remove();
+					hasMovement = true;
+					break;
+				}
+			}
+			if (hasMovement) {
+				this.sourceEffectSettings.add(movementSettings);
+			}
+		}
+	}
+	
+	public AbilitySettings deepCopy() {
+		AbilitySettings copy = new AbilitySettings();
+		copy.windupTime = this.windupTime;
+		copy.cooldownTime = this.cooldownTime;
+		copy.isPermanent = this.isPermanent;
+		copy.duration = this.duration;
+		Array <EffectSettings> effectSettingsCopy = new Array <EffectSettings> ();
+		for (EffectSettings eSettings : this.sourceEffectSettings) {
+			effectSettingsCopy.add(eSettings.deepCopy());
+		}
+		copy.sourceEffectSettings = effectSettingsCopy;
+		return copy;
 	}
 	
 }

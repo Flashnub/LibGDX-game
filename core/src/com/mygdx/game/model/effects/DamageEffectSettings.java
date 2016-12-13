@@ -11,4 +11,11 @@ public class DamageEffectSettings extends EffectSettings {
 		super.read(json, jsonData);
 		this.type = EffectType.DAMAGE;
 	}
+
+	@Override
+	public DamageEffectSettings deepCopy() {
+		DamageEffectSettings copy = new DamageEffectSettings();
+		this.setBaseFieldsForSettings(copy);
+		return copy;
+	}
 } 

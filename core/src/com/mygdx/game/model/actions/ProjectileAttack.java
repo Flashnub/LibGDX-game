@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.Effect;
+import com.mygdx.game.model.effects.EffectSettings;
+import com.mygdx.game.model.effects.MovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.CollisionChecker;
 import com.mygdx.game.model.projectiles.Projectile;
@@ -43,7 +45,7 @@ public class ProjectileAttack extends ActionSegment{
 			}
 			else if (settings.getAbilitySettings() instanceof AttackSettings) {
 				AttackSettings atkSettings = (AttackSettings) settings.getAbilitySettings();
-				Attack attack = new Attack(source, target, atkSettings);
+				Attack attack = new Attack(source, atkSettings);
 				potentialAbility = attack;
 			}
 		}
@@ -72,7 +74,7 @@ public class ProjectileAttack extends ActionSegment{
 	
 	@Override
 	public float getTotalTime() {
-		if (this.forceInterrupt) {
+		if (this.forceCooldownState) {
 			return this.projAttackSettings.getAbilitySettings().windupTime + this.stateTime + this.projAttackSettings.getAbilitySettings().cooldownTime;
 		}
 		return this.projAttackSettings.getAbilitySettings().windupTime + this.projAttackSettings.getAbilitySettings().cooldownTime + this.projAttackSettings.getAbilitySettings().duration;
@@ -87,7 +89,7 @@ public class ProjectileAttack extends ActionSegment{
 	}
 	
 	@Override
-	public void sendActionToListener(ActionListener actionListener) {
+	public void sendActionToListener(ActionListener actionListener, float delta) {
 //		for (Projectile projectile : projectiles) {
 //			actionListener.processProjectile(projectile);
 //		}
@@ -97,8 +99,8 @@ public class ProjectileAttack extends ActionSegment{
 			}
 			this.projectileIterateTime = 0f;
 		}
-		if (this.potentialAbility instanceof Attack) {
-			actionListener.processAttack((Attack) this.potentialAbility);
+		if (this.potentialAbility != null) {
+			this.potentialAbility.sendActionToListener(actionListener, delta);
 		}
 	}
 	
@@ -130,7 +132,7 @@ public class ProjectileAttack extends ActionSegment{
 			}
 			else if (projAttackSettings.getAbilitySettings() instanceof AttackSettings) {
 				AttackSettings atkSettings = (AttackSettings) projAttackSettings.getAbilitySettings();
-				Attack attack = new Attack(source, target, atkSettings);
+				Attack attack = new Attack(source, atkSettings);
 				projAttack.potentialAbility = attack;
 			}
 		}
@@ -152,5 +154,9 @@ public class ProjectileAttack extends ActionSegment{
 			effect.setForceInterrupt(true);
 		}
 	}
-
+	
+	@Override
+	public MovementEffectSettings getReplacementMovement() {
+		return potentialAbility.getReplacementMovement();
+	}
 }

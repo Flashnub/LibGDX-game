@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
@@ -51,6 +52,8 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     SaveController saveController;
     DialogueController dialogueController;
     InputMultiplexer inputHandlers;
+    Array <Rectangle> additionalRectangles;
+    float stateTime;
     
     public WorldModel(TiledMapTileLayer collisionLayer) {
     	enemies = new Array<Enemy>();   
@@ -60,8 +63,10 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     	nearbyObjects = new Array <WorldObject>();
     	npcCharacters = new Array <NPCCharacter>();
     	nearbyNPCs = new Array <NPCCharacter>();
+    	this.additionalRectangles = new Array <Rectangle>();
     	this.collisionLayer = collisionLayer;
     	saveController = new SaveController();
+    	stateTime = 0f;
     	
 //    	System.out.println("Width: " + collisionLayer.getTileWidth() + "Height: " + collisionLayer.getTileHeight());
     	inputHandlers = new InputMultiplexer();
@@ -150,7 +155,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     				return new NPCCharacter(name, dialogueController);
     		}
     	}
-    	 return null;
+    	return null;
     }
     
     private WorldObject getObjectFromString(String typeOfObject, MapProperties properties) {
@@ -182,7 +187,10 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     public void act(float delta) {
         // Fixed timestep
         accumulatedTime += delta;
-
+        stateTime += delta;
+        if (stateTime % 10 < 0.2) {
+        	this.additionalRectangles.clear();
+        }
         while (accumulatedTime > 0) {
         	float timeForAction = accumulatedTime <= MAX_TIMESTEP ? accumulatedTime : MAX_TIMESTEP;
     		player.act(timeForAction, collisionLayer);
@@ -260,6 +268,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 
 	@Override
 	public void processAttack(Attack attack) {
+		this.additionalRectangles.add(attack.getHitBox());
 		if (player.getCharacterData().getAllegiance() != attack.getAllegiance()) {
 			checkIfAttackLands(player, attack);
 		}
@@ -302,7 +311,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 
 	@Override
 	public void objectToActOn(WorldObject object) {
-		if (!object.isActivated()) {
+		if (object != null && !object.isActivated()) {
 			for (WorldListener listener : worldListeners) {
 				listener.handlePlayerInteractionWithObject(object);
 			}		
@@ -469,6 +478,10 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 
 	public Array<Projectile> getProjectiles() {
 		return projectiles;
+	}
+
+	public Array<Rectangle> getAdditionalRectangles() {
+		return additionalRectangles;
 	}
 
 	public Array<Enemy> getEnemies() {

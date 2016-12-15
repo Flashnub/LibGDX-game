@@ -1,6 +1,5 @@
 package com.mygdx.game.model.characters.player;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.badlogic.gdx.utils.Array;

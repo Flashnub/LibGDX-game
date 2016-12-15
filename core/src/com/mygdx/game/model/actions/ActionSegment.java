@@ -2,7 +2,6 @@ package com.mygdx.game.model.actions;
 
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.EffectDataRetriever;
-import com.mygdx.game.model.effects.MovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
 
 public abstract class ActionSegment implements EffectDataRetriever {
@@ -15,10 +14,11 @@ public abstract class ActionSegment implements EffectDataRetriever {
 	public static int CombatPriority = 2;
 	
 	Float currentTime;
-	boolean hasProcessedSource;
+	boolean hasProcessedActiveSource;
+	boolean hasProcessedWindupSource;
 	boolean didChangeState;
 	boolean forceEnd; //Used for ending actions involuntarily (Removes from processing)
-	boolean forceCooldownState; //Used for ending actions voluntarily (puts into cooldown state)
+	boolean forceCooldownState; //Used for actions that end on demand rather than fixed time 
 	CharacterModel source;
 	ActionState actionState;
 	float stateTime;
@@ -26,14 +26,24 @@ public abstract class ActionSegment implements EffectDataRetriever {
 	public ActionSegment() {
 		forceEnd = false;
 		forceCooldownState = false;
+		hasProcessedActiveSource = false;
+		hasProcessedWindupSource = false;
 		stateTime = 0f;
 	}
 
-	public void sourceProcess(CharacterModel source) {
-		hasProcessedSource = true;
+	public void sourceActiveProcess(CharacterModel source) {
+		hasProcessedActiveSource = true;
 		this.setActionState(ActionState.ACTION);
-		sourceProcessWithoutSuper(source);
-
+		sourceActiveProcessWithoutSuper(source);
+	}
+	
+	public void sourceWindupProcess(CharacterModel source) {
+		hasProcessedWindupSource = true;
+		this.setActionState(ActionState.WINDUP);
+		sourceWindupProcessWithoutSuper(source);
+		if (!source.isActionLock()) {
+			source.lockControls();
+		}
 	}
 	
 	
@@ -50,15 +60,14 @@ public abstract class ActionSegment implements EffectDataRetriever {
 			this.setActionState(ActionState.COOLDOWN);
 		}
 		else if (currentTime >= this.getWindUpTime()) {
-			if (!this.hasProcessedSource) {
-				sourceProcess(getSource());
+			if (!this.hasProcessedActiveSource) {
+				sourceActiveProcess(getSource());
 			}
 			sendActionToListener(actionListener, delta);
 		}
 		else if (this.actionState != ActionState.WINDUP){
-			this.setActionState(ActionState.WINDUP);
-			if (!source.isActionLock()) {
-				source.lockControls();
+			if (!this.hasProcessedWindupSource) {
+				sourceWindupProcess(source);
 			}
 		}
 	}	
@@ -94,7 +103,8 @@ public abstract class ActionSegment implements EffectDataRetriever {
 
 	
 	public abstract void sendActionToListener(ActionListener actionListener, float delta);
-	public abstract void sourceProcessWithoutSuper(CharacterModel source);
+	public abstract void sourceActiveProcessWithoutSuper(CharacterModel source);
+	public abstract void sourceWindupProcessWithoutSuper(CharacterModel source);
 	public abstract float getWindUpTime();
 	public abstract float getWindUpPlusActionTime();
 	public abstract float getTotalTime();

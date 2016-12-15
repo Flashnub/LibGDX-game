@@ -14,7 +14,8 @@ public class Attack extends ActionSegment {
 	Rectangle hitBox;
 	int allegiance;
 	AttackSettings attackSettings;
-	Array <Effect> sourceEffects;
+	Array <Effect> activeSourceEffects;
+	Array <Effect> windupSourceEffects;
 	Array <CharacterModel> alreadyHitCharacters;
 	float hitTime;
 	
@@ -23,7 +24,8 @@ public class Attack extends ActionSegment {
 		this.source = source;
 		this.allegiance = source.getAllegiance();
 		this.attackSettings = settings.deepCopy();
-		this.sourceEffects = new Array <Effect>();
+		this.activeSourceEffects = new Array <Effect>();
+		this.windupSourceEffects = new Array <Effect>();
 		this.alreadyHitCharacters = new Array<CharacterModel>();
 		this.hitTime = 0f;
 		if (source.isFacingLeft()) {
@@ -36,9 +38,11 @@ public class Attack extends ActionSegment {
 	
 	public void processAttackOnCharacter(CharacterModel target) {
 		if (!this.alreadyHitCharacters.contains(target, true)) {
-			for (EffectSettings effectSettings : this.attackSettings.targetEffectSettings) {
-				Effect effect = EffectInitializer.initializeEffect(effectSettings, this);
-				target.addEffect(effect);
+			if (!target.checkIfIntercepted(this)) {
+				for (EffectSettings effectSettings : this.attackSettings.targetEffectSettings) {
+					Effect effect = EffectInitializer.initializeEffect(effectSettings, this);
+					target.addEffect(effect);
+				}
 			}
 			this.alreadyHitCharacters.add(target);
 		}
@@ -62,11 +66,19 @@ public class Attack extends ActionSegment {
 		actionListener.processAttack(this);
 	}
 	
-	public void sourceProcessWithoutSuper(CharacterModel source) {
+	public void sourceActiveProcessWithoutSuper(CharacterModel source) {
 		for (EffectSettings effectSettings : attackSettings.sourceEffectSettings) {
 			Effect effect = EffectInitializer.initializeEffect(effectSettings, this);
 			source.addEffect(effect);
-			sourceEffects.add(effect);
+			activeSourceEffects.add(effect);
+		}
+	}
+	
+	public void sourceWindupProcessWithoutSuper(CharacterModel source) {
+		for (EffectSettings effectSettings : attackSettings.windupEffectSettings) {
+			Effect effect = EffectInitializer.initializeEffect(effectSettings, this);
+			source.addEffect(effect);
+			windupSourceEffects.add(effect);
 		}
 	}
 	
@@ -102,8 +114,11 @@ public class Attack extends ActionSegment {
 	
 	@Override
 	public void interruptionBlock() {
-		for(Effect effect : this.sourceEffects) {
-			effect.setForceInterrupt(true);
+		for(Effect effect : this.activeSourceEffects) {
+			effect.setForceEnd(true);
+		}
+		for (Effect effect : this.windupSourceEffects) {
+			effect.setForceEnd(true);
 		}
 	}
 	
@@ -128,6 +143,10 @@ public class Attack extends ActionSegment {
 		this.hitBox = hitBox;
 	}
 
+	public AttackSettings getAttackSettings() {
+		return attackSettings;
+	}
+
 	public void setSource(CharacterModel source) {
 		this.source = source;
 	}
@@ -136,8 +155,12 @@ public class Attack extends ActionSegment {
 		this.allegiance = allegiance;
 	}
 
+	public Array<CharacterModel> getAlreadyHitCharacters() {
+		return alreadyHitCharacters;
+	}
+
 	@Override
-	public MovementEffectSettings getReplacementMovement() {
+	public MovementEffectSettings getReplacementMovementForStagger() {
 		MovementEffectSettings mSettings = null;
 		for (EffectSettings settings : this.attackSettings.targetEffectSettings) {
 			if (settings instanceof MovementEffectSettings) {

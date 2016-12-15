@@ -23,23 +23,14 @@
 	}
 	"PlayerBlock": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
+		"duration": 1,
 		"sourceEffectSettings": [
 			{
-				"class": "com.mygdx.game.model.effects.MovementEffectSettings",
-				"duration": 0.5,
-				"delayToActivate": 0,
-				"isInstantaneous": false,
+				"class": "com.mygdx.game.model.effects.BlockEffectSettings",
 				"value": 0,
-				"velocity": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": 100,
-					"y": 0
-				}
-				"acceleration": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": -200,
-					"y": 0
-				}
+				"isInstantaneous": false,
+				"perfectBlockTime": 0.3,
+				"duration": 1
 			}
 		]
 	}

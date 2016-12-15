@@ -1,7 +1,5 @@
 package com.mygdx.game.model.actions;
 
-import java.util.ArrayList;
-
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Json.Serializable;

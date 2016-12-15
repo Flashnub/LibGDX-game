@@ -10,8 +10,10 @@ public class EnemyAIInitializer {
 		switch (enemyAIKey) {
 			case "Basic":
 			enemyAI = new BasicEnemyAI(properties, source, world);
+			break;
 			case "Dummy":
 			enemyAI = new DummyAI(properties, source, world);
+			break;
 		}
 		return enemyAI;
 	}

@@ -1,6 +1,5 @@
 package com.mygdx.game.model.characters;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.badlogic.gdx.utils.Array;
@@ -10,10 +9,8 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.mygdx.game.model.actions.nonhostile.DialogueSettings;
 import com.mygdx.game.model.actions.nonhostile.NormalDialogueSettings;
 import com.mygdx.game.model.actions.nonhostile.ConditionalDialogueSettings;
-import com.mygdx.game.model.actions.nonhostile.DialogueAction;
 import com.mygdx.game.model.actions.nonhostile.DialogueIndex;
 import com.mygdx.game.model.characters.Character.CharacterModel;
-import com.mygdx.game.model.events.DialogueListener;
 
 public class NPCProperties implements Serializable {
 	HashMap <String, NormalDialogueSettings> storyDialogues;

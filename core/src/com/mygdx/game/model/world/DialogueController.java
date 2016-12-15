@@ -3,7 +3,6 @@ package com.mygdx.game.model.world;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.actions.nonhostile.DialogueSettings;
-import com.mygdx.game.model.actions.nonhostile.NormalDialogueSettings;
 import com.mygdx.game.model.characters.NPCCharacter;
 import com.mygdx.game.model.characters.NPCCharacter.NPCCharacterModel;
 import com.mygdx.game.model.characters.enemies.Enemy;

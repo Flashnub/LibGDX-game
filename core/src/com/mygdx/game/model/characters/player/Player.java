@@ -8,7 +8,6 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
-import com.mygdx.game.model.actions.ActionSegment;
 import com.mygdx.game.model.actions.ActionSegment.ActionState;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.ActionSequence.ActionType;
@@ -200,15 +199,12 @@ public class Player extends Character implements InputProcessor {
 	    }
 	    
 	    private void block() {
-	    	this.setImmuneToInjury(true);
-	    	setState(this.blockState);
+	    	if (!jumping) {
+		    	ActionSequence blockAction = this.getCharacterProperties().getActions().get("PlayerBlock").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());
+		    	this.addActionSequence(blockAction);
+	    	}
 	    }
 	    
-	    private void stopBlock() {
-	    	setState(this.idleState);
-	    	this.setImmuneToInjury(false);
-	    }
-
 	    public boolean isDodging() {
 	        return dashing;
 	    }
@@ -316,9 +312,6 @@ public class Player extends Character implements InputProcessor {
 			case Keys.D: 
 				isWalkRightPressed = false;
 				checkIfNeedToStopWalk();
-				break;
-			case Keys.Q:
-				stopBlock();
 				break;
 			case Keys.SPACE:
 				stopJump();

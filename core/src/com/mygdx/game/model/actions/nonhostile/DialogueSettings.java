@@ -4,7 +4,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Json.Serializable;
 import com.badlogic.gdx.utils.JsonValue;
-import com.mygdx.game.model.characters.player.Player;
 import com.mygdx.game.model.effects.EffectSettings;
 
 public abstract class DialogueSettings implements Serializable{

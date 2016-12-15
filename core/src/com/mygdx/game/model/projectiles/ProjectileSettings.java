@@ -6,7 +6,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.mygdx.game.model.actions.AbilitySettings;
-import com.mygdx.game.model.effects.Effect;
 import com.mygdx.game.model.effects.EffectSettings;
 import com.badlogic.gdx.utils.JsonValue;
 
@@ -17,14 +16,14 @@ public class ProjectileSettings extends AbilitySettings{
 	private Boolean tracks; //shouldn't be used with smartAim/bounces/hasCollisionDetection.
 	private Boolean useSmartAim;
 	private Boolean hasCollisionDetection;
-	private ArrayList <EffectSettings> targetEffects;
+	private Array <EffectSettings> targetEffects;
 	private String name;
 	private Float speed;
 	private Float windupSpeed;
 	private Float cooldownSpeed;
 	private Float gravity;
 	private Vector2 size;
-	private ArrayList<Vector2> possibleOrigins;
+	private Array<Vector2> possibleOrigins;
 	private Float angleOfVelocity; //use this to fire projectile in a direction rather than at a target.
 	private Float projectileDuration;
 	private Float windupTime;
@@ -87,17 +86,17 @@ public class ProjectileSettings extends AbilitySettings{
 		tracks = json.readValue("tracks", Boolean.class, jsonData);
 		hasCollisionDetection = json.readValue("hasCollisionDetection", Boolean.class, jsonData);
 		useSmartAim = json.readValue("useSmartAim", Boolean.class, jsonData);
-		targetEffects = json.readValue("targetEffects", ArrayList.class, jsonData);
+		targetEffects = json.readValue("targetEffects", Array.class, jsonData);
 		name = json.readValue("name", String.class, jsonData);
 		speed = json.readValue("speed", Float.class, jsonData);
 		angleOfVelocity = json.readValue("angleOfVelocity", Float.class, jsonData);
 		size = json.readValue("size", Vector2.class, jsonData);
-		ArrayList <Vector2> possibleOrigins = json.readValue("possibleOrigins", ArrayList.class, jsonData);
+		Array <Vector2> possibleOrigins = json.readValue("possibleOrigins", Array.class, jsonData);
 		if (possibleOrigins != null) {
 			this.possibleOrigins = possibleOrigins;
 		}
 		else {
-			this.possibleOrigins = new ArrayList<Vector2>();
+			this.possibleOrigins = new Array<Vector2>();
 			this.possibleOrigins.add(new Vector2(0, 0));
 		}
 		Float projectileDuration = json.readValue("projectileDuration", Float.class, jsonData);
@@ -173,7 +172,7 @@ public class ProjectileSettings extends AbilitySettings{
 		return hasCollisionDetection;
 	}
 
-	public ArrayList<EffectSettings> getTargetEffects() {
+	public Array<EffectSettings> getTargetEffects() {
 		return targetEffects;
 	}
 	
@@ -193,7 +192,7 @@ public class ProjectileSettings extends AbilitySettings{
 		return size;
 	}
 
-	public ArrayList<Vector2> getPossibleOrigins() {
+	public Array<Vector2> getPossibleOrigins() {
 		return possibleOrigins;
 	}
 

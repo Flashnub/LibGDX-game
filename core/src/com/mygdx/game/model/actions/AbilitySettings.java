@@ -1,6 +1,5 @@
 package com.mygdx.game.model.actions;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.badlogic.gdx.utils.Array;
@@ -12,6 +11,7 @@ import com.mygdx.game.model.effects.MovementEffectSettings;
 
 public class AbilitySettings implements Serializable {
 	Array<EffectSettings> sourceEffectSettings;
+	Array <EffectSettings> windupEffectSettings;
 	Float windupTime;
 	Float cooldownTime;
 	Float duration;
@@ -20,6 +20,7 @@ public class AbilitySettings implements Serializable {
 	@Override
 	public void write(Json json) {
 		json.writeValue("sourceEffectSettings", sourceEffectSettings);
+		json.writeValue("windupEffectSettings", windupEffectSettings);
 		json.writeValue("windupTime", windupTime);
 		json.writeValue("cooldownTime", cooldownTime);
 		json.writeValue("duration", duration);		
@@ -57,6 +58,10 @@ public class AbilitySettings implements Serializable {
 			this.cooldownTime = 0f;
 		}
 		sourceEffectSettings = json.readValue("sourceEffectSettings", Array.class, jsonData);
+		windupEffectSettings = json.readValue("windupEffectSettings", Array.class, jsonData);
+		if (windupEffectSettings == null) {
+			windupEffectSettings = new Array <EffectSettings> ();
+		}
 	}
 
 	public Float getDuration() {
@@ -104,6 +109,12 @@ public class AbilitySettings implements Serializable {
 			effectSettingsCopy.add(eSettings.deepCopy());
 		}
 		copy.sourceEffectSettings = effectSettingsCopy;
+		
+		Array <EffectSettings> effectSettingsCopy2 = new Array <EffectSettings> ();
+		for (EffectSettings eSettings : this.windupEffectSettings) {
+			effectSettingsCopy2.add(eSettings.deepCopy());
+		}
+		copy.windupEffectSettings = effectSettingsCopy2;
 		return copy;
 	}
 	

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.Effect;
-import com.mygdx.game.model.effects.EffectSettings;
 import com.mygdx.game.model.effects.MovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.CollisionChecker;
@@ -104,13 +103,20 @@ public class ProjectileAttack extends ActionSegment{
 		}
 	}
 	
-	public void sourceProcessWithoutSuper(CharacterModel source) {
+	public void sourceActiveProcessWithoutSuper(CharacterModel source) {
 		if (this.potentialAbility != null) {
-			this.potentialAbility.sourceProcessWithoutSuper(source);
+			this.potentialAbility.sourceActiveProcessWithoutSuper(source);
 		}
 		for (Projectile projectile : projectiles) {
 			this.actionListener.addProjectile(projectile);
 		}
+	}
+	
+	@Override
+	public void sourceWindupProcessWithoutSuper(CharacterModel source) {
+		if (this.potentialAbility != null) {
+			this.potentialAbility.sourceWindupProcessWithoutSuper(source);
+		}		
 	}
 
 	@Override
@@ -151,12 +157,14 @@ public class ProjectileAttack extends ActionSegment{
 	@Override
 	public void interruptionBlock() {
 		for(Effect effect : this.sourceEffects) {
-			effect.setForceInterrupt(true);
+			effect.setForceEnd(true);
 		}
 	}
 	
 	@Override
-	public MovementEffectSettings getReplacementMovement() {
-		return potentialAbility.getReplacementMovement();
+	public MovementEffectSettings getReplacementMovementForStagger() {
+		return potentialAbility.getReplacementMovementForStagger();
 	}
+
+
 }

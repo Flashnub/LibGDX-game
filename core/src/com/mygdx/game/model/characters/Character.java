@@ -9,7 +9,6 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.constants.JSONController;
-import com.mygdx.game.model.actions.ActionSegment;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.Attack;
 import com.mygdx.game.model.characters.player.Player.PlayerModel;
@@ -17,6 +16,7 @@ import com.mygdx.game.model.effects.Effect;
 import com.mygdx.game.model.effects.MovementEffect;
 import com.mygdx.game.model.effects.MovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
+import com.mygdx.game.model.events.AssaultInterceptor;
 import com.mygdx.game.model.events.ObjectListener;
 import com.mygdx.game.model.projectiles.Projectile;
 
@@ -267,6 +267,17 @@ public abstract class Character {
 			return null;
 		}
 		
+		public boolean checkIfIntercepted(Attack attack) {
+			boolean interceptedAttack = true;
+			for (Effect effect : this.currentEffects) {
+				if (effect instanceof AssaultInterceptor) {
+					AssaultInterceptor attackInterceptor = (AssaultInterceptor) effect;
+					interceptedAttack = attackInterceptor.didInterceptAttack(this, attack);
+				}
+			}
+			return interceptedAttack;
+		}
+		
 		private void setWalkingStatesIfNeeded() {
 			if (this.walking) {
 				if (this.directionLock) {
@@ -435,13 +446,30 @@ public abstract class Character {
 		
 		public void shouldProjectileHit(Projectile projectile) {
 			if (!isImmuneToInjury()) {
-				projectile.processExpirationOrHit(this);
+				boolean didInterceptAttack = false;
+				for (Effect effect : this.currentEffects) {
+					if (effect instanceof AssaultInterceptor) {
+						didInterceptAttack = ((AssaultInterceptor) effect).didInterceptProjectile(this, projectile);
+						break;
+					}
+				}
+				if (!didInterceptAttack) {
+					projectile.processExpirationOrHit(this);
+				}
 			}
 		}
 		
 		public void shouldAttackHit(Attack attack) {
 			if (!isImmuneToInjury()) {
-				attack.processAttackOnCharacter(this);
+				boolean didInterceptAttack = false;
+				for (Effect effect : this.currentEffects) {
+					if (effect instanceof AssaultInterceptor) {
+						didInterceptAttack = ((AssaultInterceptor) effect).didInterceptAttack(this, attack);
+					}
+				}
+				if (!didInterceptAttack) {
+					attack.processAttackOnCharacter(this);
+				}
 			}
 		}
 		
@@ -455,6 +483,14 @@ public abstract class Character {
 		
 		public void removeFromCurrentHealth(float value) {
 			this.setCurrentHealth(this.currentHealth - value);
+		}
+		
+		public void addToCurrentWill(float value) {
+			this.setCurrentWill(value + this.currentWill);
+		}
+		
+		public void removeFromCurrentWill(float value) {
+			this.setCurrentWill(this.currentWill - value);
 		}
 		
 		public void removeFromCurrentStability(float value, MovementEffectSettings replacementMovement) {

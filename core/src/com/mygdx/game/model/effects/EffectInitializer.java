@@ -21,6 +21,9 @@ public class EffectInitializer {
 		case ITEMGIVE:
 			effect = new ItemEffect(settings, retriever);
 			break;
+		case BLOCK:
+			effect = new BlockEffect(settings, retriever);
+			break;
 		}
 		return effect;
 	}

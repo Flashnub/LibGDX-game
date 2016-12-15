@@ -1,7 +1,5 @@
 package com.mygdx.game.model.actions;
 
-import java.util.ArrayList;
-
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -55,6 +53,7 @@ public class AttackSettings extends AbilitySettings{
 		this.cooldownTime = settings.cooldownTime;
 		this.windupTime = settings.windupTime;
 		this.sourceEffectSettings = settings.sourceEffectSettings;
+		this.windupEffectSettings = settings.windupEffectSettings;
 		this.isPermanent = settings.isPermanent;
 	}
 	
@@ -74,4 +73,10 @@ public class AttackSettings extends AbilitySettings{
 		copy.targetEffectSettings = newTargetSettings;
 		return copy;
 	}
+
+	public Array<EffectSettings> getTargetEffectSettings() {
+		return targetEffectSettings;
+	}
+	
+	
 }

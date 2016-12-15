@@ -7,7 +7,7 @@ public abstract class Effect {
 	Boolean isActive;
 	boolean hasProcessedInitial;
 	boolean hasProcessedCompletion;
-	boolean forceInterrupt;
+	boolean forceEnd;
 	float currentTime;
 	EffectDataRetriever retriever;
 	
@@ -16,13 +16,13 @@ public abstract class Effect {
 		this.isActive = false;
 		this.hasProcessedInitial = false;
 		this.hasProcessedCompletion = false;
-		this.forceInterrupt = false;
+		this.forceEnd = false;
 		this.settings = settings;
 		this.retriever = retriever;
 	}
 	
 	public enum EffectType {
-		MOVEMENT, DAMAGE, HEALING, ITEMGIVE, STABILITYDMG
+		MOVEMENT, DAMAGE, HEALING, ITEMGIVE, STABILITYDMG, BLOCK
 	}
 	
 	
@@ -48,7 +48,7 @@ public abstract class Effect {
 		if ((currentTime > settings.delayToActivate && currentTime < settings.duration + settings.delayToActivate) || settings.isInstantaneous) {
 			this.processDuringActive(target, delta);
 		}
-		if ((currentTime >= (settings.duration + settings.delayToActivate) || settings.isInstantaneous || this.forceInterrupt) && !this.hasProcessedCompletion) {
+		if ((currentTime >= (settings.duration + settings.delayToActivate) || settings.isInstantaneous || this.forceEnd) && !this.hasProcessedCompletion) {
 			isFinished = true;
 			this.completion(target);
 		}
@@ -64,14 +64,18 @@ public abstract class Effect {
 			return this.settings.duration - (this.currentTime - this.settings.delayToActivate);
 		}
 	}
+	
+	public float getActiveTime() {
+		return this.currentTime - this.settings.delayToActivate;
+	}
 
 	
 	public float getCurrentTime() {
 		return currentTime;
 	}
 
-	public void setForceInterrupt(boolean forceInterrupt) {
-		this.forceInterrupt = forceInterrupt;
+	public void setForceEnd(boolean forceEnd) {
+		this.forceEnd = forceEnd;
 	}
 
 	

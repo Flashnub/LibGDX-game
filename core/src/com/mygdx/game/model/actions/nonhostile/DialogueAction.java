@@ -7,7 +7,6 @@ import com.mygdx.game.model.effects.EffectInitializer;
 import com.mygdx.game.model.effects.EffectSettings;
 import com.mygdx.game.model.effects.MovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
-import com.mygdx.game.model.events.DialogueListener;
 import com.mygdx.game.model.world.DialogueController;
 
 public class DialogueAction extends ActionSegment {
@@ -29,7 +28,7 @@ public class DialogueAction extends ActionSegment {
 	}
 
 	@Override
-	public void sourceProcessWithoutSuper(CharacterModel source) {
+	public void sourceActiveProcessWithoutSuper(CharacterModel source) {
 		if (dialogue.targetEffects != null) {
 			for (EffectSettings effectSettings : dialogue.targetEffects) {
 				Effect effect = EffectInitializer.initializeEffect(effectSettings, this);
@@ -75,8 +74,14 @@ public class DialogueAction extends ActionSegment {
 	}
 
 	@Override
-	public MovementEffectSettings getReplacementMovement() {
+	public MovementEffectSettings getReplacementMovementForStagger() {
 		return null;
+	}
+
+	@Override
+	public void sourceWindupProcessWithoutSuper(CharacterModel source) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

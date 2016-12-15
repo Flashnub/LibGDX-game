@@ -4,7 +4,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.mygdx.game.model.effects.Effect.EffectType;
 
-public class StabilityDamageEffectSettings extends EffectSettings{
+public class StabilityDamageEffectSettings extends EffectSettings implements WillGenerator{
 	
 	@Override
 	public void read(Json json, JsonValue jsonData) {
@@ -18,5 +18,12 @@ public class StabilityDamageEffectSettings extends EffectSettings{
 		this.setBaseFieldsForSettings(copy);
 		return copy;
 	}
+
+	@Override
+	public float getPotentialWill() {
+		return this.value / 4;
+	}
+	
+	
 }
 

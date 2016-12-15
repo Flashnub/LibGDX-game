@@ -4,14 +4,7 @@ size: 1024,1024
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-BasicEnemy-Circle1
-  rotate: false
-  xy: 2, 204
-  size: 100, 200
-  orig: 100, 200
-  offset: 0, 0
-  index: -1
-BasicEnemy-Stagger1
+BasicEnemy-Backwalk1
   rotate: false
   xy: 2, 204
   size: 100, 200
@@ -19,6 +12,27 @@ BasicEnemy-Stagger1
   offset: 0, 0
   index: -1
 BasicEnemy-Idle1
+  rotate: false
+  xy: 2, 204
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+BasicEnemy-Walk1
+  rotate: false
+  xy: 2, 204
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+BasicEnemy-Circle1
+  rotate: false
+  xy: 2, 2
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+BasicEnemy-Stagger1
   rotate: false
   xy: 2, 2
   size: 100, 200

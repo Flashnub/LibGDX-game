@@ -6,10 +6,8 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.nonhostile.ConditionalDialogueSettings;
-import com.mygdx.game.model.characters.enemies.Enemy.EnemyModel;
 import com.mygdx.game.model.characters.player.GameSave;
 import com.mygdx.game.model.characters.player.Player;
-import com.mygdx.game.model.events.DialogueListener;
 import com.mygdx.game.model.world.DialogueActor;
 import com.mygdx.game.model.world.DialogueController;
 

@@ -104,6 +104,26 @@
 		"windupTime": 0.3,
 		"duration": 0.2,
 		"cooldownTime": 0.3,
+		"windupEffectSettings": [
+			{
+				"class": "com.mygdx.game.model.effects.MovementEffectSettings",
+				"duration": 0.3,
+				"delayToActivate": 0,
+				"useGravity": false,
+				"isInstantaneous": false,
+				"value": 0,
+				"velocity": {
+					"class": "com.badlogic.gdx.math.Vector2",
+					"x": 0,
+					"y": 0
+				}
+				"acceleration": {
+					"class": "com.badlogic.gdx.math.Vector2",
+					"x": 0,
+					"y": 0
+				}
+			}
+		]
 		"sourceEffectSettings": [
 			{
 				"class": "com.mygdx.game.model.effects.DamageEffectSettings",

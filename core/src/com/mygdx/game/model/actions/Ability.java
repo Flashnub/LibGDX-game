@@ -10,13 +10,15 @@ import com.mygdx.game.model.events.ActionListener;
 
 public class Ability extends ActionSegment{
 	AbilitySettings settings;
-	Array <Effect> sourceEffects;
+	Array <Effect> activeSourceEffects;
+	Array <Effect> windupSourceEffects;
 	
 	public Ability(CharacterModel source, AbilitySettings settings) {
 		super();
 		this.settings = settings.deepCopy();
 		this.source = source;
-		this.sourceEffects = new Array <Effect>();
+		this.activeSourceEffects = new Array <Effect>();
+		this.windupSourceEffects = new Array <Effect>();
 	}
 	
 	public Ability(CharacterModel source, AbilitySettings settings, MovementEffectSettings replacementMovement) {
@@ -30,11 +32,19 @@ public class Ability extends ActionSegment{
 		
 	}
 	
-	public void sourceProcessWithoutSuper(CharacterModel source) {
+	public void sourceActiveProcessWithoutSuper(CharacterModel source) {
 		for (EffectSettings effectSettings : settings.sourceEffectSettings) {
 			Effect effect = EffectInitializer.initializeEffect(effectSettings, this);
 			source.addEffect(effect);
-			sourceEffects.add(effect);
+			activeSourceEffects.add(effect);
+		}
+	}
+	
+	public void sourceWindupProcessWithoutSuper(CharacterModel source) {
+		for (EffectSettings effectSettings : settings.windupEffectSettings) {
+			Effect effect = EffectInitializer.initializeEffect(effectSettings, this);
+			source.addEffect(effect);
+			windupSourceEffects.add(effect);
 		}
 	}
 
@@ -69,13 +79,16 @@ public class Ability extends ActionSegment{
 
 	@Override
 	public void interruptionBlock() {
-		for(Effect effect : this.sourceEffects) {
-			effect.setForceInterrupt(true);
+		for(Effect effect : this.activeSourceEffects) {
+			effect.setForceEnd(true);
+		}
+		for (Effect effect : this.windupSourceEffects) {
+			effect.setForceEnd(true);
 		}
 	}
 
 	@Override
-	public MovementEffectSettings getReplacementMovement() {
+	public MovementEffectSettings getReplacementMovementForStagger() {
 		return null;
 	}
 

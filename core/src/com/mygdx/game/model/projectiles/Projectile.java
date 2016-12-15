@@ -358,6 +358,12 @@ public class Projectile extends EntityModel implements EffectDataRetriever{
 
 	}
 	
+	public void explosionCheck() {
+		if (this.settings.isExplodeOnImpact()) {
+			this.actionListener.deleteProjectile(this);
+		}
+	}
+	
 	public CharacterModel getTarget() {
 		return target;
 	}
@@ -432,7 +438,7 @@ public class Projectile extends EntityModel implements EffectDataRetriever{
 	}
 
 	@Override
-	public MovementEffectSettings getReplacementMovement() {
+	public MovementEffectSettings getReplacementMovementForStagger() {
 		MovementEffectSettings mSettings = null;
 		for (EffectSettings settings : this.settings.getTargetEffects()) {
 			if (settings instanceof MovementEffectSettings) {

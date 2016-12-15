@@ -1,6 +1,6 @@
 {
 	"class": com.mygdx.game.model.characters.enemies.EnemyProperties,
-	"enemyAIKey": "Dummy",
+	"enemyAIKey": "Basic",
 	"drops": []
 
 }

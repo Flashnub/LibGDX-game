@@ -7,11 +7,9 @@ import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.actions.nonhostile.DialogueAction;
 import com.mygdx.game.model.actions.nonhostile.DialogueSettings;
 import com.mygdx.game.model.characters.Character.CharacterModel;
-import com.mygdx.game.model.effects.EffectSettings;
 import com.mygdx.game.model.effects.MovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.CollisionChecker;
-import com.mygdx.game.model.events.DialogueListener;
 import com.mygdx.game.model.world.DialogueController;
 import com.mygdx.game.wrappers.StringWrapper;
 

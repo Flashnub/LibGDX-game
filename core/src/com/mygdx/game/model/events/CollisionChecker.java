@@ -1,6 +1,5 @@
 package com.mygdx.game.model.events;
 
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.mygdx.game.model.characters.EntityModel;
 

@@ -2,8 +2,10 @@ package com.mygdx.game.model.effects;
 
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.actions.Attack;
+import com.mygdx.game.model.actions.HitTracker;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.events.AssaultInterceptor;
+import com.mygdx.game.model.projectiles.Explosion;
 import com.mygdx.game.model.projectiles.Projectile;
 
 public class BlockEffect extends Effect implements AssaultInterceptor{
@@ -31,7 +33,7 @@ public class BlockEffect extends Effect implements AssaultInterceptor{
 		if (this.isActive) {
 			float potentialWill = this.calculateWillFromEffects(attack.getAttackSettings().getTargetEffectSettings());
 			target.addToCurrentWill(potentialWill);
-			attack.getAlreadyHitCharacters().add(target);
+			attack.getAlreadyHitCharacters().add(new HitTracker(target));
 			if (!isPerfect) {
 				//calculate damage
 				target.removeFromCurrentHealth(1);
@@ -46,7 +48,7 @@ public class BlockEffect extends Effect implements AssaultInterceptor{
 		if (this.isActive) {
 			float potentialWill = this.calculateWillFromEffects(projectile.getSettings().getTargetEffects());
 			target.addToCurrentWill(potentialWill);
-			projectile.explosionCheck();
+			projectile.collisionCheck(false);
 			if (!isPerfect) {
 				//calculate damage
 				target.removeFromCurrentHealth(1);
@@ -64,6 +66,21 @@ public class BlockEffect extends Effect implements AssaultInterceptor{
 			}
 		}
 		return totalWill;
+	}
+
+	@Override
+	public boolean didInterceptExplosion(CharacterModel target, Explosion explosion) {
+		if (this.isActive) {
+			float potentialWill = this.calculateWillFromEffects(explosion.getExplosionSettings().getTargetEffects());
+			target.addToCurrentWill(potentialWill);
+			explosion.getAlreadyHitCharacters().add(target);
+			if (!isPerfect) {
+				//calculate damage
+				target.removeFromCurrentHealth(1);
+			}
+			return true;
+		}
+		return false;
 	}
 
 

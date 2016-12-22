@@ -88,7 +88,7 @@ public abstract class WorldObject extends EntityModel {
 	}
 	
 	public void update(float delta, TiledMapTileLayer collisionLayer) {
-		this.setGameplaySize(delta, collisionLayer);
+		this.setGameplaySize(delta);
 		this.movementWithCollisionDetection(delta, collisionLayer);
 		if (this.didChangeState) {
 			this.itemUIModel.setAnimationTime(0f);

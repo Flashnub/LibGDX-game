@@ -4,35 +4,35 @@ size: 1024,1024
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-Gate-Activated1
+Activated1
   rotate: false
   xy: 2, 672
   size: 50, 333
   orig: 50, 333
   offset: 0, 0
   index: -1
-Gate-Activating1
+Activating1
   rotate: false
   xy: 2, 337
   size: 50, 333
   orig: 50, 333
   offset: 0, 0
   index: -1
-Gate-Activating2
+Activating2
   rotate: false
   xy: 54, 672
   size: 50, 333
   orig: 50, 333
   offset: 0, 0
   index: -1
-Gate-Activating3
+Activating3
   rotate: false
   xy: 2, 2
   size: 50, 333
   orig: 50, 333
   offset: 0, 0
   index: -1
-Gate-Deactivated1
+Deactivated1
   rotate: false
   xy: 54, 337
   size: 50, 333

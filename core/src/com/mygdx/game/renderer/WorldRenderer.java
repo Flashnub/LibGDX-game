@@ -14,6 +14,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.model.characters.Character;
 import com.mygdx.game.model.characters.player.Player;
+import com.mygdx.game.model.projectiles.Explosion;
 import com.mygdx.game.model.projectiles.Projectile;
 import com.mygdx.game.model.world.WorldModel;
 import com.mygdx.game.model.worldObjects.WorldObject;
@@ -93,6 +94,7 @@ public class WorldRenderer implements CoordinatesHelper{
 	        drawEnemies(gameBatch);
 	        drawProjectiles(gameBatch);
 	        drawWorldObjects(gameBatch);
+	        drawExplosions(gameBatch);
 	        gameBatch.end();
 	    }
 	    
@@ -136,7 +138,17 @@ public class WorldRenderer implements CoordinatesHelper{
 		    			projectile.getImageHitBox().y,  
 		    			projectile.getImageHitBox().width, 
 		    			projectile.getImageHitBox().height);	  
-		    	}
+		    }
+	    }
+	    
+	    private void drawExplosions(SpriteBatch batch) {
+	    	for (Explosion explosion : worldModel.getExplosions()) {
+		    	batch.draw(explosion.getExplosionUIModel().getCurrentFrame(), 
+		    			explosion.getImageHitBox().x,
+		    			explosion.getImageHitBox().y,  
+		    			explosion.getImageHitBox().width, 
+		    			explosion.getImageHitBox().height);	  
+		    }
 	    }
 	    
 	    private void drawWorldObjects(SpriteBatch batch) {

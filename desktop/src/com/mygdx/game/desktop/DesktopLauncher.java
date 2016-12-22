@@ -68,6 +68,17 @@ public class DesktopLauncher {
             TexturePacker.process(settings, inputDir, outputDir, "textures");
     	}
     	
+        parentOutputDir = "Sprites/Explosions/";
+        parentInputDir = "Sprites/Explosions/";
+        ArrayList<String> explosionNames = new ArrayList<String>();
+        explosionNames.add("BasicExplosion");
+        for(String explosionName : explosionNames) {
+        	String inputDir = parentInputDir + explosionName;
+        	String outputDir = parentOutputDir + explosionName;
+        	
+            TexturePacker.process(settings, inputDir, outputDir, "textures");
+        }
+    	
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.width = 800;
 		config.height = 600;

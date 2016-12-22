@@ -1,5 +1,7 @@
 package com.mygdx.game.model.actions;
 
+import java.util.Iterator;
+
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.characters.Character.CharacterModel;
@@ -16,8 +18,7 @@ public class Attack extends ActionSegment {
 	AttackSettings attackSettings;
 	Array <Effect> activeSourceEffects;
 	Array <Effect> windupSourceEffects;
-	Array <CharacterModel> alreadyHitCharacters;
-	float hitTime;
+	Array <HitTracker> alreadyHitCharacters;
 	
 	public Attack(CharacterModel source, AttackSettings settings) {
 		super();
@@ -26,8 +27,7 @@ public class Attack extends ActionSegment {
 		this.attackSettings = settings.deepCopy();
 		this.activeSourceEffects = new Array <Effect>();
 		this.windupSourceEffects = new Array <Effect>();
-		this.alreadyHitCharacters = new Array<CharacterModel>();
-		this.hitTime = 0f;
+		this.alreadyHitCharacters = new Array<HitTracker>();
 		if (source.isFacingLeft()) {
 			this.hitBox = new Rectangle(source.getGameplayHitBox().x + settings.originX - 10, source.getGameplayHitBox().y + settings.originY, -settings.width, settings.height);
 		}
@@ -37,16 +37,18 @@ public class Attack extends ActionSegment {
 	}
 	
 	public void processAttackOnCharacter(CharacterModel target) {
-		if (!this.alreadyHitCharacters.contains(target, true)) {
-			if (!target.checkIfIntercepted(this)) {
-				for (EffectSettings effectSettings : this.attackSettings.targetEffectSettings) {
-					Effect effect = EffectInitializer.initializeEffect(effectSettings, this);
-					target.addEffect(effect);
-				}
+		for (HitTracker tracker : this.alreadyHitCharacters) {
+			if (tracker.equals(target)){
+				return;
 			}
-			this.alreadyHitCharacters.add(target);
 		}
-
+		if (!target.checkIfIntercepted(this)) {
+			for (EffectSettings effectSettings : this.attackSettings.targetEffectSettings) {
+				Effect effect = EffectInitializer.initializeEffect(effectSettings, this);
+				target.addEffect(effect);
+			}
+		}
+		this.alreadyHitCharacters.add(new HitTracker(target));
 	}
 	
 	@Override
@@ -57,10 +59,13 @@ public class Attack extends ActionSegment {
 	
 	@Override
 	public void sendActionToListener(ActionListener actionListener, float delta) {
-		hitTime += delta;
-		if (hitTime > this.attackSettings.hitRate) {
-			this.alreadyHitCharacters.clear();
-			this.hitTime = 0f;
+		Iterator <HitTracker> iterator = this.alreadyHitCharacters.iterator();
+		while(iterator.hasNext()) {
+			HitTracker tracker = iterator.next();
+			boolean isFinished = tracker.update(delta, this.attackSettings.hitRate);
+			if (isFinished) {
+				iterator.remove();
+			}
 		}
 		//Need to limit this to X hits per attack.
 		actionListener.processAttack(this);
@@ -107,7 +112,7 @@ public class Attack extends ActionSegment {
 	@Override
 	public float getTotalTime() {
 		if (this.forceCooldownState) {
-			return this.attackSettings.windupTime + this.stateTime + this.attackSettings.cooldownTime;
+			return this.attackSettings.windupTime + this.activeTime + this.attackSettings.cooldownTime;
 		}
 		return this.attackSettings.windupTime + this.attackSettings.duration + this.attackSettings.cooldownTime;
 	}
@@ -122,15 +127,6 @@ public class Attack extends ActionSegment {
 		}
 	}
 	
-//	public MovementEffectSettings getTargetMovement() {
-//		for(EffectSettings effectSettings : attackSettings.targetEffectSettings) {
-//			if (effectSettings instanceof MovementEffectSettings) {
-//				return (MovementEffectSettings) effectSettings;
-//			}
-//		}
-//		return null;
-//	}
-
 	public Rectangle getHitBox() {
 		return hitBox;
 	}
@@ -155,7 +151,7 @@ public class Attack extends ActionSegment {
 		this.allegiance = allegiance;
 	}
 
-	public Array<CharacterModel> getAlreadyHitCharacters() {
+	public Array<HitTracker> getAlreadyHitCharacters() {
 		return alreadyHitCharacters;
 	}
 

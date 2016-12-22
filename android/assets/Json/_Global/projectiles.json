@@ -2,14 +2,19 @@
 	"Basic": {
 		"class": com.mygdx.game.model.projectiles.ProjectileSettings,
 		"name": "Basic",
-		"explodeOnImpact": true,
+		"disappearOnImpact": true,
 		"useSmartAim": true,
 		"gravity": 200,
 		"tracks": false,
 		"bounces": false,
 		"hasCollisionDetection": true,
-		"speed": 300,
-		"duration": 9,
+		"activeSpeed": 300,
+		"windupSpeed": 100,
+		"cooldownSpeed": 0,
+		"activeTillDisruption": true,
+		"windupTime": 1,
+		"cooldownTime": 1,
+		"explosionName": "BasicExplosion",
 		"targetEffects": [
 			{
 				"class": com.mygdx.game.model.effects.DamageEffectSettings,

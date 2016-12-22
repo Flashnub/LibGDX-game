@@ -3,7 +3,6 @@ package com.mygdx.game.model.effects;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.mygdx.game.model.effects.Effect.EffectType;
-import com.sun.org.apache.bcel.internal.generic.RETURN;
 
 public class DamageEffectSettings extends EffectSettings implements WillGenerator {
 	

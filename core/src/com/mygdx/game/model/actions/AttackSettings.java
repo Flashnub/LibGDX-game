@@ -47,16 +47,6 @@ public class AttackSettings extends AbilitySettings{
 
 	}
 	
-	public void setFieldsWithAbilitySettings(AbilitySettings settings)
-	{
-		this.duration = settings.duration;
-		this.cooldownTime = settings.cooldownTime;
-		this.windupTime = settings.windupTime;
-		this.sourceEffectSettings = settings.sourceEffectSettings;
-		this.windupEffectSettings = settings.windupEffectSettings;
-		this.isPermanent = settings.isPermanent;
-	}
-	
 	@Override
 	public AttackSettings deepCopy() {
 		AttackSettings copy = new AttackSettings();

@@ -4,35 +4,35 @@ size: 1024,1024
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-Lever-Activated1
+Activated1
   rotate: false
   xy: 2, 106
   size: 100, 50
   orig: 100, 50
   offset: 0, 0
   index: -1
-Lever-Activating1
+Activating1
   rotate: false
   xy: 2, 54
   size: 100, 50
   orig: 100, 50
   offset: 0, 0
   index: -1
-Lever-Activating2
+Activating2
   rotate: false
   xy: 104, 106
   size: 100, 50
   orig: 100, 50
   offset: 0, 0
   index: -1
-Lever-Activating3
+Activating3
   rotate: false
   xy: 2, 2
   size: 100, 50
   orig: 100, 50
   offset: 0, 0
   index: -1
-Lever-Deactivated1
+Deactivated1
   rotate: false
   xy: 104, 54
   size: 100, 50

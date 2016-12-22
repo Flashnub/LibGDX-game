@@ -72,7 +72,7 @@ public class Ability extends ActionSegment{
 	@Override
 	public float getTotalTime() {
 		if (this.forceCooldownState) {
-			return this.settings.windupTime + this.stateTime + this.settings.cooldownTime;
+			return this.settings.windupTime + this.activeTime + this.settings.cooldownTime;
 		}
 		return this.settings.windupTime + this.settings.duration + this.settings.cooldownTime;
 	}

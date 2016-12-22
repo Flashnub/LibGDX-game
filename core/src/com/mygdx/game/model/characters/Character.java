@@ -18,6 +18,7 @@ import com.mygdx.game.model.effects.MovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.AssaultInterceptor;
 import com.mygdx.game.model.events.ObjectListener;
+import com.mygdx.game.model.projectiles.Explosion;
 import com.mygdx.game.model.projectiles.Projectile;
 
 public abstract class Character {
@@ -110,11 +111,11 @@ public abstract class Character {
 			UUID id = UUID.randomUUID();
 			this.uuid = id.toString();
 			this.name = characterName;
-			this.gameplayHitBoxWidthModifier = 0.19f;
-			this.gameplayHitBoxHeightModifier = 0.6f;
 			this.uiModel = uiModel;
 			this.properties = JSONController.loadCharacterProperties(characterName);
 			this.properties.setSource(this);
+			this.widthCoefficient = this.properties.getWidthCoefficient();
+			this.heightCoefficient = this.properties.getHeightCoefficient();
 			setMaxHealth(properties.getMaxHealth());
 			setCurrentHealth(properties.getMaxHealth());
 			setMaxWill(properties.getMaxWill());
@@ -144,7 +145,7 @@ public abstract class Character {
 //			this.gameplayHitBox.width = this.getImageHitBox().width * gameplayHitBoxWidthModifier;
 //			this.gameplayHitBox.height = this.getImageHitBox().height * gameplayHitBoxHeightModifier;
 			
-			super.setGameplaySize(delta, collisionLayer);
+			super.setGameplaySize(delta);
 			//clamp velocity
 			if (this.getVelocity().y > this.properties.jumpSpeed)
 				this.getVelocity().y = this.properties.jumpSpeed;
@@ -454,7 +455,22 @@ public abstract class Character {
 					}
 				}
 				if (!didInterceptAttack) {
-					projectile.processExpirationOrHit(this);
+					projectile.processHit(this);
+				}
+			}
+		}
+		
+		public void shouldExplosionHit(Explosion explosion) {
+			if (!isImmuneToInjury) {
+				boolean didInterceptAttack = false;
+				for (Effect effect : this.currentEffects) {
+					if (effect instanceof AssaultInterceptor) {
+						didInterceptAttack = ((AssaultInterceptor) effect).didInterceptExplosion(this, explosion);
+						break;
+					}
+				}
+				if (!didInterceptAttack) {
+					explosion.processExplosionHit(this);
 				}
 			}
 		}
@@ -550,11 +566,11 @@ public abstract class Character {
 		}
 
 		public float getGameplayHitBoxWidthModifier() {
-			return gameplayHitBoxWidthModifier;
+			return widthCoefficient;
 		}
 
 		public float getGameplayHitBoxHeightModifier() {
-			return gameplayHitBoxHeightModifier;
+			return heightCoefficient;
 		}
 		
 

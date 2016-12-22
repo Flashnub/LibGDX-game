@@ -14,8 +14,8 @@ public class AbilitySettings implements Serializable {
 	Array <EffectSettings> windupEffectSettings;
 	Float windupTime;
 	Float cooldownTime;
-	Float duration;
-	boolean isPermanent;
+	protected Float duration;
+	boolean activeTillDisruption;
 	
 	@Override
 	public void write(Json json) {
@@ -29,19 +29,19 @@ public class AbilitySettings implements Serializable {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void read(Json json, JsonValue jsonData) {
-		Boolean isPermanent = json.readValue("isPermanent", Boolean.class, jsonData);
+		Boolean activeTillDisruption = json.readValue("activeTillDisruption", Boolean.class, jsonData);
 		Float duration = json.readValue("duration", Float.class, jsonData);
-		if (isPermanent != null && isPermanent.booleanValue()) {
+		if (activeTillDisruption != null && activeTillDisruption.booleanValue()) {
 			this.duration = Float.MAX_VALUE;
-			this.isPermanent = isPermanent.booleanValue();
+			this.activeTillDisruption = activeTillDisruption.booleanValue();
 		}
 		else if (duration != null) {
 			this.duration = duration;
-			this.isPermanent = false;
+			this.activeTillDisruption = false;
 		}
 		else {
 			this.duration = 0.5f;
-			this.isPermanent = false;
+			this.activeTillDisruption = false;
 		}
 		Float windupTime = json.readValue("windUpTime", Float.class, jsonData);
 		if (windupTime != null) {
@@ -76,8 +76,16 @@ public class AbilitySettings implements Serializable {
 		return cooldownTime;
 	}
 
-	public boolean isPermanent() {
-		return isPermanent;
+	public Float getWindUpPlusDuration() {
+		return this.windupTime + this.duration;
+	}
+	
+	public Float getTotalTime() {
+		return this.windupTime + this.duration + this.cooldownTime;
+	}
+	
+	public boolean activeTillDisruption() {
+		return activeTillDisruption;
 	}
 		
 	public void replaceMovementIfNecessary(MovementEffectSettings movementSettings) {
@@ -98,23 +106,38 @@ public class AbilitySettings implements Serializable {
 		}
 	}
 	
+	public void setFieldsWithAbilitySettings(AbilitySettings settings)
+	{
+		this.duration = settings.duration;
+		this.cooldownTime = settings.cooldownTime;
+		this.windupTime = settings.windupTime;
+		this.sourceEffectSettings = settings.sourceEffectSettings;
+		this.windupEffectSettings = settings.windupEffectSettings;
+		this.activeTillDisruption = settings.activeTillDisruption;
+	}
+	
 	public AbilitySettings deepCopy() {
 		AbilitySettings copy = new AbilitySettings();
 		copy.windupTime = this.windupTime;
 		copy.cooldownTime = this.cooldownTime;
-		copy.isPermanent = this.isPermanent;
+		copy.activeTillDisruption = this.activeTillDisruption;
 		copy.duration = this.duration;
-		Array <EffectSettings> effectSettingsCopy = new Array <EffectSettings> ();
-		for (EffectSettings eSettings : this.sourceEffectSettings) {
-			effectSettingsCopy.add(eSettings.deepCopy());
+		if (sourceEffectSettings != null) {
+			Array <EffectSettings> effectSettingsCopy = new Array <EffectSettings> ();
+			for (EffectSettings eSettings : this.sourceEffectSettings) {
+				effectSettingsCopy.add(eSettings.deepCopy());
+			}
+			copy.sourceEffectSettings = effectSettingsCopy;
 		}
-		copy.sourceEffectSettings = effectSettingsCopy;
-		
-		Array <EffectSettings> effectSettingsCopy2 = new Array <EffectSettings> ();
-		for (EffectSettings eSettings : this.windupEffectSettings) {
-			effectSettingsCopy2.add(eSettings.deepCopy());
+
+		if (windupEffectSettings != null) {
+			Array <EffectSettings> effectSettingsCopy2 = new Array <EffectSettings> ();
+			for (EffectSettings eSettings : this.windupEffectSettings) {
+				effectSettingsCopy2.add(eSettings.deepCopy());
+			}
+			copy.windupEffectSettings = effectSettingsCopy2;
 		}
-		copy.windupEffectSettings = effectSettingsCopy2;
+
 		return copy;
 	}
 	

@@ -5,16 +5,20 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.events.CollisionChecker;
 import com.mygdx.game.utils.CellWrapper;
 
 public abstract class EntityModel {
+	
+	public static final String activeState = "Active";
+	public static final String windupState = "Windup";
+	public static final String cooldownState = "Cooldown";
+	
 	public Vector2 velocity, acceleration;
 	public Rectangle gameplayHitBox;
 	public Rectangle imageHitBox;
-	public float gameplayHitBoxWidthModifier;
-	public float gameplayHitBoxHeightModifier;
+	public float widthCoefficient;
+	public float heightCoefficient;
 	public int allegiance;
 	CollisionChecker collisionChecker;
 	
@@ -27,22 +31,24 @@ public abstract class EntityModel {
 		this.gameplayHitBox = new Rectangle();
 		this.allegiance = 0;
 		
-		this.gameplayHitBoxWidthModifier = 1f;
-		this.gameplayHitBoxHeightModifier = 1f;
+		this.widthCoefficient = 1f;
+		this.heightCoefficient = 1f;
 	}
 	
 	//Not used by projectiles.
-	public void setGameplaySize(float delta, TiledMapTileLayer collisionLayer) {
+	public void setGameplaySize(float delta) {
 //		this.getVelocity().y += this.getAcceleration().y * delta;
 //		this.getVelocity().x += this.getAcceleration().x * delta;
 //		
-		this.gameplayHitBox.width = this.getImageHitBox().width * gameplayHitBoxWidthModifier;
-		this.gameplayHitBox.height = this.getImageHitBox().height * gameplayHitBoxHeightModifier;
+		this.gameplayHitBox.width = this.getImageHitBox().width * widthCoefficient;
+		this.gameplayHitBox.height = this.getImageHitBox().height * heightCoefficient;
 	}
 	
-	public void moveWithoutCollisionDetection(float delta, TiledMapTileLayer collisionLayer) {
+	public void moveWithoutCollisionDetection(float delta) {
 		this.imageHitBox.x = this.imageHitBox.x + this.velocity.x * delta;
 		this.imageHitBox.y = this.imageHitBox.y + this.velocity.y * delta;
+		this.gameplayHitBox.x = (this.imageHitBox.x + this.imageHitBox.width * ((1f - this.widthCoefficient) / 2));
+		this.gameplayHitBox.y = (this.imageHitBox.y + this.imageHitBox.height * ((1f - this.heightCoefficient) / 2));
 	}
 	
 	public CollisionCheck checkForYCollision(float maxTime, TiledMapTileLayer collisionLayer, float yVelocity, boolean shouldMove) {
@@ -71,12 +77,12 @@ public abstract class EntityModel {
 			tempVelocity += this.acceleration.y * increment;
 			
 			tempImageBounds.setY(tempImageBounds.getY() + tempVelocity * increment);
-			if (this instanceof CharacterModel) {
-				tempGameplayBounds.setY(tempImageBounds.getY() + tempImageBounds.getHeight() * .2f);
-			}
-			else {
-				tempGameplayBounds.setY(tempImageBounds.getY());
-			}
+//			if (this instanceof CharacterModel) {
+				tempGameplayBounds.setY(tempImageBounds.getY() + tempImageBounds.getHeight() * ((1f - this.heightCoefficient) / 2));
+//			}
+//			else {
+//				tempGameplayBounds.setY(tempImageBounds.getY());
+//			}
 			
 
 			if (tempVelocity < 0) {
@@ -175,6 +181,8 @@ public abstract class EntityModel {
 	
 	public abstract boolean handleAdditionCollisionLogic(Rectangle tempGameplayBounds);
 	public abstract int getAllegiance();
+	public abstract boolean isFacingLeft();
+	public abstract String getState();
 
 	
 	public CollisionCheck checkForXCollision(float maxTime, TiledMapTileLayer collisionLayer, float xVelocity, boolean shouldMove) {
@@ -202,12 +210,12 @@ public abstract class EntityModel {
 			
 			tempVelocity += this.acceleration.x * increment;
 			tempImageBounds.setX(tempImageBounds.getX() + tempVelocity * increment);
-			if (this instanceof CharacterModel) {
-				tempGameplayBounds.setX(tempImageBounds.getX() + tempImageBounds.getWidth() * .4f);
-			}
-			else {
-				tempGameplayBounds.setX(tempImageBounds.getX());
-			}
+//			if (this instanceof CharacterModel) {
+				tempGameplayBounds.setX(tempImageBounds.getX() + tempImageBounds.getWidth() * ((1f - this.widthCoefficient) / 2));
+//			}
+//			else {
+//				tempGameplayBounds.setX(tempImageBounds.getX());
+//			}
 			
 
 			if (tempVelocity < 0) {

@@ -9,9 +9,6 @@ import com.mygdx.game.assets.AnimationData;
 import com.mygdx.game.assets.EntityUIData;
 import com.mygdx.game.assets.SpriteUtils;
 import com.mygdx.game.constants.JSONController;
-import com.mygdx.game.model.characters.Character.CharacterModel;
-import com.mygdx.game.model.projectiles.Projectile;
-import com.mygdx.game.model.worldObjects.WorldObject;
 
 //=============================================================//
 //-----------------------------UI------------------------------//
@@ -23,20 +20,18 @@ public class EntityUIModel {
 	private EntityUIData entityUIData;
 	private TextureRegion currentFrame;
 	private float animationTime = 0f;
-	private String entityName;
 		
 	public EntityUIModel(String name, EntityUIDataType type) {
 		loadSprites(name, type);
-		this.entityName = name;
 	}
 		
 	private void loadSprites(String name, EntityUIDataType type) {
 		this.entityUIData = JSONController.loadUIDataFromJSONForEntity(name, type);
 			
-		loadAnimations(name);
+		loadAnimations();
 	}
 		
-	private void loadAnimations(String name) {
+	private void loadAnimations() {
 		if (entityUIData != null) {
 			animations = new ObjectMap <String, Animation>();
 			TextureAtlas playerAtlas = entityUIData.getMasterAtlas();
@@ -46,11 +41,11 @@ public class EntityUIModel {
 				Array <TextureRegion> rightAnimationFrames = new Array<TextureRegion>();
 				
 //				if (animationData.getName().equals("Active")) {
-				System.out.println(animationData.getName());
+//					System.out.println(animationData.getName());
 //				}
 					
 				for (int i = 0; i < animationData.getNumberOfFrames(); i++) {
-					TextureRegion leftFrame = playerAtlas.findRegion(SpriteUtils.animationStringWithData(name, animationData, i+1));
+					TextureRegion leftFrame = playerAtlas.findRegion(SpriteUtils.animationStringWithData(animationData, i+1));
 					leftAnimationFrames.add(leftFrame);
 					
 					TextureRegion rightFrame = new TextureRegion(leftFrame);
@@ -61,49 +56,26 @@ public class EntityUIModel {
 				Animation leftAnimation = new Animation(animationData.getDuration(), leftAnimationFrames, animationData.getPlayMode());
 				Animation rightAnimation = new Animation(animationData.getDuration(), rightAnimationFrames, animationData.getPlayMode());
 
-				animations.put(name + "-" + animationData.getName() + SpriteUtils.left, leftAnimation);
-				animations.put(name + "-" + animationData.getName() + SpriteUtils.right, rightAnimation);
+				animations.put(animationData.getName() + SpriteUtils.left, leftAnimation);
+				animations.put(animationData.getName() + SpriteUtils.right, rightAnimation);
 			}
 		}
 	}
-		
-	public void setCurrentFrame(CharacterModel model, float delta) {
-		String animationString = SpriteUtils.animationStringWithState(this.entityName, model.state, model.isFacingLeft());
-		Animation currentAnimation = animations.get(animationString);
-		
-		this.animationTime += delta;
-		currentFrame = currentAnimation.getKeyFrame(this.animationTime);
-			
-		model.imageHitBox.width = currentFrame.getRegionWidth();
-		model.imageHitBox.height = currentFrame.getRegionHeight();
-	}
 	
-	public void setCurrentFrame(Projectile projectile, float delta) {
-		String animationString = SpriteUtils.animationStringWithState(this.entityName, projectile.getProjectileState(), projectile.isFacingLeft());
-		Animation currentAnimation = animations.get(animationString);
-			
-		this.animationTime += delta;
-		currentFrame = currentAnimation.getKeyFrame(this.animationTime);
-		if (currentFrame == null) {
-			System.out.println("null frame");
-		}
-		projectile.getImageHitBox().width = currentFrame.getRegionWidth();
-		projectile.getImageHitBox().height = currentFrame.getRegionHeight();
-	}
-	
-	public boolean setCurrentFrame(WorldObject object, float delta) {
-		String animationString = SpriteUtils.animationStringWithState(this.entityName, object.getState(), object.isFacingLeft());
+	public boolean setCurrentFrame(EntityModel entity, float delta) {
+		String animationString = SpriteUtils.animationStringWithState(entity.getState(), entity.isFacingLeft());
 		Animation currentAnimation = animations.get(animationString);
 			
 		this.animationTime += delta;
 		currentFrame = currentAnimation.getKeyFrame(this.animationTime);
 		
-		object.getImageHitBox().width = currentFrame.getRegionWidth();
-		object.getImageHitBox().height = currentFrame.getRegionHeight();
+		entity.getImageHitBox().width = currentFrame.getRegionWidth();
+		entity.getImageHitBox().height = currentFrame.getRegionHeight();
 		
 		return this.isFinishedCurrentAnimation(currentAnimation);
 	}
-	
+		
+
 	private boolean isFinishedCurrentAnimation(Animation currentAnimation) {
 		return this.animationTime > currentAnimation.getAnimationDuration();
 	}

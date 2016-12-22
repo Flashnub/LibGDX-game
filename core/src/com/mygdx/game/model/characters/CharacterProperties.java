@@ -15,6 +15,8 @@ public class CharacterProperties implements Serializable {
 	float attack;
 	float maxStability;
 	float staggerAllowanceTime;
+	float heightCoefficient;
+	float widthCoefficient;
 	Float gravity;
 	Float walkingSpeed;
 	Float jumpSpeed;
@@ -39,6 +41,8 @@ public class CharacterProperties implements Serializable {
 		json.writeValue("gravity", gravity);
 		json.writeValue("injuryImmunityTime", injuryImmunityTime);
 		json.writeValue("allegiance", allegiance);
+		json.writeValue("widthCoefficient", widthCoefficient);
+		json.writeValue("heightCoefficient", heightCoefficient);
 	}
 
 	@Override
@@ -95,6 +99,21 @@ public class CharacterProperties implements Serializable {
 			this.allegiance = allegiance;
 		}
 		
+		Float widthCoefficient = json.readValue("widthCoefficient", Float.class, jsonData);
+		if (widthCoefficient != null) {
+			this.widthCoefficient = widthCoefficient;
+		}
+		else {
+			this.widthCoefficient = 1f;
+		}
+		
+		Float heightCoefficient = json.readValue("heightCoefficient", Float.class, jsonData);
+		if (heightCoefficient != null) {
+			this.heightCoefficient = heightCoefficient;
+		}
+		else {
+			this.heightCoefficient = 1f;
+		}
 	}
 
 	public CharacterProperties cloneProperties() {
@@ -108,6 +127,8 @@ public class CharacterProperties implements Serializable {
 		properties.allegiance = this.allegiance;
 		properties.gravity = this.gravity;
 		properties.injuryImmunityTime = this.injuryImmunityTime;
+		properties.widthCoefficient = this.widthCoefficient;
+		properties.heightCoefficient = this.heightCoefficient;
 		//iterate through actions.
 		HashMap <String, ActionSequence> clonedActions = new HashMap<String, ActionSequence> ();
 		for (Map.Entry<String, ActionSequence> entry : actions.entrySet()) {
@@ -128,6 +149,14 @@ public class CharacterProperties implements Serializable {
 		for (ActionSequence action : actions.values()) {
 			action.setSource(source);
 		}
+	}
+
+	public float getHeightCoefficient() {
+		return heightCoefficient;
+	}
+
+	public float getWidthCoefficient() {
+		return widthCoefficient;
 	}
 
 	public Float getInjuryImmunityTime() {

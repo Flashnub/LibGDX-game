@@ -5,8 +5,10 @@ import java.util.UUID;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.characters.EntityUIModel;
+import com.mygdx.game.model.actions.HitTracker;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.characters.CollisionCheck;
 import com.mygdx.game.model.characters.EntityModel;
@@ -21,71 +23,71 @@ import com.mygdx.game.model.events.CollisionChecker;
 import com.mygdx.game.utils.MathUtils;
 
 public class Projectile extends EntityModel implements EffectDataRetriever{
-//	
-//	public enum ProjectileState implements State {
-//		Active, Preactive;
-//		
-//		@Override
-//		public String getState() {
-//			return toString();
-//		}
-//	}
-
-	private final String activeState = "Active";
-	private final String preActiveState = "Preactive";
 	
-	private float stateTime = 0f;
-	private boolean firstTimeSetup = true;
+	private float currentTime;
+	private float activeTime;
 	private EntityUIModel projectileUIModel;
-	private String projectileState;
 	private String uuid;
 	private ActionListener actionListener;
 	private CharacterModel source;
 	private CharacterModel target;
 	private ProjectileSettings settings;
+	private String state;
+	private boolean didChangeState;
+	private boolean forceCooldown;
+	private boolean forceEnd;
+	private Array <HitTracker> charactersHit;
+
 	
 	public Projectile(String name, CharacterModel source, CharacterModel target, ActionListener actionListener, CollisionChecker collisionChecker)
 	{
 		super();
-		this.settings = JSONController.projectiles.get(name);
+		this.state = EntityModel.windupState;
+		this.forceCooldown = false;
+		this.forceEnd = false;
+		this.didChangeState = true;
+		this.currentTime = 0f;
+		this.activeTime = 0f;
+		this.settings = JSONController.projectiles.get(name).deepCopy();
+		this.widthCoefficient = this.settings.getWidthCoefficient();
+		this.heightCoefficient = this.settings.getHeightCoefficient();
 		this.acceleration.y = -this.settings.getGravity();
 		this.imageHitBox.x = source.getImageHitBox().x + (source.getImageHitBox().width / 2f) + settings.getPossibleOrigins().get(0).x;
 		this.imageHitBox.y = source.getImageHitBox().y + (source.getImageHitBox().height / 2f) + settings.getPossibleOrigins().get(0).x;
 		this.gameplayHitBox = this.imageHitBox;
 		this.projectileUIModel = new EntityUIModel(name, EntityUIDataType.PROJECTILE);
-		this.projectileState = this.activeState;
 		this.actionListener = actionListener;
 		this.setCollisionChecker(collisionChecker);
 		this.source = source;
 		this.target = target;
+		this.charactersHit = new Array <HitTracker>();
 		UUID id = UUID.randomUUID();
 		this.uuid = id.toString();
 		this.allegiance = source.getAllegiance();
 	}
-	
-	public Projectile() {
-		this.projectileState = this.activeState;
-	}
 
 	public void update(float delta, TiledMapTileLayer collisionLayer) {
-		if (this.firstTimeSetup || this.settings.isTracks()) {
-			if (this.firstTimeSetup) {
-				this.firstTimeSetup = false;
-			}
+		currentTime += delta;
+		this.changeStateCheck();
+		if (this.state.equals(EntityModel.activeState)) {
+			activeTime += delta;
+		}
+		if (this.didChangeState || this.settings.isTracks()) {
+			this.didChangeState = false;
 			this.determineAndSetVelocity(target, collisionLayer);
 			System.out.println(this.velocity);
 		}
 //		this.velocity.y -= this.settings.getGravity() * delta;
-		this.setGameplaySize(delta, collisionLayer);
+		this.setGameplaySize(delta);
 		if (this.settings.isHasCollisionDetection()) {
 			this.movementWithCollisionDetection(delta, collisionLayer);
 		}
 		else {
-			moveWithoutCollisionDetection(delta, collisionLayer);
+			moveWithoutCollisionDetection(delta);
 		}
-		stateTime += delta;
 		projectileUIModel.setCurrentFrame(this, delta);
 		actionListener.processProjectile(this);
+		this.deletionCheck();
 	}
 
 	//Taken from http://stackoverflow.com/questions/2248876/2d-game-fire-at-a-moving-target-by-predicting-intersection-of-projectile-and-u
@@ -170,7 +172,7 @@ public class Projectile extends EntityModel implements EffectDataRetriever{
 				xDelta = Math.min(-0.01f, xDelta);
 			}
 			
-			float yDelta = Math.max(0.01f, (expectedPositionOfTarget.y - projectilePosition.y));
+			float yDelta = expectedPositionOfTarget.y - projectilePosition.y;
 			if (yDelta >= 0) {
 				yDelta = Math.max(0.01f, yDelta);
 			}
@@ -182,12 +184,13 @@ public class Projectile extends EntityModel implements EffectDataRetriever{
 			
 			float time = yDelta / ((yDelta / fullDelta) * this.projectileSpeed());
 			this.velocity.x = (xDelta / fullDelta) * this.projectileSpeed();
-			this.velocity.y = ((yDelta / fullDelta) * this.projectileSpeed()) + (.5f * this.settings.getGravity() * time);
-//			System.out.println(time);
-//			System.out.println(expectedPositionOfTarget);
-//			System.out.println(target.getGameplayHitBox());
-//			System.out.println(target.getVelocity());
-//			System.out.println(projectilePosition);
+			if (this.projectileSpeed() == 0) {
+				this.velocity.y = 0;
+			}
+			else {
+				this.velocity.y = ((yDelta / fullDelta) * this.projectileSpeed()) + (.5f * this.settings.getGravity() * time);
+
+			}
 		}
 	}
 	
@@ -198,172 +201,131 @@ public class Projectile extends EntityModel implements EffectDataRetriever{
 			if (this.settings.isBounces()) {
 				this.getVelocity().x = -this.getVelocity().x;
 			}
-			else if (this.settings.isExplodeOnImpact()){
-				this.actionListener.deleteProjectile(this);
-			}
+//			else if (this.settings.isDisappearOnImpact()){
+//				forceCooldown = true;
+//				this.actionListener.deleteProjectile(this);
+//			}
+			this.collisionCheck(true);
 		}
 		CollisionCheck collisionY = this.checkForYCollision(delta, collisionLayer, this.velocity.y, true);
 		if (collisionY.isDoesCollide()) {
 			if (this.settings.isBounces()) {
 				this.getVelocity().y = -this.getVelocity().y;
 			}
-			else if (this.settings.isExplodeOnImpact()){
-				this.actionListener.deleteProjectile(this);
-			}
+//			else if (this.settings.isDisappearOnImpact()){
+//				forceCooldown = true;
+//				this.actionListener.deleteProjectile(this);
+//			}
+			this.collisionCheck(true);
 		}
-		//save old position
-//		float oldX = this.getImageHitBox().getX(), oldY = this.getImageHitBox().getY(), tileWidth = collisionLayer.getTileWidth(), tileHeight = collisionLayer.getTileHeight();
-//		boolean collisionX = false, collisionY = false;
-//		
-//		//move on x axis
-//		this.getImageHitBox().setX(this.getImageHitBox().getX() + this.getVelocity().x * delta);
-//		
-//		if (this.getVelocity().x < 0) {
-//			//left blocks
-//			Cell topLeftBlock = collisionLayer.getCell
-//					((int) (this.imageHitBox.x / tileWidth), 
-//					(int) ((this.imageHitBox.y + this.imageHitBox.height) / tileHeight));
-//			Cell middleLeftBlock = collisionLayer.getCell
-//					((int) (this.imageHitBox.x / tileWidth), 
-//					(int) ((this.imageHitBox.y + this.imageHitBox.height / 2) / tileHeight));
-//			Cell lowerLeftBlock = collisionLayer.getCell
-//					((int) (this.imageHitBox.x / tileWidth), 
-//					(int) ((this.imageHitBox.y) / tileHeight));
-//			
-//			if (topLeftBlock != null)
-//				collisionX = ((String)topLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
-//				
-//			
-//			//middle left block
-//			if(!collisionX && middleLeftBlock != null)
-//				collisionX = ((String)middleLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
-//			
-//			//lower left block
-//			if(!collisionX && lowerLeftBlock != null )
-//				collisionX = ((String)lowerLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
-//			
-////			this.leftcollisionX = collisionX;
-//			
-//		}
-//		else if (this.getVelocity().x > 0) {
-//			//right blocks
-//			Cell topRightBlock = collisionLayer.getCell
-//					((int) ((this.imageHitBox.x + this.imageHitBox.width) / tileWidth),
-//					(int) ((this.imageHitBox.y + this.imageHitBox.height) / tileHeight));
-//			Cell middleRightBlock = collisionLayer.getCell
-//					((int) ((this.imageHitBox.x + this.imageHitBox.width) / tileWidth),
-//					(int) ((this.imageHitBox.y + this.imageHitBox.height / 2) / tileHeight));
-//			Cell lowerRightBlock = collisionLayer.getCell
-//					((int) ((this.imageHitBox.x + this.imageHitBox.width) / tileWidth), 
-//					(int) ((this.imageHitBox.y) / tileHeight));
-//			
-//			// top right block
-//			if (topRightBlock != null)
-//				collisionX = ((String)topRightBlock.getTile().getProperties().get("Impassable")).equals("true");
-//			
-//			//middle right block
-//			if(!collisionX && middleRightBlock != null)
-//				collisionX = ((String)middleRightBlock.getTile().getProperties().get("Impassable")).equals("true");
-//			
-//			//lower right block
-//			if(!collisionX && lowerRightBlock != null)
-//				collisionX = ((String)lowerRightBlock.getTile().getProperties().get("Impassable")).equals("true");
-//			
-////			this.rightCollisionX = collisionX;
-//		}
-//		
-//		//react to X collision
-//		if (collisionX) {
-//			this.getImageHitBox().setX(oldX);;
-//			this.getVelocity().x = -this.getVelocity().x;
-//		}
-//
-//		
-//	
-//		//move on y axis
-//		this.getImageHitBox().setY(this.getImageHitBox().getY() + this.getVelocity().y * delta);
-//		
-//		//Collision detection: Y axis
-//		
-//		if (this.getVelocity().y < 0) {
-//			Cell bottomLeftBlock = collisionLayer.getCell((int) (this.imageHitBox.x / tileWidth), (int) ((this.bounds.y) / tileHeight));
-//			Cell bottomMiddleBlock = collisionLayer.getCell((int) ((this.imageHitBox.x + this.bounds.width / 2) / tileWidth), (int) ((this.bounds.y) / tileHeight));
-//			Cell bottomRightBlock = collisionLayer.getCell((int) ((this.imageHitBox.x + this.bounds.width) / tileWidth), (int) ((this.bounds.y) / tileHeight));
-//			//bottom left block
-//			if (bottomLeftBlock != null)
-//				collisionY = ((String)bottomLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
-//				
-//			//bottom middle block
-//			if(!collisionY && bottomMiddleBlock != null)
-//				collisionY = ((String)bottomMiddleBlock.getTile().getProperties().get("Impassable")).equals("true");
-//			
-//			//bottom right block
-//			if(!collisionY && bottomRightBlock != null)
-//				collisionY = ((String)bottomRightBlock.getTile().getProperties().get("Impassable")).equals("true");
-//			
-//	
-//		} 
-//		else if (this.getVelocity().y > 0) {
-//			Cell topLeftBlock = collisionLayer.getCell((int) (this.bounds.x / tileWidth), (int) ((this.bounds.y + this.bounds.height) / tileHeight));			
-//			Cell topMiddleBlock = collisionLayer.getCell((int) ((this.bounds.x + this.bounds.width / 2) / tileWidth), (int) ((this.bounds.y + this.bounds.height) / tileHeight));
-//			Cell topRightBlock = collisionLayer.getCell((int) ((this.bounds.x + this.bounds.width) / tileWidth), (int) ((this.bounds.y + this.bounds.height) / tileHeight));
-//			
-//			//top left block
-//			if (topLeftBlock != null)
-//				collisionY = ((String)topLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
-//			
-//			//top middle block
-//			if(!collisionY && topMiddleBlock != null)
-//				collisionY = ((String)topMiddleBlock.getTile().getProperties().get("Impassable")).equals("true");
-//			
-//			//top right block
-//			if(!collisionY && topRightBlock != null)
-//				collisionY = ((String)topRightBlock.getTile().getProperties().get("Impassable")).equals("true");
-//		}
-//		
-//		//react to Ycollision
-//		if (collisionY) {
-//			this.getImageHitBox().setY(oldY);
-//			this.getVelocity().y = -this.getVelocity().y;
-//		}
-//		return;
 	}
 	
 	public float getEffectiveRange() {
-		if (this.settings.getProjectileDuration() == null) {
+		if (this.settings.getDuration() == null) {
 			return 10f;
 		}
-		return this.settings.getProjectileDuration() * this.projectileSpeed();
+		return this.settings.getDuration() * this.projectileSpeed();
 	}
 	
 	protected float projectileSpeed() {
-		return this.settings.getSpeed();
+		return this.settings.getSpeed(this.state);
 	}
 	
 	//If characterModel is null, projectile expires.
-	public void processExpirationOrHit(CharacterModel characterModel){
-		if (characterModel != null) {
+//	public void processExpirationOrHit(CharacterModel characterModel){
+
+//			if (this.settings.isDisappearOnImpact()) {
+//				this.actionListener.deleteProjectile(this);
+//				forceCooldown = true;
+//			}
+		
+//		else {
+////			this.actionListener.deleteProjectile(this);
+////			forceCooldown = true;
+//			this.collisionCheck(true);
+//		}
+
+//	}
+	
+	public void processHit(CharacterModel target) {
+		if (target != null) {
+			for (HitTracker tracker : this.charactersHit) {
+				if (tracker.equals(target)){
+					return;
+				}
+			}
 			for (EffectSettings effectSettings : settings.getTargetEffects()) {
 				Effect effect = EffectInitializer.initializeEffect(effectSettings, this);
-				characterModel.addEffect(effect);
+				target.addEffect(effect);
 			}
-			characterModel.setImmuneToInjury(true);
-			if (this.settings.isExplodeOnImpact()) {
-				this.actionListener.deleteProjectile(this);
+			target.setImmuneToInjury(true);
+			this.charactersHit.add(new HitTracker(target));
+			if (this.getSettings().isDisappearOnImpact()) {
+				this.collisionCheck(false);
 			}
 		}
-		else {
+	}
+	
+	public boolean isActive() {
+		return this.state.equals(EntityModel.windupState) || this.state.equals(EntityModel.activeState);
+	}
+	
+	public void collisionCheck(boolean shouldExplode) {
+		if (this.settings.isDisappearOnImpact()) {
+			forceCooldown = true;
+		}
+		if (shouldExplode && this.settings.getExplosionSettings() != null) {
+			Explosion explosion = new Explosion(this.getSettings().getExplosionName(), this.getSettings().getExplosionSettings(),  this.actionListener, this);
+			this.actionListener.addExplosion(explosion);
+		}
+	}
+	
+		
+	private void deletionCheck() {
+		if (this.currentTime > this.getTotalTime() || forceEnd) {
+			this.collisionCheck(true);
 			this.actionListener.deleteProjectile(this);
 		}
+		
+	}
+	
+	private void changeStateCheck() {
+		if ((this.currentTime <= this.getTotalTime() && this.currentTime > this.getWindUpPlusDuration()) || this.forceCooldown) {
+			this.setState(EntityModel.cooldownState);
+		}
+		else if (this.currentTime > this.settings.getWindUpTime() && this.currentTime <= this.getWindUpPlusDuration()) {
+			this.setState(EntityModel.activeState);
+		}
+		else if (this.currentTime <= this.settings.getWindUpTime()) {
+			this.setState(EntityModel.windupState);
+		}		
+	}
+	
+	public float getTotalTime() {
+		if (this.forceCooldown) {
+			return this.settings.getWindUpTime() + this.activeTime + this.settings.getCooldownTime();
+		}
+		return this.settings.getWindUpTime() + this.settings.getDuration() + this.settings.getCooldownTime(); 
+	}
+	
+	private float getWindUpPlusDuration() {
+		if (this.forceCooldown) {
+			return this.settings.getWindUpTime() + this.activeTime;
+		}
+		return this.settings.getWindUpTime() + this.settings.getDuration();
+	}
+	
+	public void setState(String state) {
+		if (!this.state.equals(state))
+		{
+			this.didChangeState = true;
+		}
+		if (state.equals(EntityModel.cooldownState)) {
+			this.settings.disableGravity();
+		}
+		this.state = state;
+	}
 
-	}
-	
-	public void explosionCheck() {
-		if (this.settings.isExplodeOnImpact()) {
-			this.actionListener.deleteProjectile(this);
-		}
-	}
-	
 	public CharacterModel getTarget() {
 		return target;
 	}
@@ -383,13 +345,9 @@ public class Projectile extends EntityModel implements EffectDataRetriever{
 	public boolean isFacingLeft() {
 		return this.velocity.x < 0;
 	}
-	
-	public String getProjectileState() {
-		return projectileState;
-	}
 
-	public void setProjectileState(String projectileState) {
-		this.projectileState = projectileState;
+	public void setProjectileState(String state) {
+		this.state = state;
 		this.projectileUIModel.setAnimationTime(0f);
 	}
 	
@@ -420,7 +378,7 @@ public class Projectile extends EntityModel implements EffectDataRetriever{
 	}
 	
 	public float getStateTime() {
-		return stateTime;
+		return currentTime;
 	}
 
 	@Override
@@ -433,7 +391,6 @@ public class Projectile extends EntityModel implements EffectDataRetriever{
 
 	@Override
 	public boolean handleAdditionCollisionLogic(Rectangle tempGameplayBounds) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -446,5 +403,10 @@ public class Projectile extends EntityModel implements EffectDataRetriever{
 			}
 		}
 		return mSettings;
+	}
+
+	@Override
+	public String getState() {
+		return this.state;
 	}
 }

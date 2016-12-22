@@ -4,16 +4,23 @@ size: 1024,1024
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-Basic-Active1
+Active1
   rotate: false
   xy: 2, 24
   size: 20, 20
   orig: 20, 20
   offset: 0, 0
   index: -1
-Basic-Preactive1
+Cooldown1
   rotate: false
   xy: 2, 2
+  size: 20, 20
+  orig: 20, 20
+  offset: 0, 0
+  index: -1
+Windup1
+  rotate: false
+  xy: 24, 24
   size: 20, 20
   orig: 20, 20
   offset: 0, 0

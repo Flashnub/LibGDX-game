@@ -10,6 +10,7 @@ import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.CollisionChecker;
 import com.mygdx.game.model.projectiles.Projectile;
 import com.mygdx.game.model.projectiles.ProjectileSettings;
+import com.mygdx.game.wrappers.StringWrapper;
 
 
 public class ProjectileAttack extends ActionSegment{
@@ -34,8 +35,8 @@ public class ProjectileAttack extends ActionSegment{
 		this.actionListener = actionListener;
 		projectiles = new ArrayList<Projectile>();
 		this.projAttackSettings = settings;
-		for (ProjectileSettings projSettings : settings.getProjectileSettings()) {
-			Projectile projectile = new Projectile(projSettings.getName(), source, target, actionListener, collisionChecker);
+		for (StringWrapper projName : this.projAttackSettings.projectileSettingKeys) {
+			Projectile projectile = new Projectile(projName.value, source, target, actionListener, collisionChecker);
 			projectiles.add(projectile);
 		}
 		if (settings.getAbilitySettings() != null) {
@@ -74,7 +75,7 @@ public class ProjectileAttack extends ActionSegment{
 	@Override
 	public float getTotalTime() {
 		if (this.forceCooldownState) {
-			return this.projAttackSettings.getAbilitySettings().windupTime + this.stateTime + this.projAttackSettings.getAbilitySettings().cooldownTime;
+			return this.projAttackSettings.getAbilitySettings().windupTime + this.activeTime + this.projAttackSettings.getAbilitySettings().cooldownTime;
 		}
 		return this.projAttackSettings.getAbilitySettings().windupTime + this.projAttackSettings.getAbilitySettings().cooldownTime + this.projAttackSettings.getAbilitySettings().duration;
 	}
@@ -128,8 +129,8 @@ public class ProjectileAttack extends ActionSegment{
 		projAttack.collisionChecker = collisionChecker;
 		projectiles = new ArrayList<Projectile>();
 		projAttack.projAttackSettings = projAttackSettings;
-		for (ProjectileSettings projSettings : projAttackSettings.getProjectileSettings()) {
-			Projectile projectile = new Projectile(projSettings.getName(), source, target, actionListener, collisionChecker);
+		for (StringWrapper projName : this.projAttackSettings.projectileSettingKeys) {
+			Projectile projectile = new Projectile(projName.value, source, target, actionListener, collisionChecker);
 			projectiles.add(projectile);
 		}
 		if (projAttackSettings.getAbilitySettings() != null) {

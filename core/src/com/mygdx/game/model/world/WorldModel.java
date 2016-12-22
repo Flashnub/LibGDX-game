@@ -26,6 +26,7 @@ import com.mygdx.game.model.events.CollisionChecker;
 import com.mygdx.game.model.events.DialogueListener;
 import com.mygdx.game.model.events.ObjectListener;
 import com.mygdx.game.model.events.SaveListener;
+import com.mygdx.game.model.projectiles.Explosion;
 import com.mygdx.game.model.projectiles.Projectile;
 import com.mygdx.game.model.worldObjects.WorldObject;
 
@@ -45,6 +46,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     Array <WorldObject> nearbyObjects;
     Array <NPCCharacter> npcCharacters;
     Array <NPCCharacter> nearbyNPCs;
+    Array <Explosion> explosions;
     Player player;
     Array <WorldListener> worldListeners;
     Array <DialogueListener> dialogueListeners;
@@ -62,6 +64,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     	nearbyObjects = new Array <WorldObject>();
     	npcCharacters = new Array <NPCCharacter>();
     	nearbyNPCs = new Array <NPCCharacter>();
+    	explosions = new Array <Explosion> ();
     	this.additionalRectangles = new Array <Rectangle>();
     	this.collisionLayer = collisionLayer;
     	saveController = new SaveController();
@@ -203,16 +206,21 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     			Character npc = npcCharacters.get(i);
     			npc.act(timeForAction, collisionLayer);
     		}
+    		for (int i = 0; i < projectiles.size; i++) {
+    			Projectile projectile = projectiles.get(i);
+    			projectile.update(timeForAction, collisionLayer);
+    		}
+    		for (int i = 0; i < objects.size; i++) {
+    			WorldObject object = objects.get(i);
+    			object.update(timeForAction, collisionLayer);
+    		}
+    		for (int i = 0; i < explosions.size; i++) {
+    			Explosion explosion = explosions.get(i);
+    			explosion.update(timeForAction);
+    		}
     		accumulatedTime -= timeForAction;
         }
-		for (int i = 0; i < projectiles.size; i++) {
-			Projectile projectile = projectiles.get(i);
-			projectile.update(delta, collisionLayer);
-		}
-		for (int i = 0; i < objects.size; i++) {
-			WorldObject object = objects.get(i);
-			object.update(delta, collisionLayer);
-		}
+
 		this.dialogueController.update(delta);
     }
 
@@ -253,6 +261,11 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	public void deleteProjectile(Projectile projectile) {
 		this.projectiles.removeValue(projectile, true);		
 	}
+	
+	@Override
+	public void deleteExplosion(Explosion explosion) {
+		this.explosions.removeValue(explosion, true);
+	}
 
 	@Override
 	public void addProjectile(Projectile projectile) {
@@ -263,6 +276,30 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 			}
 		}
 		this.projectiles.add(projectile);
+	}
+	
+	@Override
+	public void addExplosion(Explosion explosion) {
+		for (Explosion explo : this.explosions) {
+			if (explo.equals(explosion)) {
+				return;
+			}
+		}
+		this.explosions.add(explosion);
+	}
+
+	@Override
+	public void processExplosion(Explosion explosion) {
+		this.additionalRectangles.add(explosion.getGameplayHitBox());
+
+		if (player.getCharacterData().getAllegiance() != explosion.getAllegiance()) {
+			checkIfExplosionLands(player, explosion);
+		}
+		for (Enemy enemy : enemies) {
+			if (enemy.getCharacterData().getAllegiance() != explosion.getAllegiance()) {
+				checkIfExplosionLands(enemy, explosion);
+			}
+		}
 	}
 
 	@Override
@@ -280,7 +317,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 
 	@Override
 	public void processProjectile(Projectile projectile) {
-		if (checkIfProjectileShouldExpire(projectile)) {
+		if (!checkIfProjectileisActive(projectile)) {
 			return;
 		}
 		if (player.getCharacterData().getAllegiance() != projectile.getAllegiance()) {
@@ -297,7 +334,6 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	
 	@Override
 	public void addObjectToWorld(WorldObject object) {
-		// TODO Auto-generated method stub
 		if (object != null && objects != null && !objects.contains(object, true)) {
 			//check if player has activated this object already.
 			objects.add(object);
@@ -333,35 +369,21 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 		}
 	}
 	
+	private void checkIfExplosionLands(Character character, Explosion explosion) {
+		if (explosion.getImageHitBox().overlaps(character.getCharacterData().getGameplayHitBox())) {
+			character.getCharacterData().shouldExplosionHit(explosion);
+		}
+	}
+	
 	private void checkIfProjectileLands(Character character, Projectile projectile) {
 		if (projectile.getImageHitBox().overlaps(character.getCharacterData().getGameplayHitBox())) {
 			character.getCharacterData().shouldProjectileHit(projectile);
 		}
 	}
 	
-	private boolean checkIfProjectileShouldExpire(Projectile projectile) {
-		if (projectile.getStateTime() > projectile.getSettings().getDuration()) {
-			projectile.processExpirationOrHit(null);
-			return true;
-		}
-		return false;
+	private boolean checkIfProjectileisActive(Projectile projectile) {
+		return projectile.isActive();
 	}
-	
-//	@Override
-//	public boolean doTilesCollideWithObjects(Array<CellWrapper> nearbyTiles, TiledMapTileLayer collisionLayer) {
-//		boolean isColliding = false;
-//		for (int i = 0; i < nearbyTiles.size; i++) {
-//			CellWrapper cell = nearbyTiles.get(i);
-//			Rectangle tileBounds = new Rectangle(cell.getOrigin().x, cell.getOrigin().y, 
-//				collisionLayer.getTileWidth(), collisionLayer.getTileHeight());
-//			for (WorldObject object : this.objects) {
-//				if (object.shouldCollideWithPlayer() && object.getImageHitBox().overlaps(tileBounds)) {
-//					isColliding = true;
-//				}
-//			}
-//		}
-//		return isColliding;
-//	}
 	
 	@Override
 	public boolean checkIfEntityCollidesWithOthers(EntityModel entity, Rectangle tempGameplayBounds) {
@@ -419,9 +441,8 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 		}
 		return isColliding;
 	}
-
-
 	
+
 	private void checkIfPlayerIsNearObjects() {
 		nearbyObjects.clear();
 		for (WorldObject object : this.objects) {
@@ -511,8 +532,9 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 		return npcCharacters;
 	}
 
-
-
+	public Array<Explosion> getExplosions() {
+		return explosions;
+	}
 
 
 

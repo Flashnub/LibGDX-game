@@ -142,8 +142,8 @@ public class Player extends Character implements InputProcessor {
 			isWalkLeftPressed = false;
 			isWalkRightPressed = false;
 			isJumpPressed = false;
-			this.gameplayHitBoxWidthModifier = 0.19f;
-			this.gameplayHitBoxHeightModifier = 0.6f;
+			this.widthCoefficient = 0.19f;
+			this.heightCoefficient = 0.6f;
 		}
 		
 		@Override

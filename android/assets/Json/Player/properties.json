@@ -4,6 +4,8 @@
 	"maxWill": 20,
 	"maxStability": 5,
 	"attack": 1,
+	"widthCoefficient": 0.2,
+	"heightCoefficient": 0.6,
 	actions: {
 		"PlayerDash": {
 			"class": com.mygdx.game.model.actions.ActionSequence,

@@ -21,14 +21,14 @@ public abstract class ActionSegment implements EffectDataRetriever {
 	boolean forceCooldownState; //Used for actions that end on demand rather than fixed time 
 	CharacterModel source;
 	ActionState actionState;
-	float stateTime;
+	float activeTime;
 	
 	public ActionSegment() {
 		forceEnd = false;
 		forceCooldownState = false;
 		hasProcessedActiveSource = false;
 		hasProcessedWindupSource = false;
-		stateTime = 0f;
+		activeTime = 0f;
 	}
 
 	public void sourceActiveProcess(CharacterModel source) {
@@ -52,7 +52,6 @@ public abstract class ActionSegment implements EffectDataRetriever {
 			this.currentTime = 0f;
 		}
 		this.currentTime += delta;
-		this.stateTime += delta;
 		if (currentTime >= this.getWindUpPlusActionTime() || this.forceCooldownState) {
 			if (forceCooldownState) {
 				this.interruptionBlock();
@@ -64,6 +63,7 @@ public abstract class ActionSegment implements EffectDataRetriever {
 				sourceActiveProcess(getSource());
 			}
 			sendActionToListener(actionListener, delta);
+			this.activeTime += delta;
 		}
 		else if (this.actionState != ActionState.WINDUP){
 			if (!this.hasProcessedWindupSource) {
@@ -86,8 +86,8 @@ public abstract class ActionSegment implements EffectDataRetriever {
 	
 	public void setActionState(ActionState state) {
 		if (this.actionState != state && !forceEnd) {
-			System.out.println("Action State" + state);
-			System.out.println("Action time:" + this.currentTime);
+//			System.out.println("Action State" + state);
+//			System.out.println("Action time:" + this.currentTime);
 			this.didChangeState = true;
 			this.actionState = state;
 		}

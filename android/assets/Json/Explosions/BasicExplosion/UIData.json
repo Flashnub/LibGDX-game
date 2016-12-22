@@ -4,24 +4,24 @@
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "Windup",
-			"numberOfFrames": 1,
+			"numberOfFrames": 2,
 			"duration": 0.05,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "Active",
-			"numberOfFrames": 1,
+			"numberOfFrames": 2,
 			"duration": 0.05,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "Cooldown",
-			"numberOfFrames": 1,
+			"numberOfFrames": 2,
 			"duration": 0.05,
 			"playMode": NORMAL
 		}
 	]
-	"masterAtlasPath": "Sprites/Projectiles/Basic/textures.atlas"
+	"masterAtlasPath": "Sprites/Explosions/BasicExplosion/textures.atlas"
 }

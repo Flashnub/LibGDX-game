@@ -4,161 +4,161 @@ size: 2048,1024
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-Player-Backwalk1
+Backwalk1
   rotate: false
   xy: 2, 810
   size: 250, 200
   orig: 250, 200
   offset: 0, 0
   index: -1
-Player-Backwalk10
+Backwalk10
   rotate: false
   xy: 758, 810
   size: 250, 200
   orig: 250, 200
   offset: 0, 0
   index: -1
-Player-Backwalk11
+Backwalk11
   rotate: false
   xy: 2, 2
   size: 250, 200
   orig: 250, 200
   offset: 0, 0
   index: -1
-Player-Backwalk2
+Backwalk2
   rotate: false
   xy: 2, 608
   size: 250, 200
   orig: 250, 200
   offset: 0, 0
   index: -1
-Player-Backwalk3
+Backwalk3
   rotate: false
   xy: 254, 810
   size: 250, 200
   orig: 250, 200
   offset: 0, 0
   index: -1
-Player-Backwalk4
+Backwalk4
   rotate: false
   xy: 2, 406
   size: 250, 200
   orig: 250, 200
   offset: 0, 0
   index: -1
-Player-Backwalk5
+Backwalk5
   rotate: false
   xy: 254, 608
   size: 250, 200
   orig: 250, 200
   offset: 0, 0
   index: -1
-Player-Backwalk6
+Backwalk6
   rotate: false
   xy: 506, 810
   size: 250, 200
   orig: 250, 200
   offset: 0, 0
   index: -1
-Player-Backwalk7
+Backwalk7
   rotate: false
   xy: 2, 204
   size: 250, 200
   orig: 250, 200
   offset: 0, 0
   index: -1
-Player-Backwalk8
+Backwalk8
   rotate: false
   xy: 254, 406
   size: 250, 200
   orig: 250, 200
   offset: 0, 0
   index: -1
-Player-Backwalk9
+Backwalk9
   rotate: false
   xy: 506, 608
   size: 250, 200
   orig: 250, 200
   offset: 0, 0
   index: -1
-Player-Block1
+Block1
   rotate: false
   xy: 254, 204
   size: 250, 200
   orig: 250, 200
   offset: 0, 0
   index: -1
-Player-Block2
+Block2
   rotate: false
   xy: 506, 406
   size: 250, 200
   orig: 250, 200
   offset: 0, 0
   index: -1
-Player-Block3
+Block3
   rotate: false
   xy: 758, 608
   size: 250, 200
   orig: 250, 200
   offset: 0, 0
   index: -1
-Player-Block4
+Block4
   rotate: false
   xy: 1010, 810
   size: 250, 200
   orig: 250, 200
   offset: 0, 0
   index: -1
-Player-Idle1
+Idle1
   rotate: false
   xy: 254, 2
   size: 250, 200
   orig: 250, 200
   offset: 0, 0
   index: -1
-Player-Walk1
+Walk1
   rotate: false
   xy: 506, 204
   size: 250, 200
   orig: 250, 200
   offset: 0, 0
   index: -1
-Player-Walk2
+Walk2
   rotate: false
   xy: 758, 406
   size: 250, 200
   orig: 250, 200
   offset: 0, 0
   index: -1
-Player-Walk3
+Walk3
   rotate: false
   xy: 1010, 608
   size: 250, 200
   orig: 250, 200
   offset: 0, 0
   index: -1
-Player-Walk4
+Walk4
   rotate: false
   xy: 1262, 810
   size: 250, 200
   orig: 250, 200
   offset: 0, 0
   index: -1
-Player-Walk5
+Walk5
   rotate: false
   xy: 506, 2
   size: 250, 200
   orig: 250, 200
   offset: 0, 0
   index: -1
-Player-Walk6
+Walk6
   rotate: false
   xy: 758, 204
   size: 250, 200
   orig: 250, 200
   offset: 0, 0
   index: -1
-Player-Walk7
+Walk7
   rotate: false
   xy: 1010, 406
   size: 250, 200

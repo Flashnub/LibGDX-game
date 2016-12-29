@@ -2,10 +2,11 @@ package com.mygdx.game.model.effects;
 
 import com.mygdx.game.model.characters.Character.CharacterModel;
 
-public class HealingEffect extends Effect {
+public class HealingEffect extends EntityEffect {
 	HealingEffectSettings hSettings;
+	public static final String type = "Healing";
 	
-	public HealingEffect(EffectSettings settings, EffectDataRetriever retriever) {
+	public HealingEffect(EffectSettings settings, EffectController retriever) {
 		super(settings, retriever);
 		if (settings instanceof DamageEffectSettings) {
 			this.hSettings = (HealingEffectSettings) settings;
@@ -14,12 +15,18 @@ public class HealingEffect extends Effect {
 	
 	@Override
 	protected void processDuringActive(CharacterModel target, float delta) {
-		if (hSettings.isInstantaneous) {
+		super.processDuringActive(target, delta);
+		if (hSettings.isInstantaneous()) {
 			target.addToCurrentHealth(hSettings.value);
 		}
 		else {
-			target.addToCurrentHealth((int) (hSettings.value * (delta / hSettings.duration)));
+			target.addToCurrentHealth((int) (hSettings.value * (delta / hSettings.getDuration())));
 		}
+	}
+
+	@Override
+	public String getType() {
+		return HealingEffect.type;
 	}
 
 }

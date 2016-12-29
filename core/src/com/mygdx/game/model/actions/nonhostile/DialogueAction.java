@@ -2,7 +2,7 @@ package com.mygdx.game.model.actions.nonhostile;
 
 import com.mygdx.game.model.actions.ActionSegment;
 import com.mygdx.game.model.characters.Character.CharacterModel;
-import com.mygdx.game.model.effects.Effect;
+import com.mygdx.game.model.effects.EntityEffect;
 import com.mygdx.game.model.effects.EffectInitializer;
 import com.mygdx.game.model.effects.EffectSettings;
 import com.mygdx.game.model.effects.MovementEffectSettings;
@@ -14,8 +14,8 @@ public class DialogueAction extends ActionSegment {
 	DialogueController dialogueController;
 	CharacterModel target;
 	
-	public DialogueAction(DialogueSettings dialogue, DialogueController dialogueController, CharacterModel source, CharacterModel target) {
-		super();
+	public DialogueAction(DialogueSettings dialogue, DialogueController dialogueController, ActionListener actionListener, CharacterModel source, CharacterModel target) {
+		super(actionListener);
 		this.setSource(source);
 		this.dialogue = dialogue;
 		this.dialogueController = dialogueController;
@@ -31,7 +31,7 @@ public class DialogueAction extends ActionSegment {
 	public void sourceActiveProcessWithoutSuper(CharacterModel source) {
 		if (dialogue.targetEffects != null) {
 			for (EffectSettings effectSettings : dialogue.targetEffects) {
-				Effect effect = EffectInitializer.initializeEffect(effectSettings, this);
+				EntityEffect effect = EffectInitializer.initializeEntityEffect(effectSettings, this);
 				target.addEffect(effect);
 			}
 		}
@@ -55,7 +55,7 @@ public class DialogueAction extends ActionSegment {
 
 	@Override
 	public ActionSegment cloneActionSegmentWithSourceAndTarget(CharacterModel source, CharacterModel target) {
-		return new DialogueAction(this.dialogue, this.dialogueController, source, target);
+		return new DialogueAction(this.dialogue, this.dialogueController, this.getActionListener(), source, target);
 	}
 
 	@Override
@@ -82,6 +82,12 @@ public class DialogueAction extends ActionSegment {
 	public void sourceWindupProcessWithoutSuper(CharacterModel source) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public ActionListener getActionListener() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

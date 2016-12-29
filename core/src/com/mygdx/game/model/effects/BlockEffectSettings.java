@@ -2,7 +2,6 @@ package com.mygdx.game.model.effects;
 
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.mygdx.game.model.effects.Effect.EffectType;
 
 public class BlockEffectSettings extends EffectSettings{
 
@@ -12,7 +11,7 @@ public class BlockEffectSettings extends EffectSettings{
 	public void read(Json json, JsonValue jsonData) {
 		super.read(json, jsonData);
 		perfectBlockTime = json.readValue("perfectBlockTime", Float.class, jsonData);
-		this.type = EffectType.BLOCK;
+		this.setType(BlockEffect.type);
 	}
 	
 	@Override

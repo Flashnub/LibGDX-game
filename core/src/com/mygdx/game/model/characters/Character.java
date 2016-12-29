@@ -12,7 +12,7 @@ import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.Attack;
 import com.mygdx.game.model.characters.player.Player.PlayerModel;
-import com.mygdx.game.model.effects.Effect;
+import com.mygdx.game.model.effects.EntityEffect;
 import com.mygdx.game.model.effects.MovementEffect;
 import com.mygdx.game.model.effects.MovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
@@ -81,7 +81,7 @@ public abstract class Character {
 //		boolean isProcessingMovementEffect;
 		EntityUIModel uiModel;
 		CharacterProperties properties;
-		ArrayList <Effect> currentEffects;
+		ArrayList <EntityEffect> currentEffects;
 		ArrayList <Integer> indicesToRemove;
 		ArrayList <ActionSequence> processingActionSequences;
 		ArrayDeque <ActionSequence> nextActiveActionSequences;
@@ -90,7 +90,7 @@ public abstract class Character {
 		float stateTime;
 		
 		public CharacterModel(String characterName, EntityUIModel uiModel) {
-			this.currentEffects = new ArrayList <Effect>();
+			this.currentEffects = new ArrayList <EntityEffect>();
 			this.indicesToRemove = new ArrayList<Integer>();
 			this.nextActiveActionSequences = new ArrayDeque<ActionSequence>();
 			this.processingActionSequences = new ArrayList <ActionSequence>();
@@ -236,8 +236,8 @@ public abstract class Character {
 		private void handleEffects(float delta) {
 			this.indicesToRemove.clear();
 //			//process existing effects.
-			for(Iterator<Effect> iterator = this.currentEffects.iterator(); iterator.hasNext();) {
-				Effect effect = iterator.next();
+			for(Iterator<EntityEffect> iterator = this.currentEffects.iterator(); iterator.hasNext();) {
+				EntityEffect effect = iterator.next();
 				boolean isFinished = effect.process(this, delta);
 				if (isFinished) {
 					iterator.remove();
@@ -245,7 +245,7 @@ public abstract class Character {
 			}
 		}
 		
-		public void addEffect(Effect effect) {
+		public void addEffect(EntityEffect effect) {
 			currentEffects.add(effect);
 		}
 		
@@ -260,7 +260,7 @@ public abstract class Character {
 		}
 		
 		public MovementEffect getCurrentMovement() {
-			for (Effect effect : this.currentEffects) {
+			for (EntityEffect effect : this.currentEffects) {
 				if (effect instanceof MovementEffect) {
 					return (MovementEffect) effect;
 				}
@@ -270,7 +270,7 @@ public abstract class Character {
 		
 		public boolean checkIfIntercepted(Attack attack) {
 			boolean interceptedAttack = true;
-			for (Effect effect : this.currentEffects) {
+			for (EntityEffect effect : this.currentEffects) {
 				if (effect instanceof AssaultInterceptor) {
 					AssaultInterceptor attackInterceptor = (AssaultInterceptor) effect;
 					interceptedAttack = attackInterceptor.didInterceptAttack(this, attack);
@@ -439,7 +439,7 @@ public abstract class Character {
 		private void staggerAction(MovementEffectSettings potentialMovementSettings) {
 			this.forceEndForActiveAction();
 //    		ActionSequence staggerAction = this.getCharacterProperties().getActions().get("Stagger").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());
-			ActionSequence staggerAction = ActionSequence.createStaggerSequence(this, potentialMovementSettings);
+			ActionSequence staggerAction = ActionSequence.createStaggerSequence(this, potentialMovementSettings, this.actionListener);
     		this.addActionSequence(staggerAction);
     		this.setCurrentStability(this.maxStability, null);
 
@@ -448,7 +448,7 @@ public abstract class Character {
 		public void shouldProjectileHit(Projectile projectile) {
 			if (!isImmuneToInjury()) {
 				boolean didInterceptAttack = false;
-				for (Effect effect : this.currentEffects) {
+				for (EntityEffect effect : this.currentEffects) {
 					if (effect instanceof AssaultInterceptor) {
 						didInterceptAttack = ((AssaultInterceptor) effect).didInterceptProjectile(this, projectile);
 						break;
@@ -463,7 +463,7 @@ public abstract class Character {
 		public void shouldExplosionHit(Explosion explosion) {
 			if (!isImmuneToInjury) {
 				boolean didInterceptAttack = false;
-				for (Effect effect : this.currentEffects) {
+				for (EntityEffect effect : this.currentEffects) {
 					if (effect instanceof AssaultInterceptor) {
 						didInterceptAttack = ((AssaultInterceptor) effect).didInterceptExplosion(this, explosion);
 						break;
@@ -478,7 +478,7 @@ public abstract class Character {
 		public void shouldAttackHit(Attack attack) {
 			if (!isImmuneToInjury()) {
 				boolean didInterceptAttack = false;
-				for (Effect effect : this.currentEffects) {
+				for (EntityEffect effect : this.currentEffects) {
 					if (effect instanceof AssaultInterceptor) {
 						didInterceptAttack = ((AssaultInterceptor) effect).didInterceptAttack(this, attack);
 					}

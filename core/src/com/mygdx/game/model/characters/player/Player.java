@@ -187,7 +187,7 @@ public class Player extends Character implements InputProcessor {
 		}
 		
 		public void dialogueAction(String uuid) {
-			ActionSequence sequence = ActionSequence.createSequenceWithDialog(this.dialogues.getDialogueForUUID(uuid), this, null, dialogueController);
+			ActionSequence sequence = ActionSequence.createSequenceWithDialog(this.dialogues.getDialogueForUUID(uuid), this, null, dialogueController, this.getActionListener());
 			this.addActionSequence(sequence);
 		}
 	    

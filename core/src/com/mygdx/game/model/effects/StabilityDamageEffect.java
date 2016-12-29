@@ -2,11 +2,12 @@ package com.mygdx.game.model.effects;
 
 import com.mygdx.game.model.characters.Character.CharacterModel;
 
-public class StabilityDamageEffect extends Effect {
+public class StabilityDamageEffect extends EntityEffect {
 		
 	private StabilityDamageEffectSettings sEffectSettings;
+	public static final String type = "StabilityDmg";
 	
-	public StabilityDamageEffect(EffectSettings settings, EffectDataRetriever retriever) {
+	public StabilityDamageEffect(EffectSettings settings, EffectController retriever) {
 		super(settings, retriever);
 		
 		if (settings instanceof StabilityDamageEffectSettings) {
@@ -15,12 +16,17 @@ public class StabilityDamageEffect extends Effect {
 	}
 	
 	protected void processDuringActive(CharacterModel target, float delta) {
-		if (sEffectSettings.isInstantaneous) {
-			target.removeFromCurrentStability(sEffectSettings.value, retriever.getReplacementMovementForStagger());
+		if (sEffectSettings.isInstantaneous()) {
+			target.removeFromCurrentStability(sEffectSettings.value, getRetriever().getReplacementMovementForStagger());
 		}
 		else {
-			target.removeFromCurrentStability((int) (sEffectSettings.value * (delta / sEffectSettings.duration)), retriever.getReplacementMovementForStagger());
+			target.removeFromCurrentStability((int) (sEffectSettings.value * (delta / sEffectSettings.getDuration())), getRetriever().getReplacementMovementForStagger());
 		}
+	}
+
+	@Override
+	public String getType() {
+		return StabilityDamageEffect.type;
 	}
 
 }

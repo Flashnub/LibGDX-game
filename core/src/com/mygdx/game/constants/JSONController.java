@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.Json;
 import com.mygdx.game.assets.EntityUIData;
 import com.mygdx.game.model.actions.AbilitySettings;
 import com.mygdx.game.model.actions.AttackSettings;
-import com.mygdx.game.model.actions.ProjectileAttackSettings;
+import com.mygdx.game.model.actions.WorldAttackSettings;
 import com.mygdx.game.model.characters.CharacterProperties;
 import com.mygdx.game.model.characters.EntityUIDataType;
 import com.mygdx.game.model.characters.NPCProperties;
@@ -26,7 +26,7 @@ public class JSONController {
     public static HashMap<String, Item> items = loadItemsFromJSON();
     public static HashMap<String, ExplosionSettings> explosions = loadExplosionsFromJSON();
     public static HashMap<String, ProjectileSettings> projectiles = loadProjectilesFromJSON();
-    public static HashMap<String, ProjectileAttackSettings> projectileAttacks = loadProjectileAttacksFromJSON();
+    public static HashMap<String, WorldAttackSettings> projectileAttacks = loadWorldAttacksFromJSON();
     public static HashMap<String, EntityUIData> uiDatas = new HashMap<String, EntityUIData>();
     public static HashMap<String, NPCProperties> npcProperties = new HashMap<String, NPCProperties>();
   
@@ -54,9 +54,9 @@ public class JSONController {
     }
 	
 	@SuppressWarnings("unchecked")
-    private static HashMap<String, ProjectileAttackSettings> loadProjectileAttacksFromJSON() {
+    private static HashMap<String, WorldAttackSettings> loadWorldAttacksFromJSON() {
         Json json = new Json();
-        HashMap<String, ProjectileAttackSettings> settings = json.fromJson(HashMap.class, Gdx.files.internal(globalFilePath + "projectileAttacks.json"));
+        HashMap<String, WorldAttackSettings> settings = json.fromJson(HashMap.class, Gdx.files.internal(globalFilePath + "worldAttacks.json"));
         return settings;
     }
     

@@ -55,7 +55,7 @@ public class ActionSequence implements Serializable {
 //		}
 //	}
 //	
-	public static ActionSequence createSequenceWithDialog(DialogueSettings settings, CharacterModel source, CharacterModel target, DialogueController dialogueController) {
+	public static ActionSequence createSequenceWithDialog(DialogueSettings settings, CharacterModel source, CharacterModel target, DialogueController dialogueController, ActionListener actionListener) {
 		ActionSequence sequence = new ActionSequence();
 		boolean hasState = settings.getActingState().equals(DialogueSettings.defaultState);
 		sequence.actionKey = new ActionSegmentKey(
@@ -75,7 +75,8 @@ public class ActionSequence implements Serializable {
 		sequence.source = source;
 		sequence.target = target;
 		sequence.dialogueController = dialogueController;
-		
+		sequence.actionListener = actionListener;
+
 		sequence.createActionFromSettings(settings, null);
 		
 		return sequence;
@@ -83,7 +84,7 @@ public class ActionSequence implements Serializable {
 	
 	static final String staggerKey = "Stagger";
 	
-	public static ActionSequence createStaggerSequence(CharacterModel source, MovementEffectSettings overridingMovement) {
+	public static ActionSequence createStaggerSequence(CharacterModel source, MovementEffectSettings overridingMovement, ActionListener actionListener) {
 		ActionSequence sequence = new ActionSequence();
 		sequence.actionKey = new ActionSegmentKey(new StringWrapper(ActionSequence.staggerKey), ActionType.Stagger);
 		sequence.isActive = true;
@@ -99,6 +100,7 @@ public class ActionSequence implements Serializable {
 		sequence.useLeft = source.isFacingLeft();
 		
 		sequence.source = source;
+		sequence.actionListener = actionListener;
 		
 		sequence.createActionFromSettings(null, overridingMovement);
 			
@@ -240,7 +242,7 @@ public class ActionSequence implements Serializable {
 	}
 	
 	public void process(float delta, ActionListener actionListener) {
-		this.action.update(delta, actionListener);
+		this.action.update(delta);
 		if (this.isActive) {
 			source.shouldUnlockControls(this);
 			if (action.didChangeState) {
@@ -269,19 +271,19 @@ public class ActionSequence implements Serializable {
 		ActionSegment action = null;
 		switch (segmentKey.getTypeOfAction()) {
 			case Attack:
-				action = new Attack(source, JSONController.attacks.get(segmentKey.getKey().value));
+				action = new Attack(source, JSONController.attacks.get(segmentKey.getKey().value), this.actionListener);
 				break;
 			case ProjectileAttack:
-				action = new ProjectileAttack(source, target, actionListener, collisionChecker, JSONController.projectileAttacks.get(segmentKey.getKey().value));
+				action = new WorldAttack(source, target, actionListener, collisionChecker, JSONController.projectileAttacks.get(segmentKey.getKey().value));
 				break;
 			case Ability:
-				action = new Ability(source, JSONController.abilities.get(segmentKey.getKey().value));
+				action = new Ability(source, JSONController.abilities.get(segmentKey.getKey().value), this.actionListener);
 				break;
 			case Stagger:
-				action = new Ability(source, JSONController.abilities.get(segmentKey.getKey().value), replacementMovement);
+				action = new Ability(source, JSONController.abilities.get(segmentKey.getKey().value), this.actionListener, replacementMovement);
 				break;
 			case Dialogue:
-				action = new DialogueAction(potentialDialogue, this.dialogueController, source, target);
+				action = new DialogueAction(potentialDialogue, this.dialogueController, this.actionListener, source, target);
 				break;
 			case Gesture:
 				break;

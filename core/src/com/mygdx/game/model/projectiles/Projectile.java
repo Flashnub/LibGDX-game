@@ -13,8 +13,8 @@ import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.characters.CollisionCheck;
 import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.characters.EntityUIDataType;
-import com.mygdx.game.model.effects.Effect;
-import com.mygdx.game.model.effects.EffectDataRetriever;
+import com.mygdx.game.model.effects.EntityEffect;
+import com.mygdx.game.model.effects.EffectController;
 import com.mygdx.game.model.effects.EffectInitializer;
 import com.mygdx.game.model.effects.EffectSettings;
 import com.mygdx.game.model.effects.MovementEffectSettings;
@@ -22,7 +22,7 @@ import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.CollisionChecker;
 import com.mygdx.game.utils.MathUtils;
 
-public class Projectile extends EntityModel implements EffectDataRetriever{
+public class Projectile extends EntityModel implements EffectController{
 	
 	private float currentTime;
 	private float activeTime;
@@ -39,7 +39,7 @@ public class Projectile extends EntityModel implements EffectDataRetriever{
 	private Array <HitTracker> charactersHit;
 
 	
-	public Projectile(String name, CharacterModel source, CharacterModel target, ActionListener actionListener, CollisionChecker collisionChecker)
+	public Projectile(String name, Vector2 origin, CharacterModel source, CharacterModel target, ActionListener actionListener, CollisionChecker collisionChecker)
 	{
 		super();
 		this.state = EntityModel.windupState;
@@ -52,8 +52,8 @@ public class Projectile extends EntityModel implements EffectDataRetriever{
 		this.widthCoefficient = this.settings.getWidthCoefficient();
 		this.heightCoefficient = this.settings.getHeightCoefficient();
 		this.acceleration.y = -this.settings.getGravity();
-		this.imageHitBox.x = source.getImageHitBox().x + (source.getImageHitBox().width / 2f) + settings.getPossibleOrigins().get(0).x;
-		this.imageHitBox.y = source.getImageHitBox().y + (source.getImageHitBox().height / 2f) + settings.getPossibleOrigins().get(0).x;
+		this.imageHitBox.x = source.getImageHitBox().x + (source.getImageHitBox().width / 2f) + origin.x;
+		this.imageHitBox.y = source.getImageHitBox().y + (source.getImageHitBox().height / 2f) + origin.y;
 		this.gameplayHitBox = this.imageHitBox;
 		this.projectileUIModel = new EntityUIModel(name, EntityUIDataType.PROJECTILE);
 		this.actionListener = actionListener;
@@ -255,7 +255,7 @@ public class Projectile extends EntityModel implements EffectDataRetriever{
 				}
 			}
 			for (EffectSettings effectSettings : settings.getTargetEffects()) {
-				Effect effect = EffectInitializer.initializeEffect(effectSettings, this);
+				EntityEffect effect = EffectInitializer.initializeEntityEffect(effectSettings, this);
 				target.addEffect(effect);
 			}
 			target.setImmuneToInjury(true);
@@ -275,7 +275,8 @@ public class Projectile extends EntityModel implements EffectDataRetriever{
 			forceCooldown = true;
 		}
 		if (shouldExplode && this.settings.getExplosionSettings() != null) {
-			Explosion explosion = new Explosion(this.getSettings().getExplosionName(), this.getSettings().getExplosionSettings(),  this.actionListener, this);
+			Vector2 explosionOrigin = new Vector2(getImageHitBox().x + (getImageHitBox().width / 2f), getImageHitBox().y + (getImageHitBox().height / 2f));
+			Explosion explosion = new Explosion(this.getSettings().getExplosionName(), this.getSettings().getExplosionSettings(),  this.actionListener, explosionOrigin, this.getAllegiance());
 			this.actionListener.addExplosion(explosion);
 		}
 	}
@@ -408,5 +409,18 @@ public class Projectile extends EntityModel implements EffectDataRetriever{
 	@Override
 	public String getState() {
 		return this.state;
+	}
+	
+	@Override
+	public ActionListener getActionListener() {
+		return this.actionListener;
+	}
+	
+	@Override
+	public Vector2 spawnOriginForChar() {
+		if (source.isFacingLeft()) {
+			return new Vector2(this.source.getImageHitBox().x + this.source.getImageHitBox().width + 100, this.source.getImageHitBox().y);
+		}
+		return new Vector2(this.source.getImageHitBox().x - 200, this.source.getImageHitBox().y);
 	}
 }

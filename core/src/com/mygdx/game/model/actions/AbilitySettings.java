@@ -10,8 +10,9 @@ import com.mygdx.game.model.effects.EffectSettings;
 import com.mygdx.game.model.effects.MovementEffectSettings;
 
 public class AbilitySettings implements Serializable {
-	Array<EffectSettings> sourceEffectSettings;
+	Array <EffectSettings> sourceEffectSettings;
 	Array <EffectSettings> windupEffectSettings;
+	
 	Float windupTime;
 	Float cooldownTime;
 	protected Float duration;

@@ -1,5 +1,6 @@
 package com.mygdx.game.model.projectiles;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Json.Serializable;
@@ -10,6 +11,7 @@ import com.mygdx.game.model.effects.EffectSettings;
 public class ExplosionSettings extends AbilitySettings implements Serializable{
 	
 	Array <EffectSettings> targetEffects;
+	Vector2 origin;
 	float widthCoefficient;
 	float heightCoefficient;
 	float hitRate;
@@ -25,6 +27,7 @@ public class ExplosionSettings extends AbilitySettings implements Serializable{
 			effectCopy.add(effectSettings.deepCopy());
 		}
 		copy.targetEffects = effectCopy;
+		copy.origin = this.origin;
 		return copy;
 	}
 	
@@ -65,6 +68,14 @@ public class ExplosionSettings extends AbilitySettings implements Serializable{
 		else {
 			this.heightCoefficient = 1f;
 		}
+	}
+	
+	public Vector2 getOrigin() {
+		return origin;
+	}
+
+	public void setOrigin(Vector2 origin) {
+		this.origin = origin;
 	}
 
 	public Array<EffectSettings> getTargetEffects() {

@@ -67,7 +67,7 @@ public class NPCCharacter extends Character{
 		
 		private void processDialogueRequest(CharacterModel target) {
 			//Make ActionSequence for dialogue.
-			ActionSequence dialogueAction = ActionSequence.createSequenceWithDialog(npcProperties.getNextStoryDialogue(), this, target, this.controller);
+			ActionSequence dialogueAction = ActionSequence.createSequenceWithDialog(npcProperties.getNextStoryDialogue(), this, target, this.controller, this.actionListener);
 			System.out.println("Adding dialogue");
 			this.addActionSequence(dialogueAction);
 
@@ -75,7 +75,7 @@ public class NPCCharacter extends Character{
 		
 		private void processDialogueRequestWithUUID(CharacterModel target, String UUIDForDialogue) {
 			//Make ActionSequence for dialogue.
-			ActionSequence dialogueAction = ActionSequence.createSequenceWithDialog(npcProperties.getSpecificExternalConditionalDialogue(UUIDForDialogue), this, target, this.controller);
+			ActionSequence dialogueAction = ActionSequence.createSequenceWithDialog(npcProperties.getSpecificExternalConditionalDialogue(UUIDForDialogue), this, target, this.controller, this.actionListener);
 			this.addActionSequence(dialogueAction);
 		}
 		

@@ -26,6 +26,7 @@ import com.mygdx.game.model.events.CollisionChecker;
 import com.mygdx.game.model.events.DialogueListener;
 import com.mygdx.game.model.events.ObjectListener;
 import com.mygdx.game.model.events.SaveListener;
+import com.mygdx.game.model.globalEffects.WorldEffect;
 import com.mygdx.game.model.projectiles.Explosion;
 import com.mygdx.game.model.projectiles.Projectile;
 import com.mygdx.game.model.worldObjects.WorldObject;
@@ -54,6 +55,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     DialogueController dialogueController;
     InputMultiplexer inputHandlers;
     Array <Rectangle> additionalRectangles;
+    Array <WorldEffect> worldEffects;
     float stateTime;
     
     public WorldModel(TiledMapTileLayer collisionLayer) {
@@ -66,6 +68,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     	nearbyNPCs = new Array <NPCCharacter>();
     	explosions = new Array <Explosion> ();
     	this.additionalRectangles = new Array <Rectangle>();
+    	this.worldEffects = new Array <WorldEffect>();
     	this.collisionLayer = collisionLayer;
     	saveController = new SaveController();
     	stateTime = 0f;
@@ -218,6 +221,10 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     			Explosion explosion = explosions.get(i);
     			explosion.update(timeForAction);
     		}
+    		for (int i = 0; i < worldEffects.size; i++) {
+    			WorldEffect effect = worldEffects.get(i);
+    			effect.process(delta);
+    		}
     		accumulatedTime -= timeForAction;
         }
 
@@ -265,6 +272,21 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	@Override
 	public void deleteExplosion(Explosion explosion) {
 		this.explosions.removeValue(explosion, true);
+	}
+	
+	@Override
+	public void spawnCharacter(String characterName, String characterType, float originX, float originY) {
+		Character character = this.getCharacterFromString(characterName, characterType);
+		if (character != null) {
+			if (character instanceof Enemy){
+				Enemy enemy = (Enemy) character;
+				this.addEnemy(enemy, originX, originY);
+			}
+			else if (character instanceof NPCCharacter) {
+				NPCCharacter npc = (NPCCharacter) character;
+				this.addNPC(npc, originX, originY);
+			}
+		}
 	}
 
 	@Override
@@ -332,6 +354,13 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 		}
 	}
 	
+	@Override
+	public void addWorldEffect(WorldEffect worldEffect) {
+		if (worldEffect != null && this.worldEffects != null && !worldEffects.contains(worldEffect, true)) {
+			worldEffects.add(worldEffect);
+		}
+	}
+
 	@Override
 	public void addObjectToWorld(WorldObject object) {
 		if (object != null && objects != null && !objects.contains(object, true)) {
@@ -535,6 +564,9 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	public Array<Explosion> getExplosions() {
 		return explosions;
 	}
+
+
+
 
 
 

@@ -5,7 +5,7 @@ import java.util.Iterator;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.characters.Character.CharacterModel;
-import com.mygdx.game.model.effects.Effect;
+import com.mygdx.game.model.effects.EntityEffect;
 import com.mygdx.game.model.effects.EffectSettings;
 import com.mygdx.game.model.effects.MovementEffectSettings;
 import com.mygdx.game.model.effects.EffectInitializer;
@@ -16,17 +16,17 @@ public class Attack extends ActionSegment {
 	Rectangle hitBox;
 	int allegiance;
 	AttackSettings attackSettings;
-	Array <Effect> activeSourceEffects;
-	Array <Effect> windupSourceEffects;
+	Array <EntityEffect> activeSourceEffects;
+	Array <EntityEffect> windupSourceEffects;
 	Array <HitTracker> alreadyHitCharacters;
 	
-	public Attack(CharacterModel source, AttackSettings settings) {
-		super();
+	public Attack(CharacterModel source, AttackSettings settings, ActionListener listener) {
+		super(listener);
 		this.source = source;
 		this.allegiance = source.getAllegiance();
 		this.attackSettings = settings.deepCopy();
-		this.activeSourceEffects = new Array <Effect>();
-		this.windupSourceEffects = new Array <Effect>();
+		this.activeSourceEffects = new Array <EntityEffect>();
+		this.windupSourceEffects = new Array <EntityEffect>();
 		this.alreadyHitCharacters = new Array<HitTracker>();
 		if (source.isFacingLeft()) {
 			this.hitBox = new Rectangle(source.getGameplayHitBox().x + settings.originX - 10, source.getGameplayHitBox().y + settings.originY, -settings.width, settings.height);
@@ -44,7 +44,7 @@ public class Attack extends ActionSegment {
 		}
 		if (!target.checkIfIntercepted(this)) {
 			for (EffectSettings effectSettings : this.attackSettings.targetEffectSettings) {
-				Effect effect = EffectInitializer.initializeEffect(effectSettings, this);
+				EntityEffect effect = EffectInitializer.initializeEntityEffect(effectSettings, this);
 				target.addEffect(effect);
 			}
 		}
@@ -53,7 +53,7 @@ public class Attack extends ActionSegment {
 	
 	@Override
 	public ActionSegment cloneActionSegmentWithSourceAndTarget(CharacterModel source, CharacterModel target) {
-		Attack attack = new Attack(source, attackSettings);
+		Attack attack = new Attack(source, attackSettings, this.actionListener);
 		return attack;
 	}
 	
@@ -73,7 +73,7 @@ public class Attack extends ActionSegment {
 	
 	public void sourceActiveProcessWithoutSuper(CharacterModel source) {
 		for (EffectSettings effectSettings : attackSettings.sourceEffectSettings) {
-			Effect effect = EffectInitializer.initializeEffect(effectSettings, this);
+			EntityEffect effect = EffectInitializer.initializeEntityEffect(effectSettings, this);
 			source.addEffect(effect);
 			activeSourceEffects.add(effect);
 		}
@@ -81,7 +81,7 @@ public class Attack extends ActionSegment {
 	
 	public void sourceWindupProcessWithoutSuper(CharacterModel source) {
 		for (EffectSettings effectSettings : attackSettings.windupEffectSettings) {
-			Effect effect = EffectInitializer.initializeEffect(effectSettings, this);
+			EntityEffect effect = EffectInitializer.initializeEntityEffect(effectSettings, this);
 			source.addEffect(effect);
 			windupSourceEffects.add(effect);
 		}
@@ -119,10 +119,10 @@ public class Attack extends ActionSegment {
 	
 	@Override
 	public void interruptionBlock() {
-		for(Effect effect : this.activeSourceEffects) {
+		for(EntityEffect effect : this.activeSourceEffects) {
 			effect.setForceEnd(true);
 		}
-		for (Effect effect : this.windupSourceEffects) {
+		for (EntityEffect effect : this.windupSourceEffects) {
 			effect.setForceEnd(true);
 		}
 	}
@@ -165,5 +165,7 @@ public class Attack extends ActionSegment {
 		}
 		return mSettings;
 	}
+
+
 
 }

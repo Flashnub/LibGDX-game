@@ -7,6 +7,7 @@ import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.actions.AbilitySettings;
 import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.effects.EffectSettings;
+import com.mygdx.game.model.globalEffects.WorldEffectSettings;
 import com.badlogic.gdx.utils.JsonValue;
 
 public class ProjectileSettings extends AbilitySettings{
@@ -14,6 +15,7 @@ public class ProjectileSettings extends AbilitySettings{
 	private Boolean disappearOnImpact;
 	private String explosionName;
 	private ExplosionSettings explosionSettings;
+	private Array <WorldEffectSettings> worldEffectSettings;
 	private Boolean bounces;
 	private Boolean tracks; //shouldn't be used with smartAim/bounces/hasCollisionDetection.
 	private Boolean useSmartAim;
@@ -25,7 +27,7 @@ public class ProjectileSettings extends AbilitySettings{
 	private Float cooldownSpeed;
 	private Float gravity;
 	private Vector2 size;
-	private Array<Vector2> possibleOrigins;
+	private Vector2 origin;
 	private Float angleOfVelocity; //use this to fire projectile in a direction rather than at a target.
 	private Float widthCoefficient;
 	private Float heightCoefficient;
@@ -47,11 +49,16 @@ public class ProjectileSettings extends AbilitySettings{
 		copy.cooldownSpeed = this.cooldownSpeed;
 		copy.gravity = this.gravity;
 		copy.size = this.size;
-		copy.possibleOrigins = this.possibleOrigins;
+		copy.origin = this.origin;
 		copy.angleOfVelocity = this.angleOfVelocity;
 		copy.explosionName = this.explosionName;
 		copy.widthCoefficient = this.widthCoefficient;
 		copy.heightCoefficient = this.heightCoefficient;
+		
+		Array <WorldEffectSettings> newWorldEffects = new Array <WorldEffectSettings>();
+		for (WorldEffectSettings wSettings : this.worldEffectSettings) {
+			newWorldEffects.add(wSettings.deepCopy());
+		}
 		
 		Array <EffectSettings> newTargetEffects = new Array <EffectSettings>();
 		for(EffectSettings eSettings : targetEffects) {
@@ -80,7 +87,7 @@ public class ProjectileSettings extends AbilitySettings{
 		json.writeValue("speed", activeSpeed);
 		json.writeValue("gravity", gravity);
 		json.writeValue("size", size);
-		json.writeValue("possibleOrigins", possibleOrigins);
+		json.writeValue("possibleOrigins", origin);
 		json.writeValue("targetEffects", targetEffects);
 		json.writeValue("angleOfVelocity", angleOfVelocity);
 		json.writeValue("widthCoefficient", widthCoefficient);
@@ -100,15 +107,6 @@ public class ProjectileSettings extends AbilitySettings{
 		activeSpeed = json.readValue("activeSpeed", Float.class, jsonData);
 		angleOfVelocity = json.readValue("angleOfVelocity", Float.class, jsonData);
 		size = json.readValue("size", Vector2.class, jsonData);
-		
-		Array <Vector2> possibleOrigins = json.readValue("possibleOrigins", Array.class, jsonData);
-		if (possibleOrigins != null) {
-			this.possibleOrigins = possibleOrigins;
-		}
-		else {
-			this.possibleOrigins = new Array<Vector2>();
-			this.possibleOrigins.add(new Vector2(0, 0));
-		}
 		
 		Float gravity = json.readValue("gravity", Float.class, jsonData);
 		if (gravity != null) {
@@ -167,6 +165,16 @@ public class ProjectileSettings extends AbilitySettings{
 		
 	}
 	
+	
+	
+	public Vector2 getOrigin() {
+		return origin;
+	}
+
+	public void setOrigin(Vector2 possibleOrigin) {
+		this.origin = possibleOrigin;
+	}
+
 	public void disableGravity() {
 		this.gravity = 0f;
 	}
@@ -218,10 +226,6 @@ public class ProjectileSettings extends AbilitySettings{
 
 	public Vector2 getSize() {
 		return size;
-	}
-
-	public Array<Vector2> getPossibleOrigins() {
-		return possibleOrigins;
 	}
 
 	public Float getAngleOfVelocity() {

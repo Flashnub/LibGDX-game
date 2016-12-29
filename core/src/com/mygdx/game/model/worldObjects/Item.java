@@ -6,10 +6,10 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Json.Serializable;
 import com.badlogic.gdx.utils.JsonValue;
 import com.mygdx.game.model.characters.Character;
-import com.mygdx.game.model.effects.Effect;
+import com.mygdx.game.model.effects.EntityEffect;
 
 public class Item implements Serializable{
-	ArrayList<Effect> effects;
+	ArrayList<EntityEffect> effects;
 	String name;
 	String desc;
 	
@@ -19,7 +19,7 @@ public class Item implements Serializable{
 	
 	
 	public void use(Character owner) {
-		for (Effect effect : effects) {
+		for (EntityEffect effect : effects) {
 			owner.getCharacterData().addEffect(effect);
 		}
 	}

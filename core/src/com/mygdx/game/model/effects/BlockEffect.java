@@ -8,12 +8,13 @@ import com.mygdx.game.model.events.AssaultInterceptor;
 import com.mygdx.game.model.projectiles.Explosion;
 import com.mygdx.game.model.projectiles.Projectile;
 
-public class BlockEffect extends Effect implements AssaultInterceptor{
+public class BlockEffect extends EntityEffect implements AssaultInterceptor{
 	
 	boolean isPerfect;
 	BlockEffectSettings bSettings;
+	public static final String type = "Block";
 
-	public BlockEffect(EffectSettings settings, EffectDataRetriever retriever) {
+	public BlockEffect(EffectSettings settings, EffectController retriever) {
 		super(settings, retriever);
 		if (settings instanceof BlockEffectSettings) {
 			bSettings = (BlockEffectSettings) settings;
@@ -23,6 +24,7 @@ public class BlockEffect extends Effect implements AssaultInterceptor{
 
 	@Override
 	protected void processDuringActive(CharacterModel target, float delta) {
+		super.processDuringActive(target, delta);
 		if (isPerfect && isActive && this.getActiveTime() > this.bSettings.perfectBlockTime) {
 			isPerfect = false;
 		}
@@ -81,6 +83,11 @@ public class BlockEffect extends Effect implements AssaultInterceptor{
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public String getType() {
+		return BlockEffect.type;
 	}
 
 

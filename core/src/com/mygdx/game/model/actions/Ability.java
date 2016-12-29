@@ -2,7 +2,7 @@ package com.mygdx.game.model.actions;
 
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.characters.Character.CharacterModel;
-import com.mygdx.game.model.effects.Effect;
+import com.mygdx.game.model.effects.EntityEffect;
 import com.mygdx.game.model.effects.EffectSettings;
 import com.mygdx.game.model.effects.MovementEffectSettings;
 import com.mygdx.game.model.effects.EffectInitializer;
@@ -10,19 +10,19 @@ import com.mygdx.game.model.events.ActionListener;
 
 public class Ability extends ActionSegment{
 	AbilitySettings settings;
-	Array <Effect> activeSourceEffects;
-	Array <Effect> windupSourceEffects;
+	Array <EntityEffect> activeSourceEffects;
+	Array <EntityEffect> windupSourceEffects;
 	
-	public Ability(CharacterModel source, AbilitySettings settings) {
-		super();
+	public Ability(CharacterModel source, AbilitySettings settings, ActionListener listener) {
+		super(listener);
 		this.settings = settings.deepCopy();
 		this.source = source;
-		this.activeSourceEffects = new Array <Effect>();
-		this.windupSourceEffects = new Array <Effect>();
+		this.activeSourceEffects = new Array <EntityEffect>();
+		this.windupSourceEffects = new Array <EntityEffect>();
 	}
 	
-	public Ability(CharacterModel source, AbilitySettings settings, MovementEffectSettings replacementMovement) {
-		this(source, settings);
+	public Ability(CharacterModel source, AbilitySettings settings, ActionListener listener, MovementEffectSettings replacementMovement) {
+		this(source, settings, listener);
 		this.settings.replaceMovementIfNecessary(replacementMovement);
 	}
 	
@@ -34,7 +34,7 @@ public class Ability extends ActionSegment{
 	
 	public void sourceActiveProcessWithoutSuper(CharacterModel source) {
 		for (EffectSettings effectSettings : settings.sourceEffectSettings) {
-			Effect effect = EffectInitializer.initializeEffect(effectSettings, this);
+			EntityEffect effect = EffectInitializer.initializeEntityEffect(effectSettings, this);
 			source.addEffect(effect);
 			activeSourceEffects.add(effect);
 		}
@@ -42,7 +42,7 @@ public class Ability extends ActionSegment{
 	
 	public void sourceWindupProcessWithoutSuper(CharacterModel source) {
 		for (EffectSettings effectSettings : settings.windupEffectSettings) {
-			Effect effect = EffectInitializer.initializeEffect(effectSettings, this);
+			EntityEffect effect = EffectInitializer.initializeEntityEffect(effectSettings, this);
 			source.addEffect(effect);
 			windupSourceEffects.add(effect);
 		}
@@ -65,7 +65,7 @@ public class Ability extends ActionSegment{
 
 	@Override
 	public ActionSegment cloneActionSegmentWithSourceAndTarget(CharacterModel source, CharacterModel target) {
-		Ability ability = new Ability (source, settings);
+		Ability ability = new Ability (source, settings, this.actionListener);
 		return ability;
 	}
 
@@ -79,16 +79,21 @@ public class Ability extends ActionSegment{
 
 	@Override
 	public void interruptionBlock() {
-		for(Effect effect : this.activeSourceEffects) {
+		for(EntityEffect effect : this.activeSourceEffects) {
 			effect.setForceEnd(true);
 		}
-		for (Effect effect : this.windupSourceEffects) {
+		for (EntityEffect effect : this.windupSourceEffects) {
 			effect.setForceEnd(true);
 		}
 	}
 
 	@Override
 	public MovementEffectSettings getReplacementMovementForStagger() {
+		return null;
+	}
+
+	@Override
+	public ActionListener getActionListener() {
 		return null;
 	}
 

@@ -1,10 +1,11 @@
 package com.mygdx.game.model.actions;
 
+import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.model.characters.Character.CharacterModel;
-import com.mygdx.game.model.effects.EffectDataRetriever;
+import com.mygdx.game.model.effects.EffectController;
 import com.mygdx.game.model.events.ActionListener;
 
-public abstract class ActionSegment implements EffectDataRetriever {
+public abstract class ActionSegment implements EffectController {
 	
 	public enum ActionState {
 		WINDUP, ACTION, COOLDOWN
@@ -22,6 +23,7 @@ public abstract class ActionSegment implements EffectDataRetriever {
 	CharacterModel source;
 	ActionState actionState;
 	float activeTime;
+	ActionListener actionListener;
 	
 	public ActionSegment() {
 		forceEnd = false;
@@ -29,6 +31,11 @@ public abstract class ActionSegment implements EffectDataRetriever {
 		hasProcessedActiveSource = false;
 		hasProcessedWindupSource = false;
 		activeTime = 0f;
+	}
+	
+	public ActionSegment(ActionListener listener) {
+		this();
+		this.actionListener = listener;
 	}
 
 	public void sourceActiveProcess(CharacterModel source) {
@@ -47,7 +54,7 @@ public abstract class ActionSegment implements EffectDataRetriever {
 	}
 	
 	
-	public void update(float delta, ActionListener actionListener) {
+	public void update(float delta) {
 		if (this.currentTime == null) {
 			this.currentTime = 0f;
 		}
@@ -101,6 +108,19 @@ public abstract class ActionSegment implements EffectDataRetriever {
 		return ActionSegment.CombatPriority;
 	}
 
+
+	@Override
+	public ActionListener getActionListener() {
+		return this.actionListener;
+	}
+	
+	@Override
+	public Vector2 spawnOriginForChar() {
+		if (source.isFacingLeft()) {
+			return new Vector2(this.source.getImageHitBox().x + this.source.getImageHitBox().width + 100, this.source.getImageHitBox().y);
+		}
+		return new Vector2(this.source.getImageHitBox().x - 200, this.source.getImageHitBox().y);
+	}
 	
 	public abstract void sendActionToListener(ActionListener actionListener, float delta);
 	public abstract void sourceActiveProcessWithoutSuper(CharacterModel source);

@@ -1,0 +1,15 @@
+{
+	"BasicProjectileAttack": {
+		"class": com.mygdx.game.model.actions.WorldAttackSettings,
+		"abilitySettingKey": "BasicProjectileAttack",
+		"worldEffectSettings": [
+			{
+				"class": com.mygdx.game.model.globalEffects.ProjectileCreateEffectSettings,
+				"projectileSettingKey": {
+					"class": com.mygdx.game.wrappers.StringWrapper,
+					"value": "Basic"
+				}
+			}
+		]
+	}
+}

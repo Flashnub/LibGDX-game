@@ -3,56 +3,58 @@ package com.mygdx.game.model.effects;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Json.Serializable;
-import com.mygdx.game.model.effects.Effect.EffectType;
 
 public abstract class EffectSettings implements Serializable {
 	int value;
-	Float duration;
-	Boolean isInstantaneous;
-	float delayToActivate;
+	private Float duration;
+	private Boolean isInstantaneous;
+	private float delayToActivate;
 	Boolean isPermanent;
-	EffectType type;
+	private String type;
 	
 	@Override
 	public void write(Json json) {
-		json.writeValue("isInstantaneous", isInstantaneous);
-		json.writeValue("duration", duration);
-		json.writeValue("delayToActivate", delayToActivate);
+		json.writeValue("isInstantaneous", isInstantaneous());
+		json.writeValue("duration", getDuration());
+		json.writeValue("delayToActivate", getDelayToActivate());
 		json.writeValue("value", value);
+		json.writeValue("isPermanent", isPermanent);
+		json.writeValue("type", type);
+
 	}
 	
 	
 	@Override
 	public void read(Json json, JsonValue jsonData) {
-		isInstantaneous = json.readValue("isInstantaneous", Boolean.class, jsonData);
-		if (isInstantaneous == null || isInstantaneous.booleanValue() == true) {
-			isInstantaneous = true;
-			duration = 0f;
-			delayToActivate = 0f;
+		setIsInstantaneous(json.readValue("isInstantaneous", Boolean.class, jsonData));
+		if (isInstantaneous() == null || isInstantaneous().booleanValue() == true) {
+			setIsInstantaneous(true);
+			setDuration(0f);
+			setDelayToActivate(0f);
 			isPermanent = false;
 		}
 		else {
-			isInstantaneous = false;
+			setIsInstantaneous(false);
 			Boolean isPermanent = json.readValue("isPermanent", Boolean.class, jsonData);
 			Float duration = json.readValue("duration", Float.class, jsonData);
 			if (isPermanent != null && isPermanent.booleanValue()) {
-				this.duration = Float.MAX_VALUE;
+				this.setDuration(Float.MAX_VALUE);
 				this.isPermanent = true;
 			}
 			else if (duration != null) {
-				this.duration = duration;
+				this.setDuration(duration);
 			}
 			else {
-				this.duration = 0.5f;
+				this.setDuration(0.5f);
 			}
 			
 			Float delayToActivate = json.readValue("delayToActivate", Float.class, jsonData);
 			if (delayToActivate != null) {
-				this.delayToActivate = delayToActivate;
+				this.setDelayToActivate(delayToActivate);
 			}
 			else 
 			{
-				this.delayToActivate = 0f;
+				this.setDelayToActivate(0f);
 			}
 		}
 		value = json.readValue("value", Integer.class, jsonData);
@@ -61,11 +63,51 @@ public abstract class EffectSettings implements Serializable {
 	public abstract EffectSettings deepCopy();	
 	
 	public void setBaseFieldsForSettings(EffectSettings settings) {
-		settings.duration = this.duration;
-		settings.delayToActivate = this.delayToActivate;
-		settings.isInstantaneous = this.isInstantaneous;
+		settings.setDuration(this.getDuration());
+		settings.setDelayToActivate(this.getDelayToActivate());
+		settings.setIsInstantaneous(this.isInstantaneous());
 		settings.isPermanent = this.isPermanent;
-		settings.type = this.type;
+		settings.setType(this.getType());
 		settings.value = this.value;
+	}
+
+
+	public String getType() {
+		return type;
+	}
+
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+
+	public float getDelayToActivate() {
+		return delayToActivate;
+	}
+
+
+	public void setDelayToActivate(float delayToActivate) {
+		this.delayToActivate = delayToActivate;
+	}
+
+
+	public Boolean isInstantaneous() {
+		return isInstantaneous;
+	}
+
+
+	public void setIsInstantaneous(Boolean isInstantaneous) {
+		this.isInstantaneous = isInstantaneous;
+	}
+
+
+	public Float getDuration() {
+		return duration;
+	}
+
+
+	public void setDuration(Float duration) {
+		this.duration = duration;
 	}
 }

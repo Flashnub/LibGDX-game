@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.mygdx.game.model.effects.EffectSettings;
-import com.mygdx.game.model.effects.Effect.EffectType;
 
 public class MovementEffectSettings extends EffectSettings {	
 	Vector2 maxVelocity;
@@ -43,7 +42,7 @@ public class MovementEffectSettings extends EffectSettings {
 		}
 		maxVelocity = new Vector2(maxVelocityX, maxVelocityY);
 		
-		this.type = EffectType.MOVEMENT;
+		this.setType(MovementEffect.type);
 		
 		
 	}
@@ -61,8 +60,8 @@ public class MovementEffectSettings extends EffectSettings {
 	}
 
 	public float getEstimatedDistance() {
-		float xDistance = (velocity.x * duration) + (0.5f * acceleration.x * duration * duration);
-		float yDistance = (velocity.y * duration) + (0.5f * acceleration.y * duration * duration);
+		float xDistance = (velocity.x * getDuration()) + (0.5f * acceleration.x * getDuration() * getDuration());
+		float yDistance = (velocity.y * getDuration()) + (0.5f * acceleration.y * getDuration() * getDuration());
 		
 		return (float) Math.sqrt(((xDistance * xDistance) + (yDistance * yDistance)));
 	}

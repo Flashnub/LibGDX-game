@@ -3,12 +3,13 @@ package com.mygdx.game.model.effects;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 
-public class MovementEffect extends Effect {
+public class MovementEffect extends EntityEffect {
 
 	Vector2 oldAccel;
 	MovementEffectSettings mSettings;	
+	public static final String type = "Movement";
 	
-	public MovementEffect(EffectSettings settings, EffectDataRetriever retriever) {
+	public MovementEffect(EffectSettings settings, EffectController retriever) {
 		super(settings, retriever);
 		oldAccel = new Vector2();
 		if (settings instanceof MovementEffectSettings) {
@@ -60,6 +61,11 @@ public class MovementEffect extends Effect {
 	
 	public Vector2 getMaxVelocity() {
 		return mSettings.maxVelocity;
+	}
+
+	@Override
+	public String getType() {
+		return MovementEffect.type;
 	}
 
 }

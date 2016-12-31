@@ -3,17 +3,16 @@ package com.mygdx.game.model.globalEffects;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.mygdx.game.wrappers.StringWrapper;
 
 public class ExplosionCreateEffectSettings extends WorldEffectSettings{
 
-	StringWrapper explosionKey;
+	String explosionKey;
 	Vector2 origin;
 	
 	@Override
 	public WorldEffectSettings deepCopy() {
 		ExplosionCreateEffectSettings copy = new ExplosionCreateEffectSettings();
-		copy.setBaseFieldsForSettings(this);
+		this.setBaseFieldsForSettings(copy);
 		copy.explosionKey = this.explosionKey;
 		copy.origin = this.origin;
 		return copy;
@@ -30,7 +29,7 @@ public class ExplosionCreateEffectSettings extends WorldEffectSettings{
 	@Override
 	public void read(Json json, JsonValue jsonData) {
 		super.read(json, jsonData);
-		explosionKey = json.readValue("explosionKey", StringWrapper.class, jsonData);
+		explosionKey = json.readValue("explosionKey", String.class, jsonData);
 		Vector2 origin = json.readValue("origin", Vector2.class, jsonData);
 		if (origin != null) {
 			this.origin = origin; 

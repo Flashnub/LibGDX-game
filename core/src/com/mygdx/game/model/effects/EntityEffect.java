@@ -57,11 +57,6 @@ public abstract class EntityEffect extends Effect {
 		return this.getCurrentTime() - this.settings.getDelayToActivate();
 	}
 
-	
-	public float getCurrentTime() {
-		return getCurrentTime();
-	}
-
 	public void setForceEnd(boolean forceEnd) {
 		this.forceEnd = forceEnd;
 	}

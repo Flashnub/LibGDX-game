@@ -3,7 +3,6 @@ package com.mygdx.game.model.projectiles;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
-import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.actions.AbilitySettings;
 import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.effects.EffectSettings;
@@ -14,7 +13,6 @@ public class ProjectileSettings extends AbilitySettings{
 	
 	private Boolean disappearOnImpact;
 	private String explosionName;
-	private ExplosionSettings explosionSettings;
 	private Array <WorldEffectSettings> worldEffectSettings;
 	private Boolean bounces;
 	private Boolean tracks; //shouldn't be used with smartAim/bounces/hasCollisionDetection.
@@ -32,11 +30,11 @@ public class ProjectileSettings extends AbilitySettings{
 	private Float widthCoefficient;
 	private Float heightCoefficient;
 	private Float hitRate;
+	private Boolean shouldRotate;
 
 	public ProjectileSettings deepCopy() {
 		ProjectileSettings copy = new ProjectileSettings();
 		copy.setFieldsWithAbilitySettings(super.deepCopy());
-		copy.explosionSettings = this.explosionSettings.deepCopy();
 		copy.hitRate = this.hitRate;
 		copy.disappearOnImpact = this.disappearOnImpact;
 		copy.bounces = this.bounces;
@@ -59,6 +57,7 @@ public class ProjectileSettings extends AbilitySettings{
 		for (WorldEffectSettings wSettings : this.worldEffectSettings) {
 			newWorldEffects.add(wSettings.deepCopy());
 		}
+		copy.worldEffectSettings = newWorldEffects;
 		
 		Array <EffectSettings> newTargetEffects = new Array <EffectSettings>();
 		for(EffectSettings eSettings : targetEffects) {
@@ -75,7 +74,6 @@ public class ProjectileSettings extends AbilitySettings{
 
 	public void write(Json json) {
 		super.write(json);
-		json.writeValue("explosionSettings", explosionSettings);
 		json.writeValue("disappearOnImpact", disappearOnImpact);
 		json.writeValue("bounces", bounces);
 		json.writeValue("tracks", tracks);
@@ -92,6 +90,7 @@ public class ProjectileSettings extends AbilitySettings{
 		json.writeValue("angleOfVelocity", angleOfVelocity);
 		json.writeValue("widthCoefficient", widthCoefficient);
 		json.writeValue("heightCoefficient", heightCoefficient);
+		json.writeValue("worldEffectSettings", worldEffectSettings);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -132,13 +131,6 @@ public class ProjectileSettings extends AbilitySettings{
 			this.cooldownSpeed = activeSpeed;
 		}
 		
-		String explosionName = json.readValue("explosionName", String.class, jsonData);
-		if (explosionName != null) {
-			this.explosionName = explosionName;
-			this.explosionSettings = JSONController.explosions.get(explosionName).deepCopy();
-		}
-		
-		
 		Float widthCoefficient = json.readValue("widthCoefficient", Float.class, jsonData);
 		if (widthCoefficient != null) {
 			this.widthCoefficient = widthCoefficient;
@@ -163,6 +155,21 @@ public class ProjectileSettings extends AbilitySettings{
 			this.hitRate = 5f;
 		}
 		
+		Array <WorldEffectSettings> worldEffectSettings = json.readValue("worldEffectSettings", Array.class, jsonData);
+		if (worldEffectSettings != null) {
+			this.worldEffectSettings = worldEffectSettings;
+		}
+		else {
+			this.worldEffectSettings = new Array <WorldEffectSettings>();
+		}
+		
+		Boolean shouldRotate = json.readValue("shouldRotate", Boolean.class, jsonData);
+		if (shouldRotate != null) {
+			this.shouldRotate = shouldRotate;
+		}
+		else {
+			this.shouldRotate = true;
+		}
 	}
 	
 	
@@ -232,10 +239,6 @@ public class ProjectileSettings extends AbilitySettings{
 		return angleOfVelocity;
 	}
 
-	public ExplosionSettings getExplosionSettings() {
-		return explosionSettings;
-	}
-
 	public String getExplosionName() {
 		return explosionName;
 	}
@@ -247,6 +250,12 @@ public class ProjectileSettings extends AbilitySettings{
 	public Float getHeightCoefficient() {
 		return heightCoefficient;
 	}
-	
-	
+
+	public Array<WorldEffectSettings> getWorldEffectSettings() {
+		return worldEffectSettings;
+	}
+
+	public Boolean getShouldRotate() {
+		return shouldRotate;
+	}
 }

@@ -5,6 +5,20 @@
 	"maxStability": 50,
 	"attack": 1,
 	actions: {
+		"BasicProjectileAttack2": {
+			"class": com.mygdx.game.model.actions.ActionSequence,
+			"actionKey": {
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": {
+					"class": com.mygdx.game.wrappers.StringWrapper,
+					"value": "BasicProjectileAttack2"
+				},
+				"typeOfAction": WorldAttack
+			}
+			"windupState": "Triangle"
+			"actingState": "Idle"
+			"cooldownState": "Circle"
+		},
 		"BasicProjectileAttack": {
 			"class": com.mygdx.game.model.actions.ActionSequence,
 			"actionKey": {
@@ -13,11 +27,11 @@
 					"class": com.mygdx.game.wrappers.StringWrapper,
 					"value": "BasicProjectileAttack"
 				},
-				"typeOfAction": ProjectileAttack
+				"typeOfAction": WorldAttack
 			}
 			"windupState": "Triangle"
 			"actingState": "Idle"
 			"cooldownState": "Circle"
-		},
+		}
 	}
 }

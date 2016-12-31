@@ -1,5 +1,6 @@
 package com.mygdx.game.model.actions;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.EffectInitializer;
@@ -31,7 +32,7 @@ public class WorldAttack extends ActionSegment{
 		worldEffects = new Array<WorldEffect>();
 		this.worldAttackSettings = settings;
 		for (WorldEffectSettings worldEffectSettings : this.worldAttackSettings.worldEffectSettings) {
-			WorldEffect effect = EffectInitializer.initializeWorldEffect(worldEffectSettings, this, collisionChecker, source, target);
+			WorldEffect effect = EffectInitializer.initializeWorldEffect(worldEffectSettings, this, collisionChecker, source, target, source.getCenteredPosition());
 			worldEffects.add(effect);
 		}
 		if (settings.getAbilitySettings() != null) {
@@ -99,30 +100,32 @@ public class WorldAttack extends ActionSegment{
 
 	@Override
 	public ActionSegment cloneActionSegmentWithSourceAndTarget(CharacterModel source, CharacterModel target) {
-		WorldAttack projAttack = new WorldAttack();
-		projAttack.source = source;
-		projAttack.target = target;
-		projAttack.actionListener = actionListener;
-		projAttack.collisionChecker = collisionChecker;
-		worldEffects = new Array<WorldEffect>();
-		projAttack.worldAttackSettings = worldAttackSettings;
+		WorldAttack worldAttack = new WorldAttack();
+		worldAttack.source = source;
+		worldAttack.target = target;
+		worldAttack.actionListener = actionListener;
+		worldAttack.collisionChecker = collisionChecker;
+		worldAttack.worldAttackSettings = worldAttackSettings;
+		Array <WorldEffect> copy = new Array <WorldEffect>();
 		for (WorldEffectSettings worldEffectSettings : this.worldAttackSettings.worldEffectSettings) {
-			WorldEffect effect = EffectInitializer.initializeWorldEffect(worldEffectSettings, this, collisionChecker, source, target);
+			Vector2 sourcePosition = new Vector2(this.source.gameplayHitBox.x + this.source.gameplayHitBox.width / 2, this.source.gameplayHitBox.y + this.source.gameplayHitBox.height / 2); 
+			WorldEffect effect = EffectInitializer.initializeWorldEffect(worldEffectSettings, this, collisionChecker, source, target, sourcePosition);
 			worldEffects.add(effect);
 		}
+		worldAttack.worldEffects = copy;
 		if (worldAttackSettings.getAbilitySettings() != null) {
 			if (worldAttackSettings.getAbilitySettings() instanceof AbilitySettings) {
-				projAttack.potentialAbility = new Ability(source, worldAttackSettings.getAbilitySettings(), this.actionListener);
+				worldAttack.potentialAbility = new Ability(source, worldAttackSettings.getAbilitySettings(), this.actionListener);
 			}
 			else if (worldAttackSettings.getAbilitySettings() instanceof AttackSettings) {
 				AttackSettings atkSettings = (AttackSettings) worldAttackSettings.getAbilitySettings();
 				Attack attack = new Attack(source, atkSettings, this.actionListener);
-				projAttack.potentialAbility = attack;
+				worldAttack.potentialAbility = attack;
 			}
 		}
 
 		
-		return projAttack;
+		return worldAttack;
 	}
 
 	@Override

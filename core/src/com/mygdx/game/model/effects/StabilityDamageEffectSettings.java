@@ -3,7 +3,7 @@ package com.mygdx.game.model.effects;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
-public class StabilityDamageEffectSettings extends EffectSettings implements WillGenerator{
+public class StabilityDamageEffectSettings extends EntityEffectSettings implements WillGenerator{
 	
 	@Override
 	public void read(Json json, JsonValue jsonData) {

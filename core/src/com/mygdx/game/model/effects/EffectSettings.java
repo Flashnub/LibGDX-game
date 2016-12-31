@@ -5,7 +5,6 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Json.Serializable;
 
 public abstract class EffectSettings implements Serializable {
-	int value;
 	private Float duration;
 	private Boolean isInstantaneous;
 	private float delayToActivate;
@@ -17,7 +16,6 @@ public abstract class EffectSettings implements Serializable {
 		json.writeValue("isInstantaneous", isInstantaneous());
 		json.writeValue("duration", getDuration());
 		json.writeValue("delayToActivate", getDelayToActivate());
-		json.writeValue("value", value);
 		json.writeValue("isPermanent", isPermanent);
 		json.writeValue("type", type);
 
@@ -57,7 +55,6 @@ public abstract class EffectSettings implements Serializable {
 				this.setDelayToActivate(0f);
 			}
 		}
-		value = json.readValue("value", Integer.class, jsonData);
 	}
 	
 	public abstract EffectSettings deepCopy();	
@@ -68,7 +65,6 @@ public abstract class EffectSettings implements Serializable {
 		settings.setIsInstantaneous(this.isInstantaneous());
 		settings.isPermanent = this.isPermanent;
 		settings.setType(this.getType());
-		settings.value = this.value;
 	}
 
 

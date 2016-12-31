@@ -1,9 +1,12 @@
 package com.mygdx.game.model.effects;
 
+import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.EffectSettings;
 import com.mygdx.game.model.events.CollisionChecker;
 import com.mygdx.game.model.globalEffects.ExplosionCreateEffect;
+import com.mygdx.game.model.globalEffects.ProjectileCreateEffect;
+import com.mygdx.game.model.globalEffects.SpawnCharacterEffect;
 import com.mygdx.game.model.globalEffects.WorldEffect;
 import com.mygdx.game.model.globalEffects.WorldEffectSettings;
 
@@ -33,11 +36,18 @@ public class EffectInitializer {
 		return effect;
 	}
 	
-	public static WorldEffect initializeWorldEffect(WorldEffectSettings settings, EffectController controller, CollisionChecker collisionChecker, CharacterModel source, CharacterModel target) {
+	public static WorldEffect initializeWorldEffect(WorldEffectSettings settings, EffectController controller, CollisionChecker collisionChecker, CharacterModel source, CharacterModel target, Vector2 originOverride) {
 		WorldEffect effect = null;
 		switch (settings.getType()) {
 		case ExplosionCreateEffect.type:
-			effect = new ExplosionCreateEffect(settings, controller, collisionChecker, source);
+			effect = new ExplosionCreateEffect(settings, controller, collisionChecker, source, originOverride);
+			break;
+		case ProjectileCreateEffect.type:
+			effect = new ProjectileCreateEffect(settings, controller, collisionChecker, source, target, originOverride);
+			break;
+		case SpawnCharacterEffect.type:
+			effect = new SpawnCharacterEffect(settings, controller, collisionChecker, source, originOverride);
+			break;
 		}
 		return effect;
 	}

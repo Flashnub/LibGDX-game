@@ -11,6 +11,7 @@ import com.mygdx.game.model.effects.EffectController;
 import com.mygdx.game.model.effects.EffectInitializer;
 import com.mygdx.game.model.effects.EffectSettings;
 import com.mygdx.game.model.effects.MovementEffectSettings;
+import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.characters.EntityUIDataType;
 import com.mygdx.game.model.characters.EntityUIModel;
@@ -28,17 +29,17 @@ public class Explosion extends EntityModel implements EffectController {
 	String state;
 	 
 	
-	public Explosion(String name, ExplosionSettings explosionSettings, ActionListener actionListener, Vector2 origin, int allegiance) {
-		this.settings = explosionSettings;
+	public Explosion(String name, ActionListener actionListener, Vector2 originOffset, int allegiance, Vector2 originOverride) {
+		this.settings = JSONController.explosions.get(name).deepCopy();
 		this.actionListener = actionListener;
 		this.currentTime = 0f;
 		this.explosionUIModel = new EntityUIModel(name, EntityUIDataType.EXPLOSION);
 		this.widthCoefficient = this.settings.getWidthCoefficient();
 		this.heightCoefficient = this.settings.getHeightCoefficient();
-//		this.imageHitBox.x = projectile.getImageHitBox().x + (projectile.getImageHitBox().width / 2f);
-//		this.imageHitBox.y = projectile.getImageHitBox().y + (projectile.getImageHitBox().height / 2f);
-		this.imageHitBox.x = origin.x;
-		this.imageHitBox.y = origin.y;
+		if (originOverride != null) {
+			this.imageHitBox.x = originOverride.x + originOffset.x;
+			this.imageHitBox.y = originOverride.y + originOffset.y;
+		}
 		UUID id = UUID.randomUUID();
 		this.uuid = id.toString();
 		this.allegiance = allegiance;

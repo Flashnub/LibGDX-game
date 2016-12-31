@@ -3,7 +3,7 @@ package com.mygdx.game.model.effects;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
-public class HealingEffectSettings extends EffectSettings {
+public class HealingEffectSettings extends EntityEffectSettings {
 	
 	@Override
 	public void read(Json json, JsonValue jsonData) {

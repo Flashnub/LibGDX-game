@@ -20,6 +20,8 @@ import com.mygdx.game.model.effects.EffectSettings;
 import com.mygdx.game.model.effects.MovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.CollisionChecker;
+import com.mygdx.game.model.globalEffects.WorldEffect;
+import com.mygdx.game.model.globalEffects.WorldEffectSettings;
 import com.mygdx.game.utils.MathUtils;
 
 public class Projectile extends EntityModel implements EffectController{
@@ -39,7 +41,7 @@ public class Projectile extends EntityModel implements EffectController{
 	private Array <HitTracker> charactersHit;
 
 	
-	public Projectile(String name, Vector2 origin, CharacterModel source, CharacterModel target, ActionListener actionListener, CollisionChecker collisionChecker)
+	public Projectile(String name, Vector2 originOffset, CharacterModel source, CharacterModel target, ActionListener actionListener, CollisionChecker collisionChecker, Vector2 originOverride)
 	{
 		super();
 		this.state = EntityModel.windupState;
@@ -52,9 +54,16 @@ public class Projectile extends EntityModel implements EffectController{
 		this.widthCoefficient = this.settings.getWidthCoefficient();
 		this.heightCoefficient = this.settings.getHeightCoefficient();
 		this.acceleration.y = -this.settings.getGravity();
-		this.imageHitBox.x = source.getImageHitBox().x + (source.getImageHitBox().width / 2f) + origin.x;
-		this.imageHitBox.y = source.getImageHitBox().y + (source.getImageHitBox().height / 2f) + origin.y;
-		this.gameplayHitBox = this.imageHitBox;
+		if (originOverride != null) {
+			this.imageHitBox.x = originOverride.x + originOffset.x;
+			this.imageHitBox.y = originOverride.y + originOffset.y;
+		}
+		else {
+			this.imageHitBox.x = source.getImageHitBox().x + (source.getImageHitBox().width / 2f) + originOffset.x;
+			this.imageHitBox.y = source.getImageHitBox().y + (source.getImageHitBox().height / 2f) + originOffset.y;
+		}
+
+		this.gameplayHitBox = new Rectangle(this.imageHitBox);
 		this.projectileUIModel = new EntityUIModel(name, EntityUIDataType.PROJECTILE);
 		this.actionListener = actionListener;
 		this.setCollisionChecker(collisionChecker);
@@ -85,7 +94,7 @@ public class Projectile extends EntityModel implements EffectController{
 		else {
 			moveWithoutCollisionDetection(delta);
 		}
-		projectileUIModel.setCurrentFrame(this, delta);
+		projectileUIModel.setCurrentFrame(this, delta, this.getVelocityAngle());
 		actionListener.processProjectile(this);
 		this.deletionCheck();
 	}
@@ -205,9 +214,9 @@ public class Projectile extends EntityModel implements EffectController{
 //				forceCooldown = true;
 //				this.actionListener.deleteProjectile(this);
 //			}
-			this.collisionCheck(true);
+			this.collisionCheck();
 		}
-		CollisionCheck collisionY = this.checkForYCollision(delta, collisionLayer, this.velocity.y, true);
+		CollisionCheck collisionY = this.checkForYCollision(delta, collisionLayer, this.velocity.y, true, !this.state.equals(EntityModel.cooldownState));
 		if (collisionY.isDoesCollide()) {
 			if (this.settings.isBounces()) {
 				this.getVelocity().y = -this.getVelocity().y;
@@ -216,7 +225,7 @@ public class Projectile extends EntityModel implements EffectController{
 //				forceCooldown = true;
 //				this.actionListener.deleteProjectile(this);
 //			}
-			this.collisionCheck(true);
+			this.collisionCheck();
 		}
 	}
 	
@@ -261,7 +270,7 @@ public class Projectile extends EntityModel implements EffectController{
 			target.setImmuneToInjury(true);
 			this.charactersHit.add(new HitTracker(target));
 			if (this.getSettings().isDisappearOnImpact()) {
-				this.collisionCheck(false);
+				this.collisionCheck();
 			}
 		}
 	}
@@ -270,21 +279,23 @@ public class Projectile extends EntityModel implements EffectController{
 		return this.state.equals(EntityModel.windupState) || this.state.equals(EntityModel.activeState);
 	}
 	
-	public void collisionCheck(boolean shouldExplode) {
+	public void collisionCheck() {
 		if (this.settings.isDisappearOnImpact()) {
 			forceCooldown = true;
 		}
-		if (shouldExplode && this.settings.getExplosionSettings() != null) {
-			Vector2 explosionOrigin = new Vector2(getImageHitBox().x + (getImageHitBox().width / 2f), getImageHitBox().y + (getImageHitBox().height / 2f));
-			Explosion explosion = new Explosion(this.getSettings().getExplosionName(), this.getSettings().getExplosionSettings(),  this.actionListener, explosionOrigin, this.getAllegiance());
-			this.actionListener.addExplosion(explosion);
+		if (this.settings.getWorldEffectSettings().size > 0) {
+			Vector2 effectOrigin = new Vector2(getImageHitBox().x + (getImageHitBox().width / 2f), getImageHitBox().y);
+			for (WorldEffectSettings wEffectSettings : this.settings.getWorldEffectSettings()) {
+				WorldEffect wEffect = EffectInitializer.initializeWorldEffect(wEffectSettings, this, this.getCollisionChecker(), this.source, this.target, effectOrigin);
+				this.actionListener.addWorldEffect(wEffect);
+			}
 		}
 	}
 	
 		
 	private void deletionCheck() {
 		if (this.currentTime > this.getTotalTime() || forceEnd) {
-			this.collisionCheck(true);
+			this.collisionCheck();
 			this.actionListener.deleteProjectile(this);
 		}
 		
@@ -325,6 +336,14 @@ public class Projectile extends EntityModel implements EffectController{
 			this.settings.disableGravity();
 		}
 		this.state = state;
+	}
+	
+	private float getVelocityAngle() {
+		if (!this.settings.getShouldRotate()) {
+			return 0f;
+		}
+		double angleInRads = Math.atan2(velocity.y, velocity.x);
+		return (float) Math.toDegrees(angleInRads);
 	}
 
 	public CharacterModel getTarget() {
@@ -418,9 +437,6 @@ public class Projectile extends EntityModel implements EffectController{
 	
 	@Override
 	public Vector2 spawnOriginForChar() {
-		if (source.isFacingLeft()) {
-			return new Vector2(this.source.getImageHitBox().x + this.source.getImageHitBox().width + 100, this.source.getImageHitBox().y);
-		}
-		return new Vector2(this.source.getImageHitBox().x - 200, this.source.getImageHitBox().y);
+		return new Vector2(this.getImageHitBox().x, this.getImageHitBox().y);
 	}
 }

@@ -378,7 +378,7 @@ public abstract class Character {
 				this.getVelocity().x = 0;
 				this.getAcceleration().x = 0;
 			}
-			CollisionCheck collisionY = this.checkForYCollision(delta, collisionLayer, this.velocity.y, true);
+			CollisionCheck collisionY = this.checkForYCollision(delta, collisionLayer, this.velocity.y, true, true);
 			if (collisionY.doesCollide) {
 				if (this.getVelocity().y < 0) {
 					landed();
@@ -389,7 +389,7 @@ public abstract class Character {
 		}
 		
 		public float howLongTillYCollision(float maxTime, TiledMapTileLayer collisionLayer) {
-			CollisionCheck collisionY = this.checkForYCollision(maxTime, collisionLayer, this.velocity.y, false);
+			CollisionCheck collisionY = this.checkForYCollision(maxTime, collisionLayer, this.velocity.y, false, true);
 			return collisionY.timeUntilCollision;
 		}
 		
@@ -515,6 +515,11 @@ public abstract class Character {
 		
 		public void addToCurrentStability(float value) {
 			this.setCurrentStability(value + this.currentStability, null);
+		}
+		
+		public Vector2 getCenteredPosition() {
+			Vector2 sourcePosition = new Vector2(this.gameplayHitBox.x + this.gameplayHitBox.width / 2, this.gameplayHitBox.y + this.gameplayHitBox.height / 2); 
+			return sourcePosition;
 		}
 		
 		//-------------GETTERS/SETTERS------------//

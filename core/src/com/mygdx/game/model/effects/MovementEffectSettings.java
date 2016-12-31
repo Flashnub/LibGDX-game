@@ -3,9 +3,8 @@ package com.mygdx.game.model.effects;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.mygdx.game.model.effects.EffectSettings;
 
-public class MovementEffectSettings extends EffectSettings {	
+public class MovementEffectSettings extends EntityEffectSettings {	
 	Vector2 maxVelocity;
 	Vector2 velocity;
 	Vector2 acceleration;

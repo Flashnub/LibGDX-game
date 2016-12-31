@@ -20,7 +20,7 @@ public class ActionSequence implements Serializable {
 	}
 	
 	public enum ActionType {
-		Attack, ProjectileAttack, Ability, Dialogue, Gesture, ItemGift, Stagger
+		Attack, WorldAttack, Ability, Dialogue, Gesture, ItemGift, Stagger
 	}
 	
 
@@ -47,14 +47,6 @@ public class ActionSequence implements Serializable {
 
 	}
 	
-//	public ActionSequence(ActionType type) {
-//		actionKey = new ActionSegmentKey(new StringWrapper(type.toString()), type);
-//		if (type.equals(ActionType.Dialogue) || type.equals(ActionType.StatelessDialogue)) {
-//			//Create default dialogue action and store it in char properties?
-//			//Or make static void to create dialogue Action with DialogueSettings to create them on demand?
-//		}
-//	}
-//	
 	public static ActionSequence createSequenceWithDialog(DialogueSettings settings, CharacterModel source, CharacterModel target, DialogueController dialogueController, ActionListener actionListener) {
 		ActionSequence sequence = new ActionSequence();
 		boolean hasState = settings.getActingState().equals(DialogueSettings.defaultState);
@@ -221,7 +213,7 @@ public class ActionSequence implements Serializable {
 			case Stagger:
 				return false;
 			case Attack:
-			case ProjectileAttack:
+			case WorldAttack:
 				return true;
 		}
 		return false;
@@ -258,12 +250,8 @@ public class ActionSequence implements Serializable {
 			this.action = action;
 		}
 	}
-	
 
 	public float getEffectiveRange() {
-//		for (ActionSegment actionSegment : allActionSegments) {
-//			range += actionSegment.getEffectiveRange();
-//		}
 		return action.getEffectiveRange();
 	}
 	
@@ -273,7 +261,7 @@ public class ActionSequence implements Serializable {
 			case Attack:
 				action = new Attack(source, JSONController.attacks.get(segmentKey.getKey().value), this.actionListener);
 				break;
-			case ProjectileAttack:
+			case WorldAttack:
 				action = new WorldAttack(source, target, actionListener, collisionChecker, JSONController.projectileAttacks.get(segmentKey.getKey().value));
 				break;
 			case Ability:

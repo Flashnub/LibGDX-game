@@ -42,6 +42,7 @@ public class DesktopLauncher {
 //        ArrayList<StringWrapper> projectileNames = arrayWrapper2.array;
         ArrayList <String> projectileNames = new ArrayList<String>();
         projectileNames.add("Basic");
+        projectileNames.add("Basic2");
 
     	for (String projectileName : projectileNames) {
         	String inputDir = parentInputDir + projectileName;

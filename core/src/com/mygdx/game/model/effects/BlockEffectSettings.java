@@ -3,7 +3,7 @@ package com.mygdx.game.model.effects;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
-public class BlockEffectSettings extends EffectSettings{
+public class BlockEffectSettings extends EntityEffectSettings{
 
 	float perfectBlockTime;
 	

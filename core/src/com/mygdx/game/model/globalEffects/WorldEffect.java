@@ -1,5 +1,6 @@
 package com.mygdx.game.model.globalEffects;
 
+import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.Effect;
 import com.mygdx.game.model.effects.EffectController;
@@ -13,7 +14,7 @@ public abstract class WorldEffect extends Effect{
 	WorldEffectSettings settings;
 	CharacterModel source;
 
-	public WorldEffect(WorldEffectSettings settings, EffectController retriever, CollisionChecker collisionChecker, CharacterModel source) {
+	public WorldEffect(WorldEffectSettings settings, EffectController retriever, CollisionChecker collisionChecker, CharacterModel source, Vector2 originOverride) {
 		super(settings);
 		this.actionListener = retriever.getActionListener();
 		this.collisionChecker = collisionChecker;
@@ -39,5 +40,8 @@ public abstract class WorldEffect extends Effect{
 		setCurrentTime(getCurrentTime() + delta);
 		return isFinished;
 	}
+
+	
+	
 	
 }

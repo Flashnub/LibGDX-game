@@ -4,7 +4,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.mygdx.game.model.worldObjects.Item;
 
-public class ItemEffectSettings extends EffectSettings {
+public class ItemEffectSettings extends EntityEffectSettings {
 	
 	Item item;
 	

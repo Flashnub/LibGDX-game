@@ -19,9 +19,12 @@ public class EntityUIModel {
 	private ObjectMap <String, Animation> animations;
 	private EntityUIData entityUIData;
 	private TextureRegion currentFrame;
-	private float animationTime = 0f;
+	private float animationTime;
+	private float angleOfRotation;
 		
 	public EntityUIModel(String name, EntityUIDataType type) {
+		animationTime = 0f;
+		angleOfRotation = 0f;
 		loadSprites(name, type);
 	}
 		
@@ -62,12 +65,22 @@ public class EntityUIModel {
 		}
 	}
 	
+	public boolean setCurrentFrame(EntityModel entity, float delta, float angleOfRotation) {
+		boolean result = this.setCurrentFrame(entity, delta);
+		this.angleOfRotation = angleOfRotation;
+		return result;
+	}
+	
 	public boolean setCurrentFrame(EntityModel entity, float delta) {
 		String animationString = SpriteUtils.animationStringWithState(entity.getState(), entity.isFacingLeft());
 		Animation currentAnimation = animations.get(animationString);
 			
 		this.animationTime += delta;
-		currentFrame = currentAnimation.getKeyFrame(this.animationTime);
+		TextureRegion frame = currentAnimation.getKeyFrame(this.animationTime);
+		if (frame != null) {
+			currentFrame = frame;
+		}
+
 		
 		entity.getImageHitBox().width = currentFrame.getRegionWidth();
 		entity.getImageHitBox().height = currentFrame.getRegionHeight();
@@ -91,4 +104,9 @@ public class EntityUIModel {
 	public void setAnimationTime(float animationTime) {
 		this.animationTime = animationTime;
 	}
+
+	public float getAngleOfRotation() {
+		return angleOfRotation;
+	}
+	
 }

@@ -13,12 +13,48 @@
 		"cooldownSpeed": 0,
 		"activeTillDisruption": true,
 		"windupTime": 1,
-		"cooldownTime": 1,
+		"cooldownTime": 0.1,
 		"explosionName": "BasicExplosion",
 		"targetEffects": [
 			{
 				"class": com.mygdx.game.model.effects.DamageEffectSettings,
 				"value": 2
+			}
+		],
+		"worldEffectSettings": [
+			{
+				"class": com.mygdx.game.model.globalEffects.ExplosionCreateEffectSettings,
+				"explosionKey": "BasicExplosion"
+			}
+		]
+	}
+	"Basic2": {
+		"class": com.mygdx.game.model.projectiles.ProjectileSettings,
+		"name": "Basic2",
+		"disappearOnImpact": true,
+		"useSmartAim": true,
+		"gravity": 200,
+		"tracks": false,
+		"bounces": false,
+		"hasCollisionDetection": true,
+		"activeSpeed": 300,
+		"windupSpeed": 100,
+		"cooldownSpeed": 0,
+		"activeTillDisruption": true,
+		"windupTime": 1,
+		"cooldownTime": 0.1,
+		"explosionName": "BasicExplosion",
+		"targetEffects": [
+			{
+				"class": com.mygdx.game.model.effects.DamageEffectSettings,
+				"value": 2
+			}
+		],
+		"worldEffectSettings": [
+			{
+				"class": com.mygdx.game.model.globalEffects.SpawnCharacterEffectSettings,
+				"characterName": "BasicEnemy",
+				"characterType": "Enemy"
 			}
 		]
 	}

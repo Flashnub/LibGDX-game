@@ -50,7 +50,7 @@ public class BlockEffect extends EntityEffect implements AssaultInterceptor{
 		if (this.isActive) {
 			float potentialWill = this.calculateWillFromEffects(projectile.getSettings().getTargetEffects());
 			target.addToCurrentWill(potentialWill);
-			projectile.collisionCheck(false);
+			projectile.collisionCheck();
 			if (!isPerfect) {
 				//calculate damage
 				target.removeFromCurrentHealth(1);

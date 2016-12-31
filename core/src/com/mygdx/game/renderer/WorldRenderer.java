@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -100,54 +101,74 @@ public class WorldRenderer implements CoordinatesHelper{
 	    
 	    private void drawPlayer(SpriteBatch batch) {
 	    	Player player = worldModel.getPlayer();
-	    	
-	    	batch.draw(player.getCharacterUIData().getCurrentFrame(), 
-	    			player.getCharacterData().getImageHitBox().x,  
+    		TextureRegion texture = player.getCharacterUIData().getCurrentFrame();
+    		if (texture != null) {
+		    	batch.draw(texture,
+		    		player.getCharacterData().getImageHitBox().x,  
 	    			player.getCharacterData().getImageHitBox().y,  
 	    			Math.round(player.getCharacterData().getImageHitBox().width), 
 	    			Math.round(player.getCharacterData().getImageHitBox().height));
+    		}
 	    }
 	    
 	    private void drawNPCs(SpriteBatch batch) {
 	    	for (Character npc : worldModel.getNpcCharacters()) {
-		    	batch.draw(npc.getCharacterUIData().getCurrentFrame(), 
+	    		TextureRegion texture = npc.getCharacterUIData().getCurrentFrame();
+	    		if (texture != null) {
+			    	batch.draw(texture,
 		    			npc.getCharacterData().getImageHitBox().x,  
 		    			npc.getCharacterData().getImageHitBox().y,  
 		    			npc.getCharacterData().getImageHitBox().width, 
 		    			npc.getCharacterData().getImageHitBox().height);
+	    		}
 	    	}
 	    	
 	    }
 	    
 	    private void drawEnemies(SpriteBatch batch) {
-	    	
 	    	for (Character enemy : worldModel.getEnemies()) {
-		    	batch.draw(enemy.getCharacterUIData().getCurrentFrame(), 
-		    			enemy.getCharacterData().getImageHitBox().x,  
-		    			enemy.getCharacterData().getImageHitBox().y,  
-		    			enemy.getCharacterData().getImageHitBox().width, 
-		    			enemy.getCharacterData().getImageHitBox().height);
+	    		TextureRegion texture = enemy.getCharacterUIData().getCurrentFrame();
+	    		if (texture != null) {
+			    	batch.draw(texture, 
+			    			enemy.getCharacterData().getImageHitBox().x,
+			    			enemy.getCharacterData().getImageHitBox().y,  
+			    			enemy.getCharacterData().getImageHitBox().width, 
+			    			enemy.getCharacterData().getImageHitBox().height);
+	    		}
 	    	}
 	    	
 	    }
 	    
 	    private void drawProjectiles(SpriteBatch batch) {
 	    	for (Projectile projectile : worldModel.getProjectiles()) {
-		    	batch.draw(projectile.getProjectileUIModel().getCurrentFrame(), 
-		    			projectile.getImageHitBox().x,
-		    			projectile.getImageHitBox().y,  
-		    			projectile.getImageHitBox().width, 
-		    			projectile.getImageHitBox().height);	  
+	    		TextureRegion texture = projectile.getProjectileUIModel().getCurrentFrame();
+	    		float angleOfRotation = projectile.getProjectileUIModel().getAngleOfRotation();
+	    		if (texture != null) {
+	    			batch.draw(texture, 
+	    					projectile.getImageHitBox().x, 
+	    					projectile.getImageHitBox().y, 
+	    					projectile.getImageHitBox().width / 2f, 
+	    					projectile.getImageHitBox().height / 2f, 
+	    					projectile.getImageHitBox().width, 
+	    					projectile.getImageHitBox().height, 
+	    					1f, 
+	    					1f,
+	    					angleOfRotation);
+	    		}
+	  
 		    }
 	    }
 	    
 	    private void drawExplosions(SpriteBatch batch) {
 	    	for (Explosion explosion : worldModel.getExplosions()) {
-		    	batch.draw(explosion.getExplosionUIModel().getCurrentFrame(), 
-		    			explosion.getImageHitBox().x,
-		    			explosion.getImageHitBox().y,  
-		    			explosion.getImageHitBox().width, 
-		    			explosion.getImageHitBox().height);	  
+	    		TextureRegion texture = explosion.getExplosionUIModel().getCurrentFrame();
+	    		if (texture != null) {
+			    	batch.draw(texture, 
+			    			explosion.getImageHitBox().x,
+			    			explosion.getImageHitBox().y,  
+			    			explosion.getImageHitBox().width, 
+			    			explosion.getImageHitBox().height);
+	    		}
 		    }
 	    }
 	    

@@ -36,7 +36,7 @@ public class BasicEnemyAI extends EnemyAI {
 			ArrayList <ActionSequence> actualActionSequences = new ArrayList <ActionSequence> ();
 			for (ActionSequence sequence : possibleActionSequences) {
 				float randomFloat = rand.nextFloat();
-				if (randomFloat < 0.9) {
+				if (randomFloat < 0.3) {
 					actualActionSequences.add(sequence);
 				}
 			}

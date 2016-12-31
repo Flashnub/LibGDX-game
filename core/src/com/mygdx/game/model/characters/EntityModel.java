@@ -42,7 +42,7 @@ public abstract class EntityModel {
 //		
 		this.gameplayHitBox.width = this.getImageHitBox().width * widthCoefficient;
 		this.gameplayHitBox.height = this.getImageHitBox().height * heightCoefficient;
-	}
+	}	
 	
 	public void moveWithoutCollisionDetection(float delta) {
 		this.imageHitBox.x = this.imageHitBox.x + this.velocity.x * delta;
@@ -51,7 +51,7 @@ public abstract class EntityModel {
 		this.gameplayHitBox.y = (this.imageHitBox.y + this.imageHitBox.height * ((1f - this.heightCoefficient) / 2));
 	}
 	
-	public CollisionCheck checkForYCollision(float maxTime, TiledMapTileLayer collisionLayer, float yVelocity, boolean shouldMove) {
+	public CollisionCheck checkForYCollision(float maxTime, TiledMapTileLayer collisionLayer, float yVelocity, boolean shouldMove, boolean applyGravity) {
 		float tileWidth = collisionLayer.getTileWidth();
 		float tileHeight = collisionLayer.getTileHeight();
 		
@@ -73,8 +73,8 @@ public abstract class EntityModel {
 			else {
 				increment = tempMaxTime;
 			}
-			
-			tempVelocity += this.acceleration.y * increment;
+			if (applyGravity)
+				tempVelocity += this.acceleration.y * increment;
 			
 			tempImageBounds.setY(tempImageBounds.getY() + tempVelocity * increment);
 //			if (this instanceof CharacterModel) {

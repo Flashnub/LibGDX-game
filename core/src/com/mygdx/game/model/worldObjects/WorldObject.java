@@ -80,7 +80,7 @@ public abstract class WorldObject extends EntityModel {
 				this.getVelocity().x = 0;
 				this.getAcceleration().x = 0;
 			}
-			CollisionCheck collisionY = this.checkForYCollision(delta, collisionLayer, this.velocity.y, true);
+			CollisionCheck collisionY = this.checkForYCollision(delta, collisionLayer, this.velocity.y, true, true);
 			if (collisionY.isDoesCollide()) {
 				this.getVelocity().y = 0;
 			}

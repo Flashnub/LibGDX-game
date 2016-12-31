@@ -9,10 +9,10 @@ public class SpawnCharacterEffect extends WorldEffect {
 	
 	SpawnCharacterEffectSettings spawnSettings;
 	Vector2 origin;
-	public static String type = "Spawn";
+	public static final String type = "SpawnCharacterEffect";
 	
-	public SpawnCharacterEffect(WorldEffectSettings settings, EffectController retriever, CollisionChecker collisionChecker, CharacterModel source) {
-		super(settings, retriever, collisionChecker, source);
+	public SpawnCharacterEffect(WorldEffectSettings settings, EffectController retriever, CollisionChecker collisionChecker, CharacterModel source, Vector2 originOverride) {
+		super(settings, retriever, collisionChecker, source, originOverride);
 	
 		if (settings instanceof SpawnCharacterEffectSettings) {
 			this.spawnSettings = (SpawnCharacterEffectSettings) settings;

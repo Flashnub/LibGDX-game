@@ -3,11 +3,10 @@ package com.mygdx.game.model.globalEffects;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.mygdx.game.wrappers.StringWrapper;
 
 public class ProjectileCreateEffectSettings extends WorldEffectSettings{
 
-	StringWrapper projectileSettingKey;
+	String projectileSettingKey;
 	Vector2 origin;
 	
 	@Override
@@ -20,7 +19,7 @@ public class ProjectileCreateEffectSettings extends WorldEffectSettings{
 	@Override
 	public void read(Json json, JsonValue jsonData) {
 		super.read(json, jsonData);
-		projectileSettingKey = json.readValue("projectileSettingKey", StringWrapper.class, jsonData);
+		projectileSettingKey = json.readValue("projectileSettingKey", String.class, jsonData);
 		Vector2 origin = json.readValue("origin", Vector2.class, jsonData);
 		if (origin != null) {
 			this.origin = origin; 
@@ -35,7 +34,7 @@ public class ProjectileCreateEffectSettings extends WorldEffectSettings{
 	@Override
 	public WorldEffectSettings deepCopy() {
 		ProjectileCreateEffectSettings copy = new ProjectileCreateEffectSettings();
-		copy.setBaseFieldsForSettings(this);
+		this.setBaseFieldsForSettings(copy);
 		copy.projectileSettingKey = this.projectileSettingKey;
 		copy.origin = this.origin;	
 		return copy;

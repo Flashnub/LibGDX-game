@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.JsonValue;
 
 public abstract class EntityEffectSettings extends EffectSettings{
 	
-	int value;
+	float value;
 	
 	@Override
 	public void write(Json json) {
@@ -17,7 +17,7 @@ public abstract class EntityEffectSettings extends EffectSettings{
 	@Override
 	public void read(Json json, JsonValue jsonData) {
 		super.read(json, jsonData);
-		value = json.readValue("value", Integer.class, jsonData);
+		value = json.readValue("value", Float.class, jsonData);
 
 	}
 

@@ -2,16 +2,17 @@ package com.mygdx.game.model.characters.enemies;
 
 import com.mygdx.game.model.characters.Character.CharacterModel;
 
-public class DistanceObservation extends Observation {
+public class PositionalObservation extends Observation {
 	
 	public float xDelta;
 	public float yDelta;
 	public boolean isTargetToLeft;
 	public boolean isBelowTarget;
+	public boolean isFacingTarget;
 	
-	public static String classKey = "DistanceObservation";
+	public static String classKey = "PositionalObservation";
 
-	public DistanceObservation(CharacterModel observedSource) {
+	public PositionalObservation(CharacterModel observedSource) {
 		super(observedSource);
 		this.dataType = ObservableDataType.Distance;
 	}
@@ -27,7 +28,7 @@ public class DistanceObservation extends Observation {
 	}
 
 	
-	public boolean isCloserThanOtherObservation(DistanceObservation observation) {
+	public boolean isCloserThanOtherObservation(PositionalObservation observation) {
 		return this.getHypotenuse() <= observation.getHypotenuse();
 	}
 	

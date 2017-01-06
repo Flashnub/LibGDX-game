@@ -17,7 +17,8 @@ public class AbilitySettings implements Serializable {
 	Float cooldownTime;
 	protected Float duration;
 	boolean activeTillDisruption;
-	
+	boolean sourceRespectEntityCollisions; //if this is false, the action ignores all entity collisions.
+
 	@Override
 	public void write(Json json) {
 		json.writeValue("sourceEffectSettings", sourceEffectSettings);
@@ -25,6 +26,7 @@ public class AbilitySettings implements Serializable {
 		json.writeValue("windupTime", windupTime);
 		json.writeValue("cooldownTime", cooldownTime);
 		json.writeValue("duration", duration);		
+		json.writeValue("sourceRespectEntityCollisions", sourceRespectEntityCollisions);
 	}
 	
 	@Override
@@ -62,6 +64,32 @@ public class AbilitySettings implements Serializable {
 		windupEffectSettings = json.readValue("windupEffectSettings", Array.class, jsonData);
 		if (windupEffectSettings == null) {
 			windupEffectSettings = new Array <EffectSettings> ();
+		}
+		
+		Boolean sourceRespectEntityCollisions = json.readValue("sourceRespectEntityCollisions", Boolean.class, jsonData);
+		if (sourceRespectEntityCollisions != null) {
+			this.sourceRespectEntityCollisions = sourceRespectEntityCollisions;
+		}
+		else {
+			this.sourceRespectEntityCollisions = true;
+		}		
+		
+		if (sourceEffectSettings != null) {
+			for (EffectSettings eSettings : sourceEffectSettings) {
+				if (eSettings instanceof MovementEffectSettings) {
+					MovementEffectSettings mSettings = (MovementEffectSettings) eSettings;
+					mSettings.setShouldRespectEntityCollision(this.sourceRespectEntityCollisions);
+				}
+			}
+		}
+		
+		if (windupEffectSettings != null) {
+			for (EffectSettings eSettings : windupEffectSettings) {
+				if (eSettings instanceof MovementEffectSettings) {
+					MovementEffectSettings mSettings = (MovementEffectSettings) eSettings;
+					mSettings.setShouldRespectEntityCollision(this.sourceRespectEntityCollisions);
+				}
+			}
 		}
 	}
 
@@ -115,6 +143,7 @@ public class AbilitySettings implements Serializable {
 		this.sourceEffectSettings = settings.sourceEffectSettings;
 		this.windupEffectSettings = settings.windupEffectSettings;
 		this.activeTillDisruption = settings.activeTillDisruption;
+		this.sourceRespectEntityCollisions = settings.sourceRespectEntityCollisions;
 	}
 	
 	public AbilitySettings deepCopy() {

@@ -140,5 +140,10 @@ public class WorldAttack extends ActionSegment{
 		return potentialAbility.getReplacementMovementForStagger();
 	}
 
+	@Override
+	public boolean shouldRespectEntityCollisions() {
+		return potentialAbility.shouldRespectEntityCollisions();
+	}
+
 
 }

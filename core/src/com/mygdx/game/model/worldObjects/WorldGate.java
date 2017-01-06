@@ -36,7 +36,16 @@ public class WorldGate extends WorldObject {
 	}
 
 	@Override
-	public boolean handleAdditionCollisionLogic(Rectangle tempGameplayBounds) {
+	public boolean handleAdditionalXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+		// TODO Auto-generated method stub
 		return false;
 	}
+
+	@Override
+	public boolean handleAdditionalYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
 }

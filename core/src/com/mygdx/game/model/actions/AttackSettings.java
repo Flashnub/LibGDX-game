@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.mygdx.game.model.effects.EffectSettings;
+import com.mygdx.game.model.effects.MovementEffectSettings;
 
 public class AttackSettings extends AbilitySettings{
 	float originX;
@@ -12,6 +13,9 @@ public class AttackSettings extends AbilitySettings{
 	float height;
 	float hitRate;
 	Array<EffectSettings> targetEffectSettings;
+	boolean shouldStagger;
+	boolean targetRespectEntityCollisions; //if this is false, the action ignores all entity collisions.
+
 	
 	@Override
 	public void write(Json json) {
@@ -23,6 +27,8 @@ public class AttackSettings extends AbilitySettings{
 		json.writeValue("originX", originX);
 		json.writeValue("originY", originY);		
 		json.writeValue("targetEffectSettings", targetEffectSettings);
+		json.writeValue("shouldStagger", shouldStagger);
+		json.writeValue("targetRespectEntityCollisions", targetRespectEntityCollisions);
 	}
 	
 	@Override
@@ -44,6 +50,31 @@ public class AttackSettings extends AbilitySettings{
 		else {
 			hitRate = Float.MAX_VALUE;
 		}
+		
+		Boolean shouldStagger = json.readValue("shouldStagger", Boolean.class, jsonData);
+		if (shouldStagger != null) {
+			this.shouldStagger = shouldStagger;
+		}
+		else {
+			this.shouldStagger = true;
+		}
+		
+		Boolean targetRespectEntityCollisions = json.readValue("targetRespectEntityCollisions", Boolean.class, jsonData);
+		if (targetRespectEntityCollisions != null) {
+			this.targetRespectEntityCollisions = targetRespectEntityCollisions;
+		}
+		else {
+			this.targetRespectEntityCollisions = true;
+		}
+
+		if (targetEffectSettings != null) {
+			for (EffectSettings eSettings : targetEffectSettings) {
+				if (eSettings instanceof MovementEffectSettings) {
+					MovementEffectSettings mSettings = (MovementEffectSettings) eSettings;
+					mSettings.setShouldRespectEntityCollision(this.targetRespectEntityCollisions);
+				}
+			}
+		}
 
 	}
 	
@@ -56,6 +87,7 @@ public class AttackSettings extends AbilitySettings{
 		copy.hitRate = this.hitRate;
 		copy.width = this.width;
 		copy.height = this.height;
+		copy.shouldStagger = this.shouldStagger;
 		Array<EffectSettings> newTargetSettings = new Array <EffectSettings> ();
 		for (EffectSettings eSettings : this.targetEffectSettings) {
 			newTargetSettings.add(eSettings.deepCopy());
@@ -67,6 +99,8 @@ public class AttackSettings extends AbilitySettings{
 	public Array<EffectSettings> getTargetEffectSettings() {
 		return targetEffectSettings;
 	}
-	
-	
+
+	public boolean isShouldStagger() {
+		return shouldStagger;
+	}
 }

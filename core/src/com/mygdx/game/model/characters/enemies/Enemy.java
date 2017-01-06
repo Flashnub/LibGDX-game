@@ -4,8 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Json;
+import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.characters.EntityUIModel;
+import com.mygdx.game.model.characters.ModelListener;
 import com.mygdx.game.model.characters.NPCCharacter;
+import com.mygdx.game.model.characters.NPCProperties;
 import com.mygdx.game.model.characters.player.Player;
 import com.mygdx.game.model.world.WorldModel;
 
@@ -21,14 +24,13 @@ public class Enemy extends NPCCharacter{
 	
 	public Enemy(String characterName, WorldModel world) {
 		super(characterName, world.getDialogueController());
-		this.setCharacterData(new EnemyModel(characterName, this.getCharacterUIData(), world));
+		this.setCharacterData(new EnemyModel(characterName, this.getCharacterUIData(), world, this));
 	}
 	
 	public interface PlayerObserver {
 		public void handleObservation(Observation data);
 	}
 
-	
 	public class EnemyModel extends NPCCharacterModel  {
 		
 		Player player;
@@ -37,13 +39,16 @@ public class Enemy extends NPCCharacter{
 		EnemyAI enemyAI;
 		EnemyProperties enemyProperties;
 
-		public EnemyModel(String characterName, EntityUIModel uiModel, WorldModel world) {
-			super(characterName, uiModel);
+		public EnemyModel(String characterName, EntityUIModel uiModel, WorldModel world, ModelListener modelListener) {
+			super(characterName, uiModel, modelListener);
 			this.pollTime = 0f;
 			this.pollCount = 0;
 			Json json = new Json();
 			enemyProperties = json.fromJson(EnemyProperties.class, Gdx.files.internal("Json/" + characterName + "/enemyProperties.json"));
-			enemyAI = EnemyAIInitializer.initializeAIWithKey(enemyProperties.enemyAIKey, this.getCharacterProperties(), this, world);
+			if (enemyProperties != null) {
+				enemyProperties.setSource(this);
+			}
+			enemyAI = EnemyAIInitializer.initializeAIWithKey(enemyProperties.enemyAIKey, this, world);
 			this.setCurrentlyInteractable(false);
 		}
 		
@@ -54,7 +59,6 @@ public class Enemy extends NPCCharacter{
 			super.update(delta, collisionLayer);
 			enemyAI.process(delta);
 		}
-		
 		
 		public float getPollTime() {
 			return pollTime;
@@ -90,9 +94,39 @@ public class Enemy extends NPCCharacter{
 
 
 
+		
 		@Override
-		public boolean handleAdditionCollisionLogic(Rectangle tempGameplayBounds) {
-			return this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds);
+		public boolean handleAdditionalXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+			if (alreadyCollided) {
+				this.stopHorizontalMovement();
+				return alreadyCollided;
+			}
+			else {
+				EntityModel collidedEntity = this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds);
+				boolean entityCollision = !this.tempIgnoreEntityCollision() && collidedEntity != null;
+				if (entityCollision) {
+					this.stopHorizontalMovement();
+				}
+//				this.stopEntityOverlapIfNeeded(collidedEntity, tempGameplayBounds, tempImageBounds);
+				return entityCollision;
+			}
+		}
+		
+		@Override
+		public boolean handleAdditionalYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+			return this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds) != null;
+		}
+		
+		
+		public void checkIfShouldAggroTarget(CharacterModel target, float damage) {
+			if (damage > this.enemyProperties.damageForAggro && (this.enemyAI.currentTarget == null || !this.enemyAI.currentTarget.equals(target))) {
+				this.enemyAI.currentTarget = target;
+			}
+		}
+		
+		@Override
+		public NPCProperties getNPCProperties() {
+			return this.enemyProperties;
 		}
 		
 	}

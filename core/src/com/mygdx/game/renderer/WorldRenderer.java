@@ -11,9 +11,11 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.model.characters.Character;
+import com.mygdx.game.model.characters.enemies.Enemy;
 import com.mygdx.game.model.characters.player.Player;
 import com.mygdx.game.model.projectiles.Explosion;
 import com.mygdx.game.model.projectiles.Projectile;
@@ -66,22 +68,40 @@ public class WorldRenderer implements CoordinatesHelper{
 			if (camera.position.y < camera.viewportHeight / 2)
 				camera.position.y = camera.viewportHeight / 2;
 
-	        
+//	        camera.zoom = 1f;
+			
 	        camera.update();
 	        tiledMapRenderer.setView(camera);
 	        tiledMapRenderer.render();
 	        
 	        debugRenderer.setProjectionMatrix(camera.combined);
 	        debugRenderer.begin(ShapeType.Line);
-	        debugRenderer.rect(worldModel.getPlayer().getCharacterData().getGameplayHitBox().x, 
-	        		worldModel.getPlayer().getCharacterData().getGameplayHitBox().y, 
-	        		worldModel.getPlayer().getCharacterData().getGameplayHitBox().width, 
-	        		worldModel.getPlayer().getCharacterData().getGameplayHitBox().height);
+	        Polygon playerPoly = worldModel.getPlayer().getCharacterData().getGameplayHitBoxInPolygon();
+//	        debugRenderer.rect(worldModel.getPlayer().getCharacterData().getGameplayHitBox().x, 
+//	        		worldModel.getPlayer().getCharacterData().getGameplayHitBox().y, 
+//	        		worldModel.getPlayer().getCharacterData().getGameplayHitBox().width / 2, 
+//	        		worldModel.getPlayer().getCharacterData().getGameplayHitBox().width / 2, 
+//	        		worldModel.getPlayer().getCharacterData().getGameplayHitBox().width, 
+//	        		worldModel.getPlayer().getCharacterData().getGameplayHitBox().height,
+//	        		1f, 1f,
+//	        		worldModel.getPlayer().getCharacterData().getVelocityAngle() );
+	        debugRenderer.polygon(playerPoly.getTransformedVertices());
 	        for (Projectile projectile : worldModel.getProjectiles()) {
-		        debugRenderer.rect(projectile.getImageHitBox().x, 
-		        		projectile.getImageHitBox().y, 
-		        		projectile.getImageHitBox().width, 
-		        		projectile.getImageHitBox().height);
+	        	Polygon poly = projectile.getGameplayHitBoxInPolygon();
+		        debugRenderer.polygon(poly.getTransformedVertices());
+//	        	debugRenderer.rect(projectile.getGameplayHitBox().x,
+//	        			projectile.getGameplayHitBox().y,
+//	        			projectile.getGameplayHitBox().width / 2,
+//	        			projectile.getGameplayHitBox().height / 2, 
+//	        			projectile.getGameplayHitBox().width,
+//	        			projectile.getGameplayHitBox().height, 
+//	        			1.1f, 1.1f,
+//	        			projectile.getVelocityAngle());
+	        }
+	        
+	        for (Enemy enemy : worldModel.getEnemies()) {
+	        	Polygon poly = enemy.getCharacterData().getGameplayHitBoxInPolygon();
+	        	debugRenderer.polygon(poly.getTransformedVertices());
 	        }
 	        for (Rectangle rectangle : worldModel.getAdditionalRectangles()) {
 	        	debugRenderer.rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);

@@ -19,7 +19,7 @@ public class ExplosionCreateEffect extends WorldEffect {
 			this.pSettings = (ExplosionCreateEffectSettings) settings;
 		}
 //		Explosion explosion = new Explosion(this.getSettings().getExplosionName(), this.getSettings().getExplosionSettings(),  this.actionListener, this);
-		this.explosion = new Explosion(this.pSettings.explosionKey, this.actionListener, this.pSettings.origin, source.getAllegiance(), originOverride);
+		this.explosion = new Explosion(this.pSettings.explosionKey, this.actionListener, this.pSettings.origin, source, originOverride);
 		
 
 	}

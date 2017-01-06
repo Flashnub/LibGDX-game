@@ -97,4 +97,9 @@ public class Ability extends ActionSegment{
 		return null;
 	}
 
+	@Override
+	public boolean shouldRespectEntityCollisions() {
+		return this.settings.sourceRespectEntityCollisions;
+	}
+
 }

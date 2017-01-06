@@ -1,7 +1,5 @@
 package com.mygdx.game.model.characters.enemies;
 
-import com.mygdx.game.model.characters.CharacterProperties;
-
 import java.util.ArrayList;
 
 import com.mygdx.game.model.actions.ActionSequence;
@@ -11,8 +9,10 @@ import com.mygdx.game.model.world.WorldModel;
 
 public class BasicEnemyAI extends EnemyAI {
 
-	public BasicEnemyAI(CharacterProperties properties, EnemyModel source, WorldModel world) {
-		super(properties, source, world);
+	public static final String name = "Basic";
+	
+	public BasicEnemyAI(EnemyModel source, WorldModel world) {
+		super(source, world);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -32,7 +32,7 @@ public class BasicEnemyAI extends EnemyAI {
 	@Override
 	public void setNextActionSequences(ArrayList<ActionSequence> possibleActionSequences) {
 		// TODO Auto-generated method stub
-		if (!this.source.isActionLock()) {
+		if (!this.source.isActionLock() && !isDocile()) {
 			ArrayList <ActionSequence> actualActionSequences = new ArrayList <ActionSequence> ();
 			for (ActionSequence sequence : possibleActionSequences) {
 				float randomFloat = rand.nextFloat();
@@ -41,13 +41,13 @@ public class BasicEnemyAI extends EnemyAI {
 				}
 			}
 			if (actualActionSequences.size() > 0 && !this.source.isProcessingActiveSequences()) {
-				this.source.stopWalk();
+				this.source.stopHorizontalMovement();
 				ActionSequence actionSequence = actualActionSequences.get(rand.nextInt(actualActionSequences.size()));
 				this.nextActionSequences.add(actionSequence);
 			}
 			else if (!this.source.isProcessingActiveSequences()){ 
 				//walk towards or away nearest enemy
-				source.walk(rand.nextBoolean());
+				source.horizontalMove(rand.nextBoolean());
 			}
 		}
 

@@ -85,6 +85,20 @@
 			"actingState": "Idle"
 			"cooldownState": "Idle"
 		}
+		"Rushdown": {
+			"class": com.mygdx.game.model.actions.ActionSequence,
+			"actionKey": {
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": {
+					"class": com.mygdx.game.wrappers.StringWrapper,
+					"value": "Rushdown"
+				},
+				"typeOfAction": Attack
+			}
+			"windupState": "Idle"
+			"actingState": "Idle"
+			"cooldownState": "Idle"
+		}
 		"Aerial1": {
 			"class": com.mygdx.game.model.actions.ActionSequence,
 			"actionKey": {

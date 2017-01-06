@@ -20,6 +20,7 @@ public class MovementEffect extends EntityEffect {
 	@Override
 	protected void initialProcess(CharacterModel target) {
 		super.initialProcess(target);
+		target.setTempIgnoreEntityCollision(!this.mSettings.respectEntityCollision);
 		target.getVelocity().x = target.isFacingLeft() ? -this.mSettings.velocity.x : this.mSettings.velocity.x;
 		target.getVelocity().y = this.mSettings.velocity.y;	
 		
@@ -43,12 +44,13 @@ public class MovementEffect extends EntityEffect {
 	@Override
 	protected void completion(CharacterModel target) {
 		super.completion(target);
+		target.setTempIgnoreEntityCollision(false);
 		target.acceleration.x = oldAccel.x;
 		target.acceleration.y = oldAccel.y;
 		
-		if (Math.abs(target.velocity.x) < 2f) {
-			target.velocity.x = 0;
-		}
+//		if (Math.abs(target.velocity.x) < 2f) {
+		target.velocity.x = 0;
+//		}
 	}
 	
 	public Vector2 getOldAccel() {

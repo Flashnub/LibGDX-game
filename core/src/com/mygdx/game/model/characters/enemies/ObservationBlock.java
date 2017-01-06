@@ -15,8 +15,8 @@ public class ObservationBlock {
 	
 	public void addObservation(Observation observation) {
 		if (observation.sourceOfObservation.getUuid().equals(this.sourceOfObservation.getUuid())) {
-			if (observation instanceof DistanceObservation) {
-				observations.put(DistanceObservation.classKey, observation);
+			if (observation instanceof PositionalObservation) {
+				observations.put(PositionalObservation.classKey, observation);
 			}
 		}
 	}

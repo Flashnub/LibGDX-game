@@ -17,30 +17,53 @@ public class NPCCharacter extends Character{
 	
 	public NPCCharacter(String characterName, DialogueController controller) {
 		super(characterName);
-		this.setCharacterData(new NPCCharacterModel(characterName, this.getCharacterUIData()));
+		this.setCharacterData(new NPCCharacterModel(characterName, this.getCharacterUIData(), this));
 		((NPCCharacterModel)this.getCharacterData()).setController(controller);
 	}
 	
 	public class NPCCharacterModel extends CharacterModel implements DialogueActor {
-
+		
 		NPCProperties npcProperties;
 		boolean isCurrentlyInteractable;
 		DialogueController controller;
 	    Array <String> processedCondtionalDialogueUUIDs;
+	    float currentStartPatrol;
+	    float currentEndPatrol;
+	    boolean onPatrolBreak;
+	    boolean onPatrol;
+	    float breakTime;
+	    float patrolTime;
 		
-		public NPCCharacterModel(String characterName, EntityUIModel uiModel) {
-			super(characterName, uiModel);
+		public NPCCharacterModel(String characterName, EntityUIModel uiModel, ModelListener modelListener) {
+			super(characterName, uiModel, modelListener);
 			npcProperties = JSONController.loadNPCProperties(characterName);
 			if (npcProperties != null) {
 				npcProperties.setSource(this);
 			}
 			this.isCurrentlyInteractable = true;
 			this.processedCondtionalDialogueUUIDs = new Array <String> ();
+			this.onPatrolBreak = false;
+			this.onPatrol = false;
+			this.breakTime = 0f;
+			this.patrolTime = 0f;
 		}
 
 		@Override
-		public boolean handleAdditionCollisionLogic(Rectangle tempGameplayBounds) {
+		public boolean handleAdditionalXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
 			return false;
+		}
+		
+		@Override
+		public boolean handleAdditionalYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+			return false;
+		}
+		
+		@Override
+		public void patrolWalk(boolean left) {
+			this.setFacingLeft(left);
+			this.walking = true;
+			this.velocity.x = left ? -this.getNPCProperties().patrolWalkSpeed : this.getNPCProperties().patrolWalkSpeed;
+			this.setMovementStatesIfNeeded();
 		}
 
 		@Override
@@ -55,8 +78,8 @@ public class NPCCharacter extends Character{
 		}
 		
 		private void checkForDialoguesToHandle() {
-			if (npcProperties != null) {
-				for (ConditionalDialogueSettings dialogue : npcProperties.getConditionalDialogues()){
+			if (getNPCProperties() != null) {
+				for (ConditionalDialogueSettings dialogue : getNPCProperties().getConditionalDialogues()){
 					if (!this.processedCondtionalDialogueUUIDs.contains(dialogue.getUUID(), true) && dialogue.conditionsMet()) {
 						controller.handleDialogue(dialogue);
 						this.processedCondtionalDialogueUUIDs.add(dialogue.getUUID());
@@ -64,10 +87,96 @@ public class NPCCharacter extends Character{
 				}
 			}
 		}
+
+		@Override
+		public void stopHorizontalMovement() {
+			super.stopHorizontalMovement();
+			if (this.onPatrol)
+				this.setOnBreak(true);
+		}
+		
+		public void resetPatrolFields() {
+			this.onPatrol = false;
+			this.onPatrolBreak = false;
+			this.patrolTime = 0f;
+			this.breakTime = 0f;
+			this.currentStartPatrol = 0;
+			this.currentEndPatrol = this.getNPCProperties().getRandomPatrolWayPoint(currentStartPatrol);
+		}
+		
+		public void handlePatrol(float delta) {
+			
+			//On start.
+			if ((!this.onPatrol && !this.onPatrolBreak) || (this.onPatrol && this.gameplayHitBox.x - 10f < this.currentEndPatrol && this.gameplayHitBox.x + 10f > this.currentEndPatrol)) {
+				this.setOnBreak(true);
+			}
+			
+			if (this.onPatrolBreak) {
+				this.breakTime += delta;
+				if (this.walking)
+					this.stopHorizontalMovement();
+				if (this.breakTime > this.getNPCProperties().getBreakDuration()) {
+					this.setOnBreak(false);
+				}
+			}
+			else if (this.onPatrol){
+				//figure out velocity.x
+				float startPatrolInWorldCoordinates = this.currentStartPatrol + this.gameplayHitBox.x;
+				float endPatrolInWorldCoordinates = this.currentEndPatrol + this.gameplayHitBox.x;
+				
+				if (startPatrolInWorldCoordinates == endPatrolInWorldCoordinates) {
+					this.stopHorizontalMovement();
+				}
+				else if (this.gameplayHitBox.x < startPatrolInWorldCoordinates && this.gameplayHitBox.x < endPatrolInWorldCoordinates) 
+				{
+					//NPC is to the left of startPatrol and outside patrol routine, move back to start.
+					this.patrolWalk(false);
+				}
+				else if (this.gameplayHitBox.x > startPatrolInWorldCoordinates && this.gameplayHitBox.x > endPatrolInWorldCoordinates) 
+				{
+					//NPC is to the right of startPatrol and outside patrol routine, move back to start.
+					this.patrolWalk(true);
+				}
+				else if (startPatrolInWorldCoordinates < endPatrolInWorldCoordinates) 
+				{
+					//Patrol is from left to right.
+					this.patrolWalk(false);
+					this.patrolTime += delta;
+				}
+				else if (startPatrolInWorldCoordinates > endPatrolInWorldCoordinates) {
+					//Patrol is from right to left.
+					this.patrolWalk(true);
+					this.patrolTime += delta;
+				}
+				
+				if (this.patrolTime > this.getNPCProperties().getPatrolDuration()) {
+					this.setOnBreak(true);
+				}
+
+			}
+
+			
+		}
+		
+		public void setOnBreak(boolean onBreak) {
+			this.breakTime = 0f;
+			this.patrolTime = 0f;
+			if (onBreak) {
+				this.onPatrol = false;
+				this.onPatrolBreak = true;
+			}
+			else {
+				this.currentStartPatrol = 0;
+				this.currentEndPatrol = this.getNPCProperties().getRandomPatrolWayPoint(currentStartPatrol);
+				this.onPatrol = true;
+				this.onPatrolBreak = false;
+			}
+		}
+		
 		
 		private void processDialogueRequest(CharacterModel target) {
 			//Make ActionSequence for dialogue.
-			ActionSequence dialogueAction = ActionSequence.createSequenceWithDialog(npcProperties.getNextStoryDialogue(), this, target, this.controller, this.actionListener);
+			ActionSequence dialogueAction = ActionSequence.createSequenceWithDialog(getNPCProperties().getNextStoryDialogue(), this, target, this.controller, this.actionListener);
 			System.out.println("Adding dialogue");
 			this.addActionSequence(dialogueAction);
 
@@ -75,7 +184,7 @@ public class NPCCharacter extends Character{
 		
 		private void processDialogueRequestWithUUID(CharacterModel target, String UUIDForDialogue) {
 			//Make ActionSequence for dialogue.
-			ActionSequence dialogueAction = ActionSequence.createSequenceWithDialog(npcProperties.getSpecificExternalConditionalDialogue(UUIDForDialogue), this, target, this.controller, this.actionListener);
+			ActionSequence dialogueAction = ActionSequence.createSequenceWithDialog(getNPCProperties().getSpecificExternalConditionalDialogue(UUIDForDialogue), this, target, this.controller, this.actionListener);
 			this.addActionSequence(dialogueAction);
 		}
 		
@@ -84,12 +193,27 @@ public class NPCCharacter extends Character{
 		}
 		
 		public void setDialogueIndexWithGameSave(GameSave gameSave) {
-			this.npcProperties.setChapterIndex(gameSave.chapterIndexForNPCUUID(this.npcProperties.UUID));
+			this.npcProperties.setChapterIndex(gameSave.chapterIndexForNPCUUID(this.getNPCProperties().UUID));
+		}
+		
+		public void setPatrolInfo(Array <Float> wayPoints, float patrolDuration, float breakDuration) {
+			this.getNPCProperties().setPatrolWaypoints(wayPoints);
+			this.getNPCProperties().setPatrolDuration(patrolDuration);
+			this.getNPCProperties().setBreakDuration(breakDuration);
+			if (wayPoints.size > 1) {
+				this.currentStartPatrol = 0;
+				this.currentEndPatrol = this.getNPCProperties().getRandomPatrolWayPoint(this.currentStartPatrol);
+			}
+			else {
+				this.currentStartPatrol = 0f;
+				this.currentEndPatrol = 0f;
+			}
+
 		}
 
 		@Override
 		public String getUUID() {
-			return npcProperties.UUID;
+			return getNPCProperties().UUID;
 		}
 
 		@Override
@@ -109,5 +233,32 @@ public class NPCCharacter extends Character{
 		public void setCurrentlyInteractable(boolean isCurrentlyInteractable) {
 			this.isCurrentlyInteractable = isCurrentlyInteractable;
 		}
+
+		public NPCProperties getNPCProperties() {
+			return this.npcProperties;
+		}
+
+		public void setCurrentStartPatrol(float currentStartPatrol) {
+			this.currentStartPatrol = currentStartPatrol;
+		}
+
+		public void setCurrentEndPatrol(float currentEndPatrol) {
+			this.currentEndPatrol = currentEndPatrol;
+		}
+
+		public float getCurrentStartPatrol() {
+			return currentStartPatrol;
+		}
+
+		public float getCurrentEndPatrol() {
+			return currentEndPatrol;
+		}
+
+		@Override
+		public Direction isTryingToMoveHorizontally() {
+			return Direction.NaN;
+		}
+
+
 	}
 }

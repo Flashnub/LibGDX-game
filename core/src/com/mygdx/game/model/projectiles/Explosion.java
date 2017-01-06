@@ -27,9 +27,10 @@ public class Explosion extends EntityModel implements EffectController {
 	String uuid;
 	Array <CharacterModel> alreadyHitCharacters;
 	String state;
+	CharacterModel source;
 	 
 	
-	public Explosion(String name, ActionListener actionListener, Vector2 originOffset, int allegiance, Vector2 originOverride) {
+	public Explosion(String name, ActionListener actionListener, Vector2 originOffset, CharacterModel source, Vector2 originOverride) {
 		this.settings = JSONController.explosions.get(name).deepCopy();
 		this.actionListener = actionListener;
 		this.currentTime = 0f;
@@ -42,7 +43,8 @@ public class Explosion extends EntityModel implements EffectController {
 		}
 		UUID id = UUID.randomUUID();
 		this.uuid = id.toString();
-		this.allegiance = allegiance;
+		this.allegiance = source.getAllegiance();
+		this.source = source;
 		this.state = EntityModel.windupState;
 	}
 	
@@ -52,6 +54,7 @@ public class Explosion extends EntityModel implements EffectController {
 		float oldWidth = 0f;
 		oldWidth = this.imageHitBox.width;
 		explosionUIModel.setCurrentFrame(this, delta);
+		this.handleOverlapCooldown(delta);
 		this.moveWithoutCollisionDetection(delta);
 		this.setGameplaySize(delta);
 		this.expansionCheck(oldWidth);
@@ -60,9 +63,15 @@ public class Explosion extends EntityModel implements EffectController {
 	}
 
 	@Override
-	public boolean handleAdditionCollisionLogic(Rectangle tempGameplayBounds) {
+	public boolean handleAdditionalXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
 		return false;
 	}
+
+	@Override
+	public boolean handleAdditionalYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+		return false;
+	}
+
 
 	@Override
 	public int getAllegiance() {
@@ -164,5 +173,10 @@ public class Explosion extends EntityModel implements EffectController {
 			return new Vector2(this.getImageHitBox().x + this.getImageHitBox().width + 100, this.getImageHitBox().y);
 		}
 		return new Vector2(this.getImageHitBox().x - 200, this.getImageHitBox().y);
+	}
+
+	@Override
+	public CharacterModel getSource() {
+		return this.source;
 	}
 }

@@ -88,6 +88,7 @@ public abstract class WorldObject extends EntityModel {
 	}
 	
 	public void update(float delta, TiledMapTileLayer collisionLayer) {
+		this.handleOverlapCooldown(delta);
 		this.setGameplaySize(delta);
 		this.movementWithCollisionDetection(delta, collisionLayer);
 		if (this.didChangeState) {

@@ -80,14 +80,17 @@ public class DialogueAction extends ActionSegment {
 
 	@Override
 	public void sourceWindupProcessWithoutSuper(CharacterModel source) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public ActionListener getActionListener() {
-		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public boolean shouldRespectEntityCollisions() {
+		return false;
 	}
 
 }

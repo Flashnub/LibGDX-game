@@ -28,6 +28,20 @@
 			"numberOfFrames": 4,
 			"duration": 0.05,
 			"playMode": NORMAL
+		},
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Fall",
+			"numberOfFrames": 3,
+			"duration": 0.05,
+			"playMode": NORMAL
+		},
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Jump",
+			"numberOfFrames": 1,
+			"duration": 0.05,
+			"playMode": NORMAL
 		}
 	]
 	"masterAtlasPath": "Sprites/Player/textures.atlas"

@@ -2,6 +2,7 @@ package com.mygdx.game.model.characters;
 
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -13,14 +14,18 @@ public abstract class EntityModel {
 	public static final String activeState = "Active";
 	public static final String windupState = "Windup";
 	public static final String cooldownState = "Cooldown";
+	public static final float averageOverlapCooldown = 2f;
 	
 	public Vector2 velocity, acceleration;
 	public Rectangle gameplayHitBox;
 	public Rectangle imageHitBox;
 	public float widthCoefficient;
 	public float heightCoefficient;
+	public float timeSinceOverlapCorrection;
 	public int allegiance;
 	CollisionChecker collisionChecker;
+	boolean tempIgnoreEntityCollision;
+	boolean hasProcessedOverlapCorrection;
 	
 	
 	public EntityModel() {
@@ -30,6 +35,9 @@ public abstract class EntityModel {
 		this.imageHitBox = new Rectangle();
 		this.gameplayHitBox = new Rectangle();
 		this.allegiance = 0;
+		this.timeSinceOverlapCorrection = 0f;
+		tempIgnoreEntityCollision = false;
+		this.hasProcessedOverlapCorrection = false;
 		
 		this.widthCoefficient = 1f;
 		this.heightCoefficient = 1f;
@@ -43,6 +51,17 @@ public abstract class EntityModel {
 		this.gameplayHitBox.width = this.getImageHitBox().width * widthCoefficient;
 		this.gameplayHitBox.height = this.getImageHitBox().height * heightCoefficient;
 	}	
+	
+	public void handleOverlapCooldown(float delta) {
+		if (this.hasProcessedOverlapCorrection)
+		{
+			this.timeSinceOverlapCorrection += delta;
+			if (this.timeSinceOverlapCorrection > EntityModel.averageOverlapCooldown) {
+				this.hasProcessedOverlapCorrection = false;
+				this.timeSinceOverlapCorrection = 0f;
+			}
+		}
+	}
 	
 	public void moveWithoutCollisionDetection(float delta) {
 		this.imageHitBox.x = this.imageHitBox.x + this.velocity.x * delta;
@@ -150,9 +169,11 @@ public abstract class EntityModel {
 				tilesToCheckForWorldObjects.add(new CellWrapper(topMiddleBlock, new Vector2(topMiddleXIndex * tileWidth, topMiddleYIndex * tileHeight)));
 				tilesToCheckForWorldObjects.add(new CellWrapper(topRightBlock, new Vector2(topRightXIndex * tileWidth, topRightYIndex * tileHeight)));
 			}
-			collisionY = collisionY
-					|| this.collisionChecker.checkIfEntityCollidesWithObjects(this, tempGameplayBounds)
-					|| this.handleAdditionCollisionLogic(tempGameplayBounds);
+			collisionY = collisionY	|| this.collisionChecker.checkIfEntityCollidesWithObjects(this, tempGameplayBounds);
+			boolean additionalCollisionY = this.handleAdditionalYCollisionLogic(tempGameplayBounds, tempImageBounds, collisionY);
+			if (!collisionY && additionalCollisionY) {
+				collisionY = true;
+			}
 
 			
 			if (collisionY)
@@ -179,10 +200,28 @@ public abstract class EntityModel {
 		return new CollisionCheck(collisionY, time);
 	}
 	
-	public abstract boolean handleAdditionCollisionLogic(Rectangle tempGameplayBounds);
+	public abstract boolean handleAdditionalXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided);
+	public abstract boolean handleAdditionalYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided);
+
 	public abstract int getAllegiance();
 	public abstract boolean isFacingLeft();
 	public abstract String getState();
+	
+	public float getVelocityAngle() {
+		return 0f;
+	}
+	
+	public Polygon getGameplayHitBoxInPolygon() {
+		Polygon polygon = new Polygon(new float[] {
+			this.gameplayHitBox.x, this.gameplayHitBox.y,
+			this.gameplayHitBox.x, this.gameplayHitBox.y + this.gameplayHitBox.height,
+			this.gameplayHitBox.x + this.gameplayHitBox.width, this.gameplayHitBox.y + this.gameplayHitBox.height,
+			this.gameplayHitBox.x + this.gameplayHitBox.width, this.gameplayHitBox.y
+		});
+		polygon.setOrigin(this.gameplayHitBox.x + this.gameplayHitBox.width / 2, this.gameplayHitBox.y + this.gameplayHitBox.height / 2);
+		polygon.setRotation(this.getVelocityAngle());
+		return polygon;
+	}
 
 	
 	public CollisionCheck checkForXCollision(float maxTime, TiledMapTileLayer collisionLayer, float xVelocity, boolean shouldMove) {
@@ -290,8 +329,11 @@ public abstract class EntityModel {
 			}
 			
 			collisionX = collisionX 
-					|| this.collisionChecker.checkIfEntityCollidesWithObjects(this, tempGameplayBounds)
-					|| this.handleAdditionCollisionLogic(tempGameplayBounds);
+					|| this.collisionChecker.checkIfEntityCollidesWithObjects(this, tempGameplayBounds);
+			boolean additionalCollisionX = this.handleAdditionalXCollisionLogic(tempGameplayBounds, tempImageBounds, collisionX);
+			if (!collisionX && additionalCollisionX) {
+				collisionX = true;
+			}
 			
 			if (collisionX)
 			{
@@ -312,6 +354,39 @@ public abstract class EntityModel {
 		}
 		//react to X collision
 		return new CollisionCheck(collisionX, time);
+	}
+	
+	public void stopEntityOverlapIfNeeded(EntityModel entity, Rectangle tempGameplayBounds, Rectangle tempImageBounds) {
+		if (entity != null && !this.tempIgnoreEntityCollision && !entity.tempIgnoreEntityCollision && this.gameplayHitBox.overlaps(entity.gameplayHitBox) && tempGameplayBounds.overlaps(entity.gameplayHitBox) && (this.velocity.x == 0 || entity.velocity.x == 0)) {
+			if (tempGameplayBounds.x > entity.gameplayHitBox.x){
+//				this.gameplayHitBox.x += tempGameplayBounds.width > entity.gameplayHitBox.width ? tempGameplayBounds.width + 20f : entity.gameplayHitBox.width + 20f;
+//				this.imageHitBox.x += tempImageBounds.width > entity.imageHitBox.width ? tempImageBounds.width + 20f : entity.imageHitBox.width + 20f;
+				
+				float positionalDifference = tempGameplayBounds.x - entity.gameplayHitBox.x;
+				if (positionalDifference + tempGameplayBounds.x + tempGameplayBounds.width > entity.gameplayHitBox.x + entity.gameplayHitBox.width) {
+					this.imageHitBox.x += tempGameplayBounds.width;
+				}
+				else {
+					this.imageHitBox.x += entity.gameplayHitBox.width;
+				}
+
+
+			}
+			else {
+//				this.gameplayHitBox.x -= tempGameplayBounds.width > entity.gameplayHitBox.width ? tempGameplayBounds.width - 20f : entity.gameplayHitBox.width - 20f;
+//				this.imageHitBox.x -= tempImageBounds.width > entity.imageHitBox.width ? tempImageBounds.width - 20f : entity.imageHitBox.width - 20f;
+				float positionalDifference = tempGameplayBounds.x - entity.gameplayHitBox.x;
+				if (positionalDifference + tempGameplayBounds.x + tempGameplayBounds.width < entity.gameplayHitBox.x + entity.gameplayHitBox.width) {
+					this.imageHitBox.x -= tempGameplayBounds.width;
+				}
+				else {
+					this.imageHitBox.x -= entity.gameplayHitBox.width;
+				}
+			}
+			this.gameplayHitBox.x = this.imageHitBox.x + this.imageHitBox.getWidth() * ((1f - this.widthCoefficient) / 2);		
+			this.hasProcessedOverlapCorrection = true;
+		}
+
 	}
 	
 	public Vector2 getVelocity() {
@@ -337,4 +412,18 @@ public abstract class EntityModel {
 	public void setCollisionChecker(CollisionChecker itemListener) {
 		this.collisionChecker = itemListener;
 	}
+	
+	public boolean tempIgnoreEntityCollision() {
+		return tempIgnoreEntityCollision;
+	}
+
+	public void setTempIgnoreEntityCollision(boolean tempIgnoreEntityCollision) {
+		this.tempIgnoreEntityCollision = tempIgnoreEntityCollision;
+	}
+
+	public boolean hasProcessedOverlapCorrection() {
+		return hasProcessedOverlapCorrection;
+	}
+	
+	
 }

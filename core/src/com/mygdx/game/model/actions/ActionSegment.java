@@ -131,5 +131,6 @@ public abstract class ActionSegment implements EffectController {
 	public abstract ActionSegment cloneActionSegmentWithSourceAndTarget(CharacterModel source, CharacterModel target);
 	public abstract float getEffectiveRange();
 	public abstract void interruptionBlock();
+	public abstract boolean shouldRespectEntityCollisions();
 //	public abstract boolean canBeInterrupted();
 }

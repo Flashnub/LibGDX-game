@@ -21,10 +21,14 @@ public class EntityUIModel {
 	private TextureRegion currentFrame;
 	private float animationTime;
 	private float angleOfRotation;
+	private boolean shouldStagger;
+	public static final float standardStaggerDuration = 0.1f;
+	private float staggerTime;
 		
 	public EntityUIModel(String name, EntityUIDataType type) {
 		animationTime = 0f;
 		angleOfRotation = 0f;
+		staggerTime = 0f;
 		loadSprites(name, type);
 	}
 		
@@ -74,8 +78,17 @@ public class EntityUIModel {
 	public boolean setCurrentFrame(EntityModel entity, float delta) {
 		String animationString = SpriteUtils.animationStringWithState(entity.getState(), entity.isFacingLeft());
 		Animation currentAnimation = animations.get(animationString);
-			
-		this.animationTime += delta;
+		
+		if (this.shouldStagger) {
+			this.staggerTime += delta;
+			if (this.staggerTime >= EntityUIModel.standardStaggerDuration) {
+				this.shouldStagger = false;
+			}
+		}
+		else {
+			this.staggerTime = 0f;
+			this.animationTime += delta;
+		}
 		TextureRegion frame = currentAnimation.getKeyFrame(this.animationTime);
 		if (frame != null) {
 			currentFrame = frame;
@@ -109,4 +122,8 @@ public class EntityUIModel {
 		return angleOfRotation;
 	}
 	
+	public void stagger() {
+		this.shouldStagger = true;
+		this.staggerTime = 0f;
+	}
 }

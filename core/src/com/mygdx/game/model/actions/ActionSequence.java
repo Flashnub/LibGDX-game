@@ -7,6 +7,7 @@ import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.actions.nonhostile.DialogueAction;
 import com.mygdx.game.model.actions.nonhostile.DialogueSettings;
 import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.characters.EntityUIModel;
 import com.mygdx.game.model.effects.MovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.CollisionChecker;
@@ -41,10 +42,12 @@ public class ActionSequence implements Serializable {
 	private ActionListener actionListener;
 	private CollisionChecker collisionChecker;
 	private DialogueController dialogueController;
-	
+	private boolean isStaggered;
+	private float staggerTime;
 	
 	public ActionSequence() {
-
+		this.isStaggered = false;
+		this.staggerTime = 0f;
 	}
 	
 	public static ActionSequence createSequenceWithDialog(DialogueSettings settings, CharacterModel source, CharacterModel target, DialogueController dialogueController, ActionListener actionListener) {
@@ -234,14 +237,24 @@ public class ActionSequence implements Serializable {
 	}
 	
 	public void process(float delta, ActionListener actionListener) {
-		this.action.update(delta);
-		if (this.isActive) {
-			source.shouldUnlockControls(this);
-			if (action.didChangeState) {
-				source.setState(this.getCurrentActionState());
-
+		if (this.isStaggered) {
+			this.staggerTime += delta;
+			if (this.staggerTime > EntityUIModel.standardStaggerDuration) {
+				this.isStaggered = false;
+				this.staggerTime = 0f;
 			}
 		}
+		else {
+			this.action.update(delta);
+			if (this.isActive) {
+				source.shouldUnlockControls(this);
+				if (action.didChangeState) {
+					source.setState(this.getCurrentActionState());
+
+				}
+			}
+		}
+
 	}
 	
 	private void createActionFromSettings(DialogueSettings potentialDialogue, MovementEffectSettings replacementMovement) {
@@ -279,6 +292,11 @@ public class ActionSequence implements Serializable {
 				break;
 		}
 		return action;
+	}
+	
+	public void stagger() {
+		this.isStaggered = true;
+		this.staggerTime = 0f;
 	}
 	
 	public ActionSegmentKey getActionKey() {

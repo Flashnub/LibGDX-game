@@ -52,6 +52,7 @@ public class ProjectileSettings extends AbilitySettings{
 		copy.explosionName = this.explosionName;
 		copy.widthCoefficient = this.widthCoefficient;
 		copy.heightCoefficient = this.heightCoefficient;
+		copy.shouldRotate = this.shouldRotate;
 		
 		Array <WorldEffectSettings> newWorldEffects = new Array <WorldEffectSettings>();
 		for (WorldEffectSettings wSettings : this.worldEffectSettings) {

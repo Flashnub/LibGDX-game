@@ -9,6 +9,7 @@ public class MovementEffectSettings extends EntityEffectSettings {
 	Vector2 velocity;
 	Vector2 acceleration;
 	boolean useGravity;
+	boolean respectEntityCollision;
 
 	@Override
 	public void write(Json json) {
@@ -30,6 +31,7 @@ public class MovementEffectSettings extends EntityEffectSettings {
 		else {
 			this.useGravity = true;
 		}
+		
 		Float maxVelocityX = json.readValue("maxVelocityX", Float.class, jsonData);
 		Float maxVelocityY = json.readValue("maxVelocityY", Float.class, jsonData);
 		
@@ -42,7 +44,7 @@ public class MovementEffectSettings extends EntityEffectSettings {
 		maxVelocity = new Vector2(maxVelocityX, maxVelocityY);
 		
 		this.setType(MovementEffect.type);
-		
+		this.respectEntityCollision = true;
 		
 	}
 
@@ -56,6 +58,10 @@ public class MovementEffectSettings extends EntityEffectSettings {
 	
 	public Vector2 getMaxVelocity() {
 		return maxVelocity;
+	}
+	
+	public boolean shouldRespectEntityCollision() {
+		return respectEntityCollision;
 	}
 
 	public float getEstimatedDistance() {
@@ -73,6 +79,12 @@ public class MovementEffectSettings extends EntityEffectSettings {
 		copy.acceleration = this.acceleration;
 		copy.maxVelocity = this.maxVelocity;
 		copy.useGravity = this.useGravity;
+		copy.respectEntityCollision = this.respectEntityCollision;
 		return copy;
 	}
+
+	public void setShouldRespectEntityCollision(boolean respectEntityCollision) {
+		this.respectEntityCollision = respectEntityCollision;
+	}
+
 }

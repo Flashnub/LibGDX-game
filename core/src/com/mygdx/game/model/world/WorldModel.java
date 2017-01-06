@@ -8,6 +8,8 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.constants.SaveController;
@@ -38,6 +40,10 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     private float accumulatedTime = 0f;
     final String kSpawnPoint = "SpawnPoint";
     final String kEntityType = "EntityType";
+    final String kPatrolWaypoint = "PatrolWaypoint";
+    final String kPatrolDuration = "PatrolDuration";
+    final String kBreakDuration = "BreakDuration";
+
     
     TiledMapTileLayer collisionLayer;
     Array <Enemy> enemies;  
@@ -110,9 +116,9 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 				if (character instanceof Player) {
 					player = (Player)character; 
 					player.getCharacterData().imageHitBox.x = collisionLayer.getTileWidth() * x;
-					player.getCharacterData().gameplayHitBox.x = .4f*(collisionLayer.getTileWidth() * x);
+					player.getCharacterData().gameplayHitBox.x = (collisionLayer.getTileWidth() * x);
 					player.getCharacterData().imageHitBox.y = collisionLayer.getTileHeight() * y;
-					player.getCharacterData().gameplayHitBox.y = .2f*(collisionLayer.getTileWidth() * y);
+					player.getCharacterData().gameplayHitBox.y = (collisionLayer.getTileWidth() * y);
 					player.getCharacterData().setActionListener(this);
 					player.getCharacterData().setObjectListener(this);
 					player.getCharacterData().setCollisionChecker(this);
@@ -121,11 +127,49 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 				}
 				else if (character instanceof Enemy){
 					Enemy enemy = (Enemy) character;
+					Array <Float> patrolWaypoints = new Array <Float>();
+					Integer index = 1;
+					Object wayPoint = tile.getTile().getProperties().get(kPatrolWaypoint.concat(index.toString()));
+					while (wayPoint != null) {
+						patrolWaypoints.add((Float)wayPoint);
+						index += 1;
+						wayPoint = tile.getTile().getProperties().get(kPatrolWaypoint.concat(index.toString()));
+					}
+					
+					float patrolDuration = 0f;
+					if (tile.getTile().getProperties().containsKey(kPatrolDuration)) {
+						patrolDuration = (float) tile.getTile().getProperties().get(kPatrolDuration);
+					}
+					float breakDuration = 0f; 
+					if (tile.getTile().getProperties().containsKey(kBreakDuration)) {
+						breakDuration = (float) tile.getTile().getProperties().get(kBreakDuration);
+					}
+					
 					this.addEnemy(enemy, collisionLayer.getTileWidth() * x,  collisionLayer.getTileHeight() * y);
+					enemy.setPatrolInfo(patrolWaypoints, patrolDuration, breakDuration);
 				}
 				else if (character instanceof NPCCharacter) {
 					NPCCharacter npc = (NPCCharacter) character;
+					Array <Float> patrolWaypoints = new Array <Float>();
+					Integer index = 1;
+					Object wayPoint = tile.getTile().getProperties().get(kPatrolWaypoint.concat(index.toString()));
+					while (wayPoint != null) {
+						patrolWaypoints.add((Float)wayPoint);
+						index += 1;
+						wayPoint = tile.getTile().getProperties().get(kPatrolWaypoint.concat(index.toString()));
+					}
+					
+					float patrolDuration = Float.MAX_VALUE;
+					if (tile.getTile().getProperties().containsKey(kPatrolDuration)) {
+						patrolDuration = (float) tile.getTile().getProperties().get(kPatrolDuration);
+					}
+					float breakDuration = Float.MAX_VALUE; 
+					if (tile.getTile().getProperties().containsKey(kBreakDuration)) {
+						breakDuration = (float) tile.getTile().getProperties().get(kBreakDuration);
+					}
+					
 					this.addNPC(npc, collisionLayer.getTileWidth() * x, collisionLayer.getTileHeight() * y);
+					npc.setPatrolInfo(patrolWaypoints, patrolDuration, breakDuration);
 				}
 			}
     	}
@@ -240,9 +284,9 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	
 	private void addEnemy(Enemy enemy, float xPosition, float yPosition) {
 		enemy.getCharacterData().imageHitBox.x = xPosition;
-		enemy.getCharacterData().gameplayHitBox.x = .4f*xPosition;
+		enemy.getCharacterData().gameplayHitBox.x = xPosition;
 		enemy.getCharacterData().imageHitBox.y = yPosition;
-		enemy.getCharacterData().gameplayHitBox.y = .2f*yPosition;
+		enemy.getCharacterData().gameplayHitBox.y = yPosition;
 		enemies.add(enemy);
 		((EnemyModel) enemy.getCharacterData()).setPlayer(player);
 		((EnemyModel) enemy.getCharacterData()).setActionListener(this);
@@ -255,9 +299,9 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	
 	private void addNPC(NPCCharacter npc, float xPosition, float yPosition) {
 		npc.getCharacterData().imageHitBox.x = xPosition;
-		npc.getCharacterData().gameplayHitBox.x = .4f*xPosition;
+		npc.getCharacterData().gameplayHitBox.x = xPosition;
 		npc.getCharacterData().imageHitBox.y = yPosition;
-		npc.getCharacterData().gameplayHitBox.y = .2f*yPosition;
+		npc.getCharacterData().gameplayHitBox.y = yPosition;
 		npcCharacters.add(npc);
 		((NPCCharacterModel) npc.getCharacterData()).setActionListener(this);
 		((NPCCharacterModel) npc.getCharacterData()).setObjectListener(this);
@@ -291,7 +335,6 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 
 	@Override
 	public void addProjectile(Projectile projectile) {
-		// TODO Auto-generated method stub
 		for (Projectile proj : this.projectiles) {
 			if (proj.equals(projectile)) {
 				return;
@@ -399,13 +442,17 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	}
 	
 	private void checkIfExplosionLands(Character character, Explosion explosion) {
-		if (explosion.getImageHitBox().overlaps(character.getCharacterData().getGameplayHitBox())) {
+		Polygon explosionPolygon = explosion.getGameplayHitBoxInPolygon();
+		Polygon characterPolygon = character.getCharacterData().getGameplayHitBoxInPolygon();
+		if (Intersector.overlapConvexPolygons(explosionPolygon, characterPolygon)) {
 			character.getCharacterData().shouldExplosionHit(explosion);
 		}
 	}
 	
 	private void checkIfProjectileLands(Character character, Projectile projectile) {
-		if (projectile.getImageHitBox().overlaps(character.getCharacterData().getGameplayHitBox())) {
+		Polygon projectilePolygon = projectile.getGameplayHitBoxInPolygon();
+		Polygon characterPolygon = character.getCharacterData().getGameplayHitBoxInPolygon();
+		if (Intersector.overlapConvexPolygons(projectilePolygon, characterPolygon)) {
 			character.getCharacterData().shouldProjectileHit(projectile);
 		}
 	}
@@ -415,48 +462,62 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	}
 	
 	@Override
-	public boolean checkIfEntityCollidesWithOthers(EntityModel entity, Rectangle tempGameplayBounds) {
-		boolean isColliding = false;
+	public EntityModel checkIfEntityCollidesWithOthers(EntityModel entity, Rectangle tempGameplayBounds) {
+		EntityModel collidingEntity = null;
 		if (entity.getAllegiance() == Player.allegiance) {
 			for (Enemy enemy : this.enemies) {
-				if (enemy.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds)) {
-					isColliding = true;
+				if (enemy.getCharacterData().getAllegiance() != Player.allegiance && enemy.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds)) {
+					collidingEntity = enemy.getCharacterData();
 					break;
 				}
 			}
-			if (!isColliding) {
-				for (WorldObject object : this.objects) {
-					if (object.shouldCollideWithCharacter() && object.getGameplayHitBox().overlaps(tempGameplayBounds)) {
-						isColliding = true;
-						break;
-					}
-				}
-			}
+//			if (collidingEntity == null) {
+//				for (WorldObject object : this.objects) {
+//					if (object.shouldCollideWithCharacter() && object.getGameplayHitBox().overlaps(tempGameplayBounds)) {
+//						collidingEntity = true;
+//						break;
+//					}
+//				}
+//			}
 
 		}
-		else if (entity.getAllegiance() == WorldObject.allegiance) {
-			isColliding = player.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds);
-			if (!isColliding) {
-				for (Enemy enemy : this.enemies) {
-					if (enemy.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds)) {
-						isColliding = true;
-						break;
-					}
+		else if (entity instanceof NPCCharacterModel){
+			for (Enemy enemy : this.enemies) {
+				if (enemy.getCharacterData().getAllegiance() != entity.getAllegiance() && enemy.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds)) {
+					collidingEntity = enemy.getCharacterData();
+					break;
 				}
 			}
-		}
-		else {
-			isColliding = player.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds);
-			if (!isColliding) {
-				for (WorldObject object : this.objects) {
-					if (object.shouldCollideWithCharacter() && object.getGameplayHitBox().overlaps(tempGameplayBounds)) {
-						isColliding = true;
-						break;
-					}
+			if (collidingEntity == null && entity.getAllegiance() != Player.allegiance) {
+				if (player.getCharacterData().getAllegiance() != entity.getAllegiance() && player.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds)) {
+					collidingEntity = player.getCharacterData();
 				}
+
 			}
 		}
-		return isColliding;
+//		else if (entity.getAllegiance() == WorldObject.allegiance) {
+//			isColliding = player.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds);
+//			if (!isColliding) {
+//				for (Enemy enemy : this.enemies) {
+//					if (enemy.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds)) {
+//						isColliding = true;
+//						break;
+//					}
+//				}
+//			}
+//		}
+//		else {
+//			isColliding = player.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds);
+//			if (!isColliding) {
+//				for (WorldObject object : this.objects) {
+//					if (object.shouldCollideWithCharacter() && object.getGameplayHitBox().overlaps(tempGameplayBounds)) {
+//						isColliding = true;
+//						break;
+//					}
+//				}
+//			}
+//		}
+		return collidingEntity;
 	}
 
 	@Override

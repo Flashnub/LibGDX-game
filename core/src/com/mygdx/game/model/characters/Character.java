@@ -8,10 +8,10 @@ import java.util.UUID;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.Attack;
-import com.mygdx.game.model.characters.player.Player.PlayerModel;
 import com.mygdx.game.model.effects.EntityEffect;
 import com.mygdx.game.model.effects.MovementEffect;
 import com.mygdx.game.model.effects.MovementEffectSettings;
@@ -21,12 +21,12 @@ import com.mygdx.game.model.events.ObjectListener;
 import com.mygdx.game.model.projectiles.Explosion;
 import com.mygdx.game.model.projectiles.Projectile;
 
-public abstract class Character {
+public abstract class Character implements ModelListener {
 	
 	private EntityUIModel characterUIData;
 	private CharacterModel characterData;
 	
-	enum Direction {
+	public enum Direction {
 		LEFT, RIGHT, NaN;
 	}
 	
@@ -45,6 +45,14 @@ public abstract class Character {
 		}
 	}
 	
+	public void setPatrolInfo(Array <Float> patrolWaypoints, float patrolDuration, float breakDuration) {
+		this.getCharacterData().setPatrolInfo(patrolWaypoints, patrolDuration, breakDuration);
+	}
+	
+	public void actionStagger() {
+		this.characterUIData.stagger();
+	}
+	
 	//=============================================================//
 	//----------------------------MODEL----------------------------//
 	//=============================================================//
@@ -54,14 +62,17 @@ public abstract class Character {
 		public final String idleState = "Idle";
 		public final String walkState = "Walk";
 		public final String backWalkState = "Backwalk";
+		public final String jumpState = "Jump";
+		public final String fallState = "Fall";
 		
 		String state;
 		float currentHealth, maxHealth, currentWill, maxWill, attack, currentStability, maxStability;
 		boolean isImmuneToInjury, attacking, directionLock;
 		protected boolean jumping;
-		boolean walking;
+		protected boolean walking;
 		boolean didChangeState;
-		boolean staggering;
+		boolean stabilityStaggering;
+		boolean actionStaggering;
 		boolean facingLeft;
 		boolean actionLocked;
 	    public float injuryTime = 0f;
@@ -74,6 +85,7 @@ public abstract class Character {
 //		public float gameplayHitBoxHeightModifier;
 		ActionListener actionListener;
 		ObjectListener objectListener;
+		ModelListener modelListener;
 		
 //		public Vector2 velocity, acceleration;
 //		public Rectangle gameplayHitBox;
@@ -89,7 +101,7 @@ public abstract class Character {
 		//Debug
 		float stateTime;
 		
-		public CharacterModel(String characterName, EntityUIModel uiModel) {
+		public CharacterModel(String characterName, EntityUIModel uiModel, ModelListener modelListener) {
 			this.currentEffects = new ArrayList <EntityEffect>();
 			this.indicesToRemove = new ArrayList<Integer>();
 			this.nextActiveActionSequences = new ArrayDeque<ActionSequence>();
@@ -97,7 +109,7 @@ public abstract class Character {
 			setState(idleState);
 			isImmuneToInjury = false;
 			attacking = false;
-			staggering = false;
+			stabilityStaggering = false;
 			jumping = true;
 			facingLeft = false;
 			lockedFacingDirection = Direction.RIGHT;
@@ -107,6 +119,7 @@ public abstract class Character {
 //			isProcessingMovementEffect = false;
 			stateTime = 0f;
 			staggerTime = 0f;
+			this.modelListener = modelListener;
 
 			UUID id = UUID.randomUUID();
 			this.uuid = id.toString();
@@ -127,6 +140,7 @@ public abstract class Character {
 		}
 		
 		public void update(float delta, TiledMapTileLayer collisionLayer) {
+			this.handleOverlapCooldown(delta);
 			this.setGameplaySize(delta, collisionLayer);
 			this.movementWithCollisionDetection(delta, collisionLayer);
 			this.manageAutomaticStates(delta, collisionLayer);
@@ -181,6 +195,9 @@ public abstract class Character {
 //			}
 			if (!jumping && !walking && !this.isProcessingActiveSequences()) {
 				setState(idleState);
+			}
+			else if (jumping && this.velocity.y <= 0 && this.state.equals(jumpState)) {
+				setState(fallState);
 			}
 		}
 		
@@ -269,7 +286,7 @@ public abstract class Character {
 		}
 		
 		public boolean checkIfIntercepted(Attack attack) {
-			boolean interceptedAttack = true;
+			boolean interceptedAttack = false;
 			for (EntityEffect effect : this.currentEffects) {
 				if (effect instanceof AssaultInterceptor) {
 					AssaultInterceptor attackInterceptor = (AssaultInterceptor) effect;
@@ -279,8 +296,16 @@ public abstract class Character {
 			return interceptedAttack;
 		}
 		
-		private void setWalkingStatesIfNeeded() {
-			if (this.walking) {
+		protected void setMovementStatesIfNeeded() {
+			if (this.jumping) {
+				if (this.velocity.y > 0) {
+					this.setState(jumpState);
+				}
+				else {
+					this.setState(fallState);
+				}
+			}
+			else if (this.walking) {
 				if (this.directionLock) {
 					if (this.velocity.x >= 0 && this.lockedFacingDirection.equals(Direction.LEFT)) {
 		    			this.setState(backWalkState);
@@ -306,14 +331,20 @@ public abstract class Character {
 	    	this.directionLock = true;
 	    	this.lockedFacingDirection = this.isFacingLeft() ? Direction.LEFT : Direction.RIGHT;
 	    	//change walk if necessary
-	    	this.setWalkingStatesIfNeeded();
+	    	this.setMovementStatesIfNeeded();
 	    }
 	    
 	    public void unlockDirection() {
 	    	this.directionLock = false;
+	    	if (this.lockedFacingDirection.equals(Direction.LEFT) && this.velocity.x > 0) {
+		    	this.setFacingLeft(false);
+	    	}
+	    	else if (this.lockedFacingDirection.equals(Direction.RIGHT) && this.velocity.x < 0) {
+		    	this.setFacingLeft(true);
+	    	}
 	    	this.lockedFacingDirection = Direction.NaN; 
 	    	//change walk if necessary
-	    	this.setWalkingStatesIfNeeded();
+	    	this.setMovementStatesIfNeeded();
 	    }
 		
 		public boolean isTargetToLeft(CharacterModel target) {
@@ -323,44 +354,52 @@ public abstract class Character {
 		public void jump() {
 	        if (!jumping && !actionLocked) {
 	            jumping = true;
+	            walking = false;
 	            this.getVelocity().y = getJumpSpeed();
+		    	this.setMovementStatesIfNeeded();
 	        }
 	    }
 		
 	    public void stopJump() {
 	    	if (jumping && this.getVelocity().y >= 0) {
 	    		this.getVelocity().y = 0;
+		    	this.setMovementStatesIfNeeded();
 	    	}
 	    }
 	    
-		public void walk(boolean left) {
+		public void horizontalMove(boolean left) {
 			if (!this.actionLocked) {
 				this.setFacingLeft(left);
-				this.walking = true;
-//	    		ActionSequence walkAction = this.getCharacterProperties().getActions().get("Walk").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());
-//	    		this.addActionSequence(walkAction);
-				this.velocity.x = left ? -this.properties.getWalkingSpeed() : this.properties.getWalkingSpeed();
-//				if (this instanceof PlayerModel) {
-//				setState(this.directionLock && 
-//					(left && this.lockedFacingDirection.equals(Direction.RIGHT) 
-//					|| !left && this.lockedFacingDirection.equals(Direction.LEFT))  
-//					? this.backWalkState : this.walkState); //Walk
-//				}
-				this.setWalkingStatesIfNeeded();
+				if (!jumping) {
+					this.walking = true;
+				}
+
+				setHorizontalSpeedForMovement(left);
+
+				this.setMovementStatesIfNeeded();
 			}
 		}
 		
-		public void stopWalk() {
-//			for (ActionSequence sequence : getProcessingActionSequences()) {
-//				if (sequence.getActionKey().getKey().value.equals("Walk")) {
-//					sequence.forceInterrupt();
-//				}
-//			}
-			this.velocity.x = 0;
-			this.walking = false;
-			if (this instanceof PlayerModel) {
+		public void setHorizontalSpeedForMovement(boolean movingLeft) {
+			if (this.walking) {
+				this.velocity.x = movingLeft ? -this.properties.getHorizontalSpeed() : this.properties.getHorizontalSpeed();
+			}
+			else if (this.jumping) {
+				this.acceleration.x = movingLeft ? -this.properties.getHorizontalAcceleration() : this.properties.getHorizontalAcceleration();
+			}
+		}
+		
+		public abstract void patrolWalk(boolean left);
+		
+		public void stopHorizontalMovement() {
+			if (this.walking) {
+				this.velocity.x = 0;
 				setState(this.idleState);
 			}
+			else if (this.jumping) {
+				this.acceleration.x = 0;
+			}
+			this.walking = false;
 		}
 		
 		public float getJumpSpeed() {
@@ -368,8 +407,10 @@ public abstract class Character {
 		}
 		
 		public float getWalkSpeed() {
-			return this.properties.walkingSpeed;
+			return this.properties.horizontalSpeed;
 		}
+		
+		public abstract Direction isTryingToMoveHorizontally();
 
 		protected void movementWithCollisionDetection(float delta, TiledMapTileLayer collisionLayer) {
 		//logic for collision detection
@@ -378,6 +419,11 @@ public abstract class Character {
 				this.getVelocity().x = 0;
 				this.getAcceleration().x = 0;
 			}
+			else if (!isTryingToMoveHorizontally().equals(Direction.NaN)) {
+				boolean left = isTryingToMoveHorizontally().equals(Direction.LEFT);
+				this.setHorizontalSpeedForMovement(left);
+			}
+
 			CollisionCheck collisionY = this.checkForYCollision(delta, collisionLayer, this.velocity.y, true, true);
 			if (collisionY.doesCollide) {
 				if (this.getVelocity().y < 0) {
@@ -404,14 +450,15 @@ public abstract class Character {
 	    	if (this.jumping) {
 	    		this.forceEndForActiveAction();
 				this.jumping = false;
-				this.setWalkingStatesIfNeeded();
-//				if (this.getVelocity().x > 0)
-//				{
-//					setState(walkState);  
-//				}
-//				else if (this.getVelocity().x < 0) {
-//					setState(backWalkState);
-//				}
+				this.acceleration.x = 0;
+				this.velocity.x = 0;
+				if (!this.isTryingToMoveHorizontally().equals(Direction.NaN)) {
+					boolean left = this.isTryingToMoveHorizontally().equals(Direction.LEFT);
+					this.horizontalMove(left);
+				}
+				else {
+					this.setMovementStatesIfNeeded();
+				}
 	    	}
 	    }
 		
@@ -441,6 +488,7 @@ public abstract class Character {
 //    		ActionSequence staggerAction = this.getCharacterProperties().getActions().get("Stagger").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());
 			ActionSequence staggerAction = ActionSequence.createStaggerSequence(this, potentialMovementSettings, this.actionListener);
     		this.addActionSequence(staggerAction);
+    		this.actionStagger();
     		this.setCurrentStability(this.maxStability, null);
 
 		}
@@ -522,12 +570,25 @@ public abstract class Character {
 			return sourcePosition;
 		}
 		
+		public abstract void setPatrolInfo(Array<Float> wayPoints, float patrolDuration, float breakDuration);
+		
+		public void actionStagger() {
+			this.actionStaggering = true;
+			ActionSequence currentSeq = this.getCurrentActiveActionSeq();
+			if (currentSeq != null) {
+				currentSeq.stagger();
+			}
+			this.modelListener.actionStagger();
+		}
+		
 		//-------------GETTERS/SETTERS------------//
-		
-		
 		
 		public String getState() {
 			return state;
+		}
+
+		public boolean isActionStaggering() {
+			return actionStaggering;
 		}
 
 		public boolean isLockDirection() {
@@ -602,9 +663,12 @@ public abstract class Character {
 		public void setState(String state) {
 //			System.out.println(this.name + "'s state: " + this.state);
 //			System.out.println("Time spent in state: " + this.stateTime);
-			this.state = state;
-			this.didChangeState = true;
-			this.stateTime = 0f;
+			if (this.state == null || !this.state.equals(state)) {
+				this.state = state;
+				this.didChangeState = true;
+				this.stateTime = 0f;
+			}
+
 		}
 
 		public float getCurrentHealth() {
@@ -702,12 +766,12 @@ public abstract class Character {
 			this.jumping = jumping;
 		}
 
-		public boolean isStaggering() {
-			return staggering;
+		public boolean isStabilityStaggering() {
+			return stabilityStaggering;
 		}
 
-		public void setStaggering(boolean staggering) {
-			this.staggering = staggering;
+		public void setStabilityStaggering(boolean staggering) {
+			this.stabilityStaggering = staggering;
 		}
 
 		public boolean isFacingLeft() {
@@ -728,7 +792,6 @@ public abstract class Character {
 			return properties;
 		}
 		
-
 	}
 	
 	@Override 

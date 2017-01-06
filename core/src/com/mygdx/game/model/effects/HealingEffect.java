@@ -16,12 +16,9 @@ public class HealingEffect extends EntityEffect {
 	@Override
 	protected void processDuringActive(CharacterModel target, float delta) {
 		super.processDuringActive(target, delta);
-		if (hSettings.isInstantaneous()) {
-			target.addToCurrentHealth(hSettings.value);
-		}
-		else {
-			target.addToCurrentHealth((int) (hSettings.value * (delta / hSettings.getDuration())));
-		}
+		float healing = hSettings.isInstantaneous().booleanValue() ? hSettings.value : (hSettings.value * Math.min((delta / hSettings.getDuration()), 1f));
+		target.addToCurrentHealth(healing);
+
 	}
 
 	@Override

@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.EntityEffect;
+import com.mygdx.game.model.effects.MovementEffect;
 import com.mygdx.game.model.effects.EffectSettings;
 import com.mygdx.game.model.effects.MovementEffectSettings;
 import com.mygdx.game.model.effects.EffectInitializer;
@@ -38,7 +39,7 @@ public class Attack extends ActionSegment {
 	
 	public void processAttackOnCharacter(CharacterModel target) {
 		for (HitTracker tracker : this.alreadyHitCharacters) {
-			if (tracker.equals(target)){
+			if (tracker.characterHit.equals(target)){
 				return;
 			}
 		}
@@ -48,6 +49,17 @@ public class Attack extends ActionSegment {
 				target.addEffect(effect);
 			}
 		}
+		target.actionStagger();
+		source.actionStagger();
+		
+		//Stop movementEffect if attack respects collision with target
+		if (this.shouldRespectEntityCollisions()) {
+			MovementEffect mEffect = source.getCurrentMovement();
+			if (mEffect != null) {
+				mEffect.setForceEnd(true);
+			}
+		}
+		
 		this.alreadyHitCharacters.add(new HitTracker(target));
 	}
 	
@@ -72,6 +84,7 @@ public class Attack extends ActionSegment {
 	}
 	
 	public void sourceActiveProcessWithoutSuper(CharacterModel source) {
+		source.setTempIgnoreEntityCollision(this.shouldRespectEntityCollisions());
 		for (EffectSettings effectSettings : attackSettings.sourceEffectSettings) {
 			EntityEffect effect = EffectInitializer.initializeEntityEffect(effectSettings, this);
 			source.addEffect(effect);
@@ -166,6 +179,13 @@ public class Attack extends ActionSegment {
 		return mSettings;
 	}
 
+	public boolean shouldStagger() {
+		return this.attackSettings.shouldStagger;
+	}
 
+	@Override
+	public boolean shouldRespectEntityCollisions() {
+		return this.attackSettings.sourceRespectEntityCollisions;
+	}
 
 }

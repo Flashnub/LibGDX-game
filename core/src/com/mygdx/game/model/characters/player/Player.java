@@ -13,9 +13,11 @@ import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.ActionSequence.ActionType;
 import com.mygdx.game.model.actions.nonhostile.ConditionalDialogueSettings;
 import com.mygdx.game.model.characters.Character;
+import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.characters.NPCCharacter;
 import com.mygdx.game.model.characters.NPCCharacter.NPCCharacterModel;
 import com.mygdx.game.model.characters.EntityUIModel;
+import com.mygdx.game.model.characters.ModelListener;
 import com.mygdx.game.model.characters.player.GameSave.UUIDType;
 import com.mygdx.game.model.world.DialogueController;
 import com.mygdx.game.model.world.SpawnPoint;
@@ -37,7 +39,7 @@ public class Player extends Character implements InputProcessor {
 	
 	private void setUpPlayer() {
 		loadSaveFile();
-		setCharacterData(new PlayerModel(characterName, this.getCharacterUIData()));
+		setCharacterData(new PlayerModel(characterName, this.getCharacterUIData(), this));
 		this.getCharacterData().setName(characterName);
 	}
 	
@@ -108,8 +110,8 @@ public class Player extends Character implements InputProcessor {
 	    GameSave gameSave;
 	    boolean isTalking;
 
-		public PlayerModel(String characterName, EntityUIModel uiModel) {
-			super(characterName, uiModel);
+		public PlayerModel(String characterName, EntityUIModel uiModel, ModelListener modelListener) {
+			super(characterName, uiModel, modelListener);
 			Json json = new Json();
 			GameSave gameSave;
 			FileHandle fileHandle = Gdx.files.local("Saves/currentSave.json");
@@ -220,7 +222,7 @@ public class Player extends Character implements InputProcessor {
 	    	 		nextAction = this.getCharacterProperties().getActions().get("Aerial1").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());
 	    	 	}
 	    	 	else if (this.isLockDirection()) {
-	    	 		nextAction = this.getCharacterProperties().getActions().get("Launch").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());;
+	    	 		nextAction = this.getCharacterProperties().getActions().get("Rushdown").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());;
 	    	 	}
 	    	 	else {
 	    	 		nextAction = this.getCharacterProperties().getActions().get("PlayerAttack").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());
@@ -246,7 +248,7 @@ public class Player extends Character implements InputProcessor {
 	    
 	    @Override
 	    public void shouldUnlockControls(ActionSequence action) {
-	    	if ((action.getAction().getActionState().equals(ActionState.COOLDOWN) && action.isActive()) || action.getAction().isFinished())
+	    	if ((action.getAction().getActionState().equals(ActionState.COOLDOWN) && action.isActive() && !this.isActionStaggering()) || action.getAction().isFinished())
 	    	{
 	    		this.setActionLock(false);
 	    	}
@@ -257,6 +259,7 @@ public class Player extends Character implements InputProcessor {
 	    	return this.getCurrentActiveActionSeq() != null && !this.getCurrentActiveActionSeq().getAction().getActionState().equals(ActionState.WINDUP);
 	    }
 	    
+	    
 		public boolean handleKeyDown (int keyCode)
 		{
 			if (!applicableKeys.contains(keyCode, true)) {
@@ -265,11 +268,11 @@ public class Player extends Character implements InputProcessor {
 			switch (keyCode) {
 			case Keys.A:
 				isWalkLeftPressed = true;
-				walk(true);
+				horizontalMove(true);
 				break;
 			case Keys.D:
 				isWalkRightPressed = true;
-				walk(false);
+				horizontalMove(false);
 				break;
 			case Keys.Q:
 				block();
@@ -328,7 +331,7 @@ public class Player extends Character implements InputProcessor {
 		
 		private void checkIfNeedToStopWalk() {
 			if (!isWalkLeftPressed && !isWalkRightPressed) {
-				this.stopWalk();
+				this.stopHorizontalMovement();
 			}
 		}
 		
@@ -384,17 +387,66 @@ public class Player extends Character implements InputProcessor {
 
 
 		@Override
-		public boolean handleAdditionCollisionLogic(Rectangle tempGameplayBounds) {
-			return this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds);
+		public boolean handleAdditionalXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds,  boolean alreadyCollided) {
+			if (alreadyCollided) {
+				if (this.walking) {
+					this.stopHorizontalMovement();
+				}
+				return alreadyCollided;
+			}
+			else {
+				EntityModel collidedEntity = this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds);
+				boolean entityCollision = !this.tempIgnoreEntityCollision() && collidedEntity != null;
+				if (entityCollision) {
+					this.stopHorizontalMovement();
+				}
+				if (!this.hasProcessedOverlapCorrection()) {
+					this.stopEntityOverlapIfNeeded(collidedEntity, tempGameplayBounds, tempImageBounds);
+				}
+				return entityCollision;
+			}
 		}
-
+		
+		@Override
+		public boolean handleAdditionalYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+			return this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds) != null;
+		}
 
 		public void setDialogueController(DialogueController dialogueController) {
 			this.dialogueController = dialogueController;
 		}
-		
+
+		@Override
+		public void setPatrolInfo(Array<Float> wayPoints, float patrolDuration, float breakDuration) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void patrolWalk(boolean left) {
+			
+		}
+
+		@Override
+		public Direction isTryingToMoveHorizontally() {
+			// TODO Auto-generated method stub
+			if (this.isWalkLeftPressed && this.isWalkRightPressed) {
+				return Direction.NaN;
+			}
+			else if (this.isWalkLeftPressed) {
+				return Direction.LEFT;
+			}
+			else if (this.isWalkRightPressed) {
+				return Direction.RIGHT;
+			}
+			return Direction.NaN;
+
+		}
+
+
 		
 	}
+
 
 	
 }

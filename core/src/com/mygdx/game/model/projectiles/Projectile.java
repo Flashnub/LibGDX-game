@@ -87,6 +87,7 @@ public class Projectile extends EntityModel implements EffectController{
 			System.out.println(this.velocity);
 		}
 //		this.velocity.y -= this.settings.getGravity() * delta;
+		this.handleOverlapCooldown(delta);
 		this.setGameplaySize(delta);
 		if (this.settings.isHasCollisionDetection()) {
 			this.movementWithCollisionDetection(delta, collisionLayer);
@@ -338,7 +339,8 @@ public class Projectile extends EntityModel implements EffectController{
 		this.state = state;
 	}
 	
-	private float getVelocityAngle() {
+	@Override
+	public float getVelocityAngle() {
 		if (!this.settings.getShouldRotate()) {
 			return 0f;
 		}
@@ -410,9 +412,15 @@ public class Projectile extends EntityModel implements EffectController{
 	}
 
 	@Override
-	public boolean handleAdditionCollisionLogic(Rectangle tempGameplayBounds) {
+	public boolean handleAdditionalXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
 		return false;
 	}
+
+	@Override
+	public boolean handleAdditionalYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+		return false;
+	}
+
 
 	@Override
 	public MovementEffectSettings getReplacementMovementForStagger() {
@@ -438,5 +446,10 @@ public class Projectile extends EntityModel implements EffectController{
 	@Override
 	public Vector2 spawnOriginForChar() {
 		return new Vector2(this.getImageHitBox().x, this.getImageHitBox().y);
+	}
+
+	@Override
+	public CharacterModel getSource() {
+		return this.source;
 	}
 }

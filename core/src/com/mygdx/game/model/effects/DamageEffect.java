@@ -1,6 +1,7 @@
 package com.mygdx.game.model.effects;
 
 import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.characters.enemies.Enemy.EnemyModel;
 
 public class DamageEffect extends EntityEffect{
 	DamageEffectSettings dSettings;
@@ -14,11 +15,12 @@ public class DamageEffect extends EntityEffect{
 	}
 
 	protected void processDuringActive(CharacterModel target, float delta) {
-		if (dSettings.isInstantaneous()) {
-			target.removeFromCurrentHealth(dSettings.value);
-		}
-		else {
-			target.removeFromCurrentHealth((int) (dSettings.value * (delta / dSettings.getDuration())));
+		super.processDuringActive(target, delta);
+		float damage = dSettings.isInstantaneous().booleanValue() ? dSettings.value : (dSettings.value * Math.min((delta / dSettings.getDuration()), 1f));
+		target.removeFromCurrentHealth(damage);
+		if (target instanceof EnemyModel) {
+			EnemyModel enemyTarget = (EnemyModel) target;
+			enemyTarget.checkIfShouldAggroTarget(this.getRetriever().getSource(), damage);
 		}
 	}
 

@@ -88,7 +88,21 @@ Block1
   orig: 250, 200
   offset: 0, 0
   index: -1
+Jump1
+  rotate: false
+  xy: 254, 204
+  size: 250, 200
+  orig: 250, 200
+  offset: 0, 0
+  index: -1
 Block2
+  rotate: false
+  xy: 506, 406
+  size: 250, 200
+  orig: 250, 200
+  offset: 0, 0
+  index: -1
+Fall1
   rotate: false
   xy: 506, 406
   size: 250, 200
@@ -102,7 +116,21 @@ Block3
   orig: 250, 200
   offset: 0, 0
   index: -1
+Fall2
+  rotate: false
+  xy: 758, 608
+  size: 250, 200
+  orig: 250, 200
+  offset: 0, 0
+  index: -1
 Block4
+  rotate: false
+  xy: 1010, 810
+  size: 250, 200
+  orig: 250, 200
+  offset: 0, 0
+  index: -1
+Fall3
   rotate: false
   xy: 1010, 810
   size: 250, 200

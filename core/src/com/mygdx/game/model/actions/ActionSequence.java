@@ -1,5 +1,6 @@
 package com.mygdx.game.model.actions;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Json.Serializable;
 import com.badlogic.gdx.utils.JsonValue;
@@ -26,7 +27,6 @@ public class ActionSequence implements Serializable {
 	
 
 	private ActionSegmentKey actionKey;
-	private ActionSegmentKey nextActionKey;
 	private ActionSegment action;
 	private ActionStrategy strategy;
 	private String windupState;
@@ -44,6 +44,9 @@ public class ActionSequence implements Serializable {
 	private DialogueController dialogueController;
 	private boolean isStaggered;
 	private float staggerTime;
+	private Array <Integer> inputs;
+	private boolean isAerial;
+	private Array <ActionSegmentKey> chainableActionKeys;
 	
 	public ActionSequence() {
 		this.isStaggered = false;
@@ -54,7 +57,7 @@ public class ActionSequence implements Serializable {
 		ActionSequence sequence = new ActionSequence();
 		boolean hasState = settings.getActingState().equals(DialogueSettings.defaultState);
 		sequence.actionKey = new ActionSegmentKey(
-				new StringWrapper(hasState ? DialogueSettings.defaultState : DialogueSettings.stateless),
+				hasState ? DialogueSettings.defaultState : DialogueSettings.stateless,
 				ActionType.Dialogue);
 		sequence.isActive = hasState;
 		sequence.strategy = ActionStrategy.Story;
@@ -81,7 +84,7 @@ public class ActionSequence implements Serializable {
 	
 	public static ActionSequence createStaggerSequence(CharacterModel source, MovementEffectSettings overridingMovement, ActionListener actionListener) {
 		ActionSequence sequence = new ActionSequence();
-		sequence.actionKey = new ActionSegmentKey(new StringWrapper(ActionSequence.staggerKey), ActionType.Stagger);
+		sequence.actionKey = new ActionSegmentKey(ActionSequence.staggerKey, ActionType.Stagger);
 		sequence.isActive = true;
 		sequence.strategy = ActionStrategy.Story;
 		
@@ -116,7 +119,6 @@ public class ActionSequence implements Serializable {
 	public void read(Json json, JsonValue jsonData) {
 		actionKey = json.readValue("actionKey", ActionSegmentKey.class, jsonData);
 		strategy = json.readValue("strategy", ActionStrategy.class, jsonData);
-		nextActionKey = json.readValue("nextActionKey", ActionSegmentKey.class, jsonData);
 		String windupState = json.readValue("windupState", String.class, jsonData);
 		String cooldownState = json.readValue("cooldownState", String.class, jsonData);
 		String leftWindupState = json.readValue("leftWindupState", String.class, jsonData);
@@ -183,7 +185,6 @@ public class ActionSequence implements Serializable {
 	public ActionSequence cloneBareSequence() {
 		ActionSequence sequence = new ActionSequence();
 		sequence.actionKey = this.actionKey;
-		sequence.nextActionKey = this.nextActionKey;
 		sequence.strategy = this.strategy;
 		sequence.windupState = this.windupState;
 		sequence.actingState = this.actingState;
@@ -272,16 +273,16 @@ public class ActionSequence implements Serializable {
 		ActionSegment action = null;
 		switch (segmentKey.getTypeOfAction()) {
 			case Attack:
-				action = new Attack(source, JSONController.attacks.get(segmentKey.getKey().value), this.actionListener);
+				action = new Attack(source, JSONController.attacks.get(segmentKey.getKey()), this.actionListener);
 				break;
 			case WorldAttack:
-				action = new WorldAttack(source, target, actionListener, collisionChecker, JSONController.projectileAttacks.get(segmentKey.getKey().value));
+				action = new WorldAttack(source, target, actionListener, collisionChecker, JSONController.projectileAttacks.get(segmentKey.getKey()));
 				break;
 			case Ability:
-				action = new Ability(source, JSONController.abilities.get(segmentKey.getKey().value), this.actionListener);
+				action = new Ability(source, JSONController.abilities.get(segmentKey.getKey()), this.actionListener);
 				break;
 			case Stagger:
-				action = new Ability(source, JSONController.abilities.get(segmentKey.getKey().value), this.actionListener, replacementMovement);
+				action = new Ability(source, JSONController.abilities.get(segmentKey.getKey()), this.actionListener, replacementMovement);
 				break;
 			case Dialogue:
 				action = new DialogueAction(potentialDialogue, this.dialogueController, this.actionListener, source, target);
@@ -301,10 +302,6 @@ public class ActionSequence implements Serializable {
 	
 	public ActionSegmentKey getActionKey() {
 		return actionKey;
-	}
-	
-	public ActionSegmentKey getNextActionKey() {
-		return nextActionKey;
 	}
 
 	public ActionSegment getAction() {

@@ -7,14 +7,14 @@ import com.mygdx.game.model.actions.ActionSequence.ActionType;
 import com.mygdx.game.wrappers.StringWrapper;
 
 public class ActionSegmentKey implements Serializable{
-	StringWrapper key;
+	String key;
 	ActionType typeOfAction;
 	
 	public ActionSegmentKey() {
 		
 	}
 	
-	public ActionSegmentKey(StringWrapper key, ActionType typeOfAction) {
+	public ActionSegmentKey(String key, ActionType typeOfAction) {
 		this.key = key;
 		this.typeOfAction = typeOfAction;
 	}
@@ -30,9 +30,19 @@ public class ActionSegmentKey implements Serializable{
 	public void read(Json json, JsonValue jsonData) {
 		// TODO Auto-generated method stub
 		typeOfAction = json.readValue("typeOfAction", ActionType.class, jsonData);
-		key = json.readValue("key", StringWrapper.class, jsonData);
+		key = json.readValue("key", String.class, jsonData);
 	}
-	public StringWrapper getKey() {
+	
+	@Override
+	public boolean equals(Object object) {
+		if (object instanceof ActionSegmentKey) {
+			ActionSegmentKey segmentKey = (ActionSegmentKey) object;
+			return this.typeOfAction.equals(segmentKey.typeOfAction) && this.key.equals(segmentKey.key);
+		}
+		return false;
+	}
+	
+	public String getKey() {
 		return key;
 	}
 	public ActionType getTypeOfAction() {

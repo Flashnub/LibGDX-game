@@ -25,6 +25,7 @@ public class CharacterProperties implements Serializable {
 	Integer allegiance;
 	CharacterModel source;
 	HashMap<String, ActionSequence> actions;
+	String weaponKey;
 	
 	public CharacterProperties() {
 		
@@ -44,6 +45,8 @@ public class CharacterProperties implements Serializable {
 		json.writeValue("allegiance", allegiance);
 		json.writeValue("widthCoefficient", widthCoefficient);
 		json.writeValue("heightCoefficient", heightCoefficient);
+		json.writeValue("weaponKey", weaponKey);
+
 	}
 
 	@Override
@@ -54,6 +57,8 @@ public class CharacterProperties implements Serializable {
 		attack = json.readValue("attack", Float.class, jsonData);
 		maxStability = json.readValue("maxStability", Float.class, jsonData);
 		actions = json.readValue("actions", HashMap.class, jsonData);
+		weaponKey = json.readValue("weaponKey", String.class, jsonData);
+
 		
 		Float horizontalSpeed = json.readValue("horizontalSpeed", Float.class, jsonData);
 		if (horizontalSpeed != null) {
@@ -139,6 +144,7 @@ public class CharacterProperties implements Serializable {
 		properties.widthCoefficient = this.widthCoefficient;
 		properties.heightCoefficient = this.heightCoefficient;
 		properties.horizontalAcceleration = this.horizontalAcceleration;
+		properties.weaponKey = this.weaponKey;
 		//iterate through actions.
 		HashMap <String, ActionSequence> clonedActions = new HashMap<String, ActionSequence> ();
 		for (Map.Entry<String, ActionSequence> entry : actions.entrySet()) {

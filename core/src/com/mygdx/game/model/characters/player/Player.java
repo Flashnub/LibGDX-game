@@ -216,7 +216,7 @@ public class Player extends Character implements InputProcessor {
 	    		ActionSequence followup = this.getFollowupSequence();
 	    	 	ActionSequence nextAction;
 	    	 	if (followup != null) {
-	    	 		nextAction =  this.getCharacterProperties().getActions().get(followup.getActionKey().getKey().value).cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());;
+	    	 		nextAction =  this.getCharacterProperties().getActions().get(followup.getActionKey().getKey()).cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());;
 	    	 	}
 	    	 	else if (this.jumping){
 	    	 		nextAction = this.getCharacterProperties().getActions().get("Aerial1").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());
@@ -235,14 +235,14 @@ public class Player extends Character implements InputProcessor {
 
 	       	
 	    private ActionSequence getFollowupSequence() {
-    	 	for (ActionSequence action : this.getProcessingActionSequences()) {
-	    		if (action.isActive() 
-	    		&& action.getActionKey().getTypeOfAction().equals(ActionType.Attack)
-	    		&& action.getNextActionKey() != null) {
-	    			ActionSequence followingAttack = this.getCharacterProperties().getActions().get(action.getNextActionKey().getKey().value).cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());;
-	    			return followingAttack;
-	    		}
-	    	}
+//    	 	for (ActionSequence action : this.getProcessingActionSequences()) {
+//	    		if (action.isActive() 
+//	    		&& action.getActionKey().getTypeOfAction().equals(ActionType.Attack)
+//	    		&& action.getNextActionKey() != null) {
+//	    			ActionSequence followingAttack = this.getCharacterProperties().getActions().get(action.getNextActionKey().getKey()).cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());;
+//	    			return followingAttack;
+//	    		}
+//	    	}
 	    	return null;
 	    }
 	    

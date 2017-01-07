@@ -11,10 +11,7 @@
 			"class": com.mygdx.game.model.actions.ActionSequence,
 			"actionKey": {
 				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": {
-					"class": com.mygdx.game.wrappers.StringWrapper,
-					"value": "PlayerDash"
-				},
+				"key": "PlayerDash",
 				"typeOfAction": Ability
 			}
 			"windUpState": "Idle"
@@ -25,10 +22,7 @@
 			"class": com.mygdx.game.model.actions.ActionSequence,
 			"actionKey": {
 				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": {
-					"class": com.mygdx.game.wrappers.StringWrapper,
-					"value": "PlayerBlock"
-				},
+				"key": "PlayerBlock",
 				"typeOfAction": Ability
 			}
 			"windUpState": "Idle"
@@ -39,18 +33,12 @@
 			"class": com.mygdx.game.model.actions.ActionSequence,
 			"actionKey": {
 				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": {
-					"class": com.mygdx.game.wrappers.StringWrapper,
-					"value": "PlayerAttack"
-				},
+				"key": "PlayerAttack",
 				"typeOfAction": Attack
 			}
 			"nextActionKey": {
 				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": {
-					"class": com.mygdx.game.wrappers.StringWrapper,
-					"value": "PlayerAttack2"
-				},
+				"key": "PlayerAttack2",
 				"typeOfAction": Attack
 			}
 			"windupState": "Walk"
@@ -61,10 +49,7 @@
 			"class": com.mygdx.game.model.actions.ActionSequence,
 			"actionKey": {
 				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": {
-					"class": com.mygdx.game.wrappers.StringWrapper,
-					"value": "PlayerAttack2"
-				},
+				"key": "PlayerAttack2",
 				"typeOfAction": Attack
 			}
 			"windupState": "Idle"
@@ -75,10 +60,7 @@
 			"class": com.mygdx.game.model.actions.ActionSequence,
 			"actionKey": {
 				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": {
-					"class": com.mygdx.game.wrappers.StringWrapper,
-					"value": "Launch"
-				},
+				"key": "Launch",
 				"typeOfAction": Attack
 			}
 			"windupState": "Idle"
@@ -89,10 +71,7 @@
 			"class": com.mygdx.game.model.actions.ActionSequence,
 			"actionKey": {
 				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": {
-					"class": com.mygdx.game.wrappers.StringWrapper,
-					"value": "Rushdown"
-				},
+				"key": "Rushdown",
 				"typeOfAction": Attack
 			}
 			"windupState": "Idle"
@@ -103,10 +82,7 @@
 			"class": com.mygdx.game.model.actions.ActionSequence,
 			"actionKey": {
 				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": {
-					"class": com.mygdx.game.wrappers.StringWrapper,
-					"value": "Aerial1"
-				},
+				"key": "Aerial1",
 				"typeOfAction": Attack
 			}
 			"windupState": "Idle"
@@ -117,10 +93,7 @@
 			"class": com.mygdx.game.model.actions.ActionSequence,
 			"actionKey": {
 				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": {
-					"class": com.mygdx.game.wrappers.StringWrapper,
-					"value": "Aerial2"
-				},
+				"key": "Aerial2",
 				"typeOfAction": Attack
 			}
 			"windupState": "Backwalk"

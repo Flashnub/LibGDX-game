@@ -14,6 +14,7 @@ import com.mygdx.game.model.characters.EntityUIDataType;
 import com.mygdx.game.model.characters.NPCProperties;
 import com.mygdx.game.model.projectiles.ExplosionSettings;
 import com.mygdx.game.model.projectiles.ProjectileSettings;
+import com.mygdx.game.model.weapons.WeaponProperties;
 import com.mygdx.game.model.worldObjects.Item;
 
 public class JSONController {
@@ -29,6 +30,7 @@ public class JSONController {
     public static HashMap<String, WorldAttackSettings> projectileAttacks = loadWorldAttacksFromJSON();
     public static HashMap<String, EntityUIData> uiDatas = new HashMap<String, EntityUIData>();
     public static HashMap<String, NPCProperties> npcProperties = new HashMap<String, NPCProperties>();
+    public static HashMap<String, WeaponProperties> weaponProperties = new HashMap <String, WeaponProperties>();
   
 	 
 	@SuppressWarnings("unchecked")
@@ -129,6 +131,21 @@ public class JSONController {
 
 		}
 		return npcProperties.get(characterName);
+	}
+	
+	public static WeaponProperties loadWeaponProperties(String weaponName) {
+		if (!weaponProperties.containsKey(weaponName)) {
+	        Json json = new Json();
+			FileHandle fileHandle = Gdx.files.local(jsonFilePath + weaponName + "/NPCProperties.json");
+			if (fileHandle.exists()) {
+				WeaponProperties properties = json.fromJson(WeaponProperties.class, Gdx.files.internal(jsonFilePath + weaponName + "/WeaponProperties.json"));
+		        if (properties != null) {
+		        	weaponProperties.put(weaponName, properties);		
+		        }
+			}
+
+		}
+		return weaponProperties.get(weaponName);
 	}
 	
 }

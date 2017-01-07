@@ -10,10 +10,7 @@
 			"class": com.mygdx.game.model.actions.ActionSequence,
 			"actionKey": {
 				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": {
-					"class": com.mygdx.game.wrappers.StringWrapper,
-					"value": "BasicProjectileAttack"
-				},
+				"key": "BasicProjectileAttack",
 				"typeOfAction": WorldAttack
 			}
 			"windupState": "Triangle"

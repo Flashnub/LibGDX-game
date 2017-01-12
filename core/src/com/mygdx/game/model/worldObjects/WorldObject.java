@@ -7,11 +7,13 @@ import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.characters.EntityUIDataType;
 import com.mygdx.game.model.characters.EntityUIModel;
 import com.mygdx.game.model.characters.player.GameSave.UUIDType;
+import com.mygdx.game.model.characters.player.Player.PlayerModel;
+import com.mygdx.game.model.events.InteractableObject;
 import com.mygdx.game.model.events.ObjectListener;
 import com.mygdx.game.model.events.SaveListener;
 import com.mygdx.game.model.world.WorldModel;
 
-public abstract class WorldObject extends EntityModel {
+public abstract class WorldObject extends EntityModel implements InteractableObject{
 	
 	final String deactivatedState = "Deactivated";
 	final String activatingState = "Activating";
@@ -76,12 +78,12 @@ public abstract class WorldObject extends EntityModel {
 	public void movementWithCollisionDetection(float delta, TiledMapTileLayer collisionLayer) {
 		if (this.shouldMove()) {
 			CollisionCheck collisionX = this.checkForXCollision(delta, collisionLayer, this.velocity.x, true);
-			if (collisionX.isDoesCollide()) {
+			if (collisionX.doesCollide()) {
 				this.getVelocity().x = 0;
 				this.getAcceleration().x = 0;
 			}
 			CollisionCheck collisionY = this.checkForYCollision(delta, collisionLayer, this.velocity.y, true, true);
-			if (collisionY.isDoesCollide()) {
+			if (collisionY.doesCollide()) {
 				this.getVelocity().y = 0;
 			}
 		}
@@ -147,6 +149,12 @@ public abstract class WorldObject extends EntityModel {
 	@Override
 	public int getAllegiance() {
 		return WorldObject.allegiance;
+	}
+	
+	@Override 
+	public void actOnThis(PlayerModel player) {
+		this.objListener.objectToActOn(this);
+
 	}
 
 }

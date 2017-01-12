@@ -1,7 +1,6 @@
 package com.mygdx.game.model.characters.enemies;
 
-import java.util.ArrayList;
-
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.characters.enemies.Enemy.EnemyModel;
@@ -30,20 +29,27 @@ public class BasicEnemyAI extends EnemyAI {
 	}
 
 	@Override
-	public void setNextActionSequences(ArrayList<ActionSequence> possibleActionSequences) {
+	public void setNextActionSequences(Array<ActionSequence> possibleActionSequences) {
 		// TODO Auto-generated method stub
 		if (!this.source.isActionLock() && !isDocile()) {
-			ArrayList <ActionSequence> actualActionSequences = new ArrayList <ActionSequence> ();
+			ActionSequence nextSeq = null;
+			float maxProbability = 0f;
 			for (ActionSequence sequence : possibleActionSequences) {
-				float randomFloat = rand.nextFloat();
-				if (randomFloat < 0.3) {
-					actualActionSequences.add(sequence);
+				maxProbability += sequence.getProbabilityToActivate();
+			}
+			float randomProbability = (maxProbability + this.probabilityToRun()) * rand.nextFloat();
+			float currentIndexProbability = 0f;
+			for (ActionSequence sequence : possibleActionSequences) {
+				currentIndexProbability += sequence.getProbabilityToActivate();
+				if (currentIndexProbability > randomProbability) {
+					nextSeq = sequence;
+					break;
 				}
 			}
-			if (actualActionSequences.size() > 0 && !this.source.isProcessingActiveSequences()) {
-				this.source.stopHorizontalMovement();
-				ActionSequence actionSequence = actualActionSequences.get(rand.nextInt(actualActionSequences.size()));
-				this.nextActionSequences.add(actionSequence);
+			if (nextSeq != null) {
+//				this.source.stopHorizontalMovement();
+//				this.nextActionSequences.add(currentSeq);
+				this.source.addActionSequence(nextSeq);
 			}
 			else if (!this.source.isProcessingActiveSequences()){ 
 				//walk towards or away nearest enemy
@@ -51,5 +57,10 @@ public class BasicEnemyAI extends EnemyAI {
 			}
 		}
 
+	}
+
+	@Override
+	public float probabilityToRun() {
+		return 1f;
 	}
 }

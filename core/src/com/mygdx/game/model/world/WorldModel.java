@@ -13,8 +13,10 @@ import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.constants.SaveController;
+import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.Attack;
 import com.mygdx.game.model.characters.Character;
+import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.characters.NPCCharacter;
 import com.mygdx.game.model.characters.NPCCharacter.NPCCharacterModel;
@@ -44,6 +46,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     final String kPatrolDuration = "PatrolDuration";
     final String kBreakDuration = "BreakDuration";
 
+    float freezeWorldDuration = 0f;
     
     TiledMapTileLayer collisionLayer;
     Array <Enemy> enemies;  
@@ -63,6 +66,9 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     Array <Rectangle> additionalRectangles;
     Array <WorldEffect> worldEffects;
     float stateTime;
+    boolean freezeWorld;
+    float freezeTime;
+    CharacterModel characterImmuneToFreeze;
     
     public WorldModel(TiledMapTileLayer collisionLayer) {
     	enemies = new Array<Enemy>();   
@@ -78,6 +84,9 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     	this.collisionLayer = collisionLayer;
     	saveController = new SaveController();
     	stateTime = 0f;
+    	freezeWorld = false;
+    	freezeTime = 0f;
+    	characterImmuneToFreeze = null;
     	
 //    	System.out.println("Width: " + collisionLayer.getTileWidth() + "Height: " + collisionLayer.getTileHeight());
     	inputHandlers = new InputMultiplexer();
@@ -242,38 +251,69 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
         }
         while (accumulatedTime > 0) {
         	float timeForAction = accumulatedTime <= MAX_TIMESTEP ? accumulatedTime : MAX_TIMESTEP;
-    		player.act(timeForAction, collisionLayer);
-    		this.checkIfPlayerIsNearObjects();
-    		this.checkIfPlayerIsNearNPCs();
+        	if (!this.freezeWorld || player.getCharacterData().equals(this.characterImmuneToFreeze)) {
+        		player.act(timeForAction, collisionLayer);
+        		this.checkIfPlayerIsNearNPCs();
+        		this.checkIfPlayerIsNearObjects();
+        	}
+
     		for (int i = 0; i < enemies.size; i++) {
     			Character enemy = enemies.get(i);
-    			enemy.act(timeForAction, collisionLayer);
+            	if (!this.freezeWorld || enemy.getCharacterData().equals(this.characterImmuneToFreeze)) {
+            		enemy.act(timeForAction, collisionLayer);
+            	}
     		}
     		for (int i = 0; i < npcCharacters.size; i++) {
     			Character npc = npcCharacters.get(i);
-    			npc.act(timeForAction, collisionLayer);
+            	if (!this.freezeWorld || npc.getCharacterData().equals(this.characterImmuneToFreeze)) {
+        			npc.act(timeForAction, collisionLayer);
+            	}
     		}
     		for (int i = 0; i < projectiles.size; i++) {
     			Projectile projectile = projectiles.get(i);
-    			projectile.update(timeForAction, collisionLayer);
+    			if (!this.freezeWorld) 
+    				projectile.update(timeForAction, collisionLayer);
     		}
     		for (int i = 0; i < objects.size; i++) {
     			WorldObject object = objects.get(i);
-    			object.update(timeForAction, collisionLayer);
+    			if (!this.freezeWorld) 
+    				object.update(timeForAction, collisionLayer);
     		}
     		for (int i = 0; i < explosions.size; i++) {
     			Explosion explosion = explosions.get(i);
-    			explosion.update(timeForAction);
+    			if (!this.freezeWorld) 
+    				explosion.update(timeForAction);
     		}
     		for (int i = 0; i < worldEffects.size; i++) {
     			WorldEffect effect = worldEffects.get(i);
-    			effect.process(delta);
+    			if (!this.freezeWorld) 
+    				effect.process(delta);
     		}
     		accumulatedTime -= timeForAction;
         }
 
 		this.dialogueController.update(delta);
+		
+		if (freezeWorld) {
+			this.freezeTime += delta;
+			if (this.freezeTime > this.freezeWorldDuration) {
+				this.freezeTime = 0f;
+				this.freezeWorldDuration = 0f;
+				this.freezeWorld = false;
+				this.characterImmuneToFreeze = null;
+			}
+		}
     }
+    
+	@Override
+	public void superActivatedFrom(CharacterModel source, ActionSequence sequence) {
+		this.freezeWorld = true;
+		this.characterImmuneToFreeze = source;
+		this.freezeWorldDuration = sequence.getAction().getWindUpTime();
+		for (WorldListener listener : this.worldListeners) {
+			listener.handleSuperAction(sequence);
+		}
+	}
 
 	public void deleteEnemy(Enemy enemy) {
 		this.enemies.removeValue(enemy, true);
@@ -556,7 +596,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 			}
 		}
 		if (nearbyNPCs.size > 0) {
-			((PlayerModel) player.getCharacterData()).setNearbyNPC(nearbyNPCs.get(0));
+			((PlayerModel) player.getCharacterData()).setNearbyObject((NPCCharacterModel) nearbyNPCs.get(0).getCharacterData());
 		}
 		for (WorldListener listener : worldListeners) {
 			listener.updateWithNearbyNPCs(this.nearbyNPCs);
@@ -626,6 +666,9 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 		return explosions;
 	}
 
+	public TiledMapTileLayer getCollisionLayer() {
+		return this.collisionLayer;
+	}
 
 
 

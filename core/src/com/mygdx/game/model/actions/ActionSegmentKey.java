@@ -4,7 +4,6 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Json.Serializable;
 import com.mygdx.game.model.actions.ActionSequence.ActionType;
-import com.mygdx.game.wrappers.StringWrapper;
 
 public class ActionSegmentKey implements Serializable{
 	String key;

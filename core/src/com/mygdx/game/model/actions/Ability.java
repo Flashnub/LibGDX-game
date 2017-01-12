@@ -12,6 +12,7 @@ public class Ability extends ActionSegment{
 	AbilitySettings settings;
 	Array <EntityEffect> activeSourceEffects;
 	Array <EntityEffect> windupSourceEffects;
+
 	
 	public Ability(CharacterModel source, AbilitySettings settings, ActionListener listener) {
 		super(listener);
@@ -32,7 +33,33 @@ public class Ability extends ActionSegment{
 		
 	}
 	
+	@Override
+	public void sourceCompletionWithoutSuper(CharacterModel source) {
+//		source.setWidthCoefficient(source.getCharacterProperties().getWidthCoefficient());
+//		source.setHeightCoefficient(source.getCharacterProperties().getHeightCoefficient());
+//		source.setxOffsetModifier(0f);
+//		source.setyOffsetModifier(0f);
+		if (!this.shouldRespectEntityCollisions())
+			source.setRespectEntityCollision(true);
+	}
+
+	
 	public void sourceActiveProcessWithoutSuper(CharacterModel source) {
+		if (this.settings.tempWidthModifier != null) {
+			source.setWidthCoefficient(this.settings.tempWidthModifier.floatValue());
+		}
+		if (this.settings.tempHeightModifier != null) {
+			source.setHeightCoefficient(this.settings.tempHeightModifier.floatValue());
+		}
+		if (this.settings.xOffsetModifier != null) {
+			source.setxOffsetModifier(this.settings.xOffsetModifier.floatValue());
+		}
+		if (this.settings.yOffsetModifier != null) {
+			source.setyOffsetModifier(this.settings.yOffsetModifier.floatValue());
+		}
+		if (!this.shouldRespectEntityCollisions())
+			source.setRespectEntityCollision(false);
+		
 		for (EffectSettings effectSettings : settings.sourceEffectSettings) {
 			EntityEffect effect = EffectInitializer.initializeEntityEffect(effectSettings, this);
 			source.addEffect(effect);
@@ -101,5 +128,6 @@ public class Ability extends ActionSegment{
 	public boolean shouldRespectEntityCollisions() {
 		return this.settings.sourceRespectEntityCollisions;
 	}
+
 
 }

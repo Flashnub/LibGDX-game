@@ -6,7 +6,7 @@
 	"attack": 1,
 	"widthCoefficient": 0.2,
 	"heightCoefficient": 0.6,
-	actions: {
+	"actions": {
 		"PlayerDash": {
 			"class": com.mygdx.game.model.actions.ActionSequence,
 			"actionKey": {
@@ -17,6 +17,10 @@
 			"windUpState": "Idle"
 			"actingState": "Walk"
 			"cooldownState": "Block"
+			"inputs": [
+				["LEFTMOVEMENT"],
+				["MOVEMENT"]
+			]
 		},
 		"PlayerBlock": {
 			"class": com.mygdx.game.model.actions.ActionSequence,
@@ -28,77 +32,17 @@
 			"windUpState": "Idle"
 			"actingState": "Walk"
 			"cooldownState": "Block"
+			"inputs": [
+				["SPECIAL"],
+				["LEFTSPECIAL"]
+			]
 		},
-		"PlayerAttack": {
-			"class": com.mygdx.game.model.actions.ActionSequence,
-			"actionKey": {
-				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": "PlayerAttack",
-				"typeOfAction": Attack
-			}
-			"nextActionKey": {
-				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": "PlayerAttack2",
-				"typeOfAction": Attack
-			}
-			"windupState": "Walk"
-			"actingState": "Backwalk"
-			"cooldownState": "Walk"
-		},
-		"PlayerAttack2": {
-			"class": com.mygdx.game.model.actions.ActionSequence,
-			"actionKey": {
-				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": "PlayerAttack2",
-				"typeOfAction": Attack
-			}
-			"windupState": "Idle"
-			"actingState": "Block"
-			"cooldownState": "Idle"
+		
+	},
+	"weaponKeys": [
+		{
+			"class": com.mygdx.game.wrappers.StringWrapper,
+			"value": "Staff"
 		}
-		"Launch": {
-			"class": com.mygdx.game.model.actions.ActionSequence,
-			"actionKey": {
-				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": "Launch",
-				"typeOfAction": Attack
-			}
-			"windupState": "Idle"
-			"actingState": "Idle"
-			"cooldownState": "Idle"
-		}
-		"Rushdown": {
-			"class": com.mygdx.game.model.actions.ActionSequence,
-			"actionKey": {
-				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": "Rushdown",
-				"typeOfAction": Attack
-			}
-			"windupState": "Idle"
-			"actingState": "Idle"
-			"cooldownState": "Idle"
-		}
-		"Aerial1": {
-			"class": com.mygdx.game.model.actions.ActionSequence,
-			"actionKey": {
-				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": "Aerial1",
-				"typeOfAction": Attack
-			}
-			"windupState": "Idle"
-			"actingState": "Walk"
-			"cooldownState": "Backwalk"
-		}
-		"Aerial2": {
-			"class": com.mygdx.game.model.actions.ActionSequence,
-			"actionKey": {
-				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": "Aerial2",
-				"typeOfAction": Attack
-			}
-			"windupState": "Backwalk"
-			"actingState": "Idle"
-			"cooldownState": "Block"
-		}
-	}
+	]
 }

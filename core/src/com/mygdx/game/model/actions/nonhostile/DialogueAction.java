@@ -93,4 +93,9 @@ public class DialogueAction extends ActionSegment {
 		return false;
 	}
 
+	@Override
+	public void sourceCompletionWithoutSuper(CharacterModel source) {
+		
+	}
+
 }

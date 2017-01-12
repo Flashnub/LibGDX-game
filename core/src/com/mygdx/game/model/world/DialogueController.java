@@ -116,7 +116,7 @@ public class DialogueController implements InputProcessor{
 					if (characterModel.getUUID().equals(UUIDForCharacter)) {
 						//Handle next dialogue
 						if (this.currentDialogue.getUUIDForNextDialogue() != null) {
-							characterModel.externalDialogueAction(player.getCharacterData(), this.currentDialogue.getUUIDForNextDialogue()); //How to figure out the target?
+							characterModel.responseDialogueAction(player.getCharacterData(), this.currentDialogue.getUUIDForNextDialogue()); //How to figure out the target?
 						}
 						else {
 							characterModel.dialogueAction(player.getCharacterData()); //How to figure out the target?

@@ -20,9 +20,13 @@ public abstract class ActionSegment implements EffectController {
 	boolean didChangeState;
 	boolean forceEnd; //Used for ending actions involuntarily (Removes from processing)
 	boolean forceCooldownState; //Used for actions that end on demand rather than fixed time 
+	boolean hasProcessedInterruption;
+	boolean hasProcessedCompletion;
+	boolean shouldChain;
 	CharacterModel source;
 	ActionState actionState;
 	float activeTime;
+
 	ActionListener actionListener;
 	
 	public ActionSegment() {
@@ -30,12 +34,16 @@ public abstract class ActionSegment implements EffectController {
 		forceCooldownState = false;
 		hasProcessedActiveSource = false;
 		hasProcessedWindupSource = false;
+		hasProcessedInterruption = false;
+		hasProcessedCompletion = false;
+		shouldChain = false;
 		activeTime = 0f;
 	}
 	
 	public ActionSegment(ActionListener listener) {
 		this();
 		this.actionListener = listener;
+		
 	}
 
 	public void sourceActiveProcess(CharacterModel source) {
@@ -53,29 +61,36 @@ public abstract class ActionSegment implements EffectController {
 		}
 	}
 	
+	public void completionBlock(CharacterModel source) {
+		this.setActionState(ActionState.COOLDOWN);
+		this.hasProcessedCompletion = true;
+		this.sourceCompletionWithoutSuper(source);
+//		System.out.println("Completion");
+	}
+	
 	
 	public void update(float delta) {
 		if (this.currentTime == null) {
 			this.currentTime = 0f;
 		}
 		this.currentTime += delta;
-		if (currentTime >= this.getWindUpPlusActionTime() || this.forceCooldownState) {
-			if (forceCooldownState) {
+		if (currentTime >= this.getWindUpPlusActionTime() || this.forceCooldownState || this.forceEnd) {
+			if (!hasProcessedInterruption && (forceCooldownState || this.forceEnd)) {
 				this.interruptionBlock();
 			}
-			this.setActionState(ActionState.COOLDOWN);
+			if (!this.hasProcessedCompletion) {
+				this.completionBlock(source);
+			}
 		}
-		else if (currentTime >= this.getWindUpTime()) {
+		else if (currentTime >= this.getWindUpTime() && hasProcessedWindupSource) {
 			if (!this.hasProcessedActiveSource) {
 				sourceActiveProcess(getSource());
 			}
 			sendActionToListener(actionListener, delta);
 			this.activeTime += delta;
 		}
-		else if (this.actionState != ActionState.WINDUP){
-			if (!this.hasProcessedWindupSource) {
-				sourceWindupProcess(source);
-			}
+		else if (!this.hasProcessedWindupSource){
+			sourceWindupProcess(source);
 		}
 	}	
 	
@@ -92,7 +107,7 @@ public abstract class ActionSegment implements EffectController {
 	}
 	
 	public void setActionState(ActionState state) {
-		if (this.actionState != state && !forceEnd) {
+		if (this.actionState != state) {
 //			System.out.println("Action State" + state);
 //			System.out.println("Action time:" + this.currentTime);
 			this.didChangeState = true;
@@ -107,7 +122,14 @@ public abstract class ActionSegment implements EffectController {
 	public int getPriority() {
 		return ActionSegment.CombatPriority;
 	}
-
+	
+	public boolean shouldChain() {
+		return shouldChain;
+	}
+	
+	public void setShouldChain(boolean shouldChain) {
+		this.shouldChain = shouldChain;
+	}
 
 	@Override
 	public ActionListener getActionListener() {
@@ -125,6 +147,7 @@ public abstract class ActionSegment implements EffectController {
 	public abstract void sendActionToListener(ActionListener actionListener, float delta);
 	public abstract void sourceActiveProcessWithoutSuper(CharacterModel source);
 	public abstract void sourceWindupProcessWithoutSuper(CharacterModel source);
+	public abstract void sourceCompletionWithoutSuper(CharacterModel source);
 	public abstract float getWindUpTime();
 	public abstract float getWindUpPlusActionTime();
 	public abstract float getTotalTime();

@@ -133,12 +133,12 @@ public class JSONController {
 		return npcProperties.get(characterName);
 	}
 	
-	public static WeaponProperties loadWeaponProperties(String weaponName) {
+	public static WeaponProperties loadWeaponProperties(String weaponName, String characterName) {
 		if (!weaponProperties.containsKey(weaponName)) {
 	        Json json = new Json();
-			FileHandle fileHandle = Gdx.files.local(jsonFilePath + weaponName + "/NPCProperties.json");
+			FileHandle fileHandle = Gdx.files.local(jsonFilePath + characterName + "/" + weaponName + ".json");
 			if (fileHandle.exists()) {
-				WeaponProperties properties = json.fromJson(WeaponProperties.class, Gdx.files.internal(jsonFilePath + weaponName + "/WeaponProperties.json"));
+				WeaponProperties properties = json.fromJson(WeaponProperties.class, Gdx.files.internal(jsonFilePath + characterName + "/" + weaponName + ".json"));
 		        if (properties != null) {
 		        	weaponProperties.put(weaponName, properties);		
 		        }

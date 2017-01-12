@@ -1,6 +1,8 @@
 package com.mygdx.game.model.events;
 
+import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.Attack;
+import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.globalEffects.WorldEffect;
 import com.mygdx.game.model.projectiles.Explosion;
 import com.mygdx.game.model.projectiles.Projectile;
@@ -15,4 +17,5 @@ public interface ActionListener {
 	void addWorldEffect(WorldEffect worldEffect);
 	void addProjectile(Projectile projectile);
 	void addExplosion(Explosion explosion);
+	void superActivatedFrom(CharacterModel source, ActionSequence sequence);
 }

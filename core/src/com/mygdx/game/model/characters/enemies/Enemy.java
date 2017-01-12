@@ -103,7 +103,7 @@ public class Enemy extends NPCCharacter{
 			}
 			else {
 				EntityModel collidedEntity = this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds);
-				boolean entityCollision = !this.tempIgnoreEntityCollision() && collidedEntity != null;
+				boolean entityCollision = this.respectEntityCollision() && collidedEntity != null;
 				if (entityCollision) {
 					this.stopHorizontalMovement();
 				}

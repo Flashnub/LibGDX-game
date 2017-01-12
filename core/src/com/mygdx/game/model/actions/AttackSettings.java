@@ -4,7 +4,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.mygdx.game.model.effects.EffectSettings;
-import com.mygdx.game.model.effects.MovementEffectSettings;
 
 public class AttackSettings extends AbilitySettings{
 	float originX;
@@ -65,15 +64,6 @@ public class AttackSettings extends AbilitySettings{
 		}
 		else {
 			this.targetRespectEntityCollisions = true;
-		}
-
-		if (targetEffectSettings != null) {
-			for (EffectSettings eSettings : targetEffectSettings) {
-				if (eSettings instanceof MovementEffectSettings) {
-					MovementEffectSettings mSettings = (MovementEffectSettings) eSettings;
-					mSettings.setShouldRespectEntityCollision(this.targetRespectEntityCollisions);
-				}
-			}
 		}
 
 	}

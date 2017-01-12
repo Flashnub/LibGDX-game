@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.characters.NPCCharacter;
 import com.mygdx.game.model.characters.enemies.Enemy;
 import com.mygdx.game.model.world.WorldListener;
@@ -88,6 +89,12 @@ public class HUDRenderer implements WorldListener{
 
 	@Override
 	public void updateWithNearbyNPCs(Array<NPCCharacter> npcs) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void handleSuperAction(ActionSequence action) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -1,30 +1,35 @@
 package com.mygdx.game.model.characters.player;
 
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.controllers.Controller;
+import com.badlogic.gdx.controllers.ControllerListener;
+import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.Queue;
+import com.mygdx.game.constants.InputConverter;
+import com.mygdx.game.constants.InputConverter.DirectionalInput;
+import com.mygdx.game.constants.InputType;
 import com.mygdx.game.model.actions.ActionSegment.ActionState;
 import com.mygdx.game.model.actions.ActionSequence;
-import com.mygdx.game.model.actions.ActionSequence.ActionType;
 import com.mygdx.game.model.actions.nonhostile.ConditionalDialogueSettings;
 import com.mygdx.game.model.characters.Character;
 import com.mygdx.game.model.characters.EntityModel;
-import com.mygdx.game.model.characters.NPCCharacter;
-import com.mygdx.game.model.characters.NPCCharacter.NPCCharacterModel;
 import com.mygdx.game.model.characters.EntityUIModel;
 import com.mygdx.game.model.characters.ModelListener;
 import com.mygdx.game.model.characters.player.GameSave.UUIDType;
+import com.mygdx.game.model.events.InteractableObject;
 import com.mygdx.game.model.world.DialogueController;
 import com.mygdx.game.model.world.SpawnPoint;
 import com.mygdx.game.model.worldObjects.Item;
-import com.mygdx.game.model.worldObjects.WorldObject;
 
-public class Player extends Character implements InputProcessor {
+public class Player extends Character implements InputProcessor, ControllerListener {
 
 	public static final String characterName = "Player";
 	public static final String characterType = "Player";
@@ -95,20 +100,79 @@ public class Player extends Character implements InputProcessor {
 		return false;
 	}
 	
+
+	@Override
+	public void connected(Controller controller) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void disconnected(Controller controller) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean buttonDown(Controller controller, int buttonCode) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean buttonUp(Controller controller, int buttonCode) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean axisMoved(Controller controller, int axisCode, float value) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean povMoved(Controller controller, int povCode, PovDirection value) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean xSliderMoved(Controller controller, int sliderCode, boolean value) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean ySliderMoved(Controller controller, int sliderCode, boolean value) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean accelerometerMoved(Controller controller, int accelerometerCode, Vector3 value) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
 	public class PlayerModel extends CharacterModel{
 	
 		final String blockState = "Block";		
-		boolean dashing, canControl, isWalkLeftPressed, isWalkRightPressed, isJumpPressed;
-	    Array<Integer> applicableKeys;
+		boolean dashing, canControl, isJumpPressed;
+		DirectionalInput currentlyHeldDirection;
+//	    Array<Integer> applicableKeys;
 	    Array <String> processedCondtionalDialogueUUIDs;
 	    SpawnPoint spawnPoint;
-	    WorldObject nearbyObject;
-	    NPCCharacter nearbyNPC;
+//	    WorldObject nearbyObject;
+//	    NPCCharacter nearbyNPC;
+	    InteractableObject nearbyObject;
 	    PlayerProperties playerProperties;
 	    DialogueDatabase dialogues;
 	    DialogueController dialogueController;
 	    GameSave gameSave;
 	    boolean isTalking;
+		Queue <String> inputs;
+		InputConverter inputConverter;
 
 		public PlayerModel(String characterName, EntityUIModel uiModel, ModelListener modelListener) {
 			super(characterName, uiModel, modelListener);
@@ -127,25 +191,26 @@ public class Player extends Character implements InputProcessor {
 			dialogues = json.fromJson(DialogueDatabase.class, Gdx.files.internal("Json/Player/dialogues.json"));
 			dialogues.setSource(this);
 			this.processedCondtionalDialogueUUIDs = new Array <String>();
-			applicableKeys = new Array<Integer>();
-			applicableKeys.add(Keys.W);
-			applicableKeys.add(Keys.A);
-			applicableKeys.add(Keys.S);
-			applicableKeys.add(Keys.D);
-			applicableKeys.add(Keys.Q);
-			applicableKeys.add(Keys.E);
-			applicableKeys.add(Keys.R);
-			applicableKeys.add(Keys.Z);
-			applicableKeys.add(Keys.X);
-			applicableKeys.add(Keys.TAB); 
-			applicableKeys.add(Keys.SPACE);
+//			applicableKeys = new Array<Integer>();
+//			applicableKeys.add(Keys.W);
+//			applicableKeys.add(Keys.A);
+//			applicableKeys.add(Keys.S);
+//			applicableKeys.add(Keys.D);
+//			applicableKeys.add(Keys.Q);
+//			applicableKeys.add(Keys.E);
+//			applicableKeys.add(Keys.R);
+//			applicableKeys.add(Keys.Z);
+//			applicableKeys.add(Keys.X);
+//			applicableKeys.add(Keys.TAB); 
+//			applicableKeys.add(Keys.SPACE);
 			dashing = false;
 			canControl = false;
-			isWalkLeftPressed = false;
-			isWalkRightPressed = false;
+			this.currentlyHeldDirection = DirectionalInput.NONE;
 			isJumpPressed = false;
 			this.widthCoefficient = 0.19f;
 			this.heightCoefficient = 0.6f;
+			this.inputs = new Queue <String> ();
+			this.inputConverter = new InputConverter(this.gameSave);
 		}
 		
 		@Override
@@ -246,13 +311,33 @@ public class Player extends Character implements InputProcessor {
 	    	return null;
 	    }
 	    
-	    @Override
-	    public void shouldUnlockControls(ActionSequence action) {
-	    	if ((action.getAction().getActionState().equals(ActionState.COOLDOWN) && action.isActive() && !this.isActionStaggering()) || action.getAction().isFinished())
-	    	{
-	    		this.setActionLock(false);
+	    private boolean queueUpActionFromInputs() {
+	    	ActionSequence sequence = null;
+	    	//Check char props first.
+	    	sequence = this.getCharacterProperties().getSequenceGivenInputs(this.inputs, isFacingLeft());
+	    	if (sequence != null) {
+		    	this.stopHorizontalMovement();
+	    		this.addActionSequence(sequence.cloneSequenceWithSourceAndTarget(this, null, getActionListener(), this.getCollisionChecker()));
+	    		return true;
 	    	}
+	    	//Check weapon next.
+	    	sequence = this.getCurrentWeapon().getSpecificWeaponAction(this.inputs, isFacingLeft());
+	    	if (sequence != null) {
+		    	this.stopHorizontalMovement();
+	    		this.addActionSequence(sequence.cloneSequenceWithSourceAndTarget(this, null, getActionListener(), this.getCollisionChecker()));
+	    		return true;
+	    	}
+	    	
+	    	return false;
 	    }
+	    
+//	    @Override
+//	    public void shouldUnlockControls(ActionSequence action) {
+//	    	if ((action.getAction().getActionState().equals(ActionState.COOLDOWN) && action.isActive()) || action.getAction().isFinished())
+//	    	{
+//	    		this.setActionLock(false);
+//	    	}
+//	    }
 	    
 	    @Override
 		public boolean isAbleToEnqueueAction() {
@@ -262,37 +347,54 @@ public class Player extends Character implements InputProcessor {
 	    
 		public boolean handleKeyDown (int keyCode)
 		{
-			if (!applicableKeys.contains(keyCode, true)) {
-				return false;
+//			switch(keyCode) {
+//			case Keys.A:
+//				this.currentlyHeldDirection = DirectionalInput.LEFT;
+//				break;
+//			case Keys.D:
+//				this.currentlyHeldDirection = DirectionalInput.RIGHT;
+//				break;
+//			case Keys.S:
+//				this.currentlyHeldDirection = DirectionalInput.DOWN;
+//				break;
+//			case Keys.W:
+//				this.currentlyHeldDirection = DirectionalInput.UP;
+//				break;
+//			}
+			DirectionalInput potentialDirectionalInput = this.inputConverter.getDirectionFromKeyCodeForDown(keyCode);
+			if (!potentialDirectionalInput.equals(DirectionalInput.NONE))
+				this.currentlyHeldDirection = potentialDirectionalInput;
+			
+			String inputType = this.inputConverter.convertIntToInputType(keyCode, this.currentlyHeldDirection);
+			this.inputs.addFirst(inputType);
+//			System.out.println(inputs.get(0));
+			if (this.queueUpActionFromInputs())
+			{
+				return true;
 			}
-			switch (keyCode) {
-			case Keys.A:
-				isWalkLeftPressed = true;
+			switch (inputType) {
+			case InputType.LEFT:
 				horizontalMove(true);
 				break;
-			case Keys.D:
-				isWalkRightPressed = true;
+			case InputType.RIGHT:
 				horizontalMove(false);
 				break;
-			case Keys.Q:
-				block();
-				break;
-			case Keys.SPACE:
+//			case Keys.Q:
+//				block();
+//				break;
+			case InputType.JUMP:
 				jump();
 				break;
-			case Keys.E:
-				attack();
-				break;
-			case Keys.Z:
-				dash(true);
-				break;
-			case Keys.R:
+//			case Keys.E:
+//				attack();
+//				break;
+//			case Keys.Z:
+//				dash(true);
+//				break;
+			case InputType.ACTION:
 				actOnObject();
 				break;
-			case Keys.X:
-				this.processNPCRequest();
-				break;
-			case Keys.TAB:
+			case InputType.LOCKON:
 				this.lockDirection();
 				break;
 			default:
@@ -304,22 +406,18 @@ public class Player extends Character implements InputProcessor {
 		}
 		
 		public boolean handleKeyUp (int keyCode) {
-			if (!applicableKeys.contains(keyCode, true)) {
-				return false;
+			DirectionalInput directionHeld = this.inputConverter.getDirectionFromKeyCodeForUp(keyCode, this.currentlyHeldDirection);
+			if (directionHeld != null) {
+				this.currentlyHeldDirection = directionHeld;
+				checkIfNeedToStopWalk();
 			}
-			switch (keyCode) {
-			case Keys.A:
-				isWalkLeftPressed = false;
-				checkIfNeedToStopWalk();
-				break;
-			case Keys.D: 
-				isWalkRightPressed = false;
-				checkIfNeedToStopWalk();
-				break;
-			case Keys.SPACE:
-				stopJump();
-				break;
-			case Keys.TAB:
+			String inputType = this.inputConverter.convertIntToInputType(keyCode, this.currentlyHeldDirection);
+
+			switch (inputType) {
+//			case InputType.JUMP:
+//				stopJump();
+//				break;
+			case InputType.LOCKON:
 				unlockDirection();
 				break;
 			default:
@@ -330,38 +428,30 @@ public class Player extends Character implements InputProcessor {
 		}
 		
 		private void checkIfNeedToStopWalk() {
-			if (!isWalkLeftPressed && !isWalkRightPressed) {
+			if (!this.currentlyHeldDirection.equals(DirectionalInput.LEFT) && !this.currentlyHeldDirection.equals(DirectionalInput.RIGHT)) {
 				this.stopHorizontalMovement();
 			}
 		}
 		
 
 		private void actOnObject() {
-			this.getObjectListener().objectToActOn(this.nearbyObject);
-		}
-		
-		private void processNPCRequest() {
-			if (this.nearbyNPC != null) {
-				((NPCCharacterModel) this.nearbyNPC.getCharacterData()).dialogueAction(this);
+			if (nearbyObject != null) {
+				this.nearbyObject.actOnThis(this);
 			}
 		}
+		
+
 
 		@Override
 		public int getAllegiance() {
 			return Player.allegiance;
 		}
 
-		public WorldObject getNearbyObject() {
-			return nearbyObject;
-		}
-
-		public void setNearbyObject(WorldObject nearbyObject) {
+		public void setNearbyObject(InteractableObject nearbyObject) {
 			this.nearbyObject = nearbyObject;
 		}
 		
-		public void setNearbyNPC(NPCCharacter npc) {
-			this.nearbyNPC = npc;
-		}
+
 
 		public PlayerProperties getPlayerProperties() {
 			return playerProperties;
@@ -396,7 +486,7 @@ public class Player extends Character implements InputProcessor {
 			}
 			else {
 				EntityModel collidedEntity = this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds);
-				boolean entityCollision = !this.tempIgnoreEntityCollision() && collidedEntity != null;
+				boolean entityCollision = this.respectEntityCollision() && collidedEntity != null;
 				if (entityCollision) {
 					this.stopHorizontalMovement();
 				}
@@ -429,14 +519,10 @@ public class Player extends Character implements InputProcessor {
 
 		@Override
 		public Direction isTryingToMoveHorizontally() {
-			// TODO Auto-generated method stub
-			if (this.isWalkLeftPressed && this.isWalkRightPressed) {
-				return Direction.NaN;
-			}
-			else if (this.isWalkLeftPressed) {
+			if (this.currentlyHeldDirection.equals(DirectionalInput.LEFT)) {
 				return Direction.LEFT;
 			}
-			else if (this.isWalkRightPressed) {
+			else if (this.currentlyHeldDirection.equals(DirectionalInput.RIGHT)) {
 				return Direction.RIGHT;
 			}
 			return Direction.NaN;
@@ -446,7 +532,6 @@ public class Player extends Character implements InputProcessor {
 
 		
 	}
-
 
 	
 }

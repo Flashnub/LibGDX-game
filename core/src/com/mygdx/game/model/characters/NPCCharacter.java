@@ -8,6 +8,8 @@ import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.nonhostile.ConditionalDialogueSettings;
 import com.mygdx.game.model.characters.player.GameSave;
 import com.mygdx.game.model.characters.player.Player;
+import com.mygdx.game.model.characters.player.Player.PlayerModel;
+import com.mygdx.game.model.events.InteractableObject;
 import com.mygdx.game.model.world.DialogueActor;
 import com.mygdx.game.model.world.DialogueController;
 
@@ -21,7 +23,7 @@ public class NPCCharacter extends Character{
 		((NPCCharacterModel)this.getCharacterData()).setController(controller);
 	}
 	
-	public class NPCCharacterModel extends CharacterModel implements DialogueActor {
+	public class NPCCharacterModel extends CharacterModel implements DialogueActor, InteractableObject {
 		
 		NPCProperties npcProperties;
 		boolean isCurrentlyInteractable;
@@ -222,7 +224,7 @@ public class NPCCharacter extends Character{
 		}
 
 		@Override
-		public void externalDialogueAction(CharacterModel target, String UUIDForDialogue) {
+		public void responseDialogueAction(CharacterModel target, String UUIDForDialogue) {
 			this.processDialogueRequestWithUUID(target, UUIDForDialogue);
 		}
 
@@ -257,6 +259,11 @@ public class NPCCharacter extends Character{
 		@Override
 		public Direction isTryingToMoveHorizontally() {
 			return Direction.NaN;
+		}
+
+		@Override
+		public void actOnThis(PlayerModel player) {
+			this.dialogueAction(player);
 		}
 
 

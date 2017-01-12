@@ -2,7 +2,6 @@ package com.mygdx.game.model.characters.enemies;
 
 import java.util.ArrayList;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Json.Serializable;
 import com.mygdx.game.model.characters.NPCProperties;

@@ -64,12 +64,13 @@ public abstract class EnemyAI implements PlayerObserver {
 		this.observationBlocks.clear();
 	}
 	
-	public abstract void setNextActionSequences(ArrayList <ActionSequence> possibleActionSequences);
+	public abstract void setNextActionSequences(Array <ActionSequence> possibleActionSequences);
+	public abstract float probabilityToRun();
 	
 	
-	public ArrayList <ActionSequence> figureOutPossibleMoves() {
-		ArrayList <ActionSequence> possibleActionsToTake = new ArrayList <ActionSequence>();
-		if (!this.source.isActionLock() && !this.source.isProcessingActiveSequences() && this.currentTarget != null) {
+	public Array <ActionSequence> figureOutPossibleMoves() {
+		Array <ActionSequence> possibleActionsToTake = new Array <ActionSequence>();
+		if (!this.source.isActionLock() && this.currentTarget != null) {
 			PositionalObservation distanceObservation = null;
 			for (ObservationBlock observationBlock : this.observationBlocks) {
 				//find closest enemy and shoot.
@@ -82,10 +83,13 @@ public abstract class EnemyAI implements PlayerObserver {
 			if (distanceObservation != null) {
 				float rawDistance = distanceObservation.getHypotenuse();
 				//shoot if far, attack if close.
-				
+				ActionSequence currentSequence = this.source.getCurrentActiveActionSeq();
 				for (ActionSequence actionSequence : this.source.getCharacterProperties().getActions().values()) {
 					ActionSequence clonedSequence = actionSequence.cloneSequenceWithSourceAndTarget(this.source, distanceObservation.sourceOfObservation, world, world);
 					if (clonedSequence.getEffectiveRange() >= rawDistance) {
+						if (currentSequence != null && currentSequence.isActionChainableWithThis(clonedSequence)) {
+							clonedSequence.increaseProbability();
+						}
 						possibleActionsToTake.add(clonedSequence);
 					}
 				}

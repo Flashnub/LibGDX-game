@@ -3,11 +3,14 @@ package com.mygdx.game.model.characters;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Json.Serializable;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.wrappers.StringWrapper;
 import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.Queue;
 
 public class CharacterProperties implements Serializable {
 	float maxHealth;
@@ -25,7 +28,8 @@ public class CharacterProperties implements Serializable {
 	Integer allegiance;
 	CharacterModel source;
 	HashMap<String, ActionSequence> actions;
-	String weaponKey;
+	Array <StringWrapper> weaponKeys;
+	Array <ActionSequence> sequencesSortedByInputSize;
 	
 	public CharacterProperties() {
 		
@@ -45,7 +49,7 @@ public class CharacterProperties implements Serializable {
 		json.writeValue("allegiance", allegiance);
 		json.writeValue("widthCoefficient", widthCoefficient);
 		json.writeValue("heightCoefficient", heightCoefficient);
-		json.writeValue("weaponKey", weaponKey);
+		json.writeValue("weaponKeys", weaponKeys);
 
 	}
 
@@ -57,7 +61,13 @@ public class CharacterProperties implements Serializable {
 		attack = json.readValue("attack", Float.class, jsonData);
 		maxStability = json.readValue("maxStability", Float.class, jsonData);
 		actions = json.readValue("actions", HashMap.class, jsonData);
-		weaponKey = json.readValue("weaponKey", String.class, jsonData);
+		Array <StringWrapper> weaponKeys = json.readValue("weaponKeys", Array.class, jsonData);
+		if (weaponKeys == null) {
+			this.weaponKeys = new Array <StringWrapper>();
+		}
+		else {
+			this.weaponKeys = weaponKeys;
+		}
 
 		
 		Float horizontalSpeed = json.readValue("horizontalSpeed", Float.class, jsonData);
@@ -128,6 +138,12 @@ public class CharacterProperties implements Serializable {
 		else {
 			this.heightCoefficient = 1f;
 		}
+		
+		this.sequencesSortedByInputSize = new Array <ActionSequence> ();
+		for (ActionSequence sequence : this.actions.values()) {
+			ActionSequence.addSequenceToSortedArray(sequencesSortedByInputSize, sequence);
+		}
+		
 	}
 
 	public CharacterProperties cloneProperties() {
@@ -144,13 +160,17 @@ public class CharacterProperties implements Serializable {
 		properties.widthCoefficient = this.widthCoefficient;
 		properties.heightCoefficient = this.heightCoefficient;
 		properties.horizontalAcceleration = this.horizontalAcceleration;
-		properties.weaponKey = this.weaponKey;
+		properties.weaponKeys = this.weaponKeys;
 		//iterate through actions.
 		HashMap <String, ActionSequence> clonedActions = new HashMap<String, ActionSequence> ();
 		for (Map.Entry<String, ActionSequence> entry : actions.entrySet()) {
 			clonedActions.put(entry.getKey(), entry.getValue().cloneBareSequence());
 		}
 		properties.setActions(clonedActions);
+		properties.sequencesSortedByInputSize = new Array <ActionSequence>();
+		for (ActionSequence sequence : clonedActions.values()) {
+			ActionSequence.addSequenceToSortedArray(properties.sequencesSortedByInputSize, sequence);
+		}
 		properties.setSource(this.source);
 //		Iterator<Map.Entry<String, ActionSequence>> iterator = actions.entrySet().iterator();
 //		while (iterator.hasNext()) {
@@ -165,6 +185,18 @@ public class CharacterProperties implements Serializable {
 		for (ActionSequence action : actions.values()) {
 			action.setSource(source);
 		}
+	}
+	
+	public ActionSequence getSequenceGivenInputs(Queue<String> inputs, boolean useLeftInputs) {
+		ActionSequence result = null;
+		for (ActionSequence sequence : this.sequencesSortedByInputSize) {
+			if (sequence.doInputsMatch(inputs, useLeftInputs)) {
+				result = sequence;
+				break;
+			}
+		}
+		
+		return result;
 	}
 
 	public float getHeightCoefficient() {
@@ -233,5 +265,9 @@ public class CharacterProperties implements Serializable {
 
 	public Integer getAllegiance() {
 		return allegiance;
+	}
+
+	public Array <StringWrapper> getWeaponKeys() {
+		return weaponKeys;
 	}
 }

@@ -207,7 +207,7 @@ public class Projectile extends EntityModel implements EffectController{
 	protected void movementWithCollisionDetection(float delta, TiledMapTileLayer collisionLayer) {
 		//logic for collision detection
 		CollisionCheck collisionX = this.checkForXCollision(delta, collisionLayer, this.velocity.x, true);
-		if (collisionX.isDoesCollide()) {
+		if (collisionX.doesCollide()) {
 			if (this.settings.isBounces()) {
 				this.getVelocity().x = -this.getVelocity().x;
 			}
@@ -218,7 +218,7 @@ public class Projectile extends EntityModel implements EffectController{
 			this.collisionCheck();
 		}
 		CollisionCheck collisionY = this.checkForYCollision(delta, collisionLayer, this.velocity.y, true, !this.state.equals(EntityModel.cooldownState));
-		if (collisionY.isDoesCollide()) {
+		if (collisionY.doesCollide()) {
 			if (this.settings.isBounces()) {
 				this.getVelocity().y = -this.getVelocity().y;
 			}

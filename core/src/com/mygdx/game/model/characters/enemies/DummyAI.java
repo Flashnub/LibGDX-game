@@ -1,7 +1,6 @@
 package com.mygdx.game.model.characters.enemies;
 
-import java.util.ArrayList;
-
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.characters.enemies.Enemy.EnemyModel;
 import com.mygdx.game.model.world.WorldModel;
@@ -20,9 +19,14 @@ public class DummyAI extends EnemyAI {
 	}
 
 	@Override
-	public void setNextActionSequences(ArrayList<ActionSequence> possibleActionSequences) {
+	public void setNextActionSequences(Array<ActionSequence> possibleActionSequences) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public float probabilityToRun() {
+		return 1f;
 	}
 
 }

@@ -1,0 +1,133 @@
+{
+	"class": com.mygdx.game.model.weapons.WeaponProperties,
+	"name": "Staff",
+	"description": "PlayerStaff",
+	"weaponActions": [
+	{
+		"class": com.mygdx.game.model.actions.ActionSequence,
+		"actionKey": {
+			"class": com.mygdx.game.model.actions.ActionSegmentKey,
+			"key": "Attack",
+			"typeOfAction": Attack
+		},
+		"chainableActionKeys": [
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "Attack2",
+				"typeOfAction": Attack
+			},
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "Launch",
+				"typeOfAction": Attack
+			}
+			
+		],
+		"inputs": [
+			["LIGHTATTACK"]
+		]
+		"windupState": "Walk"
+		"actingState": "Backwalk"
+		"cooldownState": "Walk"
+	},
+	{
+		"class": com.mygdx.game.model.actions.ActionSequence,
+		"actionKey": {
+			"class": com.mygdx.game.model.actions.ActionSegmentKey,
+			"key": "Attack2",
+			"typeOfAction": Attack
+		},
+		"chainableActionKeys": [
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "Rushdown",
+				"typeOfAction": Attack
+			},
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "Launch",
+				"typeOfAction": Attack
+			}
+			
+		],
+		"inputs": [
+			["MEDIUMATTACK"]
+		]
+		"windupState": "Walk"
+		"actingState": "Block"
+		"cooldownState": "Walk"
+	},
+	{
+		"class": com.mygdx.game.model.actions.ActionSequence,
+		"actionKey": {
+			"class": com.mygdx.game.model.actions.ActionSegmentKey,
+			"key": "Launch",
+			"typeOfAction": Attack
+		},
+		"inputs": [
+			["UPHEAVYATTACK"]
+		]
+		"windupState": "Idle"
+		"actingState": "Idle"
+		"cooldownState": "Idle"
+	},
+	{
+		"class": com.mygdx.game.model.actions.ActionSequence,
+		"actionKey": {
+			"class": com.mygdx.game.model.actions.ActionSegmentKey,
+			"key": "Rushdown",
+			"typeOfAction": Attack
+		},
+		"inputs": [
+			["DOWNHEAVYATTACK"]
+		]
+		"windupState": "Idle"
+		"actingState": "Idle"
+		"cooldownState": "Idle"
+	},
+	{
+		"class": com.mygdx.game.model.actions.ActionSequence,
+		"actionKey": {
+			"class": com.mygdx.game.model.actions.ActionSegmentKey,
+			"key": "Aerial1",
+			"typeOfAction": Attack
+		},
+		"chainableActionKeys": [
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "Aerial2",
+				"typeOfAction": Attack
+			}				
+		],
+		"inputs": [
+			["LIGHTATTACK"]
+		]
+		"windupState": "Backwalk"
+		"actingState": "Walk"
+		"cooldownState": "Backwalk"
+		"useType": Aerial
+	},
+	{
+		"class": com.mygdx.game.model.actions.ActionSequence,
+		"actionKey": {
+			"class": com.mygdx.game.model.actions.ActionSegmentKey,
+			"key": "Aerial2",
+			"typeOfAction": Attack
+		},
+		"chainableActionKeys": [
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "Aerial1",
+				"typeOfAction": Attack
+			}				
+		]
+		"inputs": [
+			["MEDIUMATTACK"]
+		]
+		"windupState": "Block"
+		"actingState": "Walk"
+		"cooldownState": "Block"
+		"useType": Aerial
+	}
+	]
+}

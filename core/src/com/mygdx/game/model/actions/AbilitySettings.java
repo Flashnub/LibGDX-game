@@ -18,6 +18,10 @@ public class AbilitySettings implements Serializable {
 	protected Float duration;
 	boolean activeTillDisruption;
 	boolean sourceRespectEntityCollisions; //if this is false, the action ignores all entity collisions.
+	Float tempWidthModifier;
+	Float tempHeightModifier;
+	Float xOffsetModifier;
+	Float yOffsetModifier;
 
 	@Override
 	public void write(Json json) {
@@ -27,11 +31,30 @@ public class AbilitySettings implements Serializable {
 		json.writeValue("cooldownTime", cooldownTime);
 		json.writeValue("duration", duration);		
 		json.writeValue("sourceRespectEntityCollisions", sourceRespectEntityCollisions);
+		
 	}
 	
 	@Override
 	@SuppressWarnings("unchecked")
 	public void read(Json json, JsonValue jsonData) {
+		tempWidthModifier = json.readValue("tempWidthModifier", Float.class, jsonData);
+		tempHeightModifier = json.readValue("tempHeightModifier", Float.class, jsonData);
+		Float xOffsetModifier = json.readValue("xOffsetModifier", Float.class, jsonData);
+		if (xOffsetModifier != null) {
+			this.xOffsetModifier = xOffsetModifier;
+		}
+		else {
+			this.xOffsetModifier = 0f;
+		}
+		
+		Float yOffsetModifier = json.readValue("yOffsetModifier", Float.class, jsonData);
+		if (yOffsetModifier != null) {
+			this.yOffsetModifier = yOffsetModifier;
+		}
+		else {
+			this.yOffsetModifier = 0f;
+		}
+		
 		Boolean activeTillDisruption = json.readValue("activeTillDisruption", Boolean.class, jsonData);
 		Float duration = json.readValue("duration", Float.class, jsonData);
 		if (activeTillDisruption != null && activeTillDisruption.booleanValue()) {
@@ -61,6 +84,10 @@ public class AbilitySettings implements Serializable {
 			this.cooldownTime = 0f;
 		}
 		sourceEffectSettings = json.readValue("sourceEffectSettings", Array.class, jsonData);
+		if (sourceEffectSettings == null) {
+			sourceEffectSettings = new Array <EffectSettings> ();
+		}
+		
 		windupEffectSettings = json.readValue("windupEffectSettings", Array.class, jsonData);
 		if (windupEffectSettings == null) {
 			windupEffectSettings = new Array <EffectSettings> ();
@@ -74,23 +101,6 @@ public class AbilitySettings implements Serializable {
 			this.sourceRespectEntityCollisions = true;
 		}		
 		
-		if (sourceEffectSettings != null) {
-			for (EffectSettings eSettings : sourceEffectSettings) {
-				if (eSettings instanceof MovementEffectSettings) {
-					MovementEffectSettings mSettings = (MovementEffectSettings) eSettings;
-					mSettings.setShouldRespectEntityCollision(this.sourceRespectEntityCollisions);
-				}
-			}
-		}
-		
-		if (windupEffectSettings != null) {
-			for (EffectSettings eSettings : windupEffectSettings) {
-				if (eSettings instanceof MovementEffectSettings) {
-					MovementEffectSettings mSettings = (MovementEffectSettings) eSettings;
-					mSettings.setShouldRespectEntityCollision(this.sourceRespectEntityCollisions);
-				}
-			}
-		}
 	}
 
 	public Float getDuration() {
@@ -144,6 +154,10 @@ public class AbilitySettings implements Serializable {
 		this.windupEffectSettings = settings.windupEffectSettings;
 		this.activeTillDisruption = settings.activeTillDisruption;
 		this.sourceRespectEntityCollisions = settings.sourceRespectEntityCollisions;
+		this.tempHeightModifier = settings.tempHeightModifier;
+		this.tempWidthModifier = settings.tempWidthModifier;
+		this.xOffsetModifier = settings.xOffsetModifier;
+		this.yOffsetModifier = settings.yOffsetModifier;
 	}
 	
 	public AbilitySettings deepCopy() {
@@ -152,6 +166,10 @@ public class AbilitySettings implements Serializable {
 		copy.cooldownTime = this.cooldownTime;
 		copy.activeTillDisruption = this.activeTillDisruption;
 		copy.duration = this.duration;
+		copy.tempHeightModifier = this.tempHeightModifier;
+		copy.tempWidthModifier = this.tempWidthModifier;
+		copy.xOffsetModifier = this.xOffsetModifier;
+		copy.yOffsetModifier = this.yOffsetModifier;
 		if (sourceEffectSettings != null) {
 			Array <EffectSettings> effectSettingsCopy = new Array <EffectSettings> ();
 			for (EffectSettings eSettings : this.sourceEffectSettings) {
@@ -169,6 +187,14 @@ public class AbilitySettings implements Serializable {
 		}
 
 		return copy;
+	}
+
+	public Float getTempWidthGameplayHitBoxModifier() {
+		return tempWidthModifier;
+	}
+
+	public Float getTempHeightGameplayHitBoxModifier() {
+		return tempHeightModifier;
 	}
 	
 }

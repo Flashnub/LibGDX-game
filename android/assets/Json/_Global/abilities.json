@@ -1,12 +1,13 @@
 {
 	"PlayerDash": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
+		"duration": 0.5,
 		"sourceRespectEntityCollisions": false,
 		"sourceEffectSettings": [
 			{
 				"class": "com.mygdx.game.model.effects.MovementEffectSettings",
-				"duration": 1,
-				"delayToActivate": 0.3,
+				"duration": 0.5,
+				"delayToActivate": 0.0,
 				"isInstantaneous": false,
 				"value": 0,
 				"velocity": {
@@ -16,7 +17,7 @@
 				}
 				"acceleration": {
 					"class": "com.badlogic.gdx.math.Vector2",
-					"x": -200,
+					"x": -800,
 					"y": 0
 				}
 			}

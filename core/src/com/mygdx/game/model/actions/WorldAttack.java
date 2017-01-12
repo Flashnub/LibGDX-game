@@ -41,7 +41,7 @@ public class WorldAttack extends ActionSegment{
 			}
 			else if (settings.getAbilitySettings() instanceof AttackSettings) {
 				AttackSettings atkSettings = (AttackSettings) settings.getAbilitySettings();
-				Attack attack = new Attack(source, atkSettings, actionListener);
+				Attack attack = new Attack(source, atkSettings, actionListener, this.collisionChecker);
 				potentialAbility = attack;
 			}
 		}
@@ -97,6 +97,13 @@ public class WorldAttack extends ActionSegment{
 			this.potentialAbility.sourceWindupProcessWithoutSuper(source);
 		}		
 	}
+	
+	@Override
+	public void sourceCompletionWithoutSuper(CharacterModel source) {
+		if (this.potentialAbility != null) {
+			this.potentialAbility.sourceCompletionWithoutSuper(source);
+		}				
+	}
 
 	@Override
 	public ActionSegment cloneActionSegmentWithSourceAndTarget(CharacterModel source, CharacterModel target) {
@@ -119,7 +126,7 @@ public class WorldAttack extends ActionSegment{
 			}
 			else if (worldAttackSettings.getAbilitySettings() instanceof AttackSettings) {
 				AttackSettings atkSettings = (AttackSettings) worldAttackSettings.getAbilitySettings();
-				Attack attack = new Attack(source, atkSettings, this.actionListener);
+				Attack attack = new Attack(source, atkSettings, this.actionListener, this.collisionChecker);
 				worldAttack.potentialAbility = attack;
 			}
 		}
@@ -144,6 +151,8 @@ public class WorldAttack extends ActionSegment{
 	public boolean shouldRespectEntityCollisions() {
 		return potentialAbility.shouldRespectEntityCollisions();
 	}
+
+
 
 
 }

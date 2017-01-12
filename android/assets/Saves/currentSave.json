@@ -1,14 +1,142 @@
 {
-objectsInteractedHistory: [
+objectsInteractedHistory: []
+acquiredItemsHistory: [
 	{
 		class: java.lang.Integer
-		value: 300
-	}
-	{
-		class: java.lang.Integer
-		value: 200
+		value: 100
 	}
 ]
-acquiredItemsHistory: []
 inventoryItemKeys: []
+npcChapterIndices: null
+controlScheme: {}
+KBMouseScheme: {
+	A: {
+		class: java.lang.String
+		value: LEFT
+	}
+	QLEFT: {
+		class: java.lang.String
+		value: LEFTMOVEMENT
+	}
+	XDOWN: {
+		class: java.lang.String
+		value: DOWNMEDIUMATTACK
+	}
+	C: {
+		class: java.lang.String
+		value: HEAVYATTACK
+	}
+	D: {
+		class: java.lang.String
+		value: RIGHT
+	}
+	E: {
+		class: java.lang.String
+		value: ACTION
+	}
+	Q: {
+		class: java.lang.String
+		value: MOVEMENT
+	}
+	R: {
+		class: java.lang.String
+		value: SPECIAL
+	}
+	S: {
+		class: java.lang.String
+		value: DOWN
+	}
+	QRIGHT: {
+		class: java.lang.String
+		value: RIGHTMOVEMENT
+	}
+	W: {
+		class: java.lang.String
+		value: UP
+	}
+	RDOWN: {
+		class: java.lang.String
+		value: DOWNSPECIAL
+	}
+	X: {
+		class: java.lang.String
+		value: MEDIUMATTACK
+	}
+	CLEFT: {
+		class: java.lang.String
+		value: LEFTHEAVYATTACK
+	}
+	Z: {
+		class: java.lang.String
+		value: LIGHTATTACK
+	}
+	ZRIGHT: {
+		class: java.lang.String
+		value: RIGHTLIGHTATTACK
+	}
+	CUP: {
+		class: java.lang.String
+		value: UPHEAVYATTACK
+	}
+	Space: {
+		class: java.lang.String
+		value: JUMP
+	}
+	CRIGHT: {
+		class: java.lang.String
+		value: RIGHTHEAVYATTACK
+	}
+	XLEFT: {
+		class: java.lang.String
+		value: LEFTMEDIUMATTACK
+	}
+	QDOWN: {
+		class: java.lang.String
+		value: DOWNMOVEMENT
+	}
+	ZDOWN: {
+		class: java.lang.String
+		value: DOWNLIGHTATTACK
+	}
+	RUP: {
+		class: java.lang.String
+		value: UPSPECIAL
+	}
+	QUP: {
+		class: java.lang.String
+		value: UPMOVEMENT
+	}
+	XUP: {
+		class: java.lang.String
+		value: UPMEDIUMATTACK
+	}
+	Tab: {
+		class: java.lang.String
+		value: LOCKON
+	}
+	ZUP: {
+		class: java.lang.String
+		value: UPLIGHTATTACK
+	}
+	XRIGHT: {
+		class: java.lang.String
+		value: RIGHTMEDIUMATTACK
+	}
+	CDOWN: {
+		class: java.lang.String
+		value: DOWNHEAVYATTACK
+	}
+	ZLEFT: {
+		class: java.lang.String
+		value: LEFTLIGHTATTACK
+	}
+	RRIGHT: {
+		class: java.lang.String
+		value: RIGHTSPECIAL
+	}
+	RLEFT: {
+		class: java.lang.String
+		value: LEFTSPECIAL
+	}
+}
 }

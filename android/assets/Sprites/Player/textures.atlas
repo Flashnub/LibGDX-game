@@ -18,6 +18,27 @@ Backwalk10
   orig: 250, 200
   offset: 0, 0
   index: -1
+TensionStagger1
+  rotate: false
+  xy: 758, 810
+  size: 250, 200
+  orig: 250, 200
+  offset: 0, 0
+  index: -1
+TensionStaggerCooldown1
+  rotate: false
+  xy: 758, 810
+  size: 250, 200
+  orig: 250, 200
+  offset: 0, 0
+  index: -1
+TensionStaggerWindup1
+  rotate: false
+  xy: 758, 810
+  size: 250, 200
+  orig: 250, 200
+  offset: 0, 0
+  index: -1
 Backwalk11
   rotate: false
   xy: 2, 2

@@ -1,8 +1,11 @@
 package com.mygdx.game.model.weapons;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Queue;
 import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.actions.ActionSequence;
+import com.mygdx.game.model.actions.ActionSequence.UseType;
+import com.mygdx.game.model.characters.Character.CharacterModel;
 
 public class Weapon {
 	
@@ -28,11 +31,15 @@ public class Weapon {
 		return nextAction;
 	}
 	
-	public ActionSequence getSpecificWeaponAction(Queue <String> inputs, boolean useLeftInputs) {
+	public ActionSequence getSpecificWeaponAction(Queue <String> inputs, CharacterModel source) {
 		ActionSequence nextAction = null;
+		boolean isInAir = source.isJumping();
 		if (wProperties != null) {
 			for (ActionSequence weaponAction : wProperties.getWeaponActions()) {
-				if (weaponAction.doInputsMatch(inputs, useLeftInputs)) {
+				if (weaponAction.doInputsMatch(inputs, source, false) &&
+					(weaponAction.getUseType().equals(UseType.Either)
+					|| (isInAir && weaponAction.getUseType().equals(UseType.Aerial))
+					|| (!isInAir && weaponAction.getUseType().equals(UseType.Ground)))) {
 					nextAction = weaponAction;
 					break;
 				}

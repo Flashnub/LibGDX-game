@@ -42,6 +42,27 @@
 			"numberOfFrames": 1,
 			"duration": 0.05,
 			"playMode": NORMAL
+		},
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "TensionStaggerWindup",
+			"numberOfFrames": 1,
+			"duration": 0.05,
+			"playMode": NORMAL
+		},
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "TensionStagger",
+			"numberOfFrames": 1,
+			"duration": 0.05,
+			"playMode": NORMAL
+		},
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "TensionStaggerCooldown",
+			"numberOfFrames": 1,
+			"duration": 0.05,
+			"playMode": NORMAL
 		}
 	]
 	"masterAtlasPath": "Sprites/Player/textures.atlas"

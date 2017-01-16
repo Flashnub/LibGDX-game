@@ -1,6 +1,7 @@
 package com.mygdx.game.model.effects;
 
 import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.events.ActionListener;
 
 public class HealingEffect extends EntityEffect {
 	HealingEffectSettings hSettings;
@@ -26,4 +27,28 @@ public class HealingEffect extends EntityEffect {
 		return HealingEffect.type;
 	}
 
+	@Override
+	public boolean shouldReciprocateToSource(CharacterModel target, ActionListener listener) {
+		return false;
+	}
+
+	@Override
+	public void flipValues() {
+		
+	}
+	
+	@Override
+	public boolean shouldAddIfIntercepted() {
+		return false;
+	}
+
+	@Override
+	public void flipValuesIfNecessary(CharacterModel target, CharacterModel source) {
+		
+	}
+
+	@Override
+	public boolean isUniqueEffect() {
+		return false;
+	}
 }

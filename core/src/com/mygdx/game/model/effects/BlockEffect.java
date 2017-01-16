@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.actions.Attack;
 import com.mygdx.game.model.actions.HitTracker;
 import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.AssaultInterceptor;
 import com.mygdx.game.model.projectiles.Explosion;
 import com.mygdx.game.model.projectiles.Projectile;
@@ -88,6 +89,32 @@ public class BlockEffect extends EntityEffect implements AssaultInterceptor{
 	@Override
 	public String getType() {
 		return BlockEffect.type;
+	}
+
+	@Override
+	public boolean shouldReciprocateToSource(CharacterModel target, ActionListener listener) {
+		return false;
+	}
+
+	@Override
+	public void flipValues() {
+		
+	}
+
+	@Override
+	public boolean shouldAddIfIntercepted() {
+		return false;
+	}
+
+	@Override
+	public void flipValuesIfNecessary(CharacterModel target, CharacterModel source) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isUniqueEffect() {
+		return true;
 	}
 
 

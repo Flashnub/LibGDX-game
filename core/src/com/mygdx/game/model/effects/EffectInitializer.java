@@ -32,6 +32,9 @@ public class EffectInitializer {
 		case BlockEffect.type:
 			effect = new BlockEffect(settings, controller);
 			break;
+		case TensionAddEffect.type:
+			effect = new TensionAddEffect(settings, controller);
+			break;
 		}
 		return effect;
 	}

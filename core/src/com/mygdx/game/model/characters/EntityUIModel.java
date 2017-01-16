@@ -22,7 +22,7 @@ public class EntityUIModel {
 	private float animationTime;
 	private float angleOfRotation;
 	private boolean shouldStagger;
-	public static final float standardStaggerDuration = 0.1f;
+	public static final float standardStaggerDuration = 0.2f;
 	private float staggerTime;
 		
 	public EntityUIModel(String name, EntityUIDataType type) {

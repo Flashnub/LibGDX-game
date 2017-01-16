@@ -1,20 +1,40 @@
 package com.mygdx.game.model.effects;
 
+import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.model.characters.EntityUIModel;
 import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.conditions.PassiveCondition;
+import com.mygdx.game.model.conditions.PassiveConditionSettings;
+import com.mygdx.game.model.events.ActionListener;
+import com.mygdx.game.model.conditions.ConditionInitializer;
 
 public abstract class EntityEffect extends Effect {
 
+	Array <PassiveCondition> passiveConditions;
+	float staggerTime;
+	boolean staggered;
+	EntityEffectSettings eSettings;
 	
-	public EntityEffect(EffectSettings settings, EffectController retriever) {
+	public EntityEffect(EffectSettings settings, EffectController controller) {
 		super(settings);
-		this.setRetriever(retriever);
+		this.setController(controller);
+		this.passiveConditions = new Array <PassiveCondition>();
+		for (PassiveConditionSettings conditionSettings : this.settings.getPassiveConditions()) {
+			PassiveCondition condition = ConditionInitializer.initializePassiveCondition(this.getController().getSource(), conditionSettings);
+			this.passiveConditions.add(condition);
+		}
+		staggerTime = 0f;
+		staggered = false;
+		if (settings instanceof EntityEffectSettings) {
+			this.eSettings = (EntityEffectSettings) settings;
+		}
 	}
 	
-	public enum EffectType {
-		MOVEMENT, DAMAGE, HEALING, ITEMGIVE, STABILITYDMG, BLOCK
-	}
-	
-	
+	public abstract boolean shouldReciprocateToSource(CharacterModel target, ActionListener listener);
+	public abstract void flipValues();
+	public abstract void flipValuesIfNecessary(CharacterModel target, CharacterModel source);
+	public abstract boolean shouldAddIfIntercepted();
+	public abstract boolean isUniqueEffect();
 	
 	protected void initialProcess(CharacterModel target) {
 		super.initialProcess();
@@ -29,11 +49,26 @@ public abstract class EntityEffect extends Effect {
 	}
 	
 	public boolean process(CharacterModel target, float delta) {
+		if (this.staggered) {
+			this.staggerTime += delta;
+			if (staggerTime > EntityUIModel.standardStaggerDuration) {
+				this.staggered = false;
+				this.staggerTime = 0f;
+			}
+			return false;
+		}
 		boolean isFinished = false;
+		boolean conditionsMet = true;
+		for (PassiveCondition condition : this.passiveConditions) {
+			conditionsMet = conditionsMet && condition.isConditionMet();
+			if (!conditionsMet && this.isActive && condition.endIfNotMet()) {
+				this.setForceEnd(true);
+			}
+		}
 		if ((getCurrentTime() >= settings.getDelayToActivate() || settings.isInstantaneous()) && !this.hasProcessedInitial()) {
 			this.initialProcess(target);
 		}
-		if ((getCurrentTime() > settings.getDelayToActivate() && getCurrentTime() < settings.getDuration() + settings.getDelayToActivate()) || settings.isInstantaneous()) {
+		if ((getCurrentTime() > settings.getDelayToActivate() && getCurrentTime() < settings.getDuration() + settings.getDelayToActivate()) || settings.isInstantaneous() && conditionsMet) {
 			this.processDuringActive(target, delta);
 		}
 		if ((getCurrentTime() >= (settings.getDuration() + settings.getDelayToActivate()) || settings.isInstantaneous() || this.isForceEnd()) && !this.hasProcessedCompletion()) {
@@ -61,5 +96,12 @@ public abstract class EntityEffect extends Effect {
 		this.forceEnd = forceEnd;
 	}
 
+	public void stagger() {
+		this.staggered = true;
+	}
+	
+	public Integer getSpecificID() {
+		return this.eSettings.getSpecificID();
+	}
 	
 }

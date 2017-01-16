@@ -19,12 +19,14 @@ public abstract class ActionSegment implements EffectController {
 	boolean hasProcessedWindupSource;
 	boolean didChangeState;
 	boolean forceEnd; //Used for ending actions involuntarily (Removes from processing)
+	boolean forceActiveState; //Activate on Demand instead of fixed time.
 	boolean forceCooldownState; //Used for actions that end on demand rather than fixed time 
 	boolean hasProcessedInterruption;
 	boolean hasProcessedCompletion;
 	boolean shouldChain;
 	CharacterModel source;
 	ActionState actionState;
+	float windupTime;
 	float activeTime;
 
 	ActionListener actionListener;
@@ -38,6 +40,8 @@ public abstract class ActionSegment implements EffectController {
 		hasProcessedCompletion = false;
 		shouldChain = false;
 		activeTime = 0f;
+		windupTime = 0f;			
+		this.currentTime = 0f;
 	}
 	
 	public ActionSegment(ActionListener listener) {
@@ -65,14 +69,10 @@ public abstract class ActionSegment implements EffectController {
 		this.setActionState(ActionState.COOLDOWN);
 		this.hasProcessedCompletion = true;
 		this.sourceCompletionWithoutSuper(source);
-//		System.out.println("Completion");
 	}
 	
 	
 	public void update(float delta) {
-		if (this.currentTime == null) {
-			this.currentTime = 0f;
-		}
 		this.currentTime += delta;
 		if (currentTime >= this.getWindUpPlusActionTime() || this.forceCooldownState || this.forceEnd) {
 			if (!hasProcessedInterruption && (forceCooldownState || this.forceEnd)) {
@@ -82,15 +82,18 @@ public abstract class ActionSegment implements EffectController {
 				this.completionBlock(source);
 			}
 		}
-		else if (currentTime >= this.getWindUpTime() && hasProcessedWindupSource) {
+		else if ((currentTime >= this.getWindUpTime() || this.forceActiveState) && this.hasProcessedWindupSource) {
 			if (!this.hasProcessedActiveSource) {
 				sourceActiveProcess(getSource());
 			}
 			sendActionToListener(actionListener, delta);
 			this.activeTime += delta;
 		}
-		else if (!this.hasProcessedWindupSource){
-			sourceWindupProcess(source);
+		else {
+			if (!this.hasProcessedWindupSource) {
+				sourceWindupProcess(source);
+			}
+			this.windupTime += delta;
 		}
 	}	
 	
@@ -108,8 +111,6 @@ public abstract class ActionSegment implements EffectController {
 	
 	public void setActionState(ActionState state) {
 		if (this.actionState != state) {
-//			System.out.println("Action State" + state);
-//			System.out.println("Action time:" + this.currentTime);
 			this.didChangeState = true;
 			this.actionState = state;
 		}
@@ -155,5 +156,6 @@ public abstract class ActionSegment implements EffectController {
 	public abstract float getEffectiveRange();
 	public abstract void interruptionBlock();
 	public abstract boolean shouldRespectEntityCollisions();
-//	public abstract boolean canBeInterrupted();
+	public abstract boolean doesNeedDisruptionDuringWindup();
+	public abstract boolean doesNeedDisruptionDuringActive();
 }

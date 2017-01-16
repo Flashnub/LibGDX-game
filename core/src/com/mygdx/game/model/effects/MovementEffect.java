@@ -2,6 +2,8 @@ package com.mygdx.game.model.effects;
 
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.events.ActionListener;
+import com.mygdx.game.model.characters.CollisionCheck;
 
 public class MovementEffect extends EntityEffect {
 
@@ -14,6 +16,7 @@ public class MovementEffect extends EntityEffect {
 		oldAccel = new Vector2();
 		if (settings instanceof MovementEffectSettings) {
 			this.mSettings = (MovementEffectSettings) settings;
+			this.staggered = mSettings.startWithStagger;
 		}
 	}
 
@@ -46,9 +49,7 @@ public class MovementEffect extends EntityEffect {
 		target.acceleration.x = oldAccel.x;
 		target.acceleration.y = oldAccel.y;
 		
-//		if (Math.abs(target.velocity.x) < 2f) {
 		target.velocity.x = 0;
-//		}
 	}
 	
 	public Vector2 getOldAccel() {
@@ -68,4 +69,34 @@ public class MovementEffect extends EntityEffect {
 		return MovementEffect.type;
 	}
 
+	@Override
+	public boolean shouldReciprocateToSource(CharacterModel target, ActionListener listener) {
+		//Miniscule amount of time, should only reciprocate if target is next to wall.
+		CollisionCheck collisionCheck = target.checkForXCollision(0.1f, listener.getCollisionLayer(), this.mSettings.velocity.x, this.mSettings.acceleration.x, false);
+		return collisionCheck.doesCollide();
+	}
+
+	@Override
+	public void flipValues() {
+		this.mSettings.velocity.x = -this.mSettings.velocity.x;
+		this.mSettings.acceleration.x = -this.mSettings.acceleration.x;
+	}
+	
+	@Override
+	public boolean shouldAddIfIntercepted() {
+		return true;
+	}
+
+	@Override
+	public void flipValuesIfNecessary(CharacterModel target, CharacterModel source) {
+		if (target.gameplayHitBox.x <= source.gameplayHitBox.x && source.isFacingLeft()) {
+			flipValues();
+		}
+
+	}
+
+	@Override
+	public boolean isUniqueEffect() {
+		return true;
+	}
 }

@@ -59,6 +59,13 @@
 			}
 		]
 	}
+	"TensionStagger": {
+		"class": "com.mygdx.game.model.actions.AbilitySettings",
+		"duration": 2,
+		"sourceEffectSettings": [
+
+		]
+	}
 	"BasicProjectileAttack": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
 		"sourceEffectSettings": [

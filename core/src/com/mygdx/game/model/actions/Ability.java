@@ -24,7 +24,11 @@ public class Ability extends ActionSegment{
 	
 	public Ability(CharacterModel source, AbilitySettings settings, ActionListener listener, MovementEffectSettings replacementMovement) {
 		this(source, settings, listener);
-		this.settings.replaceMovementIfNecessary(replacementMovement);
+		if (replacementMovement != null) {
+			this.settings.replaceMovementIfNecessary(replacementMovement);
+			replacementMovement.setStartWithStagger(true);
+		}
+
 	}
 	
 	@Override
@@ -35,10 +39,10 @@ public class Ability extends ActionSegment{
 	
 	@Override
 	public void sourceCompletionWithoutSuper(CharacterModel source) {
-//		source.setWidthCoefficient(source.getCharacterProperties().getWidthCoefficient());
-//		source.setHeightCoefficient(source.getCharacterProperties().getHeightCoefficient());
-//		source.setxOffsetModifier(0f);
-//		source.setyOffsetModifier(0f);
+		source.setWidthCoefficient(source.getCharacterProperties().getWidthCoefficient());
+		source.setHeightCoefficient(source.getCharacterProperties().getHeightCoefficient());
+		source.setxOffsetModifier(0f);
+		source.setyOffsetModifier(0f);
 		if (!this.shouldRespectEntityCollisions())
 			source.setRespectEntityCollision(true);
 	}
@@ -77,12 +81,20 @@ public class Ability extends ActionSegment{
 
 	@Override
 	public float getWindUpTime() {
-		return this.settings.windupTime;
+		return this.forceActiveState ? this.windupTime : this.settings.windupTime;
 	}
 	
 	@Override 
 	public float getWindUpPlusActionTime() {
-		return this.settings.windupTime + this.settings.duration;
+		return getWindUpTime() + (this.forceCooldownState ? this.activeTime : this.settings.duration);
+	}
+	
+	@Override
+	public float getTotalTime() {
+//		if (this.forceCooldownState) {
+//			return getWindUpTime() + this.activeTime + this.settings.cooldownTime;
+//		}
+		return getWindUpPlusActionTime() + this.settings.cooldownTime;
 	}
 
 	@Override
@@ -96,13 +108,7 @@ public class Ability extends ActionSegment{
 		return ability;
 	}
 
-	@Override
-	public float getTotalTime() {
-		if (this.forceCooldownState) {
-			return this.settings.windupTime + this.activeTime + this.settings.cooldownTime;
-		}
-		return this.settings.windupTime + this.settings.duration + this.settings.cooldownTime;
-	}
+
 
 	@Override
 	public void interruptionBlock() {
@@ -127,6 +133,16 @@ public class Ability extends ActionSegment{
 	@Override
 	public boolean shouldRespectEntityCollisions() {
 		return this.settings.sourceRespectEntityCollisions;
+	}
+
+	@Override
+	public boolean doesNeedDisruptionDuringWindup() {
+		return this.settings.windupTillDisruption;
+	}
+
+	@Override
+	public boolean doesNeedDisruptionDuringActive() {
+		return this.settings.activeTillDisruption;
 	}
 
 

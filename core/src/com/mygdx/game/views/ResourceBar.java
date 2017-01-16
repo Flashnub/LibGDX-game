@@ -41,10 +41,8 @@ public class ResourceBar extends Actor{
 				}
 				return null;
 			}
-		}, PlayerWill {
-
-		}, PlayerEnergy {
-
+		}, PlayerTension {
+			
 		}, EnemyHealth {
 			@Override
 			public TextureRegion getForegroundSprite() {
@@ -140,10 +138,7 @@ public class ResourceBar extends Actor{
 			this.setWidth(viewPort.getScreenWidth() * 0.3f);
 			this.setHeight(30);
 		}
-		else if (type.getAffiliation().equals(ResourceBarType.PlayerWill.getAffiliation())) {
-			
-		}
-		else if (type.getAffiliation().equals(ResourceBarType.PlayerWill.getAffiliation())) {
+		else if (type.getAffiliation().equals(ResourceBarType.PlayerTension.getAffiliation())) {
 			
 		}
 		else if (type.getAffiliation().equals(ResourceBarType.EnemyHealth.getAffiliation())) {

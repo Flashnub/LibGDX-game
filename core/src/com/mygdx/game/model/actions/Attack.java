@@ -35,12 +35,6 @@ public class Attack extends ActionSegment {
 		this.collisionChecker = collisionChecker;
 		this.hitBox = new Rectangle(0, 0, settings.width, settings.height);
 		this.updateHitBox();
-//		if (source.isFacingLeft()) {
-//			this.hitBox = new Rectangle(source.getGameplayHitBox().x + settings.originX - 10, source.getGameplayHitBox().y + settings.originY, -settings.width, settings.height);
-//		}
-//		else {
-//			this.hitBox = new Rectangle(source.getGameplayHitBox().x + settings.originX + 10, source.getGameplayHitBox().y + settings.originY, settings.width, settings.height);
-//		}
 	}
 	
 	public void processAttackOnCharacter(CharacterModel target) {
@@ -49,14 +43,23 @@ public class Attack extends ActionSegment {
 				return;
 			}
 		}
-		if (!target.checkIfIntercepted(this)) {
-			for (EffectSettings effectSettings : this.attackSettings.targetEffectSettings) {
-				EntityEffect effect = EffectInitializer.initializeEntityEffect(effectSettings, this);
-				target.addEffect(effect);
+		boolean isIntercepted = target.checkIfIntercepted(this);
+		for (EffectSettings effectSettings : this.attackSettings.targetEffectSettings) {
+			EntityEffect effect = EffectInitializer.initializeEntityEffect(effectSettings, this);
+			if (!isIntercepted || (isIntercepted && effect.shouldAddIfIntercepted())) {
+				if (effect.shouldReciprocateToSource(target, getActionListener())) {
+					effect.flipValues();
+					source.addEffect(effect);
+				}
+				else {
+					effect.flipValuesIfNecessary(target, source);
+					target.addEffect(effect);
+				}
 			}
 		}
-		target.actionStagger();
-		source.actionStagger();
+	
+		target.actionStagger(false);
+		source.actionStagger(false);
 		this.shouldChain = true;
 		
 		//Stop movementEffect if attack respects collision with target
@@ -144,23 +147,42 @@ public class Attack extends ActionSegment {
 		return range + hitBox.width;
 	}
 
+//	@Override
+//	public float getWindUpTime() {
+//		return this.attackSettings.windupTime;
+//	}
+//	
+//	@Override 
+//	public float getWindUpPlusActionTime() {
+//		return this.attackSettings.windupTime + this.attackSettings.duration;
+//	}
+//	
+//	@Override
+//	public float getTotalTime() {
+//		if (this.forceCooldownState) {
+//			return this.attackSettings.windupTime + this.activeTime + this.attackSettings.cooldownTime;
+//		}
+//		return this.attackSettings.windupTime + this.attackSettings.duration + this.attackSettings.cooldownTime;
+//	}
+	
 	@Override
 	public float getWindUpTime() {
-		return this.attackSettings.windupTime;
+		return this.forceActiveState ? this.windupTime : this.attackSettings.windupTime;
 	}
 	
 	@Override 
 	public float getWindUpPlusActionTime() {
-		return this.attackSettings.windupTime + this.attackSettings.duration;
+		return getWindUpTime() + (this.forceCooldownState ? this.activeTime : this.attackSettings.duration);
 	}
 	
 	@Override
 	public float getTotalTime() {
-		if (this.forceCooldownState) {
-			return this.attackSettings.windupTime + this.activeTime + this.attackSettings.cooldownTime;
-		}
-		return this.attackSettings.windupTime + this.attackSettings.duration + this.attackSettings.cooldownTime;
+//		if (this.forceCooldownState) {
+//			return getWindUpTime() + this.activeTime + this.settings.cooldownTime;
+//		}
+		return getWindUpPlusActionTime() + this.attackSettings.cooldownTime;
 	}
+
 	
 	@Override
 	public void interruptionBlock() {
@@ -233,4 +255,13 @@ public class Attack extends ActionSegment {
 		return this.attackSettings.sourceRespectEntityCollisions;
 	}
 
+	@Override
+	public boolean doesNeedDisruptionDuringWindup() {
+		return this.attackSettings.windupTillDisruption;
+	}
+
+	@Override
+	public boolean doesNeedDisruptionDuringActive() {
+		return this.attackSettings.activeTillDisruption;
+	}
 }

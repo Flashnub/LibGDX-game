@@ -1,6 +1,7 @@
 package com.mygdx.game.model.effects;
 
 import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.events.ActionListener;
 
 public class StabilityDamageEffect extends EntityEffect {
 		
@@ -18,12 +19,38 @@ public class StabilityDamageEffect extends EntityEffect {
 	protected void processDuringActive(CharacterModel target, float delta) {
 		super.processDuringActive(target, delta);
 		float stabDamage = sEffectSettings.isInstantaneous().booleanValue() ? sEffectSettings.value : (sEffectSettings.value * Math.min((delta / sEffectSettings.getDuration()), 1f));
-		target.removeFromCurrentStability(stabDamage, getRetriever().getReplacementMovementForStagger());
+		target.removeFromCurrentStability(stabDamage, getController().getReplacementMovementForStagger());
 	}
 
 	@Override
 	public String getType() {
 		return StabilityDamageEffect.type;
+	}
+
+	@Override
+	public boolean shouldReciprocateToSource(CharacterModel target, ActionListener listener) {
+		return false;
+	}
+
+	@Override
+	public void flipValues() {
+		
+	}
+	
+	@Override
+	public boolean shouldAddIfIntercepted() {
+		return false;
+	}
+
+	@Override
+	public void flipValuesIfNecessary(CharacterModel target, CharacterModel source) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isUniqueEffect() {
+		return false;
 	}
 
 }

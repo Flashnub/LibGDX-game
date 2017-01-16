@@ -17,6 +17,7 @@ import com.mygdx.game.constants.InputConverter;
 import com.mygdx.game.constants.InputConverter.DirectionalInput;
 import com.mygdx.game.constants.InputType;
 import com.mygdx.game.model.actions.ActionSegment.ActionState;
+import com.mygdx.game.model.actions.ActionSequence.StaggerType;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.nonhostile.ConditionalDialogueSettings;
 import com.mygdx.game.model.characters.Character;
@@ -160,11 +161,8 @@ public class Player extends Character implements InputProcessor, ControllerListe
 		final String blockState = "Block";		
 		boolean dashing, canControl, isJumpPressed;
 		DirectionalInput currentlyHeldDirection;
-//	    Array<Integer> applicableKeys;
 	    Array <String> processedCondtionalDialogueUUIDs;
 	    SpawnPoint spawnPoint;
-//	    WorldObject nearbyObject;
-//	    NPCCharacter nearbyNPC;
 	    InteractableObject nearbyObject;
 	    PlayerProperties playerProperties;
 	    DialogueDatabase dialogues;
@@ -191,18 +189,6 @@ public class Player extends Character implements InputProcessor, ControllerListe
 			dialogues = json.fromJson(DialogueDatabase.class, Gdx.files.internal("Json/Player/dialogues.json"));
 			dialogues.setSource(this);
 			this.processedCondtionalDialogueUUIDs = new Array <String>();
-//			applicableKeys = new Array<Integer>();
-//			applicableKeys.add(Keys.W);
-//			applicableKeys.add(Keys.A);
-//			applicableKeys.add(Keys.S);
-//			applicableKeys.add(Keys.D);
-//			applicableKeys.add(Keys.Q);
-//			applicableKeys.add(Keys.E);
-//			applicableKeys.add(Keys.R);
-//			applicableKeys.add(Keys.Z);
-//			applicableKeys.add(Keys.X);
-//			applicableKeys.add(Keys.TAB); 
-//			applicableKeys.add(Keys.SPACE);
 			dashing = false;
 			canControl = false;
 			this.currentlyHeldDirection = DirectionalInput.NONE;
@@ -265,63 +251,71 @@ public class Player extends Character implements InputProcessor, ControllerListe
 	    	}
 	    }
 	    
-	    private void block() {
-	    	if (!jumping) {
-		    	ActionSequence blockAction = this.getCharacterProperties().getActions().get("PlayerBlock").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());
-		    	this.addActionSequence(blockAction);
-	    	}
-	    }
+//	    private void block() {
+//	    	if (!jumping) {
+//		    	ActionSequence blockAction = this.getCharacterProperties().getActions().get("PlayerBlock").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());
+//		    	this.addActionSequence(blockAction);
+//	    	}
+//	    }
 	    
 	    public boolean isDodging() {
 	        return dashing;
 	    }
 	    
-	    private void attack() {
-	    	if (!this.isProcessingActiveSequences() || this.isAbleToEnqueueAction()) {
-	    		ActionSequence followup = this.getFollowupSequence();
-	    	 	ActionSequence nextAction;
-	    	 	if (followup != null) {
-	    	 		nextAction =  this.getCharacterProperties().getActions().get(followup.getActionKey().getKey()).cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());;
-	    	 	}
-	    	 	else if (this.jumping){
-	    	 		nextAction = this.getCharacterProperties().getActions().get("Aerial1").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());
-	    	 	}
-	    	 	else if (this.isLockDirection()) {
-	    	 		nextAction = this.getCharacterProperties().getActions().get("Rushdown").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());;
-	    	 	}
-	    	 	else {
-	    	 		nextAction = this.getCharacterProperties().getActions().get("PlayerAttack").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());
-	    	 	}
-	    		this.addActionSequence(nextAction);
-	    	}
-	   
-	    }
+//	    private void attack() {
+//	    	if (!this.isProcessingActiveSequences() || this.isAbleToEnqueueAction()) {
+//	    		ActionSequence followup = this.getFollowupSequence();
+//	    	 	ActionSequence nextAction;
+//	    	 	if (followup != null) {
+//	    	 		nextAction =  this.getCharacterProperties().getActions().get(followup.getActionKey().getKey()).cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());;
+//	    	 	}
+//	    	 	else if (this.jumping){
+//	    	 		nextAction = this.getCharacterProperties().getActions().get("Aerial1").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());
+//	    	 	}
+//	    	 	else if (this.isLockDirection()) {
+//	    	 		nextAction = this.getCharacterProperties().getActions().get("Rushdown").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());;
+//	    	 	}
+//	    	 	else {
+//	    	 		nextAction = this.getCharacterProperties().getActions().get("PlayerAttack").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());
+//	    	 	}
+//	    		this.addActionSequence(nextAction);
+//	    	}
+//	   
+//	    }
 	    
 
-	       	
-	    private ActionSequence getFollowupSequence() {
-//    	 	for (ActionSequence action : this.getProcessingActionSequences()) {
-//	    		if (action.isActive() 
-//	    		&& action.getActionKey().getTypeOfAction().equals(ActionType.Attack)
-//	    		&& action.getNextActionKey() != null) {
-//	    			ActionSequence followingAttack = this.getCharacterProperties().getActions().get(action.getNextActionKey().getKey()).cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());;
-//	    			return followingAttack;
-//	    		}
-//	    	}
-	    	return null;
+	    private void checkToDisruptCurrentAct(String inputType) {
+	    	if (this.getCurrentActiveActionSeq() != null) {
+		    	boolean needsInterruptForWindup = this.getCurrentActiveActionSeq().getAction().doesNeedDisruptionDuringWindup() && this.getCurrentActiveActionSeq().getAction().getActionState().equals(ActionState.WINDUP);
+		    	boolean needsInterruptForAction = this.getCurrentActiveActionSeq().getAction().doesNeedDisruptionDuringActive() && this.getCurrentActiveActionSeq().getAction().getActionState().equals(ActionState.ACTION);
+		    	
+		    	if (needsInterruptForWindup || needsInterruptForAction) {
+		    		Queue <String> inputs = new Queue <String>();
+			    	inputs.addFirst(inputType);
+			    	if (this.getCurrentActiveActionSeq().doInputsMatch(inputs, this, true)) {
+			    		if (needsInterruptForWindup) {
+			    			this.forceActiveForActiveAction();
+			    		}
+			    		else if (needsInterruptForAction) {
+			    			this.forceCooldownForActiveAction();
+			    		}
+			    	}
+		    	}
+	    	}
+	    	
 	    }
 	    
 	    private boolean queueUpActionFromInputs() {
 	    	ActionSequence sequence = null;
 	    	//Check char props first.
-	    	sequence = this.getCharacterProperties().getSequenceGivenInputs(this.inputs, isFacingLeft());
+	    	sequence = this.getCharacterProperties().getSequenceGivenInputs(this.inputs, this);
 	    	if (sequence != null) {
 		    	this.stopHorizontalMovement();
 	    		this.addActionSequence(sequence.cloneSequenceWithSourceAndTarget(this, null, getActionListener(), this.getCollisionChecker()));
 	    		return true;
 	    	}
 	    	//Check weapon next.
-	    	sequence = this.getCurrentWeapon().getSpecificWeaponAction(this.inputs, isFacingLeft());
+	    	sequence = this.getCurrentWeapon().getSpecificWeaponAction(this.inputs, this);
 	    	if (sequence != null) {
 		    	this.stopHorizontalMovement();
 	    		this.addActionSequence(sequence.cloneSequenceWithSourceAndTarget(this, null, getActionListener(), this.getCollisionChecker()));
@@ -339,10 +333,10 @@ public class Player extends Character implements InputProcessor, ControllerListe
 //	    	}
 //	    }
 	    
-	    @Override
-		public boolean isAbleToEnqueueAction() {
-	    	return this.getCurrentActiveActionSeq() != null && !this.getCurrentActiveActionSeq().getAction().getActionState().equals(ActionState.WINDUP);
-	    }
+//	    @Override
+//		public boolean isAbleToEnqueueAction() {
+//	    	return this.getCurrentActiveActionSeq() != null && !this.getCurrentActiveActionSeq().getAction().getActionState().equals(ActionState.WINDUP);
+//	    }
 	    
 	    
 		public boolean handleKeyDown (int keyCode)
@@ -412,7 +406,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 				checkIfNeedToStopWalk();
 			}
 			String inputType = this.inputConverter.convertIntToInputType(keyCode, this.currentlyHeldDirection);
-
+			this.checkToDisruptCurrentAct(inputType);
 			switch (inputType) {
 //			case InputType.JUMP:
 //				stopJump();
@@ -527,6 +521,13 @@ public class Player extends Character implements InputProcessor, ControllerListe
 			}
 			return Direction.NaN;
 
+		}
+
+		@Override
+		public void tensionOverload() {
+			ActionSequence staggerAction = ActionSequence.createStaggerSequence(this, null, this.getActionListener(), StaggerType.Tension);
+    		this.addActionSequence(staggerAction);
+    		this.setCurrentTension(0);
 		}
 
 

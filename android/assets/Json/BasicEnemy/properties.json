@@ -3,6 +3,7 @@
 	"maxHealth": 20,
 	"maxWill": 20,
 	"maxStability": 50,
+	"maxTension": 10,
 	"attack": 1,
 	"horizontalSpeed": 300,
 	actions: {

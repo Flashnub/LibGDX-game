@@ -10,6 +10,7 @@ import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.actions.nonhostile.DialogueAction;
 import com.mygdx.game.model.actions.nonhostile.DialogueSettings;
 import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.conditions.ConditionInitializer;
 import com.mygdx.game.model.characters.EntityUIModel;
 import com.mygdx.game.model.effects.MovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
@@ -29,9 +30,22 @@ public class ActionSequence implements Serializable {
 	public enum UseType {
 		Aerial, Ground, Either
 	}
+	
+	public enum StaggerType {
+		Normal, Tension;
+		
+		public String getKeyForStaggerType() {
+			switch(this) {
+			case Normal:
+				return ActionSequence.staggerKey;
+			case Tension: 
+				return ActionSequence.tensionStaggerKey;
+			}
+			return ActionSequence.staggerKey;
+		}
+	}
 
 	private ActionSegmentKey actionKey;
-	private ActionSegment action;
 	private ActionStrategy strategy;
 	private String windupState;
 	private String actingState;
@@ -41,24 +55,32 @@ public class ActionSequence implements Serializable {
 	private String leftCooldownState;
 	private boolean useLeft;
 	private boolean isActive;
-	private CharacterModel source;
-	private CharacterModel target;
-	private ActionListener actionListener;
-	private CollisionChecker collisionChecker;
-	private DialogueController dialogueController;
-	private boolean isStaggered;
-	private boolean cannotBeOverriden;
-	private float staggerTime;
+
 	private boolean isSuper;
 	private Array <Array <String>> leftInputs;
 	private Array <Array <String>> rightInputs;
 	private UseType useType;
 	private Array <ActionSegmentKey> chainableActionKeys;
 	private float probabilityToActivate;
+	private Array <ActionConditionSettings> conditionSettings;
+	
+	//Non json properties
+	private CharacterModel source;
+	private CharacterModel target;
+	private ActionListener actionListener;
+	private CollisionChecker collisionChecker;
+	private DialogueController dialogueController;
+	private float staggerTime;
+	private ActionSegment action;
+	private boolean isStaggered;
+	private boolean cannotBeOverriden;
+	private boolean shouldOverridePrevAction;
+
 	
 	public ActionSequence() {
 		this.isStaggered = false;
 		this.cannotBeOverriden = false;
+		this.shouldOverridePrevAction = false;
 		this.staggerTime = 0f;
 		this.probabilityToActivate = 0f;
 		this.isSuper = false;
@@ -86,9 +108,11 @@ public class ActionSequence implements Serializable {
 		sequence.dialogueController = dialogueController;
 		sequence.actionListener = actionListener;
 		sequence.cannotBeOverriden = true;
+		sequence.shouldOverridePrevAction = true;
 		sequence.useType = UseType.Either;
 		sequence.leftInputs = new Array <Array <String>>();
 		sequence.rightInputs = new Array <Array <String>>();
+		sequence.conditionSettings = new Array <ActionConditionSettings>();
 		
 		sequence.createActionFromSettings(settings, null);
 		
@@ -96,30 +120,46 @@ public class ActionSequence implements Serializable {
 	}
 	
 	static final String staggerKey = "Stagger";
+	static final String tensionStaggerKey = "TensionStagger";
 	
-	public static ActionSequence createStaggerSequence(CharacterModel source, MovementEffectSettings overridingMovement, ActionListener actionListener) {
+	public static ActionSequence createStaggerSequence(CharacterModel source, MovementEffectSettings overridingMovement, ActionListener actionListener, StaggerType staggerType) {
 		ActionSequence sequence = new ActionSequence();
-		sequence.actionKey = new ActionSegmentKey(ActionSequence.staggerKey, ActionType.Stagger);
+		sequence.actionKey = new ActionSegmentKey(staggerType.getKeyForStaggerType(), ActionType.Stagger);
 		sequence.isActive = true;
 		sequence.strategy = ActionStrategy.Story;
-		
-		sequence.windupState = "StaggerWindup";
-		sequence.actingState = "Stagger";
-		sequence.cooldownState = "StaggerCooldown";
+		if (staggerType.equals(StaggerType.Tension)) {
+			sequence.windupState = "TensionStaggerWindup";
+			sequence.actingState = "TensionStagger";
+			sequence.cooldownState = "TensionStaggerCooldown";
+		}
+		else {
+			sequence.windupState = "StaggerWindup";
+			sequence.actingState = "Stagger";
+			sequence.cooldownState = "StaggerCooldown";
+		}
+
 		
 		sequence.leftWindupState = sequence.windupState;
 		sequence.leftActingState = sequence.actingState;
 		sequence.leftCooldownState = sequence.cooldownState;
 		sequence.useLeft = source.isFacingLeft();
+		sequence.cannotBeOverriden = true; //Shouldn't remove action for tension
+		sequence.shouldOverridePrevAction = staggerType.equals(StaggerType.Normal);
+
 		
 		sequence.source = source;
 		sequence.actionListener = actionListener;
 		sequence.useType = UseType.Either;
 		sequence.leftInputs = new Array <Array <String>>();
 		sequence.rightInputs = new Array <Array <String>>();
+		sequence.conditionSettings = new Array <ActionConditionSettings>();
 
-		
-		sequence.createActionFromSettings(null, overridingMovement);
+		if (staggerType.equals(StaggerType.Normal)) {
+			sequence.createActionFromSettings(null, overridingMovement);
+		}
+		else {
+			sequence.createActionFromSettings(null, null);
+		}
 			
 		return sequence;
 	}
@@ -165,6 +205,11 @@ public class ActionSequence implements Serializable {
 				rightInputCombination.add(newInput);
 			}
 			this.rightInputs.add(rightInputCombination);
+		}
+		
+		this.conditionSettings = json.readValue("conditionSettings", Array.class, jsonData);
+		if (conditionSettings == null) {
+			this.conditionSettings = new Array <ActionConditionSettings>();
 		}
 
 		String windupState = json.readValue("windupState", String.class, jsonData);
@@ -259,12 +304,16 @@ public class ActionSequence implements Serializable {
 	}
 	
 	public void forceEnd() {
-		if (!this.cannotBeOverriden)
-			this.action.forceEnd = true;
+//		if (!this.cannotBeOverriden)
+		this.action.forceEnd = true;
 	}
 	
 	public void forceCooldownState() {
 		this.action.forceCooldownState = true;
+	}
+	
+	public void forceActiveState() {
+		this.action.forceActiveState = true;
 	}
 	
 	public boolean isFinished() {
@@ -374,19 +423,24 @@ public class ActionSequence implements Serializable {
 		this.staggerTime = 0f;
 	}
 	
-	public boolean doInputsMatch(Queue <String> inputs, boolean useLeftInputs) {
+	public boolean doInputsMatch(Queue <String> inputs, CharacterModel source, boolean onlyFirstInput) {
+		boolean useLeftInputs = source.isFacingLeft();
+		boolean shouldAdd = this.shouldAddGivenSource(source);
 		boolean isMatching = false;
-		Array <Array <String>> properInputsForTesting = useLeftInputs ? this.leftInputs : this.rightInputs;
-		for (Array <String> inputCombination : properInputsForTesting) {
-			boolean isSequenceMatchingSoFar = true;
-			if (inputs.size >= inputCombination.size) {
-				for (int i = 0; i < inputCombination.size; i++) {
-					isSequenceMatchingSoFar = isSequenceMatchingSoFar && inputs.get(i).equals(inputCombination.get(i));
+		if (shouldAdd) {
+			Array <Array <String>> properInputsForTesting = useLeftInputs ? this.leftInputs : this.rightInputs;
+			for (Array <String> inputCombination : properInputsForTesting) {
+				boolean isSequenceMatchingSoFar = true;
+				if (inputs.size >= inputCombination.size) {
+					for (int i = 0; i < (onlyFirstInput ? 1 : inputCombination.size); i++) {
+						isSequenceMatchingSoFar = isSequenceMatchingSoFar 
+								&& inputs.get(i).equals(inputCombination.get(i));
+					}
 				}
-			}
-			if (isSequenceMatchingSoFar) {
-				isMatching = true;
-				break;
+				if (isSequenceMatchingSoFar) {
+					isMatching = true;
+					break;
+				}
 			}
 		}
 
@@ -405,6 +459,17 @@ public class ActionSequence implements Serializable {
 		if (!isAdded) {
 			sequences.add(sequence);
 		}
+	}
+	
+	public boolean shouldAddGivenSource(CharacterModel source) {
+		boolean shouldAdd = true;
+		if (conditionSettings != null) {
+			for (ActionConditionSettings conditionSettings : this.conditionSettings) {
+				ActionCondition condition = ConditionInitializer.initializeActiveCondition(source, conditionSettings);
+				shouldAdd = shouldAdd && condition.isConditionMet();
+			}
+		}
+		return shouldAdd;
 	}
 	
 	public boolean cannotBeOverriden() {
@@ -459,4 +524,14 @@ public class ActionSequence implements Serializable {
 	public float getProbabilityToActivate() {
 		return probabilityToActivate;
 	}
+
+	public UseType getUseType() {
+		return useType;
+	}
+
+	public boolean shouldOverridePrevAction() {
+		return shouldOverridePrevAction;
+	}
+	
+	
 }

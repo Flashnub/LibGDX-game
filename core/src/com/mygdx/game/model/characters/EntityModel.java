@@ -49,10 +49,7 @@ public abstract class EntityModel {
 	}
 	
 	//Not used by projectiles.
-	public void setGameplaySize(float delta) {
-//		this.getVelocity().y += this.getAcceleration().y * delta;
-//		this.getVelocity().x += this.getAcceleration().x * delta;
-//		
+	public void setGameplaySize(float delta) {	
 		this.gameplayHitBox.width = this.getImageHitBox().width * widthCoefficient;
 		this.gameplayHitBox.height = this.getImageHitBox().height * heightCoefficient;
 	}	
@@ -102,12 +99,8 @@ public abstract class EntityModel {
 				tempVelocity += this.acceleration.y * increment;
 			
 			tempImageBounds.setY(tempImageBounds.getY() + tempVelocity * increment);
-//			if (this instanceof CharacterModel) {
-				tempGameplayBounds.setY(this.yOffsetModifier + tempImageBounds.getY() + tempImageBounds.getHeight() * ((1f - this.heightCoefficient) / 2));
-//			}
-//			else {
-//				tempGameplayBounds.setY(tempImageBounds.getY());
-//			}
+			tempGameplayBounds.setY(this.yOffsetModifier + tempImageBounds.getY() + tempImageBounds.getHeight() * ((1f - this.heightCoefficient) / 2));
+
 			
 
 			if (tempVelocity < 0) {
@@ -202,9 +195,7 @@ public abstract class EntityModel {
 			time += increment;
 			tempMaxTime -= increment;
 		}
-		//move on x axis
-//		this.getImageHitBox().setX(this.getImageHitBox().getX() + this.getVelocity().x * delta);
-//		this.getGameplayHitBox().setX(this.getImageHitBox().getX() + (this.getImageHitBox().getWidth() * .4f));
+
 		if (shouldMove && !collisionY) {
 			this.gameplayHitBox.y = tempGameplayBounds.y;
 			this.imageHitBox.y = tempImageBounds.y;
@@ -239,7 +230,7 @@ public abstract class EntityModel {
 	}
 
 	
-	public CollisionCheck checkForXCollision(float maxTime, TiledMapTileLayer collisionLayer, float xVelocity, boolean shouldMove) {
+	public CollisionCheck checkForXCollision(float maxTime, TiledMapTileLayer collisionLayer, float xVelocity, float xAcceleration, boolean shouldMove) {
 		float tileWidth = collisionLayer.getTileWidth();
 		float tileHeight = collisionLayer.getTileHeight();
 		
@@ -263,14 +254,10 @@ public abstract class EntityModel {
 				increment = tempMaxTime;
 			}
 			
-			tempVelocity += this.acceleration.x * increment;
+			tempVelocity += xAcceleration * increment;
 			tempImageBounds.setX(tempImageBounds.getX() + tempVelocity * increment);
-//			if (this instanceof CharacterModel) {
-				tempGameplayBounds.setX(this.xOffsetModifier + tempImageBounds.getX() + tempImageBounds.getWidth() * ((1f - this.widthCoefficient) / 2));
-//			}
-//			else {
-//				tempGameplayBounds.setX(tempImageBounds.getX());
-//			}
+			tempGameplayBounds.setX(this.xOffsetModifier + tempImageBounds.getX() + tempImageBounds.getWidth() * ((1f - this.widthCoefficient) / 2));
+
 			
 
 			if (tempVelocity < 0) {
@@ -306,8 +293,6 @@ public abstract class EntityModel {
 				tilesToCheckForWorldObjects.add(new CellWrapper(middleLeftBlock, new Vector2(middleLeftXIndex * tileWidth, middleLeftYIndex * tileHeight)));
 				tilesToCheckForWorldObjects.add(new CellWrapper(lowerLeftBlock, new Vector2(lowerLeftXIndex * tileWidth, lowerLeftYIndex * tileHeight)));
 
-//				this.leftcollisionX = collisionX;
-				
 			}
 			else if (tempVelocity > 0) {
 				//right blocks
@@ -338,7 +323,6 @@ public abstract class EntityModel {
 				if(!collisionX && lowerRightBlock != null)
 					collisionX = ((Boolean)lowerRightBlock.getTile().getProperties().get("Impassable")).equals(true);
 				
-//				this.rightCollisionX = collisionX;
 				tilesToCheckForWorldObjects.add(new CellWrapper(topRightBlock, new Vector2(topRightXIndex * tileWidth, topRightYIndex * tileHeight)));
 				tilesToCheckForWorldObjects.add(new CellWrapper(middleRightBlock, new Vector2(middleRightXIndex * tileWidth, middleRightYIndex * tileHeight)));
 				tilesToCheckForWorldObjects.add(new CellWrapper(lowerRightBlock, new Vector2(lowerRightXIndex * tileWidth, lowerRightYIndex * tileHeight)));

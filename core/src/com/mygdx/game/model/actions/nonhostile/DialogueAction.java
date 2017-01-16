@@ -98,4 +98,14 @@ public class DialogueAction extends ActionSegment {
 		
 	}
 
+	@Override
+	public boolean doesNeedDisruptionDuringWindup() {
+		return false;
+	}
+
+	@Override
+	public boolean doesNeedDisruptionDuringActive() {
+		return false;
+	}
+
 }

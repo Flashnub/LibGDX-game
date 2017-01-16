@@ -1,5 +1,6 @@
 package com.mygdx.game.model.events;
 
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.Attack;
 import com.mygdx.game.model.characters.Character.CharacterModel;
@@ -18,4 +19,5 @@ public interface ActionListener {
 	void addProjectile(Projectile projectile);
 	void addExplosion(Explosion explosion);
 	void superActivatedFrom(CharacterModel source, ActionSequence sequence);
+	TiledMapTileLayer getCollisionLayer();
 }

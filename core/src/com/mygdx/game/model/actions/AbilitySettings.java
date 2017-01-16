@@ -17,6 +17,7 @@ public class AbilitySettings implements Serializable {
 	Float cooldownTime;
 	protected Float duration;
 	boolean activeTillDisruption;
+	boolean windupTillDisruption;
 	boolean sourceRespectEntityCollisions; //if this is false, the action ignores all entity collisions.
 	Float tempWidthModifier;
 	Float tempHeightModifier;
@@ -69,8 +70,13 @@ public class AbilitySettings implements Serializable {
 			this.duration = 0.5f;
 			this.activeTillDisruption = false;
 		}
+		Boolean windupTillDuration = json.readValue("windupTillDuration", Boolean.class, jsonData);
 		Float windupTime = json.readValue("windUpTime", Float.class, jsonData);
-		if (windupTime != null) {
+		if (windupTillDuration != null && windupTillDuration.booleanValue()) {
+			this.windupTime = Float.MAX_VALUE;
+			this.windupTillDisruption = windupTillDuration.booleanValue();
+		}
+		else if (windupTime != null) {
 			this.windupTime = windupTime;
 		}
 		else {
@@ -150,9 +156,24 @@ public class AbilitySettings implements Serializable {
 		this.duration = settings.duration;
 		this.cooldownTime = settings.cooldownTime;
 		this.windupTime = settings.windupTime;
-		this.sourceEffectSettings = settings.sourceEffectSettings;
-		this.windupEffectSettings = settings.windupEffectSettings;
+		if (settings.sourceEffectSettings != null) {
+			Array <EffectSettings> effectSettingsCopy = new Array <EffectSettings> ();
+			for (EffectSettings eSettings : settings.sourceEffectSettings) {
+				effectSettingsCopy.add(eSettings.deepCopy());
+			}
+			this.sourceEffectSettings = effectSettingsCopy;
+		}
+
+		if (settings.windupEffectSettings != null) {
+			Array <EffectSettings> effectSettingsCopy2 = new Array <EffectSettings> ();
+			for (EffectSettings eSettings : settings.windupEffectSettings) {
+				effectSettingsCopy2.add(eSettings.deepCopy());
+			}
+			this.windupEffectSettings = effectSettingsCopy2;
+		}
+
 		this.activeTillDisruption = settings.activeTillDisruption;
+		this.windupTillDisruption = settings.windupTillDisruption;
 		this.sourceRespectEntityCollisions = settings.sourceRespectEntityCollisions;
 		this.tempHeightModifier = settings.tempHeightModifier;
 		this.tempWidthModifier = settings.tempWidthModifier;
@@ -165,6 +186,7 @@ public class AbilitySettings implements Serializable {
 		copy.windupTime = this.windupTime;
 		copy.cooldownTime = this.cooldownTime;
 		copy.activeTillDisruption = this.activeTillDisruption;
+		copy.windupTillDisruption = this.windupTillDisruption;
 		copy.duration = this.duration;
 		copy.tempHeightModifier = this.tempHeightModifier;
 		copy.tempWidthModifier = this.tempWidthModifier;

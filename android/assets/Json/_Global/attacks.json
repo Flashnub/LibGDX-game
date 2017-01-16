@@ -5,11 +5,14 @@
 		"originY": 0,
 		"width": 100,
 		"height": 150,
-		"windupTime": 0.1,
-		"duration": 0.2,
-		"cooldownTime": 0.1,
+		"windupTime": 0.4,
+		"duration": 0.4,
+		"cooldownTime": 0.4,
 		"sourceEffectSettings": [
-
+			{
+				"class": "com.mygdx.game.model.effects.TensionAddEffectSettings",
+				"value": 1
+			}
 		]
 		"targetEffectSettings": [
 			{
@@ -22,19 +25,19 @@
 			}
 			{
 				"class": "com.mygdx.game.model.effects.MovementEffectSettings",
-				"duration": 0.4,
+				"duration": 0.3,
 				"delayToActivate": 0,
 				"useGravity": false,
 				"isInstantaneous": false,
 				"value": 0,
 				"velocity": {
 					"class": "com.badlogic.gdx.math.Vector2",
-					"x": 200,
+					"x": 100,
 					"y": 0
 				}
 				"acceleration": {
 					"class": "com.badlogic.gdx.math.Vector2",
-					"x": -80,
+					"x": -200,
 					"y": 0
 				}
 			
@@ -47,9 +50,9 @@
 		"originY": 0,
 		"width": 100,
 		"height": 150,
-		"windupTime": 0.1,
-		"duration": 0.2,
-		"cooldownTime": 0.1,
+		"windupTime": 0.4,
+		"duration": 0.4,
+		"cooldownTime": 0.4,
 		"sourceEffectSettings": [
 
 		]
@@ -60,7 +63,7 @@
 			}
 			{
 				"class": "com.mygdx.game.model.effects.StabilityDamageEffectSettings",
-				"value": 10
+				"value": 100
 			}
 			{
 				"class": "com.mygdx.game.model.effects.MovementEffectSettings",

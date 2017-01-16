@@ -9,6 +9,7 @@ public class MovementEffectSettings extends EntityEffectSettings {
 	Vector2 velocity;
 	Vector2 acceleration;
 	boolean useGravity;
+	boolean startWithStagger;
 
 	@Override
 	public void write(Json json) {
@@ -43,7 +44,7 @@ public class MovementEffectSettings extends EntityEffectSettings {
 		maxVelocity = new Vector2(maxVelocityX, maxVelocityY);
 		
 		this.setType(MovementEffect.type);
-		
+		startWithStagger = false;
 	}
 
 	public Vector2 getVelocity() {
@@ -69,11 +70,20 @@ public class MovementEffectSettings extends EntityEffectSettings {
 	public MovementEffectSettings deepCopy() {
 		MovementEffectSettings copy = new MovementEffectSettings();
 		this.setBaseFieldsForSettings(copy);
-		copy.velocity = this.velocity;
-		copy.acceleration = this.acceleration;
+		copy.velocity = new Vector2(this.velocity);
+		copy.acceleration = new Vector2(this.acceleration);
 		copy.maxVelocity = this.maxVelocity;
 		copy.useGravity = this.useGravity;
 		return copy;
 	}
 
+	public boolean isStartWithStagger() {
+		return startWithStagger;
+	}
+
+	public void setStartWithStagger(boolean startWithStagger) {
+		this.startWithStagger = startWithStagger;
+	}
+
+	
 }

@@ -57,22 +57,40 @@ public class WorldAttack extends ActionSegment{
 		return range;
 	}
 	
-	@Override 
-	public float getWindUpPlusActionTime() {
-		return this.worldAttackSettings.getAbilitySettings().windupTime + this.worldAttackSettings.getAbilitySettings().duration;
-	}
-	
+//	@Override 
+//	public float getWindUpPlusActionTime() {
+//		return this.worldAttackSettings.getAbilitySettings().windupTime + this.worldAttackSettings.getAbilitySettings().duration;
+//	}
+//	
+//	@Override
+//	public float getWindUpTime() {
+//		return this.worldAttackSettings.getAbilitySettings().windupTime;
+//	}
+//	
+//	@Override
+//	public float getTotalTime() {
+//		if (this.forceCooldownState) {
+//			return this.worldAttackSettings.getAbilitySettings().windupTime + this.activeTime + this.worldAttackSettings.getAbilitySettings().cooldownTime;
+//		}
+//		return this.worldAttackSettings.getAbilitySettings().windupTime + this.worldAttackSettings.getAbilitySettings().cooldownTime + this.worldAttackSettings.getAbilitySettings().duration;
+//	}
+//	
 	@Override
 	public float getWindUpTime() {
-		return this.worldAttackSettings.getAbilitySettings().windupTime;
+		return this.forceActiveState ? this.windupTime : this.worldAttackSettings.getAbilitySettings().windupTime;
+	}
+	
+	@Override 
+	public float getWindUpPlusActionTime() {
+		return getWindUpTime() + (this.forceCooldownState ? this.activeTime : this.worldAttackSettings.getAbilitySettings().duration);
 	}
 	
 	@Override
 	public float getTotalTime() {
-		if (this.forceCooldownState) {
-			return this.worldAttackSettings.getAbilitySettings().windupTime + this.activeTime + this.worldAttackSettings.getAbilitySettings().cooldownTime;
-		}
-		return this.worldAttackSettings.getAbilitySettings().windupTime + this.worldAttackSettings.getAbilitySettings().cooldownTime + this.worldAttackSettings.getAbilitySettings().duration;
+//		if (this.forceCooldownState) {
+//			return getWindUpTime() + this.activeTime + this.settings.cooldownTime;
+//		}
+		return getWindUpPlusActionTime() + this.worldAttackSettings.getAbilitySettings().cooldownTime;
 	}
 
 	@Override
@@ -152,7 +170,15 @@ public class WorldAttack extends ActionSegment{
 		return potentialAbility.shouldRespectEntityCollisions();
 	}
 
+	@Override
+	public boolean doesNeedDisruptionDuringWindup() {
+		return this.worldAttackSettings.getAbilitySettings().windupTillDisruption;
+	}
 
+	@Override
+	public boolean doesNeedDisruptionDuringActive() {
+		return this.worldAttackSettings.getAbilitySettings().activeTillDisruption;
+	}
 
 
 }

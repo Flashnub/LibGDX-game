@@ -413,9 +413,9 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 		if (player.getCharacterData().getAllegiance() != attack.getAllegiance()) {
 			checkIfAttackLands(player, attack);
 		}
-		for (Enemy enemy : enemies) {
-			if (enemy.getCharacterData().getAllegiance() != attack.getAllegiance()) {
-				checkIfAttackLands(enemy, attack);
+		for (int i = 0; i < enemies.size; i++) {
+			if (enemies.get(i).getCharacterData().getAllegiance() != attack.getAllegiance()) {
+				checkIfAttackLands(enemies.get(i), attack);
 			}
 		}
 	}

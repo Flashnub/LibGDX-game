@@ -77,7 +77,7 @@ public abstract class WorldObject extends EntityModel implements InteractableObj
 	
 	public void movementWithCollisionDetection(float delta, TiledMapTileLayer collisionLayer) {
 		if (this.shouldMove()) {
-			CollisionCheck collisionX = this.checkForXCollision(delta, collisionLayer, this.velocity.x, true);
+			CollisionCheck collisionX = this.checkForXCollision(delta, collisionLayer, this.velocity.x, this.acceleration.x, true);
 			if (collisionX.doesCollide()) {
 				this.getVelocity().x = 0;
 				this.getAcceleration().x = 0;

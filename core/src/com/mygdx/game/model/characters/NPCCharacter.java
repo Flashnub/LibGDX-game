@@ -266,6 +266,11 @@ public class NPCCharacter extends Character{
 			this.dialogueAction(player);
 		}
 
+		@Override
+		public void tensionOverload() {
+			
+		}
+
 
 	}
 }

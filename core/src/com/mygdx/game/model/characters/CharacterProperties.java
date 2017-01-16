@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Json.Serializable;
 import com.mygdx.game.model.actions.ActionSequence;
+import com.mygdx.game.model.actions.ActionSequence.UseType;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.wrappers.StringWrapper;
 import com.badlogic.gdx.utils.JsonValue;
@@ -17,6 +18,7 @@ public class CharacterProperties implements Serializable {
 	float maxWill;
 	float attack;
 	float maxStability;
+	float maxTension;
 	float staggerAllowanceTime;
 	float heightCoefficient;
 	float widthCoefficient;
@@ -40,6 +42,7 @@ public class CharacterProperties implements Serializable {
 		json.writeValue("maxHealth", maxHealth);
 		json.writeValue("maxStability", maxStability);
 		json.writeValue("maxWill", maxWill);
+		json.writeValue("maxTension", maxTension);
 		json.writeValue("attack", attack);
 		json.writeValue("actions", actions);
 		json.writeValue("horizontalSpeed", horizontalSpeed);
@@ -57,6 +60,7 @@ public class CharacterProperties implements Serializable {
 	@SuppressWarnings("unchecked")
 	public void read(Json json, JsonValue jsonData) {
 		maxHealth = json.readValue("maxHealth", Float.class, jsonData);
+		maxTension = json.readValue("maxTension", Float.class, jsonData);
 		maxWill = json.readValue("maxWill", Float.class, jsonData);
 		attack = json.readValue("attack", Float.class, jsonData);
 		maxStability = json.readValue("maxStability", Float.class, jsonData);
@@ -161,6 +165,7 @@ public class CharacterProperties implements Serializable {
 		properties.heightCoefficient = this.heightCoefficient;
 		properties.horizontalAcceleration = this.horizontalAcceleration;
 		properties.weaponKeys = this.weaponKeys;
+		properties.maxTension = this.maxTension;
 		//iterate through actions.
 		HashMap <String, ActionSequence> clonedActions = new HashMap<String, ActionSequence> ();
 		for (Map.Entry<String, ActionSequence> entry : actions.entrySet()) {
@@ -187,10 +192,14 @@ public class CharacterProperties implements Serializable {
 		}
 	}
 	
-	public ActionSequence getSequenceGivenInputs(Queue<String> inputs, boolean useLeftInputs) {
+	public ActionSequence getSequenceGivenInputs(Queue<String> inputs, CharacterModel source) {
 		ActionSequence result = null;
+		boolean isInAir = source.jumping;
 		for (ActionSequence sequence : this.sequencesSortedByInputSize) {
-			if (sequence.doInputsMatch(inputs, useLeftInputs)) {
+			if (sequence.doInputsMatch(inputs, source, false) && 
+					(sequence.getUseType().equals(UseType.Either)
+					|| (isInAir && sequence.getUseType().equals(UseType.Aerial))
+					|| (!isInAir && sequence.getUseType().equals(UseType.Ground)))) {
 				result = sequence;
 				break;
 			}
@@ -269,5 +278,9 @@ public class CharacterProperties implements Serializable {
 
 	public Array <StringWrapper> getWeaponKeys() {
 		return weaponKeys;
+	}
+
+	public float getMaxTension() {
+		return maxTension;
 	}
 }

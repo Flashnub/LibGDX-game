@@ -1,7 +1,9 @@
 package com.mygdx.game.model.effects;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.mygdx.game.model.conditions.PassiveConditionSettings;
 import com.badlogic.gdx.utils.Json.Serializable;
 
 public abstract class EffectSettings implements Serializable {
@@ -10,6 +12,7 @@ public abstract class EffectSettings implements Serializable {
 	private float delayToActivate;
 	Boolean isPermanent;
 	private String type;
+	Array <PassiveConditionSettings> passiveConditions;
 	
 	@Override
 	public void write(Json json) {
@@ -18,10 +21,12 @@ public abstract class EffectSettings implements Serializable {
 		json.writeValue("delayToActivate", getDelayToActivate());
 		json.writeValue("isPermanent", isPermanent);
 		json.writeValue("type", type);
+		json.writeValue("passiveConditions", passiveConditions);
 
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void read(Json json, JsonValue jsonData) {
 		setIsInstantaneous(json.readValue("isInstantaneous", Boolean.class, jsonData));
@@ -55,6 +60,14 @@ public abstract class EffectSettings implements Serializable {
 				this.setDelayToActivate(0f);
 			}
 		}
+		
+		Array <PassiveConditionSettings> passiveConditions = json.readValue("passiveConditions", Array.class, jsonData);
+		if (passiveConditions != null) {
+			this.passiveConditions = passiveConditions;
+		}
+		else {
+			this.passiveConditions = new Array <PassiveConditionSettings>();
+		}
 	}
 	
 	public abstract EffectSettings deepCopy();	
@@ -65,45 +78,51 @@ public abstract class EffectSettings implements Serializable {
 		settings.setIsInstantaneous(this.isInstantaneous());
 		settings.isPermanent = this.isPermanent;
 		settings.setType(this.getType());
+		Array <PassiveConditionSettings> conditionSettings = new Array <PassiveConditionSettings> ();
+		if (this.passiveConditions != null) {
+			for (PassiveConditionSettings condition : this.passiveConditions) {
+				conditionSettings.add(condition);
+			}
+		}
+		settings.passiveConditions = conditionSettings;
 	}
-
 
 	public String getType() {
 		return type;
 	}
 
-
 	public void setType(String type) {
 		this.type = type;
 	}
-
 
 	public float getDelayToActivate() {
 		return delayToActivate;
 	}
 
-
 	public void setDelayToActivate(float delayToActivate) {
 		this.delayToActivate = delayToActivate;
 	}
-
 
 	public Boolean isInstantaneous() {
 		return isInstantaneous;
 	}
 
-
 	public void setIsInstantaneous(Boolean isInstantaneous) {
 		this.isInstantaneous = isInstantaneous;
 	}
-
 
 	public Float getDuration() {
 		return duration;
 	}
 
-
 	public void setDuration(Float duration) {
 		this.duration = duration;
 	}
+
+	public Array<PassiveConditionSettings> getPassiveConditions() {
+		return passiveConditions;
+	}
+
+
+	
 }

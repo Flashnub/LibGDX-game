@@ -2,6 +2,7 @@ package com.mygdx.game.model.effects;
 
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.characters.enemies.Enemy.EnemyModel;
+import com.mygdx.game.model.events.ActionListener;
 
 public class DamageEffect extends EntityEffect{
 	DamageEffectSettings dSettings;
@@ -20,7 +21,7 @@ public class DamageEffect extends EntityEffect{
 		target.removeFromCurrentHealth(damage);
 		if (target instanceof EnemyModel) {
 			EnemyModel enemyTarget = (EnemyModel) target;
-			enemyTarget.checkIfShouldAggroTarget(this.getRetriever().getSource(), damage);
+			enemyTarget.checkIfShouldAggroTarget(this.getController().getSource(), damage);
 		}
 	}
 
@@ -29,6 +30,30 @@ public class DamageEffect extends EntityEffect{
 		return DamageEffect.type;
 	}
 
+	@Override
+	public boolean shouldReciprocateToSource(CharacterModel target, ActionListener listener) {
+		return false;
+	}
 
+	@Override
+	public void flipValues() {
+		
+	}
+
+	@Override
+	public boolean shouldAddIfIntercepted() {
+		return false;
+	}
+
+	@Override
+	public void flipValuesIfNecessary(CharacterModel target, CharacterModel source) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isUniqueEffect() {
+		return false;
+	}
 
 }

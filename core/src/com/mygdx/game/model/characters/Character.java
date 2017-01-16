@@ -14,7 +14,10 @@ import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.Attack;
 import com.mygdx.game.model.characters.CollisionCheck.CollisionType;
 import com.mygdx.game.model.actions.ActionSegment.ActionState;
+import com.mygdx.game.model.actions.ActionSequence.ActionType;
+import com.mygdx.game.model.actions.ActionSequence.StaggerType;
 import com.mygdx.game.model.effects.EntityEffect;
+import com.mygdx.game.model.effects.EntityEffectSettings;
 import com.mygdx.game.model.effects.MovementEffect;
 import com.mygdx.game.model.effects.MovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
@@ -70,7 +73,7 @@ public abstract class Character implements ModelListener {
 		public final String fallState = "Fall";
 		
 		String state;
-		float currentHealth, maxHealth, currentWill, maxWill, attack, currentStability, maxStability;
+		float currentHealth, maxHealth, currentWill, maxWill, attack, currentStability, maxStability, currentTension, maxTension;
 		boolean isImmuneToInjury, attacking, directionLock;
 		protected boolean jumping;
 		protected boolean walking;
@@ -143,6 +146,8 @@ public abstract class Character implements ModelListener {
 			setAttack(properties.getAttack());
 			setMaxStability(properties.getMaxStability());
 			setCurrentStability(properties.getMaxStability(), null);
+			setMaxTension(properties.getMaxTension());
+			setCurrentTension(0);
 			acceleration.y = -properties.getGravity();
 			weapons = new Array <Weapon> ();
 			for (StringWrapper key : this.getCharacterProperties().getWeaponKeys()) {
@@ -160,7 +165,6 @@ public abstract class Character implements ModelListener {
 			this.manageAutomaticStates(delta, collisionLayer);
 			this.handleEffects(delta);
 			this.handleActionSequences(delta);
-//			System.out.println(imageHitBox.x + " " + imageHitBox.y + " " + imageHitBox.width + " " + imageHitBox.height);
 			if (this.actionStaggering) {
 				this.actionStaggerTime += delta;
 				if (this.actionStaggerTime > EntityUIModel.standardStaggerDuration) {
@@ -177,11 +181,7 @@ public abstract class Character implements ModelListener {
 		}
 		
 		public void setGameplaySize(float delta, TiledMapTileLayer collisionLayer) {
-//			this.getVelocity().y += this.getAcceleration().y * delta;
-//			this.getVelocity().x += this.getAcceleration().x * delta;
-//			
-//			this.gameplayHitBox.width = this.getImageHitBox().width * gameplayHitBoxWidthModifier;
-//			this.gameplayHitBox.height = this.getImageHitBox().height * gameplayHitBoxHeightModifier;
+
 			
 			super.setGameplaySize(delta);
 			//clamp velocity
@@ -190,8 +190,7 @@ public abstract class Character implements ModelListener {
 			else if (this.getVelocity().y < -this.properties.jumpSpeed) {
 				this.getVelocity().y = -this.properties.jumpSpeed; 
 			}
- //			else if (this.getVelocity().y < -this.properties.jumpSpeed)
-//				this.getVelocity().y = -this.properties.jumpSpeed;
+
 			if (this.getCurrentMovement() != null)
 			{
 				float xVelocityMax = this.getCurrentMovement().getMaxVelocity().x;
@@ -217,9 +216,6 @@ public abstract class Character implements ModelListener {
 			if (this.injuryTime > this.properties.getInjuryImmunityTime()) {
 				this.setImmuneToInjury(false);
 			}
-//			if (jumping) {
-//				setState(velocity.y >= 0 ? idleState : idleState); //Jump : Fall
-//			}
 			if (!jumping && !walking && !this.isProcessingActiveSequences()) {
 				setState(idleState);
 			}
@@ -248,6 +244,9 @@ public abstract class Character implements ModelListener {
 				if (this.isProcessingActiveSequences()) {
 					this.forceEndForActiveAction();
 				}
+				if (nextActiveAction.getActionKey().getKey().equals("Attack2") || nextActiveAction.getActionKey().getTypeOfAction().equals(ActionType.Stagger)) {
+					System.out.println("");
+				}
 				this.processingActionSequences.add(nextActiveActionSequences.poll());
 			}
 			
@@ -267,19 +266,22 @@ public abstract class Character implements ModelListener {
 		}
 		
 		public void addActionSequence (ActionSequence sequence) {
-//			sequence.setSource(this);
 			if (sequence.cannotBeOverriden()) {
-				forceEndForActiveAction(); 
-				processingActionSequences.add(sequence);
+				if (sequence.shouldOverridePrevAction()) {
+					forceEndForActiveAction(); 
+					processingActionSequences.add(sequence);
+				}
+				else {
+					nextActiveActionSequences.pollFirst();
+					nextActiveActionSequences.addFirst(sequence);
+				}
 			}
-			else if (sequence.isActive() && !actionLocked) {
-//				forceEndForActiveAction(); //necessary? No action should be there if not actionLocked.
-				nextActiveActionSequences.pollFirst();
-				nextActiveActionSequences.addFirst(sequence);
-			}
-			else if (sequence.isActive() && isAbleToEnqueueAction()) {
-				nextActiveActionSequences.pollFirst();
-				nextActiveActionSequences.addFirst(sequence);
+			else if (sequence.isActive() && (!actionLocked || isAbleToEnqueueAction())) {
+				ActionSequence nextAction = nextActiveActionSequences.peek();
+				if (nextAction == null || !nextAction.cannotBeOverriden()) {
+					nextActiveActionSequences.pollFirst();
+					nextActiveActionSequences.addFirst(sequence);
+				}
 			}
 			else if (!sequence.isActive()){
 				processingActionSequences.add(sequence);
@@ -287,12 +289,11 @@ public abstract class Character implements ModelListener {
 		}
 		
 		public boolean isAbleToEnqueueAction() {
-	    	return this.isProcessingActiveSequences() && !this.getCurrentActiveActionSeq().getAction().getActionState().equals(ActionState.WINDUP);
+	    	return this.isProcessingActiveSequences();
 	    }
 		
 		private void handleEffects(float delta) {
 			this.indicesToRemove.clear();
-//			//process existing effects.
 			for(Iterator<EntityEffect> iterator = this.currentEffects.iterator(); iterator.hasNext();) {
 				EntityEffect effect = iterator.next();
 				boolean isFinished = effect.process(this, delta);
@@ -303,7 +304,26 @@ public abstract class Character implements ModelListener {
 		}
 		
 		public void addEffect(EntityEffect effect) {
+			if (effect.isUniqueEffect()) {
+				for (EntityEffect currentEffect : this.currentEffects) {
+					if (currentEffect.getClass().equals(effect.getClass())) {
+						currentEffect.setForceEnd(true);
+					}
+				}
+			}
 			currentEffects.add(effect);
+		}
+		
+		public void removeEffectByID(Integer effectID) {
+			if (effectID.intValue() != EntityEffectSettings.defaultID) {
+				for(Iterator<EntityEffect> iterator = this.currentEffects.iterator(); iterator.hasNext();) {
+					EntityEffect effect = iterator.next();
+					if (effect.getSpecificID().intValue() == effectID.intValue() && effect.getSpecificID().intValue() != EntityEffectSettings.defaultID) {
+						effect.setForceEnd(true);
+						return;
+					}
+				}
+			}
 		}
 		
 		public void lockControls() {
@@ -311,7 +331,7 @@ public abstract class Character implements ModelListener {
 		}
 		
 		public void shouldUnlockControls(ActionSequence action) {
-	    	if ((action.getAction().getActionState().equals(ActionState.COOLDOWN) && action.isActive()) || action.getAction().isFinished())
+	    	if (action.getAction().isFinished())
 	    	{
 	    		this.setActionLock(false);
 	    	}
@@ -455,7 +475,10 @@ public abstract class Character implements ModelListener {
 
 		protected void movementWithCollisionDetection(float delta, TiledMapTileLayer collisionLayer) {
 		//logic for collision detection
-			CollisionCheck collisionX = this.checkForXCollision(delta, collisionLayer, this.velocity.x, true);
+			if (this.actionStaggering) {
+				return;
+			}
+			CollisionCheck collisionX = this.checkForXCollision(delta, collisionLayer, this.velocity.x, this.acceleration.x, true);
 			if (collisionX.doesCollide) {
 				this.getVelocity().x = 0;
 				this.getAcceleration().x = 0;
@@ -484,7 +507,7 @@ public abstract class Character implements ModelListener {
 
 		
 		public float howLongTillXCollision(float maxTime, TiledMapTileLayer collisionLayer) {
-			CollisionCheck collisionX = this.checkForXCollision(maxTime, collisionLayer, this.velocity.x, false);
+			CollisionCheck collisionX = this.checkForXCollision(maxTime, collisionLayer, this.velocity.x, this.acceleration.x, false);
 			return collisionX.timeUntilCollision;
 		}
 		
@@ -535,12 +558,21 @@ public abstract class Character implements ModelListener {
 			}
 		}
 		
+		public void forceActiveForActiveAction() {
+			for (int i = 0; i < this.processingActionSequences.size(); i++) {
+				ActionSequence sequence = this.processingActionSequences.get(i);
+				if (sequence.isActive()) {
+					sequence.forceActiveState();
+					break;
+				}
+			}
+		}
+		
 		private void staggerAction(MovementEffectSettings potentialMovementSettings) {
 			this.forceEndForActiveAction();
-//    		ActionSequence staggerAction = this.getCharacterProperties().getActions().get("Stagger").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());
-			ActionSequence staggerAction = ActionSequence.createStaggerSequence(this, potentialMovementSettings, this.actionListener);
+			ActionSequence staggerAction = ActionSequence.createStaggerSequence(this, potentialMovementSettings, this.actionListener, StaggerType.Normal);
     		this.addActionSequence(staggerAction);
-    		this.actionStagger();
+    		this.actionStagger(true);
     		this.setCurrentStability(this.maxStability, null);
 
 		}
@@ -617,6 +649,14 @@ public abstract class Character implements ModelListener {
 			this.setCurrentStability(value + this.currentStability, null);
 		}
 		
+		public void addToCurrentTension(float value) {
+			this.setCurrentTension(this.currentTension + value);
+		}
+		
+		public void removeFromCurrentTension(float value) {
+			this.setCurrentTension(this.currentTension - value);
+		}
+		
 		public Vector2 getCenteredPosition() {
 			Vector2 sourcePosition = new Vector2(this.gameplayHitBox.x + this.gameplayHitBox.width / 2, this.gameplayHitBox.y + this.gameplayHitBox.height / 2); 
 			return sourcePosition;
@@ -624,17 +664,22 @@ public abstract class Character implements ModelListener {
 		
 		public abstract void setPatrolInfo(Array<Float> wayPoints, float patrolDuration, float breakDuration);
 		
-		public void actionStagger() {
+		public void actionStagger(boolean stabilityStaggering) {
 			this.actionStaggering = true;
 			this.tempVelocityX = this.velocity.x;
 			this.tempVelocityY = this.velocity.y;
 			this.velocity.x = 0f;
 			this.velocity.y = 0f;
 			ActionSequence currentSeq = this.getCurrentActiveActionSeq();
-			
 			if (currentSeq != null) {
 				currentSeq.stagger();
 			}
+			
+			for (EntityEffect effect : this.currentEffects) {
+				if (effect instanceof MovementEffect)
+					effect.stagger();
+			}
+			
 			this.modelListener.actionStagger();
 		}
 		
@@ -719,8 +764,6 @@ public abstract class Character implements ModelListener {
 
 		public void setState(String state) {
 			if (this.state == null || !this.state.equals(state)) {
-//				System.out.println(this.name + "'s state: " + this.state);
-//				System.out.println("Time spent in state: " + this.stateTime);
 				this.state = state;
 				this.didChangeState = true;
 				this.stateTime = 0f;
@@ -844,9 +887,34 @@ public abstract class Character implements ModelListener {
 		public Weapon getCurrentWeapon() {
 			return currentWeapon;
 		}
+
+		public float getCurrentTension() {
+			return currentTension;
+		}
+
+		public void setCurrentTension(float currentTension) {
+			this.currentTension = Math.min(Math.max(0, currentTension), this.maxTension);
+			if (this.currentTension == this.maxTension) {
+				this.tensionOverload();
+			}
+		}
 		
+		public abstract void tensionOverload();
+
+		public float getMaxTension() {
+			return maxTension;
+		}
+
+		public void setMaxTension(float maxTension) {
+			this.maxTension = maxTension;
+			this.currentTension = 0;
+		}
+
+		public ArrayList<EntityEffect> getCurrentEffects() {
+			return currentEffects;
+		}
 		
-		
+				
 	}
 	
 	@Override 

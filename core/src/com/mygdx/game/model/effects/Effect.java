@@ -24,16 +24,16 @@ public abstract class Effect {
 	
 	public Effect(EffectSettings settings) {
 		this();
-		this.setRetriever(retriever);
 		this.settings = settings;
+
 	}
 	
 
-	public EffectController getRetriever() {
+	public EffectController getController() {
 		return retriever;
 	}
 
-	public void setRetriever(EffectController retriever) {
+	public void setController(EffectController retriever) {
 		this.retriever = retriever;
 	}
 

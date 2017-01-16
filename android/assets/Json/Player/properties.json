@@ -3,6 +3,7 @@
 	"maxHealth": 20,
 	"maxWill": 20,
 	"maxStability": 5,
+	"maxTension": 4,
 	"attack": 1,
 	"widthCoefficient": 0.2,
 	"heightCoefficient": 0.6,

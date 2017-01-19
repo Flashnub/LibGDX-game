@@ -17,7 +17,7 @@
 		"targetEffectSettings": [
 			{
 				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
-				"value": 2
+				"value": 200
 			}
 			{
 				"class": "com.mygdx.game.model.effects.StabilityDamageEffectSettings",

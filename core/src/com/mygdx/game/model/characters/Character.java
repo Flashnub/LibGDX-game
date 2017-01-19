@@ -16,6 +16,7 @@ import com.mygdx.game.model.characters.CollisionCheck.CollisionType;
 import com.mygdx.game.model.actions.ActionSegment.ActionState;
 import com.mygdx.game.model.actions.ActionSequence.ActionType;
 import com.mygdx.game.model.actions.ActionSequence.StaggerType;
+import com.mygdx.game.model.effects.EffectInitializer;
 import com.mygdx.game.model.effects.EntityEffect;
 import com.mygdx.game.model.effects.EntityEffectSettings;
 import com.mygdx.game.model.effects.MovementEffect;
@@ -23,6 +24,7 @@ import com.mygdx.game.model.effects.MovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.AssaultInterceptor;
 import com.mygdx.game.model.events.ObjectListener;
+import com.mygdx.game.model.globalEffects.WorldEffectSettings;
 import com.mygdx.game.model.projectiles.Explosion;
 import com.mygdx.game.model.projectiles.Projectile;
 import com.mygdx.game.model.weapons.Weapon;
@@ -81,6 +83,7 @@ public abstract class Character implements ModelListener {
 		boolean actionStaggering;
 		boolean facingLeft;
 		boolean actionLocked;
+		boolean alreadyDead;
 	    public float injuryTime = 0f;
 	    float actionStaggerTime;
 	    float tempVelocityX;
@@ -125,6 +128,7 @@ public abstract class Character implements ModelListener {
 			actionLocked = false;
 			walking = false;
 			directionLock = false;
+			alreadyDead = false;
 			stateTime = 0f;
 			actionStaggerTime = 0f;
 			tempVelocityX = 0f;
@@ -176,6 +180,7 @@ public abstract class Character implements ModelListener {
 					this.actionStaggerTime = 0f;
 				}
 			}
+			this.deathCheck();
 			//Debug
 			this.stateTime += delta;
 		}
@@ -621,8 +626,27 @@ public abstract class Character implements ModelListener {
 			}
 		}
 		
+		public void performDeathSequence() {
+			ActionSequence deathSequence = this.getCharacterProperties().getActions().get(ActionSequence.deathKey).cloneSequenceWithSourceAndTarget(this, null, actionListener, collisionChecker);
+			if (deathSequence != null) {
+				this.addActionSequence(deathSequence);
+			}
+
+		}
+		
+		public void deathCheck() {
+			if (this.getCurrentHealth() == 0 && !alreadyDead) {
+				this.performDeathSequence();
+				this.alreadyDead = true;
+			}
+		}
+		
 		public float getHealthRatio() {
 			return ((float)this.getCurrentHealth()) / ((float)this.getMaxHealth());
+		}
+		
+		public float getTensionRatio() {
+			return ((float)this.getCurrentTension()) / ((float)this.getMaxTension());
 		}
 	
 		public void addToCurrentHealth(float value) {
@@ -815,6 +839,18 @@ public abstract class Character implements ModelListener {
 
 		public String getName() {
 			return name;
+		}
+		
+		public String getNameForStaggerSeq(StaggerType type) {
+			if (type.equals(StaggerType.Normal)) {
+				return this.properties.useDefaultStagger ? "" : this.getName();
+
+			}
+			else if (type.equals(StaggerType.Tension)) {
+				return this.properties.useDefaultTensionStagger ? "" : this.getName();
+
+			}
+			return "";
 		}
 
 		public void setName(String name) {

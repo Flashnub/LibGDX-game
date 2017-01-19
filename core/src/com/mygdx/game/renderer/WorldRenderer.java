@@ -1,6 +1,8 @@
 package com.mygdx.game.renderer;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.controllers.Controller;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -14,6 +16,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.characters.Character;
 import com.mygdx.game.model.characters.enemies.Enemy;
 import com.mygdx.game.model.characters.player.Player;
@@ -216,4 +219,6 @@ public class WorldRenderer implements CoordinatesHelper{
 			Vector2 position = new Vector2(xOffset, yOffset);
 			return position;
 		}
+		
+
 }

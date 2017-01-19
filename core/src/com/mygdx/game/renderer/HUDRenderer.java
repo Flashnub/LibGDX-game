@@ -32,7 +32,9 @@ public class HUDRenderer implements WorldListener{
 		this.dialogueView = new DialogueView();
 	    stage = new Stage(new ScreenViewport());
 	    ResourceBar healthBar = new ResourceBar(ResourceBarType.PlayerHealth, worldModel.getPlayer(), helper);
+	    ResourceBar tensionBar = new ResourceBar(ResourceBarType.PlayerTension, worldModel.getPlayer(), helper);
 	    stage.addActor(healthBar);
+	    stage.addActor(tensionBar);
 	    stage.addActor(prompt);
 	    stage.addActor(dialogueView);
 		worldModel.addWorldListener(this);

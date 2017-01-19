@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Json.Serializable;
 import com.badlogic.gdx.utils.JsonValue;
 import com.mygdx.game.constants.InputConverter.DirectionalInput;
 import com.mygdx.game.constants.InputType;
+import com.mygdx.game.constants.XBox360Pad;
 
 public class GameSave implements Serializable{
 	
@@ -103,15 +104,56 @@ public class GameSave implements Serializable{
 		gameSave.acquiredItemsHistory = new Array<Integer>();
 		gameSave.inventoryItemKeys = new Array<String>();
 		gameSave.objectsInteractedHistory = new Array<Integer>();
-		gameSave.controllerScheme = new HashMap <String, String>();
 		
+		//GamePad Scheme
+		gameSave.controllerScheme = new HashMap <String, String>();
+		gameSave.controllerScheme.put(XBox360Pad.axisCodeToString(XBox360Pad.AXIS_LEFT_Y, -.5f), InputType.UP);
+		gameSave.controllerScheme.put(XBox360Pad.axisCodeToString(XBox360Pad.AXIS_LEFT_X, -.5f), InputType.LEFT);
+		gameSave.controllerScheme.put(XBox360Pad.axisCodeToString(XBox360Pad.AXIS_LEFT_Y, .5f), InputType.DOWN);
+		gameSave.controllerScheme.put(XBox360Pad.axisCodeToString(XBox360Pad.AXIS_LEFT_X, .5f), InputType.RIGHT);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_L3), InputType.USEITEM);
+//		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_LB), InputType.ACTION);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_LB), InputType.ACTIONCANCEL);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_A), InputType.JUMP);
+		
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_X), InputType.LIGHTATTACK);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_X).concat(DirectionalInput.UP.toString()), InputType.UPLIGHTATTACK);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_X).concat(DirectionalInput.LEFT.toString()), InputType.LEFTLIGHTATTACK);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_X).concat(DirectionalInput.DOWN.toString()), InputType.DOWNLIGHTATTACK);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_X).concat(DirectionalInput.RIGHT.toString()), InputType.RIGHTLIGHTATTACK);
+
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_Y), InputType.MEDIUMATTACK);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_Y).concat(DirectionalInput.UP.toString()), InputType.UPMEDIUMATTACK);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_Y).concat(DirectionalInput.LEFT.toString()), InputType.LEFTMEDIUMATTACK);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_Y).concat(DirectionalInput.DOWN.toString()), InputType.DOWNMEDIUMATTACK);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_Y).concat(DirectionalInput.RIGHT.toString()), InputType.RIGHTMEDIUMATTACK);
+
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_B), InputType.HEAVYATTACK);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_B).concat(DirectionalInput.UP.toString()), InputType.UPHEAVYATTACK);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_B).concat(DirectionalInput.LEFT.toString()), InputType.LEFTHEAVYATTACK);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_B).concat(DirectionalInput.DOWN.toString()), InputType.DOWNHEAVYATTACK);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_B).concat(DirectionalInput.RIGHT.toString()), InputType.RIGHTHEAVYATTACK);
+
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_RB), InputType.SPECIAL);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_RB).concat(DirectionalInput.UP.toString()), InputType.UPSPECIAL);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_RB).concat(DirectionalInput.LEFT.toString()), InputType.LEFTSPECIAL);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_RB).concat(DirectionalInput.DOWN.toString()), InputType.DOWNSPECIAL);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_RB).concat(DirectionalInput.RIGHT.toString()), InputType.RIGHTSPECIAL);
+
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_R3), InputType.MOVEMENT);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_R3).concat(DirectionalInput.UP.toString()), InputType.UPMOVEMENT);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_R3).concat(DirectionalInput.LEFT.toString()), InputType.LEFTMOVEMENT);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_R3).concat(DirectionalInput.DOWN.toString()), InputType.DOWNMOVEMENT);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_R3).concat(DirectionalInput.RIGHT.toString()), InputType.RIGHTMOVEMENT);
+		
+		//KBMouse Scheme
 		gameSave.KBMouseScheme = new HashMap <String, String> ();
 		gameSave.KBMouseScheme.put(Keys.toString(Keys.W), InputType.UP);
 		gameSave.KBMouseScheme.put(Keys.toString(Keys.A), InputType.LEFT);
 		gameSave.KBMouseScheme.put(Keys.toString(Keys.S), InputType.DOWN);
 		gameSave.KBMouseScheme.put(Keys.toString(Keys.D), InputType.RIGHT);
-		gameSave.KBMouseScheme.put(Keys.toString(Keys.E), InputType.ACTION);
-		gameSave.KBMouseScheme.put(Keys.toString(Keys.TAB), InputType.LOCKON);
+		gameSave.KBMouseScheme.put(Keys.toString(Keys.TAB), InputType.USEITEM);
+		gameSave.KBMouseScheme.put(Keys.toString(Keys.E), InputType.ACTIONCANCEL);
 		gameSave.KBMouseScheme.put(Keys.toString(Keys.SPACE), InputType.JUMP);
 		
 		gameSave.KBMouseScheme.put(Keys.toString(Keys.Z), InputType.LIGHTATTACK);

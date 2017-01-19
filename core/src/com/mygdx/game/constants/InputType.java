@@ -9,9 +9,10 @@ public class InputType {
 	public static final String MEDIUMATTACK = "MEDIUMATTACK";
 	public static final String HEAVYATTACK = "HEAVYATTACK"; 
 	public static final String MOVEMENT = "MOVEMENT";
-	public static final String LOCKON = "LOCKON";
+	public static final String USEITEM = "USEITEM";
 	public static final String JUMP = "JUMP";
-	public static final String ACTION = "ACTION";
+//	public static final String ACTION = "ACTION";
+	public static final String ACTIONCANCEL = "ACTIONCANCEL";
 	public static final String SPECIAL = "SPECIAL";
 	public static final String LEFTLIGHTATTACK = "LEFTLIGHTATTACK";
 	public static final String DOWNLIGHTATTACK = "DOWNLIGHTATTACK";

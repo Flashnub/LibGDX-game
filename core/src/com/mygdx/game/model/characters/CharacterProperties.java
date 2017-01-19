@@ -9,6 +9,8 @@ import com.badlogic.gdx.utils.Json.Serializable;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.ActionSequence.UseType;
 import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.globalEffects.WorldEffect;
+import com.mygdx.game.model.globalEffects.WorldEffectSettings;
 import com.mygdx.game.wrappers.StringWrapper;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Queue;
@@ -32,6 +34,8 @@ public class CharacterProperties implements Serializable {
 	HashMap<String, ActionSequence> actions;
 	Array <StringWrapper> weaponKeys;
 	Array <ActionSequence> sequencesSortedByInputSize;
+	boolean useDefaultStagger;
+	boolean useDefaultTensionStagger;
 	
 	public CharacterProperties() {
 		
@@ -143,6 +147,22 @@ public class CharacterProperties implements Serializable {
 			this.heightCoefficient = 1f;
 		}
 		
+		Boolean useDefaultStagger = json.readValue("useDefaultStagger", Boolean.class, jsonData);
+		if (useDefaultStagger != null) {
+			this.useDefaultStagger = useDefaultStagger;
+		}
+		else {
+			this.useDefaultStagger = true;
+		}
+		
+		Boolean useDefaultTensionStagger = json.readValue("useDefaultTensionStagger", Boolean.class, jsonData);
+		if (useDefaultTensionStagger != null) {
+			this.useDefaultTensionStagger = useDefaultStagger;
+		}
+		else {
+			this.useDefaultTensionStagger = true;
+		}
+		
 		this.sequencesSortedByInputSize = new Array <ActionSequence> ();
 		for (ActionSequence sequence : this.actions.values()) {
 			ActionSequence.addSequenceToSortedArray(sequencesSortedByInputSize, sequence);
@@ -166,6 +186,8 @@ public class CharacterProperties implements Serializable {
 		properties.horizontalAcceleration = this.horizontalAcceleration;
 		properties.weaponKeys = this.weaponKeys;
 		properties.maxTension = this.maxTension;
+		properties.useDefaultStagger = this.useDefaultStagger;
+		properties.useDefaultTensionStagger = this.useDefaultTensionStagger;
 		//iterate through actions.
 		HashMap <String, ActionSequence> clonedActions = new HashMap<String, ActionSequence> ();
 		for (Map.Entry<String, ActionSequence> entry : actions.entrySet()) {
@@ -283,4 +305,10 @@ public class CharacterProperties implements Serializable {
 	public float getMaxTension() {
 		return maxTension;
 	}
+
+	public boolean useDefaultStagger() {
+		return useDefaultStagger;
+	}
+	
+	
 }

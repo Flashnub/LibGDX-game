@@ -27,7 +27,9 @@ public class WorldAttackSettings implements Serializable{
 	public void read(Json json, JsonValue jsonData) {
 		abilitySettingKey = json.readValue("abilitySettingKey", String.class, jsonData);
 		worldEffectSettings = json.readValue("worldEffectSettings", Array.class, jsonData);
-		abilitySettings = JSONController.abilities.get(abilitySettingKey).deepCopy();
+		if (abilitySettingKey != null) {
+			abilitySettings = JSONController.abilities.get(abilitySettingKey).deepCopy();
+		}
 		
 	}
 

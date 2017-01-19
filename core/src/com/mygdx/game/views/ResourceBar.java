@@ -1,5 +1,6 @@
 package com.mygdx.game.views;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -41,7 +42,45 @@ public class ResourceBar extends Actor{
 				}
 				return null;
 			}
+			
+			@Override 
+			public Color getTintColor(float ratio) {
+				return ratio > 0.6f ? Color.WHITE : new Color(1, Math.max((1 - ratio), 0.1f), Math.max((1 - ratio), 0.1f), 1);
+			}
+			
 		}, PlayerTension {
+			@Override
+			public TextureRegion getForegroundSprite() {
+				TextureAtlas atlas = HUDUtils.masterAtlas;
+				if (atlas != null) {
+					return atlas.findRegion("tension-bar");
+				}
+				return null;
+			}
+			
+			@Override
+			public TextureRegion getIntermediateForegroundSprite() {
+				TextureAtlas atlas = HUDUtils.masterAtlas;
+				if (atlas != null) {
+					return atlas.findRegion("tension-bar");
+				}
+				return null;
+			}
+			
+			@Override
+			public TextureRegion getBackgroundSprite() {
+				TextureAtlas atlas = HUDUtils.masterAtlas;
+				if (atlas != null) {
+					return atlas.findRegion("tension-bar-background");
+				}
+				return null;
+			}
+						
+			@Override 
+			public Color getTintColor(float ratio) {
+				return new Color(1, Math.max((1 - ratio), 0.1f), Math.max((1 - ratio), 0.1f), 1);
+			}
+			
 			
 		}, EnemyHealth {
 			@Override
@@ -71,7 +110,10 @@ public class ResourceBar extends Actor{
 				return null;
 			}
 			
-			
+			@Override 
+			public Color getTintColor(float ratio) {
+				return ratio > 0.6f ? Color.WHITE : new Color(1, Math.max((1 - ratio), 0.1f), Math.max((1 - ratio), 0.1f), 1);
+			}
 		};
 		
 		public String getAffiliation() {
@@ -101,6 +143,10 @@ public class ResourceBar extends Actor{
 			}
 			return null;
 		}
+		
+		public Color getTintColor(float ratio) {
+			return Color.WHITE;
+		}
 	}
 	
 	TextureRegion background;
@@ -126,7 +172,7 @@ public class ResourceBar extends Actor{
 		this.foreground = type.getForegroundSprite();
 		this.intermediateForeground = type.getIntermediateForegroundSprite();
 		this.background = type.getBackgroundSprite();
-		this.expectedRatio = this.owner.getCharacterData().getHealthRatio();
+		this.expectedRatio = this.getRatio();
 		this.differenceInRatio = 0f;
 		this.helper = helper;
 	}
@@ -139,7 +185,10 @@ public class ResourceBar extends Actor{
 			this.setHeight(30);
 		}
 		else if (type.getAffiliation().equals(ResourceBarType.PlayerTension.getAffiliation())) {
-			
+			this.setX(viewPort.getScreenWidth() * 0.1f);
+			this.setY(viewPort.getScreenHeight() * 0.8f - 35);
+			this.setWidth(viewPort.getScreenWidth() * 0.2f);
+			this.setHeight(20);
 		}
 		else if (type.getAffiliation().equals(ResourceBarType.EnemyHealth.getAffiliation())) {
 			Vector2 enemyCoordinates = this.helper.getScreenCoordinatesForCharacter(owner);
@@ -148,12 +197,14 @@ public class ResourceBar extends Actor{
 			this.setWidth(ResourceBar.enemyHealthBarWidth);
 			this.setHeight(5);
 		}
-	
+		
 		batch.draw(background, this.getX(), this.getY(), this.getWidth(), this.getHeight());
 		if (this.isShowingIntermediate) {
 			batch.draw(intermediateForeground, this.getX(), this.getY(), this.getWidth() * (this.expectedRatio + differenceInRatio), this.getHeight());
 		}
+		batch.setColor(type.getTintColor(this.getRatio()));
 		batch.draw(foreground, this.getX(), this.getY(), this.getWidth() * this.expectedRatio, this.getHeight());
+		batch.setColor(Color.WHITE);
 	}
 	
 	@Override
@@ -165,9 +216,9 @@ public class ResourceBar extends Actor{
 	@Override
 	public void act(float delta) {
 		super.act(delta);
-		if (this.owner.getCharacterData().getHealthRatio() != expectedRatio) {
-			this.differenceInRatio += expectedRatio - this.owner.getCharacterData().getHealthRatio();
-			this.expectedRatio = this.owner.getCharacterData().getHealthRatio();
+		if (this.getRatio() != expectedRatio) {
+			this.differenceInRatio += expectedRatio - this.getRatio();
+			this.expectedRatio = this.getRatio();
 			this.animationTime = 0f;
 			this.isAnimating = false;
 			this.isShowingIntermediate = true;
@@ -194,5 +245,13 @@ public class ResourceBar extends Actor{
 		return super.equals(object);
 	}
 	
+	private float getRatio() {
+		if (this.type.equals(ResourceBarType.PlayerTension)) {
+			return this.owner.getCharacterData().getTensionRatio();
+		}
+		else {
+			return this.owner.getCharacterData().getHealthRatio();
+		}
+	}
 	
 }

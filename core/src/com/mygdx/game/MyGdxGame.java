@@ -1,6 +1,8 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.controllers.Controller;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -21,6 +23,11 @@ public class MyGdxGame extends Game {
 
 		GameScreen screen = new GameScreen(tiledMap, worldModel);
 		setScreen(screen);
+
+		for (Controller c : Controllers.getControllers()) {
+			System.out.println(c.getName());
+		}
+
 	}
 	
 

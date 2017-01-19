@@ -20,6 +20,7 @@ public abstract class WorldEffect extends Effect{
 		this.collisionChecker = collisionChecker;
 		this.settings = settings;
 		this.source = source;
+		this.setController(retriever);
 	}
 	
 	public abstract float getEffectiveRange();

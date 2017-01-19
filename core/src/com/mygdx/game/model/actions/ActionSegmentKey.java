@@ -8,6 +8,7 @@ import com.mygdx.game.model.actions.ActionSequence.ActionType;
 public class ActionSegmentKey implements Serializable{
 	String key;
 	ActionType typeOfAction;
+	String overridingAbilitySettingsKey;
 	
 	public ActionSegmentKey() {
 		
@@ -30,6 +31,7 @@ public class ActionSegmentKey implements Serializable{
 		// TODO Auto-generated method stub
 		typeOfAction = json.readValue("typeOfAction", ActionType.class, jsonData);
 		key = json.readValue("key", String.class, jsonData);
+		overridingAbilitySettingsKey = json.readValue("overridingAbilitySettingsKey", String.class, jsonData);
 	}
 	
 	@Override

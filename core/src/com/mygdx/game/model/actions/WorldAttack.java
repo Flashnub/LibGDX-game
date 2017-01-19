@@ -2,6 +2,7 @@ package com.mygdx.game.model.actions;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.EffectInitializer;
 import com.mygdx.game.model.effects.EntityEffect;
@@ -25,7 +26,7 @@ public class WorldAttack extends ActionSegment{
 		super();
 	}
 	
-	public WorldAttack(CharacterModel source, CharacterModel target, ActionListener actionListener, CollisionChecker collisionChecker, WorldAttackSettings settings) {
+	public WorldAttack(CharacterModel source, CharacterModel target, ActionListener actionListener, CollisionChecker collisionChecker, WorldAttackSettings settings, String overridingAbilitySettingsKey) {
 		super(actionListener);
 		this.source = source;
 		this.target = target;
@@ -35,7 +36,11 @@ public class WorldAttack extends ActionSegment{
 			WorldEffect effect = EffectInitializer.initializeWorldEffect(worldEffectSettings, this, collisionChecker, source, target, source.getCenteredPosition());
 			worldEffects.add(effect);
 		}
-		if (settings.getAbilitySettings() != null) {
+		if (settings.getAbilitySettings() != null || overridingAbilitySettingsKey != null) {
+			if (overridingAbilitySettingsKey != null) {
+				settings.abilitySettingKey = overridingAbilitySettingsKey;
+				settings.abilitySettings = JSONController.abilities.get(settings.abilitySettingKey).deepCopy();
+			}
 			if (settings.getAbilitySettings() instanceof AbilitySettings) {
 				potentialAbility = new Ability(source, settings.getAbilitySettings(), actionListener);
 			}

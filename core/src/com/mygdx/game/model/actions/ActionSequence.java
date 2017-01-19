@@ -34,16 +34,18 @@ public class ActionSequence implements Serializable {
 	public enum StaggerType {
 		Normal, Tension;
 		
-		public String getKeyForStaggerType() {
+		public String getKeyForStaggerType(String namePrefix) {
 			switch(this) {
 			case Normal:
-				return ActionSequence.staggerKey;
+				return namePrefix + ActionSequence.staggerKey;
 			case Tension: 
-				return ActionSequence.tensionStaggerKey;
+				return namePrefix + ActionSequence.tensionStaggerKey;
 			}
 			return ActionSequence.staggerKey;
 		}
 	}
+	
+	public static final String deathKey = "Death";
 
 	private ActionSegmentKey actionKey;
 	private ActionStrategy strategy;
@@ -124,7 +126,7 @@ public class ActionSequence implements Serializable {
 	
 	public static ActionSequence createStaggerSequence(CharacterModel source, MovementEffectSettings overridingMovement, ActionListener actionListener, StaggerType staggerType) {
 		ActionSequence sequence = new ActionSequence();
-		sequence.actionKey = new ActionSegmentKey(staggerType.getKeyForStaggerType(), ActionType.Stagger);
+		sequence.actionKey = new ActionSegmentKey(staggerType.getKeyForStaggerType(source.getNameForStaggerSeq(staggerType)), ActionType.Stagger);
 		sequence.isActive = true;
 		sequence.strategy = ActionStrategy.Story;
 		if (staggerType.equals(StaggerType.Tension)) {
@@ -388,7 +390,7 @@ public class ActionSequence implements Serializable {
 				action = new Attack(source, JSONController.attacks.get(segmentKey.getKey()), this.actionListener, this.collisionChecker);
 				break;
 			case WorldAttack:
-				action = new WorldAttack(source, target, actionListener, collisionChecker, JSONController.projectileAttacks.get(segmentKey.getKey()));
+				action = new WorldAttack(source, target, actionListener, collisionChecker, JSONController.worldAttacks.get(segmentKey.getKey()), segmentKey.overridingAbilitySettingsKey);
 				break;
 			case Ability:
 				action = new Ability(source, JSONController.abilities.get(segmentKey.getKey()), this.actionListener);
@@ -454,6 +456,8 @@ public class ActionSequence implements Serializable {
 		for (int i = 0; i < sequences.size; i++) {
 			if (sequence.leftInputs.size > sequences.get(i).leftInputs.size) {
 				sequences.insert(i, sequence);
+				isAdded = true;
+				break;
 			}
 		}
 		if (!isAdded) {

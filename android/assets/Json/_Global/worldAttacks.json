@@ -19,4 +19,15 @@
 			}
 		]
 	}
+	"Death": {
+		"class": com.mygdx.game.model.actions.WorldAttackSettings,
+		"worldEffectSettings": [
+			{
+				"class": com.mygdx.game.model.globalEffects.DeleteCharacterEffectSettings,
+				"delayToActivate": 4,
+				"duration": 0.01,
+				"isInstantaneous": false
+			}
+		]
+	}
 }

@@ -19,5 +19,6 @@ public interface ActionListener {
 	void addProjectile(Projectile projectile);
 	void addExplosion(Explosion explosion);
 	void superActivatedFrom(CharacterModel source, ActionSequence sequence);
+	void deleteCharacter(CharacterModel character);
 	TiledMapTileLayer getCollisionLayer();
 }

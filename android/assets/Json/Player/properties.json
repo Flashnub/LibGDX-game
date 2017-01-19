@@ -7,6 +7,8 @@
 	"attack": 1,
 	"widthCoefficient": 0.2,
 	"heightCoefficient": 0.6,
+	"useDefaultStagger": true,
+	"useDefaultTensionStagger": false,
 	"actions": {
 		"PlayerDash": {
 			"class": com.mygdx.game.model.actions.ActionSequence,
@@ -38,6 +40,18 @@
 				["LEFTSPECIAL"]
 			]
 		},
+		"Death": {
+			"class": com.mygdx.game.model.actions.ActionSequence,
+			"actionKey": {
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "Death",
+				"overridingAbilitySettingsKey": "PlayerDeath",
+				"typeOfAction": WorldAttack
+			}
+			"windupState": "Idle"
+			"actingState": "Idle"
+			"cooldownState": "Idle"
+		}
 		
 	},
 	"weaponKeys": [

@@ -5,6 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.controllers.Controller;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
@@ -69,6 +71,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     boolean freezeWorld;
     float freezeTime;
     CharacterModel characterImmuneToFreeze;
+    Controller controller;
     
     public WorldModel(TiledMapTileLayer collisionLayer) {
     	enemies = new Array<Enemy>();   
@@ -244,6 +247,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 
     public void act(float delta) {
         // Fixed timestep
+    	this.checkForControllers();
         accumulatedTime += delta;
         stateTime += delta;
         if (stateTime % 10 < 0.2) {
@@ -287,7 +291,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     		for (int i = 0; i < worldEffects.size; i++) {
     			WorldEffect effect = worldEffects.get(i);
     			if (!this.freezeWorld) 
-    				effect.process(delta);
+    				effect.process(timeForAction);
     		}
     		accumulatedTime -= timeForAction;
         }
@@ -303,6 +307,25 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 				this.characterImmuneToFreeze = null;
 			}
 		}
+    }
+    
+    @Override
+    public void deleteCharacter(CharacterModel character) {
+    	for (NPCCharacter npc : this.npcCharacters) {
+    		if (npc.getCharacterData().equals(character)) {
+    			this.npcCharacters.removeValue(npc, true);
+    			this.nearbyNPCs.removeValue(npc, true);
+    			for (WorldListener listener : this.getWorldListeners()) {
+    				listener.updateWithNearbyNPCs(nearbyNPCs);
+    			}
+    			return;
+    		}
+    	}
+    	for (Enemy enemy : this.enemies) {
+    		if (enemy.getCharacterData().equals(character)) {
+    			this.deleteEnemy(enemy);
+    		}
+    	}
     }
     
 	@Override
@@ -618,6 +641,26 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 		// TODO Auto-generated method stub
 		PlayerModel model = (PlayerModel) player.getCharacterData();
 		model.addUUIDToSave(UUID, type);
+
+	}
+	
+	private void checkForControllers() {
+		if (controller == null) {
+			Array<Controller> controllers = Controllers.getControllers();
+			if(controllers.size != 0) {
+				Controller pad = null;
+				for(Controller c : controllers) {
+					if(c.getName().toUpperCase().contains("XBOX") && c.getName().contains("360")) {
+						pad = c;
+						break;
+					}
+				}
+				if (pad != null) {
+					this.controller = pad;
+					this.controller.addListener(getPlayer());
+				}
+			}
+		}
 
 	}
 

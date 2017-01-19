@@ -6,44 +6,58 @@ filter: Nearest,Nearest
 repeat: none
 enemy-health-bar
   rotate: false
-  xy: 2, 63
+  xy: 2, 72
   size: 118, 7
   orig: 118, 7
   offset: 0, 0
   index: -1
 enemy-health-bar-background
   rotate: false
-  xy: 2, 54
+  xy: 2, 63
+  size: 118, 7
+  orig: 118, 7
+  offset: 0, 0
+  index: -1
+tension-bar-background
+  rotate: false
+  xy: 2, 63
   size: 118, 7
   orig: 118, 7
   offset: 0, 0
   index: -1
 enemy-health-bar-intermediate
   rotate: false
-  xy: 122, 63
+  xy: 122, 72
   size: 118, 7
   orig: 118, 7
   offset: 0, 0
   index: -1
 health-bar
   rotate: false
-  xy: 2, 136
+  xy: 2, 145
   size: 500, 30
   orig: 500, 30
   offset: 0, 0
   index: -1
 health-bar-background
   rotate: false
-  xy: 2, 104
+  xy: 2, 113
   size: 500, 30
   orig: 500, 30
   offset: 0, 0
   index: -1
 health-bar-intermediate
   rotate: false
-  xy: 2, 72
+  xy: 2, 81
   size: 500, 30
   orig: 500, 30
+  offset: 0, 0
+  index: -1
+tension-bar
+  rotate: false
+  xy: 2, 54
+  size: 118, 7
+  orig: 118, 7
   offset: 0, 0
   index: -1
 text-background

@@ -12,6 +12,11 @@ public class DummyAI extends EnemyAI {
 	public DummyAI(EnemyModel source, WorldModel world) {
 		super(source, world);
 	}
+	
+	@Override
+	public void process(float delta) {
+		
+	}
 
 	@Override
 	public void handleObservation(Observation data) {

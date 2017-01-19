@@ -31,16 +31,26 @@ public class Explosion extends EntityModel implements EffectController {
 	 
 	
 	public Explosion(String name, ActionListener actionListener, Vector2 originOffset, CharacterModel source, Vector2 originOverride) {
+		super();
 		this.settings = JSONController.explosions.get(name).deepCopy();
 		this.actionListener = actionListener;
 		this.currentTime = 0f;
 		this.explosionUIModel = new EntityUIModel(name, EntityUIDataType.EXPLOSION);
 		this.widthCoefficient = this.settings.getWidthCoefficient();
 		this.heightCoefficient = this.settings.getHeightCoefficient();
-		if (originOverride != null) {
+		if (originOverride != null && originOffset != null) {
 			this.imageHitBox.x = originOverride.x + originOffset.x;
 			this.imageHitBox.y = originOverride.y + originOffset.y;
 		}
+		else if (originOffset != null){
+			this.imageHitBox.x = source.getImageHitBox().x + (source.getImageHitBox().width / 2f) + originOffset.x;
+			this.imageHitBox.y = source.getImageHitBox().y + (source.getImageHitBox().height / 2f) + originOffset.y;
+		}
+		else {
+			this.imageHitBox.x = source.getImageHitBox().x + (source.getImageHitBox().width / 2f);
+			this.imageHitBox.y = source.getImageHitBox().y + (source.getImageHitBox().height / 2f);
+		}
+
 		UUID id = UUID.randomUUID();
 		this.uuid = id.toString();
 		this.allegiance = source.getAllegiance();

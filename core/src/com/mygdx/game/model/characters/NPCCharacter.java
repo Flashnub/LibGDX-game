@@ -271,6 +271,5 @@ public class NPCCharacter extends Character{
 			
 		}
 
-
 	}
 }

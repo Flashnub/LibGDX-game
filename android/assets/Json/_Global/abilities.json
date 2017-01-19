@@ -36,9 +36,21 @@
 			}
 		]
 	}
+	"BasicProjectileAttack": {
+		"class": "com.mygdx.game.model.actions.AbilitySettings",
+		"sourceEffectSettings": [
+			{
+				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
+				"value": 0
+			}
+		],
+		"windupTime": 1,
+		"cooldownTime": 1,
+		"duration": 1
+	}
 	"Stagger": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
-		"duration": 2,
+		"duration": 1,
 		"sourceEffectSettings": [
 			{
 				"class": "com.mygdx.game.model.effects.MovementEffectSettings",
@@ -59,23 +71,22 @@
 			}
 		]
 	}
-	"TensionStagger": {
+	"PlayerTensionStagger": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
-		"duration": 2,
-		"sourceEffectSettings": [
-
-		]
+		"duration": 1
 	}
-	"BasicProjectileAttack": {
+	"PlayerDeath": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
-		"sourceEffectSettings": [
-			{
-				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
-				"value": 0
-			}
-		],
+		"duration": 1
+	}
+	"BasicEnemyDeath": {
+		"class": "com.mygdx.game.model.actions.AbilitySettings",
 		"windupTime": 1,
 		"cooldownTime": 1,
+		"duration": 1
+	}
+	"BasicEnemyTensionStagger": {
+		"class": "com.mygdx.game.model.actions.AbilitySettings",
 		"duration": 1
 	}
 }

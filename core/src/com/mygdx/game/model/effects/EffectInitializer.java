@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.EffectSettings;
 import com.mygdx.game.model.events.CollisionChecker;
+import com.mygdx.game.model.globalEffects.DeleteCharacterEffect;
 import com.mygdx.game.model.globalEffects.ExplosionCreateEffect;
 import com.mygdx.game.model.globalEffects.ProjectileCreateEffect;
 import com.mygdx.game.model.globalEffects.SpawnCharacterEffect;
@@ -50,6 +51,9 @@ public class EffectInitializer {
 			break;
 		case SpawnCharacterEffect.type:
 			effect = new SpawnCharacterEffect(settings, controller, collisionChecker, source, originOverride);
+			break;
+		case DeleteCharacterEffect.type:
+			effect = new DeleteCharacterEffect(settings, controller, collisionChecker, source, originOverride);
 			break;
 		}
 		return effect;

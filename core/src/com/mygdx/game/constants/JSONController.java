@@ -27,7 +27,7 @@ public class JSONController {
     public static HashMap<String, Item> items = loadItemsFromJSON();
     public static HashMap<String, ExplosionSettings> explosions = loadExplosionsFromJSON();
     public static HashMap<String, ProjectileSettings> projectiles = loadProjectilesFromJSON();
-    public static HashMap<String, WorldAttackSettings> projectileAttacks = loadWorldAttacksFromJSON();
+    public static HashMap<String, WorldAttackSettings> worldAttacks = loadWorldAttacksFromJSON();
     public static HashMap<String, EntityUIData> uiDatas = new HashMap<String, EntityUIData>();
     public static HashMap<String, NPCProperties> npcProperties = new HashMap<String, NPCProperties>();
     public static HashMap<String, WeaponProperties> weaponProperties = new HashMap <String, WeaponProperties>();

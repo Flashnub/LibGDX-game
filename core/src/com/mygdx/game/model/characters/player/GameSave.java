@@ -22,6 +22,7 @@ public class GameSave implements Serializable{
 	Array <Integer> acquiredItemsHistory;
 	HashMap <String, Integer> npcChapterIndices;
 	Array <String> inventoryItemKeys;
+	Array <String> quickItemKeys;
 	HashMap <String, String> controllerScheme;
 	HashMap <String, String> KBMouseScheme;
 
@@ -39,7 +40,7 @@ public class GameSave implements Serializable{
 		json.writeValue("npcChapterIndices", npcChapterIndices);
 		json.writeValue("controlScheme", controllerScheme);
 		json.writeValue("KBMouseScheme", KBMouseScheme);
-
+		json.writeValue("quickItemKeys", quickItemKeys);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -91,6 +92,12 @@ public class GameSave implements Serializable{
 		return inventoryItemKeys;
 	}
 	
+	
+	
+	public Array<String> getQuickItemKeys() {
+		return quickItemKeys;
+	}
+
 	public HashMap<String, String> getControllerScheme() {
 		return controllerScheme;
 	}
@@ -104,6 +111,10 @@ public class GameSave implements Serializable{
 		gameSave.acquiredItemsHistory = new Array<Integer>();
 		gameSave.inventoryItemKeys = new Array<String>();
 		gameSave.objectsInteractedHistory = new Array<Integer>();
+		gameSave.quickItemKeys = new Array <String>();
+		
+		gameSave.inventoryItemKeys.add("HealthPotion");
+		gameSave.quickItemKeys.add("HealthPotion");
 		
 		//GamePad Scheme
 		gameSave.controllerScheme = new HashMap <String, String>();
@@ -111,7 +122,7 @@ public class GameSave implements Serializable{
 		gameSave.controllerScheme.put(XBox360Pad.axisCodeToString(XBox360Pad.AXIS_LEFT_X, -.5f), InputType.LEFT);
 		gameSave.controllerScheme.put(XBox360Pad.axisCodeToString(XBox360Pad.AXIS_LEFT_Y, .5f), InputType.DOWN);
 		gameSave.controllerScheme.put(XBox360Pad.axisCodeToString(XBox360Pad.AXIS_LEFT_X, .5f), InputType.RIGHT);
-		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_L3), InputType.USEITEM);
+		gameSave.controllerScheme.put(XBox360Pad.axisCodeToString(XBox360Pad.AXIS_LEFT_TRIGGER, .5f), InputType.USEITEM);
 //		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_LB), InputType.ACTION);
 		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_LB), InputType.ACTIONCANCEL);
 		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_A), InputType.JUMP);
@@ -140,11 +151,14 @@ public class GameSave implements Serializable{
 		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_RB).concat(DirectionalInput.DOWN.toString()), InputType.DOWNSPECIAL);
 		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_RB).concat(DirectionalInput.RIGHT.toString()), InputType.RIGHTSPECIAL);
 
-		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_R3), InputType.MOVEMENT);
-		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_R3).concat(DirectionalInput.UP.toString()), InputType.UPMOVEMENT);
-		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_R3).concat(DirectionalInput.LEFT.toString()), InputType.LEFTMOVEMENT);
-		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_R3).concat(DirectionalInput.DOWN.toString()), InputType.DOWNMOVEMENT);
-		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_R3).concat(DirectionalInput.RIGHT.toString()), InputType.RIGHTMOVEMENT);
+		gameSave.controllerScheme.put(XBox360Pad.axisCodeToString(XBox360Pad.AXIS_RIGHT_TRIGGER, -.5f), InputType.MOVEMENT);
+		gameSave.controllerScheme.put(XBox360Pad.axisCodeToString(XBox360Pad.AXIS_RIGHT_TRIGGER, -.5f).concat(DirectionalInput.UP.toString()), InputType.UPMOVEMENT);
+		gameSave.controllerScheme.put(XBox360Pad.axisCodeToString(XBox360Pad.AXIS_RIGHT_TRIGGER, -.5f).concat(DirectionalInput.LEFT.toString()), InputType.LEFTMOVEMENT);
+		gameSave.controllerScheme.put(XBox360Pad.axisCodeToString(XBox360Pad.AXIS_RIGHT_TRIGGER, -.5f).concat(DirectionalInput.DOWN.toString()), InputType.DOWNMOVEMENT);
+		gameSave.controllerScheme.put(XBox360Pad.axisCodeToString(XBox360Pad.AXIS_RIGHT_TRIGGER, -.5f).concat(DirectionalInput.RIGHT.toString()), InputType.RIGHTMOVEMENT);
+		
+		gameSave.controllerScheme.put(XBox360Pad.axisCodeToString(XBox360Pad.AXIS_RIGHT_TRIGGER, -.01f), InputType.MOVEMENTRELEASE);
+
 		
 		//KBMouse Scheme
 		gameSave.KBMouseScheme = new HashMap <String, String> ();

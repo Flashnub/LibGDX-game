@@ -9,7 +9,7 @@ public class HealingEffect extends EntityEffect {
 	
 	public HealingEffect(EffectSettings settings, EffectController retriever) {
 		super(settings, retriever);
-		if (settings instanceof DamageEffectSettings) {
+		if (settings instanceof HealingEffectSettings) {
 			this.hSettings = (HealingEffectSettings) settings;
 		}
 	}

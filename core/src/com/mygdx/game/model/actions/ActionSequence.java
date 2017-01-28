@@ -302,11 +302,15 @@ public class ActionSequence implements Serializable {
 		sequence.rightInputs = this.rightInputs;
 		sequence.probabilityToActivate = this.probabilityToActivate;
 		sequence.isSuper = this.isSuper;
+		Array <ActionConditionSettings> settingsCopy = new Array <ActionConditionSettings> ();
+		for (ActionConditionSettings settings : this.conditionSettings) {
+			settingsCopy.add(settings.deepCopy());
+		}
+		sequence.conditionSettings = settingsCopy;
 		return sequence;
 	}
 	
 	public void forceEnd() {
-//		if (!this.cannotBeOverriden)
 		this.action.forceEnd = true;
 	}
 	
@@ -320,6 +324,12 @@ public class ActionSequence implements Serializable {
 	
 	public boolean isFinished() {
 		return this.action.isFinished();
+	}
+	
+	public void addSegmentListener (ActionSegmentListener listener) {
+		if (action != null) {
+			this.action.addSegmentListener(listener);
+		}
 	}
 	
 	public boolean canUseTarget() {

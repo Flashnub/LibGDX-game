@@ -10,8 +10,8 @@
 		"cooldownTime": 0.4,
 		"sourceEffectSettings": [
 			{
-				"class": "com.mygdx.game.model.effects.TensionAddEffectSettings",
-				"value": 1
+				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
+				"value": 2
 			}
 		]
 		"targetEffectSettings": [
@@ -137,23 +137,7 @@
 		"duration": 0.2,
 		"cooldownTime": 0.1,
 		"windupEffectSettings": [
-			{
-				"class": "com.mygdx.game.model.effects.MovementEffectSettings",
-				"duration": 0.3,
-				"delayToActivate": 0,
-				"isInstantaneous": false,
-				"value": 0,
-				"velocity": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": 50,
-					"y": 200
-				}
-				"acceleration": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": -167.67,
-					"y": 0
-				}
-			}
+
 		]
 		"sourceEffectSettings": [
 

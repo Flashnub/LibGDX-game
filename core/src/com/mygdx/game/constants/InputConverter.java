@@ -40,6 +40,19 @@ public class InputConverter {
 		return result != null ? result : "";
 	}
 	
+ 	public String convertAxisTriggerToInputType(int axisCode, float value, DirectionalInput directionHeld) {
+		String result = "";
+		String inputName = XBox360Pad.axisCodeToString(axisCode, value);
+		if (directionHeld != null && !directionHeld.equals(DirectionalInput.NONE) && doesHaveDirectionalInputs(inputName, false)) {
+			inputName = inputName.concat(directionHeld.toString());
+		}
+		if (inputName != null) {
+			result = playerSave.getControllerScheme().get(inputName);
+		}
+		return result != null ? result : "";
+ 	}
+ 	
+	
 	private boolean isDirectionalInput (String inputName) {
 		String test = playerSave.getKBMouseScheme().get(inputName);
 		switch(test) {
@@ -55,20 +68,25 @@ public class InputConverter {
 	
 	private boolean doesHaveDirectionalInputs(String inputName, boolean useKeyboard) {
 		String test = useKeyboard ? playerSave.getKBMouseScheme().get(inputName) : playerSave.getControllerScheme().get(inputName);
-		switch(test) {
-		case InputType.USEITEM:
-		case InputType.JUMP:
-//		case InputType.ACTION:
-		case InputType.ACTIONCANCEL:
-			return false;
-		default:
-			return true;
-		}	
+		if (test != null) {
+			switch(test) {
+			case InputType.JUMP:
+			case InputType.ACTIONCANCEL:
+			case InputType.MOVEMENTRELEASE:
+				return false;
+			default:
+				return true;
+			}	
+		}
+		return false;
 	}
 	
  	public DirectionalInput getDirectionFromKeyCodeForDown(int keyCode) {
 		String inputName = Keys.toString(keyCode);
 		String inputType = playerSave.getKBMouseScheme().get(inputName);
+		if (inputType == null) 
+			inputType = "";
+		
 		switch (inputType) {
 		case InputType.DOWN:
 			return DirectionalInput.DOWN;
@@ -87,6 +105,9 @@ public class InputConverter {
 	public DirectionalInput getDirectionFromKeyCodeForUp(int keyCode, DirectionalInput currentDirectionHeld) {
 		String inputName = Keys.toString(keyCode);
 		String inputType = playerSave.getKBMouseScheme().get(inputName);
+		if (inputType == null) 
+			inputType = "";
+		
 		switch (inputType) {
 		case InputType.DOWN:
 		case InputType.UP:
@@ -130,6 +151,7 @@ public class InputConverter {
  		}
  	}
  	
+
 // 	public DirectionalInput getDirectionFromAxisCodeForUp(int axisCode, float value, DirectionalInput currentDirectionHeld) {
 //		String inputName = XBox360Pad.axisCodeToString(axisCode, value);
 //		String inputType = playerSave.getControllerScheme().get(inputName);

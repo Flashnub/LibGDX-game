@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.characters.NPCCharacter;
 import com.mygdx.game.model.characters.enemies.Enemy;
+import com.mygdx.game.model.worldObjects.Item;
 import com.mygdx.game.model.worldObjects.WorldObject;
 
 public interface WorldListener {
@@ -14,5 +15,6 @@ public interface WorldListener {
 	public void updateWithNearbyNPCs(Array <NPCCharacter> npcs);
 	public void handlePlayerInteractionWithObject(WorldObject object);
 	public void handleSuperAction(ActionSequence action);
+	public void handleSwitchedItem(Item item);
 }	
 

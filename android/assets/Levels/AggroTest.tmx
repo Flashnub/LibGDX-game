@@ -26,7 +26,7 @@
     <property name="Impassable" type="bool" value="false"/>
     <property name="PatrolDuration" type="float" value="3"/>
     <property name="PatrolWaypoint1" type="float" value="0"/>
-    <property name="PatrolWaypoint2" type="float" value="0"/>
+    <property name="PatrolWaypoint2" type="float" value="500"/>
     <property name="SpawnPoint" value="BasicEnemy"/>
    </properties>
   </tile>

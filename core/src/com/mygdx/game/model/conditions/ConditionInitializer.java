@@ -4,6 +4,7 @@ import com.mygdx.game.model.actions.ActionCondition;
 import com.mygdx.game.model.actions.ActionConditionSettings;
 import com.mygdx.game.model.actions.EffectActionCondition;
 import com.mygdx.game.model.actions.PreviousActionCondition;
+import com.mygdx.game.model.actions.SprintActionCondition;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 
 public class ConditionInitializer {
@@ -22,6 +23,9 @@ public class ConditionInitializer {
 			break;
 		case PreviousActionCondition.type:
 			condition = new PreviousActionCondition(settings, source);
+			break;
+		case SprintActionCondition.type:
+			condition = new SprintActionCondition(settings, source);
 			break;
 		}
 		return condition;

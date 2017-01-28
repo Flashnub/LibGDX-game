@@ -98,14 +98,14 @@ public class Enemy extends NPCCharacter{
 		@Override
 		public boolean handleAdditionalXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
 			if (alreadyCollided) {
-				this.stopHorizontalMovement();
+				this.stopHorizontalMovement(false);
 				return alreadyCollided;
 			}
 			else {
 				EntityModel collidedEntity = this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds);
 				boolean entityCollision = this.respectEntityCollision() && collidedEntity != null;
 				if (entityCollision) {
-					this.stopHorizontalMovement();
+					this.stopHorizontalMovement(false);
 				}
 //				this.stopEntityOverlapIfNeeded(collidedEntity, tempGameplayBounds, tempImageBounds);
 				return entityCollision;

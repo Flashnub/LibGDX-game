@@ -48,6 +48,19 @@ public class ResourceBar extends Actor{
 				return ratio > 0.6f ? Color.WHITE : new Color(1, Math.max((1 - ratio), 0.1f), Math.max((1 - ratio), 0.1f), 1);
 			}
 			
+			@Override
+			public Vector2 originCoefficients() {
+				return new Vector2(0.1f, 0.8f);
+			}			
+			
+			public Float fixedHeight() {
+				return 30f;
+			}
+			
+			public Float proportionalWidth() {
+				return 0.25f;
+			}
+			
 		}, PlayerTension {
 			@Override
 			public TextureRegion getForegroundSprite() {
@@ -81,6 +94,22 @@ public class ResourceBar extends Actor{
 				return new Color(1, Math.max((1 - ratio), 0.1f), Math.max((1 - ratio), 0.1f), 1);
 			}
 			
+			@Override
+			public Vector2 originCoefficients() {
+				return new Vector2(0.1f, 0.8f);
+			}
+			
+			public Float fixedHeight() {
+				return 20f;
+			}
+			
+			public Float proportionalWidth() {
+				return 0.3f;
+			}
+			
+			public Vector2 originOffset() {
+				return new Vector2(0, -35f);
+			}
 			
 		}, EnemyHealth {
 			@Override
@@ -114,6 +143,15 @@ public class ResourceBar extends Actor{
 			public Color getTintColor(float ratio) {
 				return ratio > 0.6f ? Color.WHITE : new Color(1, Math.max((1 - ratio), 0.1f), Math.max((1 - ratio), 0.1f), 1);
 			}
+			
+			public Float fixedHeight() {
+				return 5f;
+			}
+			
+			public Float fixedWidth() {
+				return 30f;
+			}
+
 		};
 		
 		public String getAffiliation() {
@@ -147,6 +185,30 @@ public class ResourceBar extends Actor{
 		public Color getTintColor(float ratio) {
 			return Color.WHITE;
 		}
+		
+		public Vector2 originCoefficients() {
+			return new Vector2();
+		}
+		
+		public Vector2 originOffset() {
+			return new Vector2();
+		}
+		
+		public Float fixedHeight() {
+			return null;
+		}
+		
+		public Float fixedWidth() {
+			return null;
+		}
+		
+		public Float proportionalWidth() {
+			return null;
+		}
+		
+		public Float proportionalHeight() {
+			return null;
+		}
 	}
 	
 	TextureRegion background;
@@ -164,8 +226,7 @@ public class ResourceBar extends Actor{
 	boolean isAnimating = false;
 	boolean isShowingIntermediate = false;
 	
-	public static final float enemyHealthBarWidth = 30f;
-	
+
 	public ResourceBar(ResourceBarType type, Character character, CoordinatesHelper helper) {
 		this.owner = character;
 		this.type = type;
@@ -178,32 +239,64 @@ public class ResourceBar extends Actor{
 	}
 	
 	public void layoutWithViewPort(Viewport viewPort, Batch batch) {
-		if (type.getAffiliation().equals(ResourceBarType.PlayerHealth.getAffiliation())) {
-			this.setX(viewPort.getScreenWidth() * 0.1f);
-			this.setY(viewPort.getScreenHeight() * 0.8f);
-			this.setWidth(viewPort.getScreenWidth() * 0.3f);
-			this.setHeight(30);
+		this.setX(viewPort.getScreenWidth() * type.originCoefficients().x + type.originOffset().x);
+		this.setY(viewPort.getScreenHeight() * type.originCoefficients().y + type.originOffset().y);
+		
+		//Width.
+		if (type.fixedWidth() != null && type.proportionalWidth() != null) {
+			this.setWidth(viewPort.getScreenWidth() * type.proportionalWidth() + type.fixedWidth());
 		}
-		else if (type.getAffiliation().equals(ResourceBarType.PlayerTension.getAffiliation())) {
-			this.setX(viewPort.getScreenWidth() * 0.1f);
-			this.setY(viewPort.getScreenHeight() * 0.8f - 35);
-			this.setWidth(viewPort.getScreenWidth() * 0.2f);
-			this.setHeight(20);
+		else if (type.fixedWidth() != null){
+			this.setWidth(type.fixedWidth());
 		}
-		else if (type.getAffiliation().equals(ResourceBarType.EnemyHealth.getAffiliation())) {
-			Vector2 enemyCoordinates = this.helper.getScreenCoordinatesForCharacter(owner);
-			this.setX(enemyCoordinates.x);
-			this.setY(enemyCoordinates.y);
-			this.setWidth(ResourceBar.enemyHealthBarWidth);
-			this.setHeight(5);
+		else {
+			this.setWidth(viewPort.getScreenWidth() * type.proportionalWidth());
 		}
 		
+		//Height.
+		if (type.fixedHeight() != null && type.proportionalHeight() != null) {
+			this.setHeight(viewPort.getScreenHeight() * type.proportionalHeight() + type.fixedHeight());
+		}
+		else if (type.fixedHeight() != null) {
+			this.setHeight(type.fixedHeight());
+		}
+		else {
+			this.setHeight(viewPort.getScreenHeight() * type.proportionalHeight() + type.fixedHeight());
+		}
+		
+//		if (type.getAffiliation().equals(ResourceBarType.PlayerHealth.getAffiliation())) {
+//
+//		}
+//		else if (type.getAffiliation().equals(ResourceBarType.PlayerTension.getAffiliation())) {
+//			this.setX(viewPort.getScreenWidth() * type.originCoefficients().x);
+//			this.setY(viewPort.getScreenHeight() * type.originCoefficients().y - 35);
+//			this.setWidth(viewPort.getScreenWidth() * 0.25f);
+//			this.setHeight(20);
+//		}
+//		else if (type.getAffiliation().equals(ResourceBarType.EnemyHealth.getAffiliation())) {
+//			Vector2 enemyCoordinates = this.helper.getScreenCoordinatesForCharacter(owner);
+//			this.setX(enemyCoordinates.x);
+//			this.setY(enemyCoordinates.y);
+//			this.setWidth(ResourceBar.enemyHealthBarWidth);
+//			this.setHeight(5);
+//		}
+
+		float intermediateRatio = 0f;
+		float solidRatio = 0f;
+		if (differenceInRatio < 0) {
+			intermediateRatio = (this.expectedRatio);
+			solidRatio = (this.expectedRatio + this.differenceInRatio);
+		}
+		else {
+			intermediateRatio = (this.expectedRatio + this.differenceInRatio);
+			solidRatio = (this.expectedRatio);
+		}
 		batch.draw(background, this.getX(), this.getY(), this.getWidth(), this.getHeight());
 		if (this.isShowingIntermediate) {
-			batch.draw(intermediateForeground, this.getX(), this.getY(), this.getWidth() * (this.expectedRatio + differenceInRatio), this.getHeight());
+			batch.draw(intermediateForeground, this.getX(), this.getY(), this.getWidth() * intermediateRatio, this.getHeight());
 		}
 		batch.setColor(type.getTintColor(this.getRatio()));
-		batch.draw(foreground, this.getX(), this.getY(), this.getWidth() * this.expectedRatio, this.getHeight());
+		batch.draw(foreground, this.getX(), this.getY(), this.getWidth() * solidRatio, this.getHeight());
 		batch.setColor(Color.WHITE);
 	}
 	
@@ -223,7 +316,7 @@ public class ResourceBar extends Actor{
 			this.isAnimating = false;
 			this.isShowingIntermediate = true;
 		}
-		else if (this.differenceInRatio > 0f) {
+		else if (this.differenceInRatio != 0f) {
 			animationTime += delta;
 			if (animationTime > delayToAnimate) {
 				this.isAnimating = true;

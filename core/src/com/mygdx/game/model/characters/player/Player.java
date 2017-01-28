@@ -1,6 +1,8 @@
 package com.mygdx.game.model.characters.player;
 
 
+import java.util.Iterator;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.controllers.Controller;
@@ -26,6 +28,7 @@ import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.characters.EntityUIModel;
 import com.mygdx.game.model.characters.ModelListener;
 import com.mygdx.game.model.characters.player.GameSave.UUIDType;
+import com.mygdx.game.model.events.StatsInfoListener;
 import com.mygdx.game.model.events.InteractableObject;
 import com.mygdx.game.model.world.DialogueController;
 import com.mygdx.game.model.world.SpawnPoint;
@@ -167,8 +170,11 @@ public class Player extends Character implements InputProcessor, ControllerListe
 	    DialogueController dialogueController;
 	    GameSave gameSave;
 	    boolean isTalking;
+
 		Queue <String> inputs;
 		InputConverter inputConverter;
+		StatsInfoListener infoListener;
+		Item selectedItemType;
 
 		public PlayerModel(String characterName, EntityUIModel uiModel, ModelListener modelListener) {
 			super(characterName, uiModel, modelListener);
@@ -184,6 +190,9 @@ public class Player extends Character implements InputProcessor, ControllerListe
 			this.gameSave = gameSave;
 			playerProperties = json.fromJson(PlayerProperties.class, Gdx.files.internal("Json/Player/playerActions.json"));
 			playerProperties.populateWith(gameSave);
+			if (playerProperties.getQuickItems().size > 0) {
+				selectedItemType = playerProperties.getQuickItems().get(0).item;
+			}
 			dialogues = json.fromJson(DialogueDatabase.class, Gdx.files.internal("Json/Player/dialogues.json"));
 			dialogues.setSource(this);
 			this.processedCondtionalDialogueUUIDs = new Array <String>();
@@ -191,8 +200,8 @@ public class Player extends Character implements InputProcessor, ControllerListe
 			canControl = false;
 			this.currentlyHeldDirection = DirectionalInput.NONE;
 			isJumpPressed = false;
-			this.widthCoefficient = 0.19f;
-			this.heightCoefficient = 0.6f;
+//			this.widthCoefficient = 0.19f;
+//			this.heightCoefficient = 0.6f;
 			this.inputs = new Queue <String> ();
 			this.inputConverter = new InputConverter(this.gameSave);
 		}
@@ -237,6 +246,23 @@ public class Player extends Character implements InputProcessor, ControllerListe
 			//Eventually add HUD code to reflect receiving item.
 		}
 		
+		public void removeFromInventory(Item item) {
+			// TODO Auto-generated method stub
+			this.getPlayerProperties().getInventory().removeValue(item, true);
+			Iterator <ItemInfo> iterator = this.getPlayerProperties().getQuickItems().iterator();
+			while (iterator.hasNext()) {
+				ItemInfo itemInfo = iterator.next();
+				if (itemInfo.item.equals(item) && item.expiresOnUse()) {
+					itemInfo.numberInInventory -= 1;
+					if (itemInfo.numberInInventory == 0) {
+						iterator.remove();
+						break;
+					}
+				}
+			}
+	
+		}
+		
 		public void dialogueAction(String uuid) {
 			ActionSequence sequence = ActionSequence.createSequenceWithDialog(this.dialogues.getDialogueForUUID(uuid), this, null, dialogueController, this.getActionListener());
 			this.addActionSequence(sequence);
@@ -249,39 +275,10 @@ public class Player extends Character implements InputProcessor, ControllerListe
 	    	}
 	    }
 	    
-//	    private void block() {
-//	    	if (!jumping) {
-//		    	ActionSequence blockAction = this.getCharacterProperties().getActions().get("PlayerBlock").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());
-//		    	this.addActionSequence(blockAction);
-//	    	}
-//	    }
-	    
 	    public boolean isDodging() {
 	        return dashing;
 	    }
 	    
-//	    private void attack() {
-//	    	if (!this.isProcessingActiveSequences() || this.isAbleToEnqueueAction()) {
-//	    		ActionSequence followup = this.getFollowupSequence();
-//	    	 	ActionSequence nextAction;
-//	    	 	if (followup != null) {
-//	    	 		nextAction =  this.getCharacterProperties().getActions().get(followup.getActionKey().getKey()).cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());;
-//	    	 	}
-//	    	 	else if (this.jumping){
-//	    	 		nextAction = this.getCharacterProperties().getActions().get("Aerial1").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());
-//	    	 	}
-//	    	 	else if (this.isLockDirection()) {
-//	    	 		nextAction = this.getCharacterProperties().getActions().get("Rushdown").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());;
-//	    	 	}
-//	    	 	else {
-//	    	 		nextAction = this.getCharacterProperties().getActions().get("PlayerAttack").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());
-//	    	 	}
-//	    		this.addActionSequence(nextAction);
-//	    	}
-//	   
-//	    }
-	    
-
 	    private void checkToDisruptCurrentAct(String inputType) {
 	    	if (this.getCurrentActiveActionSeq() != null) {
 		    	boolean needsInterruptForWindup = this.getCurrentActiveActionSeq().getAction().doesNeedDisruptionDuringWindup() && this.getCurrentActiveActionSeq().getAction().getActionState().equals(ActionState.WINDUP);
@@ -308,14 +305,14 @@ public class Player extends Character implements InputProcessor, ControllerListe
 	    	//Check char props first.
 	    	sequence = this.getCharacterProperties().getSequenceGivenInputs(this.inputs, this);
 	    	if (sequence != null) {
-		    	this.stopHorizontalMovement();
+		    	this.stopHorizontalMovement(true);
 	    		this.addActionSequence(sequence.cloneSequenceWithSourceAndTarget(this, null, getActionListener(), this.getCollisionChecker()));
 	    		return true;
 	    	}
 	    	//Check weapon next.
 	    	sequence = this.getCurrentWeapon().getSpecificWeaponAction(this.inputs, this);
 	    	if (sequence != null) {
-		    	this.stopHorizontalMovement();
+		    	this.stopHorizontalMovement(true);
 	    		this.addActionSequence(sequence.cloneSequenceWithSourceAndTarget(this, null, getActionListener(), this.getCollisionChecker()));
 	    		return true;
 	    	}
@@ -323,20 +320,10 @@ public class Player extends Character implements InputProcessor, ControllerListe
 	    	return false;
 	    }
 	    
-//	    @Override
-//	    public void shouldUnlockControls(ActionSequence action) {
-//	    	if ((action.getAction().getActionState().equals(ActionState.COOLDOWN) && action.isActive()) || action.getAction().isFinished())
-//	    	{
-//	    		this.setActionLock(false);
-//	    	}
-//	    }
-	    
-//	    @Override
-//		public boolean isAbleToEnqueueAction() {
-//	    	return this.getCurrentActiveActionSeq() != null && !this.getCurrentActiveActionSeq().getAction().getActionState().equals(ActionState.WINDUP);
-//	    }
-	    
-	    
+	    private void useItem() {
+	    	this.selectedItemType.use(this);
+	    }
+	      
 		public boolean handleKeyDown (int keyCode)
 		{
 			DirectionalInput potentialDirectionalInput = this.inputConverter.getDirectionFromKeyCodeForDown(keyCode);
@@ -345,6 +332,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 			
 			String inputType = this.inputConverter.convertKeyCodeToInputType(keyCode, this.currentlyHeldDirection);
 			if (!inputType.equals("")) {
+				System.out.println(inputType);
 				this.inputs.addFirst(inputType);
 				if (this.queueUpActionFromInputs())
 				{
@@ -361,11 +349,15 @@ public class Player extends Character implements InputProcessor, ControllerListe
 					if (!actOnObject())
 						jump();
 					break;
-//				case InputType.ACTION:
-//					actOnObject();
-//					break;
 				case InputType.USEITEM:
-//					this.lockDirection();
+					this.useItem();
+					break;
+				case InputType.MOVEMENT:
+				case InputType.LEFTMOVEMENT:
+				case InputType.UPMOVEMENT:
+				case InputType.DOWNMOVEMENT:
+				case InputType.RIGHTMOVEMENT:
+					this.movementConditionActivated = true;
 					break;
 				default:
 					break;
@@ -389,6 +381,13 @@ public class Player extends Character implements InputProcessor, ControllerListe
 				case InputType.USEITEM:
 //					unlockDirection();
 					break;
+				case InputType.MOVEMENT:
+				case InputType.LEFTMOVEMENT:
+				case InputType.UPMOVEMENT:
+				case InputType.DOWNMOVEMENT:
+				case InputType.RIGHTMOVEMENT:
+					this.movementConditionActivated = false;
+					break;
 				default:
 					break;
 				}
@@ -401,6 +400,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 		public boolean handleButtonDown(Controller controller, int buttonCode) {
 			String inputType = this.inputConverter.convertButtonCodeToInputType(buttonCode, currentlyHeldDirection);
 			if (!inputType.equals("")) {
+				System.out.println(inputType);
 				this.inputs.addFirst(inputType);
 				if (this.queueUpActionFromInputs())
 				{
@@ -411,11 +411,8 @@ public class Player extends Character implements InputProcessor, ControllerListe
 					if (!actOnObject())
 						jump();
 					break;
-//				case InputType.ACTION:
-//					actOnObject();
-//					break;
 				case InputType.USEITEM:
-//					this.lockDirection();
+					this.useItem();
 					break;
 				default:
 					break;
@@ -430,37 +427,63 @@ public class Player extends Character implements InputProcessor, ControllerListe
 			String inputType = this.inputConverter.convertButtonCodeToInputType(buttonCode, this.currentlyHeldDirection);
 			if (!inputType.equals("")) {
 				this.checkToDisruptCurrentAct(inputType);
-				switch (inputType) {
-				case InputType.USEITEM:
-					unlockDirection();
-					break;
-				default:
-					break;
-				}
 			}
 
 			return true;
 		}
 		
 		public boolean handleAxisMoved(Controller controller, int axisCode, float value) {
-			if (axisCode == XBox360Pad.AXIS_LEFT_X) {
+			if (axisCode == XBox360Pad.AXIS_LEFT_X || axisCode == XBox360Pad.AXIS_LEFT_Y) {
 				DirectionalInput potentialDirectionalInput = this.inputConverter.getDirectionFromAxisCode(axisCode, value);
-				this.currentlyHeldDirection = potentialDirectionalInput;
-
+//				System.out.println(axisCode == XBox360Pad.AXIS_LEFT_X ? "X "  + potentialDirectionalInput.toString() : "Y " + potentialDirectionalInput.toString());
+				this.setHeldDirectionForAxis(axisCode, potentialDirectionalInput);
 				switch (potentialDirectionalInput) {
-				case LEFT:
-					horizontalMove(true);
-					break;
-				case RIGHT:
-					horizontalMove(false);
-					break;
-				case NONE:
-					this.checkIfNeedToStopWalk();
-				default:
-					break;
+					case LEFT:
+						if (axisCode == XBox360Pad.AXIS_LEFT_X)
+							horizontalMove(true);
+						break;
+					case RIGHT:
+						if (axisCode == XBox360Pad.AXIS_LEFT_X)
+							horizontalMove(false);
+						break;
+					case NONE:
+						if (axisCode == XBox360Pad.AXIS_LEFT_X)
+							this.checkIfNeedToStopWalk();
+					default:
+						break;
+					}
+			}
+			else if (axisCode == XBox360Pad.AXIS_LEFT_TRIGGER) {
+				String inputType = this.inputConverter.convertAxisTriggerToInputType(axisCode, value, currentlyHeldDirection);
+				if (inputType != null) {
+					this.inputs.addFirst(inputType);
+					if (this.queueUpActionFromInputs())
+					{
+						return true;
+					}
+					switch (inputType) {
+					case InputType.MOVEMENT:
+					case InputType.LEFTMOVEMENT:
+					case InputType.UPMOVEMENT:
+					case InputType.DOWNMOVEMENT:
+					case InputType.RIGHTMOVEMENT:
+						this.movementConditionActivated = true;
+						break;
+					case InputType.MOVEMENTRELEASE:
+						this.movementConditionActivated = false;
+						break;
+					}
 				}
 			}
 			return true;
+		}
+		
+		private void setHeldDirectionForAxis(int axisCode, DirectionalInput potentialDirectionalInput) {
+			if ((axisCode == XBox360Pad.AXIS_LEFT_Y && !(this.currentlyHeldDirection.equals(DirectionalInput.LEFT) || this.currentlyHeldDirection.equals(DirectionalInput.RIGHT))) 
+			  || axisCode == XBox360Pad.AXIS_LEFT_X && !(this.currentlyHeldDirection.equals(DirectionalInput.UP) || this.currentlyHeldDirection.equals(DirectionalInput.DOWN))) {
+				this.currentlyHeldDirection = potentialDirectionalInput;
+			}
+
 		}
 		
 		public boolean handlePovMoved(Controller controller, int povCode, PovDirection value) {
@@ -470,7 +493,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 		
 		private void checkIfNeedToStopWalk() {
 			if (!this.currentlyHeldDirection.equals(DirectionalInput.LEFT) && !this.currentlyHeldDirection.equals(DirectionalInput.RIGHT)) {
-				this.stopHorizontalMovement();
+				this.stopHorizontalMovement(true);
 			}
 		}
 		
@@ -478,6 +501,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 		private boolean actOnObject() {
 			if (nearbyObject != null) {
 				this.nearbyObject.actOnThis(this);
+				nearbyObject = null;
 				return true;
 			}
 			return false;
@@ -523,7 +547,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 		public boolean handleAdditionalXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds,  boolean alreadyCollided) {
 			if (alreadyCollided) {
 				if (this.walking) {
-					this.stopHorizontalMovement();
+					this.stopHorizontalMovement(false);
 				}
 				return alreadyCollided;
 			}
@@ -531,7 +555,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 				EntityModel collidedEntity = this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds);
 				boolean entityCollision = this.respectEntityCollision() && collidedEntity != null;
 				if (entityCollision) {
-					this.stopHorizontalMovement();
+					this.stopHorizontalMovement(false);
 				}
 				if (!this.hasProcessedOverlapCorrection()) {
 					this.stopEntityOverlapIfNeeded(collidedEntity, tempGameplayBounds, tempImageBounds);
@@ -579,6 +603,18 @@ public class Player extends Character implements InputProcessor, ControllerListe
     		this.setCurrentTension(0);
 		}
 
+
+		public void setInfoListener (StatsInfoListener infoListener) {
+			this.infoListener = infoListener;
+		}
+
+		public Item getSelectedItemType() {
+			return selectedItemType;
+		}
+
+		public DirectionalInput getCurrentlyHeldDirection() {
+			return currentlyHeldDirection;
+		}
 
 		
 	}

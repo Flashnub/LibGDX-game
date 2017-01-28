@@ -23,4 +23,12 @@ public class PreviousActionConditionSettings extends ActionConditionSettings{
 	public ActionSegmentKey getPrevActionKey() {
 		return prevActionKey;
 	}
+	
+	@Override
+	public ActionConditionSettings deepCopy() {
+		PreviousActionConditionSettings copy = new PreviousActionConditionSettings();
+		copy.prevActionKey = this.prevActionKey;
+		copy.type = this.type;
+		return copy;
+	}
 }

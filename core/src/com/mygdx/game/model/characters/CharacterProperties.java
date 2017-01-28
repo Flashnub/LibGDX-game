@@ -27,6 +27,7 @@ public class CharacterProperties implements Serializable {
 	Float gravity;
 	Float horizontalSpeed;
 	Float horizontalAcceleration;
+	Float sprintSpeed;
 	Float jumpSpeed;
 	Float injuryImmunityTime;
 	Integer allegiance;
@@ -84,6 +85,14 @@ public class CharacterProperties implements Serializable {
 		}
 		else {
 			this.horizontalSpeed = 300f;
+		}
+		
+		Float sprintSpeed = json.readValue("sprintSpeed", Float.class, jsonData);
+		if (horizontalSpeed != null) {
+			this.sprintSpeed = sprintSpeed;
+		}
+		else {
+			this.sprintSpeed = 1200f;
 		}
 		
 		Float horizontalAcceleration = json.readValue("horizontalAcceleration", Float.class, jsonData);
@@ -188,6 +197,7 @@ public class CharacterProperties implements Serializable {
 		properties.maxTension = this.maxTension;
 		properties.useDefaultStagger = this.useDefaultStagger;
 		properties.useDefaultTensionStagger = this.useDefaultTensionStagger;
+		properties.sprintSpeed = this.sprintSpeed;
 		//iterate through actions.
 		HashMap <String, ActionSequence> clonedActions = new HashMap<String, ActionSequence> ();
 		for (Map.Entry<String, ActionSequence> entry : actions.entrySet()) {
@@ -248,6 +258,10 @@ public class CharacterProperties implements Serializable {
 
 	public Float getHorizontalSpeed() {
 		return horizontalSpeed;
+	}
+
+	public Float getSprintSpeed() {
+		return sprintSpeed;
 	}
 
 	public Float getHorizontalAcceleration() {

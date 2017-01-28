@@ -1,6 +1,7 @@
 package com.mygdx.game.model.actions;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.EffectController;
 import com.mygdx.game.model.events.ActionListener;
@@ -30,6 +31,8 @@ public abstract class ActionSegment implements EffectController {
 	float activeTime;
 
 	ActionListener actionListener;
+	private Array <ActionSegmentListener> segmentListeners;
+
 	
 	public ActionSegment() {
 		forceEnd = false;
@@ -42,6 +45,7 @@ public abstract class ActionSegment implements EffectController {
 		activeTime = 0f;
 		windupTime = 0f;			
 		this.currentTime = 0f;
+		this.segmentListeners = new Array <ActionSegmentListener>();
 	}
 	
 	public ActionSegment(ActionListener listener) {
@@ -54,6 +58,9 @@ public abstract class ActionSegment implements EffectController {
 		hasProcessedActiveSource = true;
 		this.setActionState(ActionState.ACTION);
 		sourceActiveProcessWithoutSuper(source);
+		for (ActionSegmentListener listener : this.segmentListeners) {
+			listener.onActive(source);
+		}
 	}
 	
 	public void sourceWindupProcess(CharacterModel source) {
@@ -63,12 +70,18 @@ public abstract class ActionSegment implements EffectController {
 		if (!source.isActionLock()) {
 			source.lockControls();
 		}
+		for (ActionSegmentListener listener : this.segmentListeners) {
+			listener.onWindup(source);
+		}
 	}
 	
 	public void completionBlock(CharacterModel source) {
 		this.setActionState(ActionState.COOLDOWN);
 		this.hasProcessedCompletion = true;
 		this.sourceCompletionWithoutSuper(source);
+		for (ActionSegmentListener listener : this.segmentListeners) {
+			listener.onCooldown(source);
+		}
 	}
 	
 	
@@ -143,6 +156,10 @@ public abstract class ActionSegment implements EffectController {
 			return new Vector2(this.source.getImageHitBox().x + this.source.getImageHitBox().width + 100, this.source.getImageHitBox().y);
 		}
 		return new Vector2(this.source.getImageHitBox().x - 200, this.source.getImageHitBox().y);
+	}
+	
+	public void addSegmentListener (ActionSegmentListener listener) {
+		this.segmentListeners.add(listener);
 	}
 	
 	public abstract void sendActionToListener(ActionListener actionListener, float delta);

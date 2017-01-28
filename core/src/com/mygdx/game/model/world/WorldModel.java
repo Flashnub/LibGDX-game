@@ -32,13 +32,15 @@ import com.mygdx.game.model.events.CollisionChecker;
 import com.mygdx.game.model.events.DialogueListener;
 import com.mygdx.game.model.events.ObjectListener;
 import com.mygdx.game.model.events.SaveListener;
+import com.mygdx.game.model.events.StatsInfoListener;
 import com.mygdx.game.model.globalEffects.WorldEffect;
 import com.mygdx.game.model.projectiles.Explosion;
 import com.mygdx.game.model.projectiles.Projectile;
+import com.mygdx.game.model.worldObjects.Item;
 import com.mygdx.game.model.worldObjects.WorldObject;
 
 
-public class WorldModel implements ActionListener, ObjectListener, SaveListener, CollisionChecker{
+public class WorldModel implements ActionListener, ObjectListener, SaveListener, CollisionChecker, StatsInfoListener{
 
     private final float MAX_TIMESTEP = 1 / 300f;
     private float accumulatedTime = 0f;
@@ -134,6 +136,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 					player.getCharacterData().setActionListener(this);
 					player.getCharacterData().setObjectListener(this);
 					player.getCharacterData().setCollisionChecker(this);
+					((PlayerModel)player.getCharacterData()).setInfoListener(this);
 					this.inputHandlers.addProcessor(player);
 					this.saveController.setCurrentGameSave(((PlayerModel) player.getCharacterData()).getGameSave());
 				}
@@ -638,7 +641,6 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	
 	@Override
 	public void addUUIDToSave(Integer UUID, UUIDType type) {
-		// TODO Auto-generated method stub
 		PlayerModel model = (PlayerModel) player.getCharacterData();
 		model.addUUIDToSave(UUID, type);
 
@@ -661,7 +663,13 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 				}
 			}
 		}
-
+	}
+	
+	@Override
+	public void onSwitchItem(Item item) {
+		for (WorldListener listener : this.worldListeners) {
+			listener.handleSwitchedItem(item);
+		}
 	}
 
 	@Override
@@ -712,9 +720,4 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	public TiledMapTileLayer getCollisionLayer() {
 		return this.collisionLayer;
 	}
-
-
-
-
-
 }

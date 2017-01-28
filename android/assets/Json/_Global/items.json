@@ -3,11 +3,21 @@
 		"class": com.mygdx.game.model.worldObjects.Item,
 		"name": "Health Potion",
 		"desc": "Restores Health",
-		"effects": [
-			{
-				"class": com.mygdx.game.model.effects.HealingEffectSettings,
-				"value": 10
+		"key": "HealthPotion",
+		"uiModel": {
+			"class": com.mygdx.game.model.worldObjects.ItemUIModel,
+			"itemIconName": "healthPotion"
+		}
+		"itemSequence": {
+			"class": com.mygdx.game.model.actions.ActionSequence,
+			"actionKey": {
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "HealthPotion",
+				"typeOfAction": Ability
 			}
-		]
+			"windUpState": "UseItemWindup"
+			"actingState": "UseItemActive"
+			"cooldownState": "UseItemCooldown"
+		}
 	}
 }

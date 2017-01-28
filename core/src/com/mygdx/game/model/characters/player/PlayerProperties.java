@@ -13,6 +13,7 @@ import com.mygdx.game.model.worldObjects.Item;
 public class PlayerProperties implements Serializable{
     HashMap<String, ActionSequence> playerSpecificActions;
     Array <Item> inventory;
+    Array <ItemInfo> quickItems;
     Array<Integer> acquiredItemsHistory;
     Array<Integer> objectsInteractedHistory;
     
@@ -37,11 +38,29 @@ public class PlayerProperties implements Serializable{
 			inventory.add(item);
 		}
 		
+		quickItems = new Array <ItemInfo>();
+		for (String itemKey : gameSave.getQuickItemKeys()) {
+			Item itemToAdd = null;
+			int numberOfItems = 0;
+			for (Item item : inventory) {
+				if (itemKey.equals(item.getKey())) {
+					if (itemToAdd == null) {
+						itemToAdd = item;
+					}
+					numberOfItems += 1;
+				}
+			}
+			
+			quickItems.add(new ItemInfo(itemToAdd, numberOfItems));
+		}
+		
 		this.acquiredItemsHistory = gameSave.acquiredItemsHistory;
 		this.objectsInteractedHistory = gameSave.objectsInteractedHistory;
 	}
 	public Array <Item> getInventory() {
 		return inventory;
 	}
-
+	public Array<ItemInfo> getQuickItems() {
+		return quickItems;
+	}
 }

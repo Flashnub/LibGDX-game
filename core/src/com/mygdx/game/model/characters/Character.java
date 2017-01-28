@@ -9,10 +9,12 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.constants.InputConverter.DirectionalInput;
 import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.Attack;
 import com.mygdx.game.model.characters.CollisionCheck.CollisionType;
+import com.mygdx.game.model.characters.player.Player.PlayerModel;
 import com.mygdx.game.model.actions.ActionSegment.ActionState;
 import com.mygdx.game.model.actions.ActionSequence.ActionType;
 import com.mygdx.game.model.actions.ActionSequence.StaggerType;
@@ -28,6 +30,7 @@ import com.mygdx.game.model.globalEffects.WorldEffectSettings;
 import com.mygdx.game.model.projectiles.Explosion;
 import com.mygdx.game.model.projectiles.Projectile;
 import com.mygdx.game.model.weapons.Weapon;
+import com.mygdx.game.model.worldObjects.Item;
 import com.mygdx.game.wrappers.StringWrapper;
 
 public abstract class Character implements ModelListener {
@@ -73,23 +76,29 @@ public abstract class Character implements ModelListener {
 		public final String backWalkState = "Backwalk";
 		public final String jumpState = "Jump";
 		public final String fallState = "Fall";
+		final float slowingAccel = 500f;
 		
 		String state;
 		float currentHealth, maxHealth, currentWill, maxWill, attack, currentStability, maxStability, currentTension, maxTension;
 		boolean isImmuneToInjury, attacking, directionLock;
 		protected boolean jumping;
 		protected boolean walking;
+		float walkingTime;
+		boolean sprinting;
 		boolean didChangeState;
 		boolean actionStaggering;
 		boolean facingLeft;
 		boolean actionLocked;
 		boolean alreadyDead;
+		boolean isSlowingDown;
 	    public float injuryTime = 0f;
 	    float actionStaggerTime;
 	    float tempVelocityX;
 	    float tempVelocityY;
 		String name, uuid; 
 		Direction lockedFacingDirection;
+	    protected boolean movementConditionActivated;
+	    float movementConditionActivatedTime;
 		
 		
 //		public float gameplayHitBoxWidthModifier;
@@ -129,10 +138,15 @@ public abstract class Character implements ModelListener {
 			walking = false;
 			directionLock = false;
 			alreadyDead = false;
+			isSlowingDown = false;
+			sprinting = false;
+			this.movementConditionActivated = false;
+			this.movementConditionActivatedTime = 0f;
 			stateTime = 0f;
 			actionStaggerTime = 0f;
 			tempVelocityX = 0f;
 			tempVelocityY = 0f;
+			walkingTime = 0f;
 			this.modelListener = modelListener;
 
 			UUID id = UUID.randomUUID();
@@ -180,6 +194,18 @@ public abstract class Character implements ModelListener {
 					this.actionStaggerTime = 0f;
 				}
 			}
+			
+			if (this.movementConditionActivated) {
+				this.movementConditionActivatedTime += delta;
+				if (movementConditionActivatedTime > .5f && this.walkingTime > .5f && !this.sprinting) {
+					sprinting = true;
+				}
+			}
+			else {
+				this.movementConditionActivatedTime = 0f;
+				sprinting = false;
+			}
+
 			this.deathCheck();
 			//Debug
 			this.stateTime += delta;
@@ -237,6 +263,11 @@ public abstract class Character implements ModelListener {
 					actionSequence.process(delta, actionListener);
 					if (actionSequence.isFinished()) {
 						iterator.remove();
+						if (this instanceof PlayerModel){
+							PlayerModel model = (PlayerModel) this;
+							if (model.getCurrentlyHeldDirection().equals(DirectionalInput.LEFT) || model.getCurrentlyHeldDirection().equals(DirectionalInput.RIGHT))
+								horizontalMove(model.getCurrentlyHeldDirection().equals(DirectionalInput.LEFT));
+						}
 					}
 				}
 
@@ -249,9 +280,8 @@ public abstract class Character implements ModelListener {
 				if (this.isProcessingActiveSequences()) {
 					this.forceEndForActiveAction();
 				}
-				if (nextActiveAction.getActionKey().getKey().equals("Attack2") || nextActiveAction.getActionKey().getTypeOfAction().equals(ActionType.Stagger)) {
-					System.out.println("");
-				}
+//				//Only if nextActiveAction has movement?
+//				this.stopHorizontalMovement();
 				this.processingActionSequences.add(nextActiveActionSequences.poll());
 			}
 			
@@ -420,7 +450,7 @@ public abstract class Character implements ModelListener {
 		public void jump() {
 	        if (!jumping && !actionLocked) {
 	            jumping = true;
-	            walking = false;
+	            this.setWalking(false);
 	            this.getVelocity().y = getJumpSpeed();
 		    	this.setMovementStatesIfNeeded();
 	        }
@@ -437,7 +467,8 @@ public abstract class Character implements ModelListener {
 			if (!this.actionLocked) {
 				this.setFacingLeft(left);
 				if (!jumping) {
-					this.walking = true;
+					this.setWalking(true);
+					this.walkingTime = 0f;
 				}
 
 				setHorizontalSpeedForMovement(left);
@@ -447,7 +478,10 @@ public abstract class Character implements ModelListener {
 		}
 		
 		public void setHorizontalSpeedForMovement(boolean movingLeft) {
-			if (this.walking) {
+			if (this.sprinting) {
+				this.velocity.x = movingLeft ? -this.properties.getSprintSpeed() : this.properties.getSprintSpeed();
+			}
+			else if (this.walking) {
 				this.velocity.x = movingLeft ? -this.properties.getHorizontalSpeed() : this.properties.getHorizontalSpeed();
 			}
 			else if (this.jumping) {
@@ -457,15 +491,28 @@ public abstract class Character implements ModelListener {
 		
 		public abstract void patrolWalk(boolean left);
 		
-		public void stopHorizontalMovement() {
+		public void stopHorizontalMovement(boolean shouldSlow) {
+			System.out.println("stopHorizontal" + shouldSlow);
 			if (this.walking) {
-				this.velocity.x = 0;
+				if (shouldSlow) {
+					this.isSlowingDown = true;
+					if (this.velocity.x > 0) {
+						this.acceleration.x = -this.slowingAccel;
+					}
+					else {
+						this.acceleration.x = this.slowingAccel;
+					}
+				}
+				else {
+					this.velocity.x = 0;
+				}
+
 				setState(this.idleState);
 			}
 			else if (this.jumping) {
 				this.acceleration.x = 0;
 			}
-			this.walking = false;
+			this.setWalking(false);
 		}
 		
 		public float getJumpSpeed() {
@@ -482,6 +529,22 @@ public abstract class Character implements ModelListener {
 		//logic for collision detection
 			if (this.actionStaggering) {
 				return;
+			}
+			
+			if (this.walking) {
+				this.walkingTime += delta;
+				System.out.println(walkingTime);
+			}
+			else {
+				this.walkingTime = 0f;
+			}
+			
+			if (this.isSlowingDown && this.getCurrentMovement() == null) {
+				if ((this.velocity.x > 0 && this.acceleration.x > 0) || (this.velocity.x < 0 && this.acceleration.x < 0)) {
+					this.velocity.x = 0;
+					this.acceleration.x = 0;
+					this.isSlowingDown = false;
+				}
 			}
 			CollisionCheck collisionX = this.checkForXCollision(delta, collisionLayer, this.velocity.x, this.acceleration.x, true);
 			if (collisionX.doesCollide) {
@@ -707,6 +770,16 @@ public abstract class Character implements ModelListener {
 			this.modelListener.actionStagger();
 		}
 		
+		public void setWalking(boolean walking) {
+			if (walking) {
+				this.walking = true;
+			}
+			else {
+				this.walking = false;
+				sprinting = false;
+			}
+		}
+ 		
 		//-------------GETTERS/SETTERS------------//
 		
 		public String getState() {
@@ -949,8 +1022,11 @@ public abstract class Character implements ModelListener {
 		public ArrayList<EntityEffect> getCurrentEffects() {
 			return currentEffects;
 		}
+
+		public boolean isSprinting() {
+			return sprinting;
+		}
 		
-				
 	}
 	
 	@Override 

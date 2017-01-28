@@ -63,7 +63,7 @@ public class NPCCharacter extends Character{
 		@Override
 		public void patrolWalk(boolean left) {
 			this.setFacingLeft(left);
-			this.walking = true;
+			this.setWalking(true);
 			this.velocity.x = left ? -this.getNPCProperties().patrolWalkSpeed : this.getNPCProperties().patrolWalkSpeed;
 			this.setMovementStatesIfNeeded();
 		}
@@ -91,8 +91,8 @@ public class NPCCharacter extends Character{
 		}
 
 		@Override
-		public void stopHorizontalMovement() {
-			super.stopHorizontalMovement();
+		public void stopHorizontalMovement(boolean shouldSlow) {
+			super.stopHorizontalMovement(shouldSlow);
 			if (this.onPatrol)
 				this.setOnBreak(true);
 		}
@@ -116,7 +116,7 @@ public class NPCCharacter extends Character{
 			if (this.onPatrolBreak) {
 				this.breakTime += delta;
 				if (this.walking)
-					this.stopHorizontalMovement();
+					this.stopHorizontalMovement(false);
 				if (this.breakTime > this.getNPCProperties().getBreakDuration()) {
 					this.setOnBreak(false);
 				}
@@ -127,7 +127,7 @@ public class NPCCharacter extends Character{
 				float endPatrolInWorldCoordinates = this.currentEndPatrol + this.gameplayHitBox.x;
 				
 				if (startPatrolInWorldCoordinates == endPatrolInWorldCoordinates) {
-					this.stopHorizontalMovement();
+					this.stopHorizontalMovement(false);
 				}
 				else if (this.gameplayHitBox.x < startPatrolInWorldCoordinates && this.gameplayHitBox.x < endPatrolInWorldCoordinates) 
 				{

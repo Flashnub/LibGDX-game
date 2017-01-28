@@ -64,6 +64,28 @@
 			"duration": 0.05,
 			"playMode": NORMAL
 		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "UseItemWindup",
+			"numberOfFrames": 1,
+			"duration": 0.05,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "UseItemActive",
+			"numberOfFrames": 1,
+			"duration": 0.05,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "UseItemCooldown",
+			"numberOfFrames": 1,
+			"duration": 0.05,
+			"playMode": NORMAL
+		}
+		
 	]
 	"masterAtlasPath": "Sprites/Player/textures.atlas"
 }

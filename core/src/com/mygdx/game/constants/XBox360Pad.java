@@ -65,6 +65,8 @@ public class XBox360Pad
 		 return "BUTTON_L3";
 	 case BUTTON_RB:
 		 return "BUTTON_RB";
+	 case BUTTON_R3:
+		 return "BUTTON_R3";
 	 default:
 		 return "";
 	 }
@@ -105,7 +107,25 @@ public class XBox360Pad
 			 return value > 0 ? "AXIS_RIGHT_Y_DOWN" : "AXIS_RIGHT_Y_UP";
 		 }
 	 case AXIS_RIGHT_TRIGGER:
-		 return value > 0 ? "AXIS_LEFT_TRIGGER" : "AXIS_RIGHT_TRIGGER";
+		 if (value >= 0.02f) {
+			 return "AXIS_LEFT_TRIGGER";
+		 }
+//		 else if (value > 0.2f)
+//		 {
+//			 return "AXIS_LEFT_TRIGGER_LIGHT";
+//		 }
+		 else if (value >= 0.02f) {
+			 return "AXIS_LEFT_TRIGGER_NONE";
+		 }
+		 else if (value < -0.02f) {
+			 return "AXIS_RIGHT_TRIGGER";
+		 }
+//		 else if (value < -0.2f) {
+//			 return "AXIS_RIGHT_TRIGGER_LIGHT";
+//		 }
+		 else if (value >= -0.02f) {
+			 return "AXIS_RIGHT_TRIGGER_NONE";
+		 }
 	 default:
 		 return "";
 	 }

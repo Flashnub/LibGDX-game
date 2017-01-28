@@ -72,7 +72,6 @@ public class DialogueView extends Actor implements DialogueListener{
 	
 	@Override
 	public void updateDialogueText(String dialogueText, String fontName, String fontColor, boolean newDialogue, String fullText) {
-		// TODO Auto-generated method stub
 		if (!this.isVisible()) {
 			fadeInDialogueView();
 		}

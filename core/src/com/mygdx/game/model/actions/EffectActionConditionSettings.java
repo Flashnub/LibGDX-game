@@ -23,4 +23,12 @@ public class EffectActionConditionSettings extends ActionConditionSettings{
 	public Integer getEffectID() {
 		return effectID;
 	}
+
+	@Override
+	public ActionConditionSettings deepCopy() {
+		EffectActionConditionSettings copy = new EffectActionConditionSettings();
+		copy.effectID = this.effectID;
+		copy.type = this.type;
+		return copy;
+	}
 }

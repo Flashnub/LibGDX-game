@@ -55,6 +55,10 @@ public class DesktopLauncher {
     	parentInputDir = "Sprites/UI/";
         TexturePacker.process(settings, parentInputDir, parentOutputDir, "textures");
         
+    	parentOutputDir = "Sprites/Items/";
+    	parentInputDir = "Sprites/Items/";
+        TexturePacker.process(settings, parentInputDir, parentOutputDir, "textures");
+        
         parentOutputDir = "Sprites/WorldObjects/";
         parentInputDir = "Sprites/WorldObjects/";
     	ArrayList <String> objectNames = new ArrayList<String>();

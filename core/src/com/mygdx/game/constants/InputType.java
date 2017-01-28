@@ -30,6 +30,7 @@ public class InputType {
 	public static final String DOWNMOVEMENT = "DOWNMOVEMENT";
 	public static final String UPMOVEMENT = "UPMOVEMENT";
 	public static final String RIGHTMOVEMENT = "RIGHTMOVEMENT";
+	public static final String MOVEMENTRELEASE = "MOVEMENTRELEASE"; 
 	public static final String LEFTSPECIAL = "LEFTSPECIAL";
 	public static final String RIGHTSPECIAL = "RIGHTSPECIAL";
 	public static final String UPSPECIAL = "UPSPECIAL"; 

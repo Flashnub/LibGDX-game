@@ -24,7 +24,8 @@
 			
 		],
 		"inputs": [
-			["LIGHTATTACK"]
+			["LIGHTATTACK"],
+			["LEFTLIGHTATTACK"]
 		]
 		"windupState": "Walk"
 		"actingState": "Backwalk"
@@ -51,7 +52,8 @@
 			
 		],
 		"inputs": [
-			["MEDIUMATTACK"]
+			["MEDIUMATTACK"],
+			["LEFTMEDIUMATTACK"]
 		]
 		"windupState": "Walk"
 		"actingState": "Block"
@@ -65,7 +67,7 @@
 			"typeOfAction": Attack
 		},
 		"inputs": [
-			["UPHEAVYATTACK"]
+			["DOWNHEAVYATTACK"]
 		]
 		"windupState": "Idle"
 		"actingState": "Idle"
@@ -79,7 +81,7 @@
 			"typeOfAction": Attack
 		},
 		"inputs": [
-			["DOWNHEAVYATTACK"]
+			["LEFTHEAVYATTACK"]
 		]
 		"windupState": "Idle"
 		"actingState": "Idle"

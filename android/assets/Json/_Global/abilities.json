@@ -89,4 +89,16 @@
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
 		"duration": 1
 	}
+	"HealthPotion": {
+		"class": "com.mygdx.game.model.actions.AbilitySettings",
+		"windupTime": 1,
+		"cooldownTime": 1,
+		"duration": 1
+		"sourceEffectSettings": [
+			{
+				"class": com.mygdx.game.model.effects.HealingEffectSettings,
+				"value": 10
+			}
+		]
+	}
 }

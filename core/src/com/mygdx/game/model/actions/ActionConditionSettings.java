@@ -21,4 +21,5 @@ public abstract class ActionConditionSettings implements Serializable{
 		return type;
 	}
 	
+	public abstract ActionConditionSettings deepCopy();
 }

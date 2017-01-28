@@ -21,8 +21,13 @@
 			"actingState": "Walk"
 			"cooldownState": "Block"
 			"inputs": [
-				["LEFTMOVEMENT"],
-				["MOVEMENT"]
+				["MOVEMENTRELEASE"]
+			]
+			"conditionSettings": [
+				{
+					"class": com.mygdx.game.model.actions.SprintActionConditionSettings,
+					"onlyIfSprinting": false
+				}
 			]
 		},
 		"PlayerBlock": {

@@ -25,6 +25,7 @@ import com.mygdx.game.model.projectiles.Projectile;
 import com.mygdx.game.model.world.WorldModel;
 import com.mygdx.game.model.worldObjects.WorldObject;
 import com.mygdx.game.views.ResourceBar;
+import com.mygdx.game.views.ResourceBar.ResourceBarType;
 
 public class WorldRenderer implements CoordinatesHelper{
 	
@@ -212,7 +213,7 @@ public class WorldRenderer implements CoordinatesHelper{
 		@Override
 		public Vector2 getScreenCoordinatesForCharacter(Character character) {
 			// TODO Auto-generated method stub
-			float xOffset = (character.getCharacterData().getImageHitBox().x + (character.getCharacterData().getImageHitBox().width / 2)) - (camera.position.x - (camera.viewportWidth / 2)) - (ResourceBar.enemyHealthBarWidth / 4);
+			float xOffset = (character.getCharacterData().getImageHitBox().x + (character.getCharacterData().getImageHitBox().width / 2)) - (camera.position.x - (camera.viewportWidth / 2)) - (ResourceBarType.EnemyHealth.fixedWidth() / 4);
 			float yOffset = (character.getCharacterData().getImageHitBox().y + (character.getCharacterData().getImageHitBox().height)) - (camera.position.y  - (camera.viewportHeight / 2));
 //			float yOffset = 150f;
 			

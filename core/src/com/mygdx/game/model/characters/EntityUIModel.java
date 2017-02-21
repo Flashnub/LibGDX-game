@@ -22,7 +22,7 @@ public class EntityUIModel {
 	private float animationTime;
 	private float angleOfRotation;
 	private boolean shouldStagger;
-	public static final float standardStaggerDuration = 0.2f;
+	public static final float standardStaggerDuration = 0.25f;
 	private float staggerTime;
 		
 	public EntityUIModel(String name, EntityUIDataType type) {
@@ -52,16 +52,19 @@ public class EntityUIModel {
 //				}
 					
 				for (int i = 0; i < animationData.getNumberOfFrames(); i++) {
-					TextureRegion leftFrame = playerAtlas.findRegion(SpriteUtils.animationStringWithData(animationData, i+1));
-					leftAnimationFrames.add(leftFrame);
-					
-					TextureRegion rightFrame = new TextureRegion(leftFrame);
-
-					rightFrame.flip(true, false);
+					TextureRegion rightFrame = playerAtlas.findRegion(SpriteUtils.animationStringWithData(animationData, i+1));
 					rightAnimationFrames.add(rightFrame);
+					
+//					if (leftFrame == null) {
+//						System.out.println("");
+//					}
+					TextureRegion leftFrame = new TextureRegion(rightFrame);
+
+					leftFrame.flip(true, false);
+					leftAnimationFrames.add(leftFrame);
 				}
-				Animation leftAnimation = new Animation(animationData.getDuration(), leftAnimationFrames, animationData.getPlayMode());
-				Animation rightAnimation = new Animation(animationData.getDuration(), rightAnimationFrames, animationData.getPlayMode());
+				Animation leftAnimation = new Animation(animationData.getFrameRate(), leftAnimationFrames, animationData.getPlayMode());
+				Animation rightAnimation = new Animation(animationData.getFrameRate(), rightAnimationFrames, animationData.getPlayMode());
 
 				animations.put(animationData.getName() + SpriteUtils.left, leftAnimation);
 				animations.put(animationData.getName() + SpriteUtils.right, rightAnimation);
@@ -78,6 +81,10 @@ public class EntityUIModel {
 	public boolean setCurrentFrame(EntityModel entity, float delta) {
 		String animationString = SpriteUtils.animationStringWithState(entity.getState(), entity.isFacingLeft());
 		Animation currentAnimation = animations.get(animationString);
+		if (currentAnimation == null) {
+			animationString = SpriteUtils.animationStringWithState("Idle", entity.isFacingLeft());
+			currentAnimation = animations.get(animationString);
+		}
 		
 		if (this.shouldStagger) {
 			this.staggerTime += delta;
@@ -125,5 +132,14 @@ public class EntityUIModel {
 	public void stagger() {
 		this.shouldStagger = true;
 		this.staggerTime = 0f;
+	}
+	
+	public float getTimeForAnimation(String animationName, String animationType){
+		for (AnimationData data : this.entityUIData.getAnimations()) {
+			if (data.getName().equals(animationName + animationType)) {
+				return data.getNumberOfFrames() * data.getFrameRate();
+			}
+		}
+		return 0f;
 	}
 }

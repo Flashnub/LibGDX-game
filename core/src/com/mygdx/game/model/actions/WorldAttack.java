@@ -6,7 +6,8 @@ import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.EffectInitializer;
 import com.mygdx.game.model.effects.EntityEffect;
-import com.mygdx.game.model.effects.MovementEffectSettings;
+import com.mygdx.game.model.effects.XMovementEffectSettings;
+import com.mygdx.game.model.effects.YMovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.CollisionChecker;
 import com.mygdx.game.model.globalEffects.WorldEffect;
@@ -33,7 +34,7 @@ public class WorldAttack extends ActionSegment{
 		worldEffects = new Array<WorldEffect>();
 		this.worldAttackSettings = settings;
 		for (WorldEffectSettings worldEffectSettings : this.worldAttackSettings.worldEffectSettings) {
-			WorldEffect effect = EffectInitializer.initializeWorldEffect(worldEffectSettings, this, collisionChecker, source, target, source.getCenteredPosition());
+			WorldEffect effect = EffectInitializer.initializeWorldEffect(worldEffectSettings, this, collisionChecker, source, target, null);
 			worldEffects.add(effect);
 		}
 		if (settings.getAbilitySettings() != null || overridingAbilitySettingsKey != null) {
@@ -51,6 +52,7 @@ public class WorldAttack extends ActionSegment{
 			}
 		}
 		this.sourceEffects = new Array <EntityEffect>();
+		this.setDurations(source);
 	}
 	
 	@Override
@@ -82,12 +84,12 @@ public class WorldAttack extends ActionSegment{
 //	
 	@Override
 	public float getWindUpTime() {
-		return this.forceActiveState ? this.windupTime : this.worldAttackSettings.getAbilitySettings().windupTime;
+		return this.forceActiveState ? this.processedWindupTime : this.windupTime;
 	}
 	
 	@Override 
 	public float getWindUpPlusActionTime() {
-		return getWindUpTime() + (this.forceCooldownState ? this.activeTime : this.worldAttackSettings.getAbilitySettings().duration);
+		return getWindUpTime() + (this.forceCooldownState ? this.processedActiveTime : this.activeTime);
 	}
 	
 	@Override
@@ -95,7 +97,7 @@ public class WorldAttack extends ActionSegment{
 //		if (this.forceCooldownState) {
 //			return getWindUpTime() + this.activeTime + this.settings.cooldownTime;
 //		}
-		return getWindUpPlusActionTime() + this.worldAttackSettings.getAbilitySettings().cooldownTime;
+		return getWindUpPlusActionTime() + this.cooldownTime;
 	}
 
 	@Override
@@ -138,8 +140,8 @@ public class WorldAttack extends ActionSegment{
 		worldAttack.worldAttackSettings = worldAttackSettings;
 		Array <WorldEffect> copy = new Array <WorldEffect>();
 		for (WorldEffectSettings worldEffectSettings : this.worldAttackSettings.worldEffectSettings) {
-			Vector2 sourcePosition = new Vector2(this.source.gameplayHitBox.x + this.source.gameplayHitBox.width / 2, this.source.gameplayHitBox.y + this.source.gameplayHitBox.height / 2); 
-			WorldEffect effect = EffectInitializer.initializeWorldEffect(worldEffectSettings, this, collisionChecker, source, target, sourcePosition);
+//			Vector2 sourcePosition = new Vector2(this.source.gameplayHitBox.x + this.source.gameplayHitBox.width / 2, this.source.gameplayHitBox.y + this.source.gameplayHitBox.height / 2); 
+			WorldEffect effect = EffectInitializer.initializeWorldEffect(worldEffectSettings, this, collisionChecker, source, target, null);
 			worldEffects.add(effect);
 		}
 		worldAttack.worldEffects = copy;
@@ -153,8 +155,6 @@ public class WorldAttack extends ActionSegment{
 				worldAttack.potentialAbility = attack;
 			}
 		}
-
-		
 		return worldAttack;
 	}
 
@@ -166,9 +166,15 @@ public class WorldAttack extends ActionSegment{
 	}
 	
 	@Override
-	public MovementEffectSettings getReplacementMovementForStagger() {
-		return potentialAbility.getReplacementMovementForStagger();
+	public XMovementEffectSettings getXReplacementMovementForStagger() {
+		return potentialAbility.getXReplacementMovementForStagger();
 	}
+	
+	@Override
+	public YMovementEffectSettings getYReplacementMovementForStagger() {
+		return potentialAbility.getYReplacementMovementForStagger();
+	}
+
 
 	@Override
 	public boolean shouldRespectEntityCollisions() {
@@ -185,5 +191,10 @@ public class WorldAttack extends ActionSegment{
 		return this.worldAttackSettings.getAbilitySettings().activeTillDisruption;
 	}
 
-
+	@Override
+	public void setDurations(CharacterModel source) {
+		this.windupTime = source.getUiModel().getTimeForAnimation(this.worldAttackSettings.getAbilitySettings().name, "Windup");
+		this.activeTime = source.getUiModel().getTimeForAnimation(this.worldAttackSettings.getAbilitySettings().name, "Active");
+		this.cooldownTime = source.getUiModel().getTimeForAnimation(this.worldAttackSettings.getAbilitySettings().name, "Cooldown");
+	}
 }

@@ -289,7 +289,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     		for (int i = 0; i < explosions.size; i++) {
     			Explosion explosion = explosions.get(i);
     			if (!this.freezeWorld) 
-    				explosion.update(timeForAction);
+    				explosion.update(timeForAction, collisionLayer);
     		}
     		for (int i = 0; i < worldEffects.size; i++) {
     			WorldEffect effect = worldEffects.get(i);
@@ -537,14 +537,6 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 					break;
 				}
 			}
-//			if (collidingEntity == null) {
-//				for (WorldObject object : this.objects) {
-//					if (object.shouldCollideWithCharacter() && object.getGameplayHitBox().overlaps(tempGameplayBounds)) {
-//						collidingEntity = true;
-//						break;
-//					}
-//				}
-//			}
 
 		}
 		else if (entity instanceof NPCCharacterModel){
@@ -561,28 +553,6 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 
 			}
 		}
-//		else if (entity.getAllegiance() == WorldObject.allegiance) {
-//			isColliding = player.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds);
-//			if (!isColliding) {
-//				for (Enemy enemy : this.enemies) {
-//					if (enemy.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds)) {
-//						isColliding = true;
-//						break;
-//					}
-//				}
-//			}
-//		}
-//		else {
-//			isColliding = player.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds);
-//			if (!isColliding) {
-//				for (WorldObject object : this.objects) {
-//					if (object.shouldCollideWithCharacter() && object.getGameplayHitBox().overlaps(tempGameplayBounds)) {
-//						isColliding = true;
-//						break;
-//					}
-//				}
-//			}
-//		}
 		return collidingEntity;
 	}
 
@@ -602,12 +572,16 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	private void checkIfPlayerIsNearObjects() {
 		nearbyObjects.clear();
 		for (WorldObject object : this.objects) {
-			if (object.getImageHitBox().overlaps(player.getCharacterData().getImageHitBox())) {
+			if (object.getGameplayHitBox().overlaps(player.getCharacterData().getGameplayHitBox())) {
 				nearbyObjects.add(object);
 			}
 		}
 		if (nearbyObjects.size > 0) {
 			((PlayerModel) player.getCharacterData()).setNearbyObject(nearbyObjects.get(0));
+		}
+		else {
+			((PlayerModel) player.getCharacterData()).setNearbyObject(null);
+
 		}
 		for (WorldListener listener : worldListeners) {
 			listener.updateWithNearbyObjects(nearbyObjects);
@@ -617,7 +591,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	private void checkIfPlayerIsNearNPCs() {
 		this.nearbyNPCs.clear();
 		for (NPCCharacter character : this.npcCharacters) {
-			if (character.getCharacterData().getImageHitBox().overlaps(player.getCharacterData().getImageHitBox())) {
+			if (character.getCharacterData().getGameplayHitBox().overlaps(player.getCharacterData().getGameplayHitBox())) {
 				nearbyNPCs.add(character);
 			}
 		}
@@ -666,9 +640,9 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	}
 	
 	@Override
-	public void onSwitchItem(Item item) {
+	public void onSwitchItem(Item item, int numberOfItems) {
 		for (WorldListener listener : this.worldListeners) {
-			listener.handleSwitchedItem(item);
+			listener.handleSwitchedItem(item, numberOfItems);
 		}
 	}
 

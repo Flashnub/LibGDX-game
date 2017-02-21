@@ -15,20 +15,29 @@ public abstract class EntityModel {
 	public static final String activeState = "Active";
 	public static final String windupState = "Windup";
 	public static final String cooldownState = "Cooldown";
-	public static final float averageOverlapCooldown = 2f;
 	
 	public Vector2 velocity, acceleration;
 	public Rectangle gameplayHitBox;
 	public Rectangle imageHitBox;
 	public float widthCoefficient;
 	public float heightCoefficient;
-	public float timeSinceOverlapCorrection;
 	float xOffsetModifier;
 	float yOffsetModifier;
 	public int allegiance;
 	CollisionChecker collisionChecker;
-	boolean respectEntityCollision;
-	boolean hasProcessedOverlapCorrection;
+	
+	boolean lockTileCollisionBehavior;
+	boolean lockEntityCollisionBehavior;
+	boolean lockObjectCollisionBehavior;
+
+	boolean isRespectingTileCollision;
+	boolean isRespectingObjectCollision;
+	boolean isRespectingEntityCollision;
+	
+	//SHOULD NOT BE MODIFIED
+	boolean shouldRespectTileCollision;
+	boolean shouldRespectObjectCollision;
+	boolean shouldRespectEntityCollision;
 	
 	
 	public EntityModel() {
@@ -38,9 +47,18 @@ public abstract class EntityModel {
 		this.imageHitBox = new Rectangle();
 		this.gameplayHitBox = new Rectangle();
 		this.allegiance = 0;
-		this.timeSinceOverlapCorrection = 0f;
-		respectEntityCollision = true;
-		this.hasProcessedOverlapCorrection = false;
+		
+		this.lockEntityCollisionBehavior = false;
+		this.lockObjectCollisionBehavior = false;
+		this.lockTileCollisionBehavior = false;
+		
+		shouldRespectEntityCollision = true;
+		shouldRespectObjectCollision = true;
+		shouldRespectTileCollision = true;
+		
+		this.isRespectingEntityCollision = this.shouldRespectEntityCollision;
+		this.isRespectingObjectCollision = this.shouldRespectObjectCollision;
+		this.isRespectingTileCollision = this.shouldRespectTileCollision;
 		
 		this.widthCoefficient = 1f;
 		this.heightCoefficient = 1f;
@@ -54,29 +72,36 @@ public abstract class EntityModel {
 		this.gameplayHitBox.height = this.getImageHitBox().height * heightCoefficient;
 	}	
 	
-	public void handleOverlapCooldown(float delta) {
-		if (this.hasProcessedOverlapCorrection)
+	public void handleCollisionRespectChecks() {
+		if (!this.lockEntityCollisionBehavior && 
+			this.isRespectingEntityCollision != this.shouldRespectEntityCollision
+			&& this.collisionChecker.checkIfEntityCollidesWithOthers(this, this.gameplayHitBox) == null) 
 		{
-			this.timeSinceOverlapCorrection += delta;
-			if (this.timeSinceOverlapCorrection > EntityModel.averageOverlapCooldown) {
-				this.hasProcessedOverlapCorrection = false;
-				this.timeSinceOverlapCorrection = 0f;
-			}
+			this.isRespectingEntityCollision = shouldRespectEntityCollision;
 		}
+//		if (this.hasProcessedOverlapCorrection)
+//		{
+//			this.timeSinceOverlapCorrection += delta;
+//			if (this.timeSinceOverlapCorrection > EntityModel.averageOverlapCooldown) {
+//				this.hasProcessedOverlapCorrection = false;
+//				this.timeSinceOverlapCorrection = 0f;
+//			}
+//		}
 	}
 	
-	public void moveWithoutCollisionDetection(float delta) {
-		this.imageHitBox.x = this.imageHitBox.x + this.velocity.x * delta;
-		this.imageHitBox.y = this.imageHitBox.y + this.velocity.y * delta;
-		this.gameplayHitBox.x = this.xOffsetModifier + (this.imageHitBox.x + this.imageHitBox.width * ((1f - this.widthCoefficient) / 2));
-		this.gameplayHitBox.y = this.yOffsetModifier + (this.imageHitBox.y + this.imageHitBox.height * ((1f - this.heightCoefficient) / 2));
-	}
+//	public void moveWithoutCollisionDetection(float delta) {
+//		this.imageHitBox.x = this.imageHitBox.x + this.velocity.x * delta;
+//		this.imageHitBox.y = this.imageHitBox.y + this.velocity.y * delta;
+//		this.gameplayHitBox.x = this.xOffsetModifier + (this.imageHitBox.x + this.imageHitBox.width * ((1f - this.widthCoefficient) / 2));
+//		this.gameplayHitBox.y = this.yOffsetModifier + (this.imageHitBox.y + this.imageHitBox.height * ((1f - this.heightCoefficient) / 2));
+//	}
 	
 	public CollisionCheck checkForYCollision(float maxTime, TiledMapTileLayer collisionLayer, float yVelocity, boolean shouldMove, boolean applyGravity) {
 		float tileWidth = collisionLayer.getTileWidth();
 		float tileHeight = collisionLayer.getTileHeight();
 		
 		boolean collisionY = false;
+		float pointOfReturn = 0f;
 		float time = 0f;
 		
 		Rectangle tempImageBounds = new Rectangle(this.imageHitBox);
@@ -103,7 +128,7 @@ public abstract class EntityModel {
 
 			
 
-			if (tempVelocity < 0) {
+			if (this.isRespectingTileCollision && tempVelocity < 0) {
 				int bottomLeftXIndex = (int) (tempGameplayBounds.x / tileWidth);
 				int bottomLeftYIndex = (int) ((tempGameplayBounds.y) / tileHeight);
 				
@@ -119,23 +144,29 @@ public abstract class EntityModel {
 				
 				Cell bottomRightBlock = collisionLayer.getCell(bottomRightXIndex, bottomRightYIndex);
 				//bottom left block
-				if (bottomLeftBlock != null)
+				if (bottomLeftBlock != null) {
 					collisionY = ((Boolean)bottomLeftBlock.getTile().getProperties().get("Impassable")).equals(true);
+					pointOfReturn = bottomLeftYIndex * tileHeight + tileHeight;
+				}
 					
 				//bottom middle block
-				if(!collisionY && bottomMiddleBlock != null)
+				if(!collisionY && bottomMiddleBlock != null) {
 					collisionY = ((Boolean)bottomMiddleBlock.getTile().getProperties().get("Impassable")).equals(true);
+					pointOfReturn = bottomMiddleYIndex * tileHeight + tileHeight;
+				}
 				
 				//bottom right block
-				if(!collisionY && bottomRightBlock != null)
+				if(!collisionY && bottomRightBlock != null) {
 					collisionY = ((Boolean)bottomRightBlock.getTile().getProperties().get("Impassable")).equals(true);
+					pointOfReturn = bottomRightYIndex * tileHeight + tileHeight;
+				}
 				
 				tilesToCheckForWorldObjects.add(new CellWrapper(bottomLeftBlock, new Vector2(bottomLeftXIndex * tileWidth, bottomLeftYIndex * tileHeight)));
 				tilesToCheckForWorldObjects.add(new CellWrapper(bottomMiddleBlock, new Vector2(bottomMiddleXIndex * tileWidth, bottomMiddleYIndex * tileHeight)));
 				tilesToCheckForWorldObjects.add(new CellWrapper(bottomRightBlock, new Vector2(bottomRightXIndex * tileWidth, bottomRightYIndex * tileHeight)));
 		
 			} 
-			else if (tempVelocity > 0) {
+			else if (this.isRespectingTileCollision && tempVelocity > 0) {
 				
 				int topLeftXIndex = (int) (tempGameplayBounds.x / tileWidth);
 				int topLeftYIndex = (int) ((tempGameplayBounds.y + tempGameplayBounds.height) / tileHeight);
@@ -153,16 +184,22 @@ public abstract class EntityModel {
 				Cell topRightBlock = collisionLayer.getCell(topRightXIndex, topRightYIndex);
 				
 				//top left block
-				if (topLeftBlock != null)
+				if (topLeftBlock != null) {
 					collisionY = ((Boolean)topLeftBlock.getTile().getProperties().get("Impassable")).equals(true);
+					pointOfReturn = topLeftYIndex * tileHeight - this.gameplayHitBox.height;
+				}
 				
 				//top middle block
-				if(!collisionY && topMiddleBlock != null)
+				if(!collisionY && topMiddleBlock != null) {
 					collisionY = ((Boolean)topMiddleBlock.getTile().getProperties().get("Impassable")).equals(true);
+					pointOfReturn = topMiddleYIndex * tileHeight - this.gameplayHitBox.height;
+				}
 				
 				//top right block
-				if(!collisionY && topRightBlock != null)
+				if(!collisionY && topRightBlock != null) {
 					collisionY = ((Boolean)topRightBlock.getTile().getProperties().get("Impassable")).equals(true);
+					pointOfReturn = topRightYIndex * tileHeight  - this.gameplayHitBox.height;
+				}
 				
 				tilesToCheckForWorldObjects.add(new CellWrapper(topLeftBlock, new Vector2(topLeftXIndex * tileWidth, topLeftYIndex * tileHeight)));
 				tilesToCheckForWorldObjects.add(new CellWrapper(topMiddleBlock, new Vector2(topMiddleXIndex * tileWidth, topMiddleYIndex * tileHeight)));
@@ -172,10 +209,13 @@ public abstract class EntityModel {
 				collisionType = CollisionType.World;
 			}
 			
-			collisionY = collisionY	|| this.collisionChecker.checkIfEntityCollidesWithObjects(this, tempGameplayBounds);
-			if (collisionY && collisionType.equals(CollisionType.None)) {
-				collisionType = CollisionType.Object;
+			if (this.isRespectingObjectCollision) {
+				collisionY = collisionY	|| this.collisionChecker.checkIfEntityCollidesWithObjects(this, tempGameplayBounds);
+				if (collisionY && collisionType.equals(CollisionType.None)) {
+					collisionType = CollisionType.Object;
+				}
 			}
+
 			
 			boolean additionalCollisionY = this.handleAdditionalYCollisionLogic(tempGameplayBounds, tempImageBounds, collisionY);
 			if (!collisionY && additionalCollisionY) {
@@ -201,9 +241,13 @@ public abstract class EntityModel {
 			this.imageHitBox.y = tempImageBounds.y;
 			this.velocity.y = tempVelocity;
 		}
+		else if (shouldMove && collisionType.equals(CollisionType.World)) {
+			this.gameplayHitBox.y = pointOfReturn;
+			this.imageHitBox.y = -1f * (this.yOffsetModifier + (this.imageHitBox.height * ((1f - this.heightCoefficient) / 2)) - this.gameplayHitBox.y );
+		}
 
 		//react to X collision
-		return new CollisionCheck(collisionY, time, collisionType);
+		return new CollisionCheck(collisionY, time, collisionType, pointOfReturn);
 	}
 	
 	public abstract boolean handleAdditionalXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided);
@@ -235,6 +279,7 @@ public abstract class EntityModel {
 		float tileHeight = collisionLayer.getTileHeight();
 		
 		boolean collisionX = false;
+		float pointOfReturn = 0f;
 		float time = 0f;
 		
 		Rectangle tempImageBounds = new Rectangle(this.imageHitBox);
@@ -260,7 +305,7 @@ public abstract class EntityModel {
 
 			
 
-			if (tempVelocity < 0) {
+			if (this.isRespectingTileCollision && tempVelocity < 0) {
 				//left blocks
 				int topLeftXIndex = ((int) (tempGameplayBounds.x / tileWidth));
 				int topLeftYIndex = ((int) ((tempGameplayBounds.y + tempGameplayBounds.height) / tileHeight));
@@ -277,24 +322,29 @@ public abstract class EntityModel {
 				
 				Cell lowerLeftBlock = collisionLayer.getCell(lowerLeftXIndex, lowerLeftYIndex);
 				
-				if (topLeftBlock != null)
+				if (topLeftBlock != null) {
 					collisionX = ((Boolean)topLeftBlock.getTile().getProperties().get("Impassable")).equals(true);
+					pointOfReturn = topLeftXIndex * tileWidth + tileWidth;
+				}
 					
-				
 				//middle left block
-				if(!collisionX && middleLeftBlock != null)
+				if(!collisionX && middleLeftBlock != null) {
 					collisionX = ((Boolean)middleLeftBlock.getTile().getProperties().get("Impassable")).equals(true);
+					pointOfReturn = middleLeftXIndex * tileWidth + tileWidth;
+				}
 				
 				//lower left block
-				if(!collisionX && lowerLeftBlock != null )
+				if(!collisionX && lowerLeftBlock != null ) {
 					collisionX = ((Boolean)lowerLeftBlock.getTile().getProperties().get("Impassable")).equals(true);
+					pointOfReturn = lowerLeftXIndex * tileWidth + tileWidth;
+				}
 				
 				tilesToCheckForWorldObjects.add(new CellWrapper(topLeftBlock, new Vector2(topLeftXIndex * tileWidth, topLeftYIndex * tileHeight)));
 				tilesToCheckForWorldObjects.add(new CellWrapper(middleLeftBlock, new Vector2(middleLeftXIndex * tileWidth, middleLeftYIndex * tileHeight)));
 				tilesToCheckForWorldObjects.add(new CellWrapper(lowerLeftBlock, new Vector2(lowerLeftXIndex * tileWidth, lowerLeftYIndex * tileHeight)));
 
 			}
-			else if (tempVelocity > 0) {
+			else if (this.isRespectingTileCollision && tempVelocity > 0) {
 				//right blocks
 				int topRightXIndex = (int) ((tempGameplayBounds.x + tempGameplayBounds.width) / tileWidth);
 				int topRightYIndex = (int) ((tempGameplayBounds.y + tempGameplayBounds.height) / tileHeight);
@@ -312,16 +362,23 @@ public abstract class EntityModel {
 				Cell lowerRightBlock = collisionLayer.getCell(lowerRightXIndex, lowerRightYIndex);
 				
 				// top right block
-				if (topRightBlock != null)
+				if (topRightBlock != null) {
 					collisionX = ((Boolean)topRightBlock.getTile().getProperties().get("Impassable")).equals(true);
+					pointOfReturn = topRightXIndex * tileWidth - (this.gameplayHitBox.width + 0.25f);
+				}
 				
 				//middle right block
-				if(!collisionX && middleRightBlock != null)
+				if(!collisionX && middleRightBlock != null) {
 					collisionX = ((Boolean)middleRightBlock.getTile().getProperties().get("Impassable")).equals(true);
+					pointOfReturn = middleRightXIndex * tileWidth - (this.gameplayHitBox.width + 0.25f);
+				}
 				
 				//lower right block
-				if(!collisionX && lowerRightBlock != null)
+				if(!collisionX && lowerRightBlock != null) {
 					collisionX = ((Boolean)lowerRightBlock.getTile().getProperties().get("Impassable")).equals(true);
+	
+					pointOfReturn = lowerRightXIndex * tileWidth - (this.gameplayHitBox.width + 0.25f);
+				}
 				
 				tilesToCheckForWorldObjects.add(new CellWrapper(topRightBlock, new Vector2(topRightXIndex * tileWidth, topRightYIndex * tileHeight)));
 				tilesToCheckForWorldObjects.add(new CellWrapper(middleRightBlock, new Vector2(middleRightXIndex * tileWidth, middleRightYIndex * tileHeight)));
@@ -332,12 +389,15 @@ public abstract class EntityModel {
 				collisionType = CollisionType.World;
 			}
 			
-			collisionX = collisionX 
-					|| this.collisionChecker.checkIfEntityCollidesWithObjects(this, tempGameplayBounds);
-			
-			if (collisionX && collisionType.equals(CollisionType.None)) {
-				collisionType = CollisionType.Object;
+			if (this.isRespectingObjectCollision) {
+				collisionX = collisionX 
+						|| this.collisionChecker.checkIfEntityCollidesWithObjects(this, tempGameplayBounds);
+				
+				if (collisionX && collisionType.equals(CollisionType.None)) {
+					collisionType = CollisionType.Object;
+				}
 			}
+
 			
 			boolean additionalCollisionX = this.handleAdditionalXCollisionLogic(tempGameplayBounds, tempImageBounds, collisionX);
 			
@@ -363,36 +423,39 @@ public abstract class EntityModel {
 			this.imageHitBox.x = tempImageBounds.x;
 			this.velocity.x = tempVelocity;
 		}
+		else if (shouldMove && collisionType.equals(CollisionType.World)) {
+			this.gameplayHitBox.x = pointOfReturn;
+			this.imageHitBox.x = -1f * (this.xOffsetModifier + (this.imageHitBox.width * ((1f - this.widthCoefficient) / 2)) - this.gameplayHitBox.x );
+		}
 		//react to X collision
-		return new CollisionCheck(collisionX, time, collisionType);
+		return new CollisionCheck(collisionX, time, collisionType, pointOfReturn);
 	}
 	
-	public void stopEntityOverlapIfNeeded(EntityModel entity, Rectangle tempGameplayBounds, Rectangle tempImageBounds) {
-		if (entity != null && this.respectEntityCollision && entity.respectEntityCollision && this.gameplayHitBox.overlaps(entity.gameplayHitBox) && tempGameplayBounds.overlaps(entity.gameplayHitBox) && (this.velocity.x == 0 || entity.velocity.x == 0)) {
-			if (tempGameplayBounds.x > entity.gameplayHitBox.x){
-			
-				float positionalDifference = tempGameplayBounds.x - entity.gameplayHitBox.x;
-				if (positionalDifference + tempGameplayBounds.x + tempGameplayBounds.width > entity.gameplayHitBox.x + entity.gameplayHitBox.width) {
-					this.imageHitBox.x += tempGameplayBounds.width;
-				}
-				else {
-					this.imageHitBox.x += entity.gameplayHitBox.width;
-				}
-			}
-			else {
-				float positionalDifference = tempGameplayBounds.x - entity.gameplayHitBox.x;
-				if (positionalDifference + tempGameplayBounds.x + tempGameplayBounds.width < entity.gameplayHitBox.x + entity.gameplayHitBox.width) {
-					this.imageHitBox.x -= tempGameplayBounds.width;
-				}
-				else {
-					this.imageHitBox.x -= entity.gameplayHitBox.width;
-				}
-			}
-			this.gameplayHitBox.x = this.imageHitBox.x + this.imageHitBox.getWidth() * ((1f - this.widthCoefficient) / 2);		
-			this.hasProcessedOverlapCorrection = true;
-		}
-
-	}
+//	public void stopEntityOverlapIfNeeded(EntityModel entity, Rectangle tempGameplayBounds, Rectangle tempImageBounds) {
+//		if (entity != null && this.respectEntityCollision && entity.respectEntityCollision && this.gameplayHitBox.overlaps(entity.gameplayHitBox) && tempGameplayBounds.overlaps(entity.gameplayHitBox) && (this.velocity.x == 0 || entity.velocity.x == 0)) {
+//			if (tempGameplayBounds.x > entity.gameplayHitBox.x){
+//			
+//				float positionalDifference = tempGameplayBounds.x - entity.gameplayHitBox.x;
+//				if (positionalDifference + tempGameplayBounds.x + tempGameplayBounds.width > entity.gameplayHitBox.x + entity.gameplayHitBox.width) {
+//					this.imageHitBox.x += tempGameplayBounds.width;
+//				}
+//				else {
+//					this.imageHitBox.x += entity.gameplayHitBox.width;
+//				}
+//			}
+//			else {
+//				float positionalDifference = tempGameplayBounds.x - entity.gameplayHitBox.x;
+//				if (positionalDifference + tempGameplayBounds.x + tempGameplayBounds.width < entity.gameplayHitBox.x + entity.gameplayHitBox.width) {
+//					this.imageHitBox.x -= tempGameplayBounds.width;
+//				}
+//				else {
+//					this.imageHitBox.x -= entity.gameplayHitBox.width;
+//				}
+//			}
+//			this.gameplayHitBox.x = this.imageHitBox.x + this.imageHitBox.getWidth() * ((1f - this.widthCoefficient) / 2);		
+//			this.hasProcessedOverlapCorrection = true;
+//		}
+//	}
 	
 	public boolean isHitBoxModified() {
 		return this.xOffsetModifier != 0 || this.yOffsetModifier != 0;
@@ -422,16 +485,27 @@ public abstract class EntityModel {
 		this.collisionChecker = itemListener;
 	}
 	
-	public boolean respectEntityCollision() {
-		return respectEntityCollision;
+	public boolean isRespectingEntityCollision() {
+		return this.isRespectingEntityCollision;
+	}
+	
+	
+
+//	public boolean hasProcessedOverlapCorrection() {
+//		return hasProcessedOverlapCorrection;
+//	}
+
+	public void setRespectingEntityCollision(boolean isRespectingEntityCollision) {
+		this.isRespectingEntityCollision = isRespectingEntityCollision;
+	}
+	
+	
+	public void lockEntityCollisionBehavior() {
+		lockEntityCollisionBehavior = true;
 	}
 
-	public void setRespectEntityCollision(boolean respectEntityCollision) {
-		this.respectEntityCollision = respectEntityCollision;
-	}
-
-	public boolean hasProcessedOverlapCorrection() {
-		return hasProcessedOverlapCorrection;
+	public void unlockEntityCollisionBehavior() {
+		lockEntityCollisionBehavior = false;
 	}
 
 	public void setWidthCoefficient(float widthCoefficient) {
@@ -457,4 +531,69 @@ public abstract class EntityModel {
 	public void setyOffsetModifier(float yOffsetModifier) {
 		this.yOffsetModifier = yOffsetModifier;
 	}
+
+	public boolean isLockTileCollisionBehavior() {
+		return lockTileCollisionBehavior;
+	}
+
+	public void setLockTileCollisionBehavior(boolean lockTileCollisionBehavior) {
+		this.lockTileCollisionBehavior = lockTileCollisionBehavior;
+	}
+
+	public boolean isLockEntityCollisionBehavior() {
+		return lockEntityCollisionBehavior;
+	}
+
+	public void setLockEntityCollisionBehavior(boolean lockEntityCollisionBehavior) {
+		this.lockEntityCollisionBehavior = lockEntityCollisionBehavior;
+	}
+
+	public boolean isLockObjectCollisionBehavior() {
+		return lockObjectCollisionBehavior;
+	}
+
+	public void setLockObjectCollisionBehavior(boolean lockObjectCollisionBehavior) {
+		this.lockObjectCollisionBehavior = lockObjectCollisionBehavior;
+	}
+
+	public boolean isRespectingTileCollision() {
+		return isRespectingTileCollision;
+	}
+
+	public void setRespectingTileCollision(boolean isRespectingTileCollision) {
+		this.isRespectingTileCollision = isRespectingTileCollision;
+	}
+
+	public boolean isRespectingObjectCollision() {
+		return isRespectingObjectCollision;
+	}
+
+	public void setRespectingObjectCollision(boolean isRespectingObjectCollision) {
+		this.isRespectingObjectCollision = isRespectingObjectCollision;
+	}
+
+	public boolean isShouldRespectTileCollision() {
+		return shouldRespectTileCollision;
+	}
+
+	public void setShouldRespectTileCollision(boolean shouldRespectTileCollision) {
+		this.shouldRespectTileCollision = shouldRespectTileCollision;
+	}
+
+	public boolean isShouldRespectObjectCollision() {
+		return shouldRespectObjectCollision;
+	}
+
+	public void setShouldRespectObjectCollision(boolean shouldRespectObjectCollision) {
+		this.shouldRespectObjectCollision = shouldRespectObjectCollision;
+	}
+
+	public boolean isShouldRespectEntityCollision() {
+		return shouldRespectEntityCollision;
+	}
+
+	public void setShouldRespectEntityCollision(boolean shouldRespectEntityCollision) {
+		this.shouldRespectEntityCollision = shouldRespectEntityCollision;
+	}
+	
 }

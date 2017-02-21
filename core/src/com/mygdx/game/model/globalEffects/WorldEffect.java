@@ -14,7 +14,7 @@ public abstract class WorldEffect extends Effect{
 	WorldEffectSettings settings;
 	CharacterModel source;
 
-	public WorldEffect(WorldEffectSettings settings, EffectController retriever, CollisionChecker collisionChecker, CharacterModel source, Vector2 originOverride) {
+	public WorldEffect(WorldEffectSettings settings, EffectController retriever, CollisionChecker collisionChecker, CharacterModel source) {
 		super(settings);
 		this.actionListener = retriever.getActionListener();
 		this.collisionChecker = collisionChecker;

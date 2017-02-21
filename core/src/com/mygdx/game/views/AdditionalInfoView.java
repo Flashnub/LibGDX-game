@@ -37,7 +37,7 @@ public class AdditionalInfoView extends Actor {
 //		batch.draw(background, this.getX(), this.getY(), this.getWidth(), this.getHeight());
 	}
 
-	public void onSwitchItem(Item item) {
-		itemView.setItemInfo(item);
+	public void onSwitchItem(Item item, int numberOfItems) {
+		itemView.setItemInfo(item, numberOfItems);
 	}
 }

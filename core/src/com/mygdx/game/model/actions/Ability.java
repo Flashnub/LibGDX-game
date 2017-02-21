@@ -4,7 +4,8 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.EntityEffect;
 import com.mygdx.game.model.effects.EffectSettings;
-import com.mygdx.game.model.effects.MovementEffectSettings;
+import com.mygdx.game.model.effects.XMovementEffectSettings;
+import com.mygdx.game.model.effects.YMovementEffectSettings;
 import com.mygdx.game.model.effects.EffectInitializer;
 import com.mygdx.game.model.events.ActionListener;
 
@@ -20,14 +21,20 @@ public class Ability extends ActionSegment{
 		this.source = source;
 		this.activeSourceEffects = new Array <EntityEffect>();
 		this.windupSourceEffects = new Array <EntityEffect>();
+		this.setDurations(source);
 	}
 	
-	public Ability(CharacterModel source, AbilitySettings settings, ActionListener listener, MovementEffectSettings replacementMovement) {
+	public Ability(CharacterModel source, AbilitySettings settings, ActionListener listener, XMovementEffectSettings xReplacementMovement, YMovementEffectSettings yReplacementMovement) {
 		this(source, settings, listener);
-		if (replacementMovement != null) {
-			this.settings.replaceMovementIfNecessary(replacementMovement);
-			replacementMovement.setStartWithStagger(true);
+		if (xReplacementMovement != null) {
+			this.settings.replaceXMovementIfNecessary(xReplacementMovement);
+			xReplacementMovement.setStartWithStagger(true);
 		}
+		if (yReplacementMovement != null) {
+			this.settings.replaceYMovementIfNecessary(yReplacementMovement);
+			yReplacementMovement.setStartWithStagger(true);
+		}
+		
 
 	}
 	
@@ -43,8 +50,9 @@ public class Ability extends ActionSegment{
 		source.setHeightCoefficient(source.getCharacterProperties().getHeightCoefficient());
 		source.setxOffsetModifier(0f);
 		source.setyOffsetModifier(0f);
-		if (!this.shouldRespectEntityCollisions())
-			source.setRespectEntityCollision(true);
+//		if (!this.shouldRespectEntityCollisions())
+//			source.setRespectEntityCollision(true);
+		source.unlockEntityCollisionBehavior();
 	}
 
 	
@@ -61,8 +69,10 @@ public class Ability extends ActionSegment{
 		if (this.settings.yOffsetModifier != null) {
 			source.setyOffsetModifier(this.settings.yOffsetModifier.floatValue());
 		}
-		if (!this.shouldRespectEntityCollisions())
-			source.setRespectEntityCollision(false);
+		if (!this.shouldRespectEntityCollisions()) {
+			source.setRespectingEntityCollision(false);
+			source.lockEntityCollisionBehavior();
+		}
 		
 		for (EffectSettings effectSettings : settings.sourceEffectSettings) {
 			EntityEffect effect = EffectInitializer.initializeEntityEffect(effectSettings, this);
@@ -81,12 +91,12 @@ public class Ability extends ActionSegment{
 
 	@Override
 	public float getWindUpTime() {
-		return this.forceActiveState ? this.windupTime : this.settings.windupTime;
+		return this.forceActiveState ? this.processedWindupTime : this.windupTime;
 	}
 	
 	@Override 
 	public float getWindUpPlusActionTime() {
-		return getWindUpTime() + (this.forceCooldownState ? this.activeTime : this.settings.duration);
+		return getWindUpTime() + (this.forceCooldownState ? this.processedActiveTime : this.activeTime);
 	}
 	
 	@Override
@@ -94,7 +104,7 @@ public class Ability extends ActionSegment{
 //		if (this.forceCooldownState) {
 //			return getWindUpTime() + this.activeTime + this.settings.cooldownTime;
 //		}
-		return getWindUpPlusActionTime() + this.settings.cooldownTime;
+		return getWindUpPlusActionTime() + this.cooldownTime;
 	}
 
 	@Override
@@ -121,9 +131,15 @@ public class Ability extends ActionSegment{
 	}
 
 	@Override
-	public MovementEffectSettings getReplacementMovementForStagger() {
+	public XMovementEffectSettings getXReplacementMovementForStagger() {
 		return null;
 	}
+	
+	@Override
+	public YMovementEffectSettings getYReplacementMovementForStagger() {
+		return null;
+	}
+
 
 	@Override
 	public ActionListener getActionListener() {
@@ -143,6 +159,13 @@ public class Ability extends ActionSegment{
 	@Override
 	public boolean doesNeedDisruptionDuringActive() {
 		return this.settings.activeTillDisruption;
+	}
+
+	@Override
+	public void setDurations(CharacterModel source) {
+		this.windupTime = source.getUiModel().getTimeForAnimation(this.settings.name, "Windup");
+		this.activeTime = source.getUiModel().getTimeForAnimation(this.settings.name, "Active");
+		this.cooldownTime = source.getUiModel().getTimeForAnimation(this.settings.name, "Cooldown");
 	}
 
 

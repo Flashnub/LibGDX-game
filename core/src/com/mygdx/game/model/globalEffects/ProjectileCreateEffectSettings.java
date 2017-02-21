@@ -39,5 +39,12 @@ public class ProjectileCreateEffectSettings extends WorldEffectSettings{
 		copy.origin = this.origin;	
 		return copy;
 	}
+	
+	public Vector2 getOrigin(boolean left) {
+		if (left) {
+			return new Vector2(-this.origin.x, this.origin.y);
+		}
+		return this.origin;
+	}
 
 }

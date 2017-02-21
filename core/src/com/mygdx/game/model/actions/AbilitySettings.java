@@ -7,15 +7,16 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Json.Serializable;
 import com.badlogic.gdx.utils.JsonValue;
 import com.mygdx.game.model.effects.EffectSettings;
-import com.mygdx.game.model.effects.MovementEffectSettings;
+import com.mygdx.game.model.effects.XMovementEffectSettings;
+import com.mygdx.game.model.effects.YMovementEffectSettings;
 
 public class AbilitySettings implements Serializable {
 	Array <EffectSettings> sourceEffectSettings;
 	Array <EffectSettings> windupEffectSettings;
 	
-	Float windupTime;
-	Float cooldownTime;
-	protected Float duration;
+//	Float windupTime;
+//	Float cooldownTime;
+//	protected Float duration;
 	boolean activeTillDisruption;
 	boolean windupTillDisruption;
 	boolean sourceRespectEntityCollisions; //if this is false, the action ignores all entity collisions.
@@ -23,16 +24,17 @@ public class AbilitySettings implements Serializable {
 	Float tempHeightModifier;
 	Float xOffsetModifier;
 	Float yOffsetModifier;
+	String name;
 
 	@Override
 	public void write(Json json) {
 		json.writeValue("sourceEffectSettings", sourceEffectSettings);
 		json.writeValue("windupEffectSettings", windupEffectSettings);
-		json.writeValue("windupTime", windupTime);
-		json.writeValue("cooldownTime", cooldownTime);
-		json.writeValue("duration", duration);		
+//		json.writeValue("windupTime", windupTime);
+//		json.writeValue("cooldownTime", cooldownTime);
+//		json.writeValue("duration", duration);		
 		json.writeValue("sourceRespectEntityCollisions", sourceRespectEntityCollisions);
-		
+		json.writeValue("name", name);
 	}
 	
 	@Override
@@ -41,6 +43,7 @@ public class AbilitySettings implements Serializable {
 		tempWidthModifier = json.readValue("tempWidthModifier", Float.class, jsonData);
 		tempHeightModifier = json.readValue("tempHeightModifier", Float.class, jsonData);
 		Float xOffsetModifier = json.readValue("xOffsetModifier", Float.class, jsonData);
+		name = json.readValue("name", String.class, jsonData);
 		if (xOffsetModifier != null) {
 			this.xOffsetModifier = xOffsetModifier;
 		}
@@ -57,38 +60,40 @@ public class AbilitySettings implements Serializable {
 		}
 		
 		Boolean activeTillDisruption = json.readValue("activeTillDisruption", Boolean.class, jsonData);
-		Float duration = json.readValue("duration", Float.class, jsonData);
-		if (activeTillDisruption != null && activeTillDisruption.booleanValue()) {
-			this.duration = Float.MAX_VALUE;
-			this.activeTillDisruption = activeTillDisruption.booleanValue();
-		}
-		else if (duration != null) {
-			this.duration = duration;
-			this.activeTillDisruption = false;
-		}
-		else {
-			this.duration = 0.5f;
-			this.activeTillDisruption = false;
-		}
+		this.activeTillDisruption = activeTillDisruption != null ? activeTillDisruption.booleanValue() : false;
+//		Float duration = json.readValue("duration", Float.class, jsonData);
+//		if (activeTillDisruption != null && activeTillDisruption.booleanValue()) {
+//			this.duration = Float.MAX_VALUE;
+//			this.activeTillDisruption = activeTillDisruption.booleanValue();
+//		}
+//		else if (duration != null) {
+//			this.duration = duration;
+//			this.activeTillDisruption = false;
+//		}
+//		else {
+//			this.duration = 0.5f;
+//			this.activeTillDisruption = false;
+//		}
 		Boolean windupTillDuration = json.readValue("windupTillDuration", Boolean.class, jsonData);
-		Float windupTime = json.readValue("windUpTime", Float.class, jsonData);
-		if (windupTillDuration != null && windupTillDuration.booleanValue()) {
-			this.windupTime = Float.MAX_VALUE;
-			this.windupTillDisruption = windupTillDuration.booleanValue();
-		}
-		else if (windupTime != null) {
-			this.windupTime = windupTime;
-		}
-		else {
-			this.windupTime = 0f;
-		}
-		Float cooldownTime = json.readValue("cooldownTime", Float.class, jsonData);
-		if (cooldownTime != null) {
-			this.cooldownTime = cooldownTime;
-		}
-		else {
-			this.cooldownTime = 0f;
-		}
+		this.windupTillDisruption = windupTillDuration != null ? windupTillDuration.booleanValue() : false;
+//		Float windupTime = json.readValue("windUpTime", Float.class, jsonData);
+//		if (windupTillDuration != null && windupTillDuration.booleanValue()) {
+//			this.windupTime = Float.MAX_VALUE;
+//			this.windupTillDisruption = windupTillDuration.booleanValue();
+//		}
+//		else if (windupTime != null) {
+//			this.windupTime = windupTime;
+//		}
+//		else {
+//			this.windupTime = 0f;
+//		}
+//		Float cooldownTime = json.readValue("cooldownTime", Float.class, jsonData);
+//		if (cooldownTime != null) {
+//			this.cooldownTime = cooldownTime;
+//		}
+//		else {
+//			this.cooldownTime = 0f;
+//		}
 		sourceEffectSettings = json.readValue("sourceEffectSettings", Array.class, jsonData);
 		if (sourceEffectSettings == null) {
 			sourceEffectSettings = new Array <EffectSettings> ();
@@ -109,53 +114,55 @@ public class AbilitySettings implements Serializable {
 		
 	}
 
-	public Float getDuration() {
-		return duration;
-	}
-
-	public Float getWindUpTime() {
-		return windupTime;
-	}
-
-	public Float getCooldownTime() {
-		return cooldownTime;
-	}
-
-	public Float getWindUpPlusDuration() {
-		return this.windupTime + this.duration;
-	}
-	
-	public Float getTotalTime() {
-		return this.windupTime + this.duration + this.cooldownTime;
-	}
-	
 	public boolean activeTillDisruption() {
 		return activeTillDisruption;
 	}
+	
+	public boolean windupTillDisruption() {
+		return this.windupTillDisruption;
+	}
 		
-	public void replaceMovementIfNecessary(MovementEffectSettings movementSettings) {
-		if (movementSettings != null) {
+	public void replaceXMovementIfNecessary(XMovementEffectSettings xMovementSettings) {
+		if (xMovementSettings != null) {
 			Iterator <EffectSettings> iterator = this.sourceEffectSettings.iterator();
 			boolean hasMovement = false;
 			while (iterator.hasNext()) {
 				EffectSettings settings = iterator.next();
-				if (settings instanceof MovementEffectSettings) {
+				if (settings instanceof XMovementEffectSettings) {
 					iterator.remove();
 					hasMovement = true;
 					break;
 				}
 			}
 			if (hasMovement) {
-				this.sourceEffectSettings.add(movementSettings);
+				this.sourceEffectSettings.add(xMovementSettings);
+			}
+		}
+	}
+	
+	public void replaceYMovementIfNecessary(YMovementEffectSettings yMovementSettings) {
+		if (yMovementSettings != null) {
+			Iterator <EffectSettings> iterator = this.sourceEffectSettings.iterator();
+			boolean hasMovement = false;
+			while (iterator.hasNext()) {
+				EffectSettings settings = iterator.next();
+				if (settings instanceof YMovementEffectSettings) {
+					iterator.remove();
+					hasMovement = true;
+					break;
+				}
+			}
+			if (hasMovement) {
+				this.sourceEffectSettings.add(yMovementSettings);
 			}
 		}
 	}
 	
 	public void setFieldsWithAbilitySettings(AbilitySettings settings)
 	{
-		this.duration = settings.duration;
-		this.cooldownTime = settings.cooldownTime;
-		this.windupTime = settings.windupTime;
+//		this.duration = settings.duration;
+//		this.cooldownTime = settings.cooldownTime;
+//		this.windupTime = settings.windupTime;
 		if (settings.sourceEffectSettings != null) {
 			Array <EffectSettings> effectSettingsCopy = new Array <EffectSettings> ();
 			for (EffectSettings eSettings : settings.sourceEffectSettings) {
@@ -179,15 +186,17 @@ public class AbilitySettings implements Serializable {
 		this.tempWidthModifier = settings.tempWidthModifier;
 		this.xOffsetModifier = settings.xOffsetModifier;
 		this.yOffsetModifier = settings.yOffsetModifier;
+		this.name = settings.name;
 	}
 	
 	public AbilitySettings deepCopy() {
 		AbilitySettings copy = new AbilitySettings();
-		copy.windupTime = this.windupTime;
-		copy.cooldownTime = this.cooldownTime;
+		copy.name = this.name;
+//		copy.windupTime = this.windupTime;
+//		copy.cooldownTime = this.cooldownTime;
 		copy.activeTillDisruption = this.activeTillDisruption;
 		copy.windupTillDisruption = this.windupTillDisruption;
-		copy.duration = this.duration;
+//		copy.duration = this.duration;
 		copy.tempHeightModifier = this.tempHeightModifier;
 		copy.tempWidthModifier = this.tempWidthModifier;
 		copy.xOffsetModifier = this.xOffsetModifier;
@@ -218,5 +227,8 @@ public class AbilitySettings implements Serializable {
 	public Float getTempHeightGameplayHitBoxModifier() {
 		return tempHeightModifier;
 	}
-	
+
+	public void setName(String name) {
+		this.name = name;
+	}
 }

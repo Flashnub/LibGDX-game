@@ -27,9 +27,9 @@ public class ItemView {
 		itemName = new Label("", labelStyle);
 	}
 	
-	public void setItemInfo(Item item) {
+	public void setItemInfo(Item item, int numberOfItems) {
 		itemIcon = item.getUiModel().getItemIcon();
-		itemName.setText(item.getName());
+		itemName.setText(item.getName() + " (" + numberOfItems + ")");
 	}
 	
 	public void draw(Batch batch, float xOrigin, float yOrigin) {

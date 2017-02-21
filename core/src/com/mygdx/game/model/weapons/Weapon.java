@@ -33,7 +33,7 @@ public class Weapon {
 	
 	public ActionSequence getSpecificWeaponAction(Queue <String> inputs, CharacterModel source) {
 		ActionSequence nextAction = null;
-		boolean isInAir = source.isJumping();
+		boolean isInAir = source.isInAir();
 		if (wProperties != null) {
 			for (ActionSequence weaponAction : wProperties.getWeaponActions()) {
 				if (weaponAction.doInputsMatch(inputs, source, false) &&

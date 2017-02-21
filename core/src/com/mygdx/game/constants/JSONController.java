@@ -1,6 +1,7 @@
 package com.mygdx.game.constants;
 
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -37,6 +38,9 @@ public class JSONController {
     private static HashMap<String, AttackSettings> loadAttacksFromJSON() {
         Json json = new Json();
 	    HashMap <String, AttackSettings> tempAttacks = json.fromJson(HashMap.class, Gdx.files.internal(globalFilePath + "attacks.json"));
+	    for (Entry<String, AttackSettings> entry : tempAttacks.entrySet()) {
+	    	entry.getValue().setName(entry.getKey());
+	    }
 	    return tempAttacks;
     }
 	
@@ -44,6 +48,9 @@ public class JSONController {
     private static HashMap<String, AbilitySettings> loadAbilitiesFromJSON() {
         Json json = new Json();
 	    HashMap <String, AbilitySettings> settings = json.fromJson(HashMap.class, Gdx.files.internal(globalFilePath + "abilities.json"));
+	    for (Entry<String, AbilitySettings> entry : settings.entrySet()) {
+	    	entry.getValue().setName(entry.getKey());
+	    }
 	    return settings;
     }
 	

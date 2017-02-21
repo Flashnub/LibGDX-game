@@ -31,7 +31,7 @@ public class BasicEnemyAI extends EnemyAI {
 	@Override
 	public void setNextActionSequences(Array<ActionSequence> possibleActionSequences) {
 		// TODO Auto-generated method stub
-		if (!this.source.isActionLock() && !isDocile()) {
+		if (!this.source.isActionLock() && !isDocile() && !this.source.isAlreadyDead()) {
 			ActionSequence nextSeq = null;
 			float maxProbability = 0f;
 			for (ActionSequence sequence : possibleActionSequences) {

@@ -269,7 +269,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 		}
 	    
 	    public void dash(boolean left) {
-	    	if (!jumping) {
+	    	if (!isInAir) {
 	    		ActionSequence dashAction = this.getCharacterProperties().getActions().get("PlayerDash").cloneSequenceWithSourceAndTarget(this, null, this.getActionListener(), this.getCollisionChecker());
 	    		this.addActionSequence(dashAction);
 	    	}
@@ -400,7 +400,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 		public boolean handleButtonDown(Controller controller, int buttonCode) {
 			String inputType = this.inputConverter.convertButtonCodeToInputType(buttonCode, currentlyHeldDirection);
 			if (!inputType.equals("")) {
-				System.out.println(inputType);
+//				System.out.println(inputType);
 				this.inputs.addFirst(inputType);
 				if (this.queueUpActionFromInputs())
 				{
@@ -457,10 +457,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 				String inputType = this.inputConverter.convertAxisTriggerToInputType(axisCode, value, currentlyHeldDirection);
 				if (inputType != null) {
 					this.inputs.addFirst(inputType);
-					if (this.queueUpActionFromInputs())
-					{
-						return true;
-					}
+					this.queueUpActionFromInputs();
 					switch (inputType) {
 					case InputType.MOVEMENT:
 					case InputType.LEFTMOVEMENT:
@@ -468,9 +465,11 @@ public class Player extends Character implements InputProcessor, ControllerListe
 					case InputType.DOWNMOVEMENT:
 					case InputType.RIGHTMOVEMENT:
 						this.movementConditionActivated = true;
+//						System.out.println("Movement pressed: " + this.movementConditionActivated);
 						break;
 					case InputType.MOVEMENTRELEASE:
 						this.movementConditionActivated = false;
+//						System.out.println("Movement pressed: " + this.movementConditionActivated);
 						break;
 					}
 				}
@@ -551,22 +550,30 @@ public class Player extends Character implements InputProcessor, ControllerListe
 				}
 				return alreadyCollided;
 			}
-			else {
+			else if (this.isRespectingEntityCollision()){
 				EntityModel collidedEntity = this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds);
-				boolean entityCollision = this.respectEntityCollision() && collidedEntity != null;
+				boolean entityCollision = collidedEntity != null;
 				if (entityCollision) {
 					this.stopHorizontalMovement(false);
 				}
-				if (!this.hasProcessedOverlapCorrection()) {
-					this.stopEntityOverlapIfNeeded(collidedEntity, tempGameplayBounds, tempImageBounds);
-				}
+//				if (!this.hasProcessedOverlapCorrection()) {
+//					this.stopEntityOverlapIfNeeded(collidedEntity, tempGameplayBounds, tempImageBounds);
+//				}
 				return entityCollision;
 			}
+			
+			return false;
 		}
 		
 		@Override
 		public boolean handleAdditionalYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
-			return this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds) != null;
+			if (alreadyCollided) {
+				return alreadyCollided;
+			}
+			else if (this.isRespectingEntityCollision()){ 
+				return this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds) != null;
+			}
+			return false;
 		}
 
 		public void setDialogueController(DialogueController dialogueController) {
@@ -598,7 +605,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 
 		@Override
 		public void tensionOverload() {
-			ActionSequence staggerAction = ActionSequence.createStaggerSequence(this, null, this.getActionListener(), StaggerType.Tension);
+			ActionSequence staggerAction = ActionSequence.createStaggerSequence(this, null, null, this.getActionListener(), StaggerType.Tension);
     		this.addActionSequence(staggerAction);
     		this.setCurrentTension(0);
 		}
@@ -610,6 +617,16 @@ public class Player extends Character implements InputProcessor, ControllerListe
 
 		public Item getSelectedItemType() {
 			return selectedItemType;
+		}
+		
+		public int getNumberOfItemsForSelected() {
+			int numberOfItems = 0;
+			for (Item item : this.getPlayerProperties().inventory) {
+				if (this.selectedItemType.equals(item)) {
+					numberOfItems += 1;
+				}
+			}
+			return numberOfItems;
 		}
 
 		public DirectionalInput getCurrentlyHeldDirection() {

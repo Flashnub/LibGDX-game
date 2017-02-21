@@ -2,6 +2,7 @@ package com.mygdx.game.model.projectiles;
 
 import java.util.UUID;
 
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -10,8 +11,10 @@ import com.mygdx.game.model.effects.EntityEffect;
 import com.mygdx.game.model.effects.EffectController;
 import com.mygdx.game.model.effects.EffectInitializer;
 import com.mygdx.game.model.effects.EffectSettings;
-import com.mygdx.game.model.effects.MovementEffectSettings;
+import com.mygdx.game.model.effects.XMovementEffectSettings;
+import com.mygdx.game.model.effects.YMovementEffectSettings;
 import com.mygdx.game.constants.JSONController;
+import com.mygdx.game.model.characters.CollisionCheck;
 import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.characters.EntityUIDataType;
 import com.mygdx.game.model.characters.EntityUIModel;
@@ -30,7 +33,7 @@ public class Explosion extends EntityModel implements EffectController {
 	CharacterModel source;
 	 
 	
-	public Explosion(String name, ActionListener actionListener, Vector2 originOffset, CharacterModel source, Vector2 originOverride) {
+	public Explosion(String name, ActionListener actionListener, CharacterModel source) {
 		super();
 		this.settings = JSONController.explosions.get(name).deepCopy();
 		this.actionListener = actionListener;
@@ -38,6 +41,23 @@ public class Explosion extends EntityModel implements EffectController {
 		this.explosionUIModel = new EntityUIModel(name, EntityUIDataType.EXPLOSION);
 		this.widthCoefficient = this.settings.getWidthCoefficient();
 		this.heightCoefficient = this.settings.getHeightCoefficient();
+
+
+		UUID id = UUID.randomUUID();
+		this.uuid = id.toString();
+		this.allegiance = source.getAllegiance();
+		this.source = source;
+		this.state = EntityModel.windupState;
+		
+		this.setShouldRespectEntityCollision(false);
+		this.setShouldRespectObjectCollision(false);
+		this.setShouldRespectTileCollision(false);
+		this.setRespectingEntityCollision(false);
+		this.setRespectingObjectCollision(false);
+		this.setRespectingTileCollision(false);
+	}
+	
+	public void setStartingPosition(Vector2 originOverride, Vector2 originOffset) {
 		if (originOverride != null && originOffset != null) {
 			this.imageHitBox.x = originOverride.x + originOffset.x;
 			this.imageHitBox.y = originOverride.y + originOffset.y;
@@ -50,22 +70,19 @@ public class Explosion extends EntityModel implements EffectController {
 			this.imageHitBox.x = source.getImageHitBox().x + (source.getImageHitBox().width / 2f);
 			this.imageHitBox.y = source.getImageHitBox().y + (source.getImageHitBox().height / 2f);
 		}
-
-		UUID id = UUID.randomUUID();
-		this.uuid = id.toString();
-		this.allegiance = source.getAllegiance();
-		this.source = source;
-		this.state = EntityModel.windupState;
+		
+		this.gameplayHitBox.setX(this.getxOffsetModifier() + this.imageHitBox.getX() + this.imageHitBox.getWidth() * ((1f - this.widthCoefficient) / 2));
+		this.gameplayHitBox.setY(this.getyOffsetModifier() + this.imageHitBox.getY() + this.imageHitBox.getHeight() * ((1f - this.heightCoefficient) / 2));
 	}
 	
-	public void update(float delta) {
+	public void update(float delta, TiledMapTileLayer collisionLayer) {
 		currentTime += delta;
 		this.changeStateCheck();
 		float oldWidth = 0f;
 		oldWidth = this.imageHitBox.width;
 		explosionUIModel.setCurrentFrame(this, delta);
-		this.handleOverlapCooldown(delta);
-		this.moveWithoutCollisionDetection(delta);
+		this.handleCollisionRespectChecks();
+		this.movementWithCollisionDetection(delta, collisionLayer); //should use movementWithCollision anyway?
 		this.setGameplaySize(delta);
 		this.expansionCheck(oldWidth);
 		this.actionListener.processExplosion(this);
@@ -127,6 +144,18 @@ public class Explosion extends EntityModel implements EffectController {
 		}
 	}
 	
+	protected void movementWithCollisionDetection(float delta, TiledMapTileLayer collisionLayer) {
+		//logic for collision detection
+		CollisionCheck collisionX = this.checkForXCollision(delta, collisionLayer, this.velocity.x, this.acceleration.x, true);
+		if (collisionX.doesCollide()) {
+
+		}
+		CollisionCheck collisionY = this.checkForYCollision(delta, collisionLayer, this.velocity.y, true, !this.state.equals(EntityModel.cooldownState));
+		if (collisionY.doesCollide()) {
+
+		}
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof Explosion) {
@@ -144,11 +173,22 @@ public class Explosion extends EntityModel implements EffectController {
 	}
 
 	@Override
-	public MovementEffectSettings getReplacementMovementForStagger() {
-		MovementEffectSettings mSettings = null;
+	public XMovementEffectSettings getXReplacementMovementForStagger() {
+		XMovementEffectSettings mSettings = null;
 		for (EffectSettings settings : this.settings.targetEffects) {
-			if (settings instanceof MovementEffectSettings) {
-				mSettings = (MovementEffectSettings) settings;
+			if (settings instanceof XMovementEffectSettings) {
+				mSettings = (XMovementEffectSettings) settings;
+			}
+		}
+		return mSettings;
+	}
+	
+	@Override
+	public YMovementEffectSettings getYReplacementMovementForStagger() {
+		YMovementEffectSettings mSettings = null;
+		for (EffectSettings settings : this.settings.targetEffects) {
+			if (settings instanceof YMovementEffectSettings) {
+				mSettings = (YMovementEffectSettings) settings;
 			}
 		}
 		return mSettings;

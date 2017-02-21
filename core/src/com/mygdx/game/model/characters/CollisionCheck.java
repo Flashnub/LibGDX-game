@@ -9,11 +9,13 @@ public class CollisionCheck {
 	boolean doesCollide;
 	CollisionType collisionType;
 	float timeUntilCollision;
+	float pointOfReturn;
 	
-	public CollisionCheck(boolean doesCollide, float timeUntilCollision, CollisionType collisionType) {
+	public CollisionCheck(boolean doesCollide, float timeUntilCollision, CollisionType collisionType, float pointOfReturn) {
 		this.doesCollide = doesCollide;
 		this.timeUntilCollision = timeUntilCollision;
 		this.collisionType = collisionType;
+		this.pointOfReturn = pointOfReturn;
 	}
 
 	public boolean doesCollide() {
@@ -27,6 +29,8 @@ public class CollisionCheck {
 	public CollisionType getCollisionType() {
 		return collisionType;
 	}
-	
-	
+
+	public float getPointOfReturn() {
+		return pointOfReturn;
+	}
 }

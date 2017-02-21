@@ -151,8 +151,16 @@ public class ResourceBar extends Actor{
 			public Float fixedWidth() {
 				return 30f;
 			}
+			
+			public boolean shouldUseHelper() {
+				return true;
+			}
 
 		};
+		
+		public boolean shouldUseHelper() {
+			return false;
+		}
 		
 		public String getAffiliation() {
 			return this.toString();
@@ -239,8 +247,17 @@ public class ResourceBar extends Actor{
 	}
 	
 	public void layoutWithViewPort(Viewport viewPort, Batch batch) {
-		this.setX(viewPort.getScreenWidth() * type.originCoefficients().x + type.originOffset().x);
-		this.setY(viewPort.getScreenHeight() * type.originCoefficients().y + type.originOffset().y);
+		if (this.type.shouldUseHelper()) {
+			Vector2 screenOffset = helper.getScreenCoordinatesForCharacter(owner);
+			this.setX(screenOffset.x);
+			this.setY(screenOffset.y);
+		}
+		else 
+		{
+			this.setX(viewPort.getScreenWidth() * type.originCoefficients().x + type.originOffset().x);
+			this.setY(viewPort.getScreenHeight() * type.originCoefficients().y + type.originOffset().y);
+		}
+
 		
 		//Width.
 		if (type.fixedWidth() != null && type.proportionalWidth() != null) {

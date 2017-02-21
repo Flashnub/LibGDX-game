@@ -37,6 +37,12 @@ public class CharacterProperties implements Serializable {
 	Array <ActionSequence> sequencesSortedByInputSize;
 	boolean useDefaultStagger;
 	boolean useDefaultTensionStagger;
+	boolean shouldRespectEntityCollisions;
+	boolean shouldRespectTileCollisions;
+	boolean shouldRespectObjectCollisions;
+	
+	Float xOffsetModifier;
+	Float yOffsetModifier;
 	
 	public CharacterProperties() {
 		
@@ -58,6 +64,9 @@ public class CharacterProperties implements Serializable {
 		json.writeValue("widthCoefficient", widthCoefficient);
 		json.writeValue("heightCoefficient", heightCoefficient);
 		json.writeValue("weaponKeys", weaponKeys);
+		json.writeValue("shouldRespectEntityCollisions", shouldRespectEntityCollisions);
+		json.writeValue("shouldRespectTileCollisions", shouldRespectTileCollisions);
+		json.writeValue("shouldRespectObjectCollisions", shouldRespectObjectCollisions);
 
 	}
 
@@ -78,6 +87,29 @@ public class CharacterProperties implements Serializable {
 			this.weaponKeys = weaponKeys;
 		}
 
+		Boolean shouldRespectEntityCollisions = json.readValue("shouldRespectEntityCollisions", Boolean.class, jsonData);
+		if (shouldRespectEntityCollisions != null) {
+			this.shouldRespectEntityCollisions = shouldRespectEntityCollisions;
+		}
+		else {
+			this.shouldRespectEntityCollisions = true;
+		}
+		
+		Boolean shouldRespectObjectCollisions = json.readValue("shouldRespectObjectCollisions", Boolean.class, jsonData);
+		if (shouldRespectObjectCollisions != null) {
+			this.shouldRespectObjectCollisions = shouldRespectObjectCollisions;
+		}
+		else {
+			this.shouldRespectObjectCollisions = true;
+		}
+		
+		Boolean shouldRespectTileCollisions = json.readValue("shouldRespectTileCollisions", Boolean.class, jsonData);
+		if (shouldRespectTileCollisions != null) {
+			this.shouldRespectTileCollisions = shouldRespectTileCollisions;
+		}
+		else {
+			this.shouldRespectTileCollisions = true;
+		}
 		
 		Float horizontalSpeed = json.readValue("horizontalSpeed", Float.class, jsonData);
 		if (horizontalSpeed != null) {
@@ -108,7 +140,7 @@ public class CharacterProperties implements Serializable {
 			this.jumpSpeed = jumpSpeed;
 		}
 		else {
-			this.jumpSpeed = 700f;
+			this.jumpSpeed = 1150f;
 		}
 		
 		Float gravity = json.readValue("gravity", Float.class, jsonData);
@@ -116,7 +148,7 @@ public class CharacterProperties implements Serializable {
 			this.gravity = gravity;
 		}
 		else {
-			this.gravity = 980f;
+			this.gravity = 2500f;
 		}
 		
 		Float injuryImmunityTime = json.readValue("injuryImmunityTime", Float.class, jsonData);
@@ -172,6 +204,22 @@ public class CharacterProperties implements Serializable {
 			this.useDefaultTensionStagger = true;
 		}
 		
+		Float xOffsetModifier = json.readValue("xOffsetModifier", Float.class, jsonData);
+		if (xOffsetModifier != null) {
+			this.xOffsetModifier = xOffsetModifier; 
+		}
+		else {
+			this.xOffsetModifier = 0f;
+		}
+		
+		Float yOffsetModifier = json.readValue("yOffsetModifier", Float.class, jsonData);
+		if (yOffsetModifier != null) {
+			this.yOffsetModifier = yOffsetModifier; 
+		}
+		else {
+			this.yOffsetModifier = 0f;
+		}
+		
 		this.sequencesSortedByInputSize = new Array <ActionSequence> ();
 		for (ActionSequence sequence : this.actions.values()) {
 			ActionSequence.addSequenceToSortedArray(sequencesSortedByInputSize, sequence);
@@ -198,6 +246,11 @@ public class CharacterProperties implements Serializable {
 		properties.useDefaultStagger = this.useDefaultStagger;
 		properties.useDefaultTensionStagger = this.useDefaultTensionStagger;
 		properties.sprintSpeed = this.sprintSpeed;
+		properties.shouldRespectEntityCollisions = this.shouldRespectEntityCollisions;
+		properties.shouldRespectObjectCollisions = this.shouldRespectObjectCollisions;
+		properties.shouldRespectTileCollisions = this.shouldRespectTileCollisions;
+		properties.xOffsetModifier = this.xOffsetModifier;
+		properties.yOffsetModifier = this.yOffsetModifier;
 		//iterate through actions.
 		HashMap <String, ActionSequence> clonedActions = new HashMap<String, ActionSequence> ();
 		for (Map.Entry<String, ActionSequence> entry : actions.entrySet()) {
@@ -226,7 +279,7 @@ public class CharacterProperties implements Serializable {
 	
 	public ActionSequence getSequenceGivenInputs(Queue<String> inputs, CharacterModel source) {
 		ActionSequence result = null;
-		boolean isInAir = source.jumping;
+		boolean isInAir = source.isInAir;
 		for (ActionSequence sequence : this.sequencesSortedByInputSize) {
 			if (sequence.doInputsMatch(inputs, source, false) && 
 					(sequence.getUseType().equals(UseType.Either)
@@ -322,6 +375,18 @@ public class CharacterProperties implements Serializable {
 
 	public boolean useDefaultStagger() {
 		return useDefaultStagger;
+	}
+
+	public boolean shouldRespectEntityCollisions() {
+		return shouldRespectEntityCollisions;
+	}
+
+	public boolean shouldRespectTileCollisions() {
+		return shouldRespectTileCollisions;
+	}
+
+	public boolean shouldRespectObjectCollisions() {
+		return shouldRespectObjectCollisions;
 	}
 	
 	

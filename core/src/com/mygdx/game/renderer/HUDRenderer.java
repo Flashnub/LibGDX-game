@@ -11,6 +11,7 @@ import com.mygdx.game.model.characters.player.Player.PlayerModel;
 import com.mygdx.game.model.world.WorldListener;
 import com.mygdx.game.model.world.WorldModel;
 import com.mygdx.game.model.worldObjects.Item;
+import com.mygdx.game.model.worldObjects.WorldItem;
 import com.mygdx.game.model.worldObjects.WorldObject;
 import com.mygdx.game.views.AdditionalInfoView;
 import com.mygdx.game.views.ButtonPromptOverlay;
@@ -48,7 +49,7 @@ public class HUDRenderer implements WorldListener{
 		
 		//Needs to update itemview for first time setup
 		PlayerModel player = (PlayerModel) worldModel.getPlayer().getCharacterData();
-		this.handleSwitchedItem(player.getSelectedItemType());
+		this.handleSwitchedItem(player.getSelectedItemType(), player.getNumberOfItemsForSelected());
 	}
 	
     public void render (float delta) {
@@ -82,8 +83,19 @@ public class HUDRenderer implements WorldListener{
 	}
 	
 	@Override
-	public void handleSwitchedItem(Item item) {
-		infoView.onSwitchItem(item);
+	public void handleSwitchedItem(Item item, int numberOfItems) {
+		infoView.onSwitchItem(item, numberOfItems);
+	}
+	
+	@Override
+	public void handlePlayerInteractionWithObject(WorldObject object) {
+		if (object instanceof WorldItem) {
+			WorldItem wItem = (WorldItem) object;
+			PlayerModel playerModel = (PlayerModel) worldModel.getPlayer().getCharacterData();
+			if (wItem.getItem().equals(playerModel.getSelectedItemType())) {
+				infoView.onSwitchItem(playerModel.getSelectedItemType(), playerModel.getNumberOfItemsForSelected());
+			}
+		}
 	}
 
 	@Override
@@ -94,12 +106,6 @@ public class HUDRenderer implements WorldListener{
 
 	@Override
 	public void updateWithNearbyObjects(Array<WorldObject> objects) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void handlePlayerInteractionWithObject(WorldObject object) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -15,6 +15,9 @@ public class ExplosionSettings extends AbilitySettings implements Serializable{
 	float widthCoefficient;
 	float heightCoefficient;
 	float hitRate;
+	Float windupTime;
+	Float cooldownTime;
+	protected Float duration;
 	
 	public ExplosionSettings deepCopy() {
 		ExplosionSettings copy = new ExplosionSettings();
@@ -28,6 +31,9 @@ public class ExplosionSettings extends AbilitySettings implements Serializable{
 		}
 		copy.targetEffects = effectCopy;
 		copy.origin = this.origin;
+		copy.windupTime = this.windupTime;
+		copy.duration = this.duration;
+		copy.cooldownTime = this.cooldownTime;
 		return copy;
 	}
 	
@@ -68,6 +74,34 @@ public class ExplosionSettings extends AbilitySettings implements Serializable{
 		else {
 			this.heightCoefficient = 1f;
 		}
+		
+		Float duration = json.readValue("duration", Float.class, jsonData);
+		if (this.activeTillDisruption()) {
+			this.duration = Float.MAX_VALUE;
+		}
+		else if (duration != null) {
+			this.duration = duration;
+		}
+		else {
+			this.duration = 0.5f;
+		}
+		Float windupTime = json.readValue("windUpTime", Float.class, jsonData);
+		if (this.windupTillDisruption()) {
+			this.windupTime = Float.MAX_VALUE;
+		}
+		else if (windupTime != null) {
+			this.windupTime = windupTime;
+		}
+		else {
+			this.windupTime = 0f;
+		}
+		Float cooldownTime = json.readValue("cooldownTime", Float.class, jsonData);
+		if (cooldownTime != null) {
+			this.cooldownTime = cooldownTime;
+		}
+		else {
+			this.cooldownTime = 0f;
+		}
 	}
 	
 	public Vector2 getOrigin() {
@@ -88,6 +122,26 @@ public class ExplosionSettings extends AbilitySettings implements Serializable{
 
 	public float getHeightCoefficient() {
 		return heightCoefficient;
+	}
+	
+	public Float getDuration() {
+		return duration;
+	}
+
+	public Float getWindUpTime() {
+		return windupTime;
+	}
+
+	public Float getCooldownTime() {
+		return cooldownTime;
+	}
+
+	public Float getWindUpPlusDuration() {
+		return this.windupTime + this.duration;
+	}
+
+	public Float getTotalTime() {
+		return this.windupTime + this.duration + this.cooldownTime;
 	}
 
 }

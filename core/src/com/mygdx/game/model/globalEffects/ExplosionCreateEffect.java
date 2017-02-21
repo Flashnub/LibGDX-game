@@ -11,24 +11,22 @@ public class ExplosionCreateEffect extends WorldEffect {
 	public static final String type = "ExplosionCreateEffect";
 	ExplosionCreateEffectSettings pSettings;
 	Explosion explosion;
-	
+	Vector2 originOverride;
 	
 	public ExplosionCreateEffect(WorldEffectSettings settings, EffectController retriever, CollisionChecker collisionChecker, CharacterModel source, Vector2 originOverride) {
-		super(settings, retriever, collisionChecker, source, originOverride);
+		super(settings, retriever, collisionChecker, source);
 		if (settings instanceof ExplosionCreateEffectSettings) {
 			this.pSettings = (ExplosionCreateEffectSettings) settings;
 		}
 //		Explosion explosion = new Explosion(this.getSettings().getExplosionName(), this.getSettings().getExplosionSettings(),  this.actionListener, this);
-		this.explosion = new Explosion(this.pSettings.explosionKey, this.actionListener, this.pSettings.origin, source, originOverride);
-		
-
+		this.explosion = new Explosion(this.pSettings.explosionKey, this.actionListener, source);
+		this.originOverride = originOverride;
 	}
-
-
 
 	@Override
 	protected void initialProcess() {
 		super.initialProcess();	
+		this.explosion.setStartingPosition(originOverride, pSettings.origin);
 		this.actionListener.addExplosion(this.explosion);
 	}
 	
@@ -37,13 +35,8 @@ public class ExplosionCreateEffect extends WorldEffect {
 		return ExplosionCreateEffect.type;
 	}
 
-
-
 	@Override
 	public float getEffectiveRange() {
 		return 0;
 	}
-
-
-
 }

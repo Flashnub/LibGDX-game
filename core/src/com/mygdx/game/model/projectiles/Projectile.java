@@ -17,7 +17,8 @@ import com.mygdx.game.model.effects.EntityEffect;
 import com.mygdx.game.model.effects.EffectController;
 import com.mygdx.game.model.effects.EffectInitializer;
 import com.mygdx.game.model.effects.EffectSettings;
-import com.mygdx.game.model.effects.MovementEffectSettings;
+import com.mygdx.game.model.effects.XMovementEffectSettings;
+import com.mygdx.game.model.effects.YMovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.CollisionChecker;
 import com.mygdx.game.model.globalEffects.WorldEffect;
@@ -41,7 +42,7 @@ public class Projectile extends EntityModel implements EffectController{
 	private Array <HitTracker> charactersHit;
 
 	
-	public Projectile(String name, Vector2 originOffset, CharacterModel source, CharacterModel target, ActionListener actionListener, CollisionChecker collisionChecker, Vector2 originOverride)
+	public Projectile(String name, CharacterModel source, CharacterModel target, ActionListener actionListener, CollisionChecker collisionChecker)
 	{
 		super();
 		this.state = EntityModel.windupState;
@@ -54,6 +55,37 @@ public class Projectile extends EntityModel implements EffectController{
 		this.widthCoefficient = this.settings.getWidthCoefficient();
 		this.heightCoefficient = this.settings.getHeightCoefficient();
 		this.acceleration.y = -this.settings.getGravity();
+
+		this.gameplayHitBox = new Rectangle(this.imageHitBox);
+		this.projectileUIModel = new EntityUIModel(name, EntityUIDataType.PROJECTILE);
+		this.actionListener = actionListener;
+		this.setCollisionChecker(collisionChecker);
+		this.source = source;
+		this.target = target;
+		this.charactersHit = new Array <HitTracker>();
+		UUID id = UUID.randomUUID();
+		this.uuid = id.toString();
+		this.allegiance = source.getAllegiance();
+		
+		if (this.settings.isHasCollisionDetection()) {
+			this.setShouldRespectEntityCollision(true);
+			this.setShouldRespectObjectCollision(true);
+			this.setShouldRespectTileCollision(true);
+			this.setRespectingEntityCollision(true);
+			this.setRespectingObjectCollision(true);
+			this.setRespectingTileCollision(true);
+		}
+		else {
+			this.setShouldRespectEntityCollision(false);
+			this.setShouldRespectObjectCollision(false);
+			this.setShouldRespectTileCollision(false);
+			this.setRespectingEntityCollision(false);
+			this.setRespectingObjectCollision(false);
+			this.setRespectingTileCollision(false);
+		}
+	}
+
+	public void setStartingPosition(Vector2 originOverride, Vector2 originOffset) {
 		if (originOverride != null && originOffset != null) {
 			this.imageHitBox.x = originOverride.x + originOffset.x;
 			this.imageHitBox.y = originOverride.y + originOffset.y;
@@ -66,19 +98,11 @@ public class Projectile extends EntityModel implements EffectController{
 			this.imageHitBox.x = source.getImageHitBox().x + (source.getImageHitBox().width / 2f);
 			this.imageHitBox.y = source.getImageHitBox().y + (source.getImageHitBox().height / 2f);
 		}
-
-		this.gameplayHitBox = new Rectangle(this.imageHitBox);
-		this.projectileUIModel = new EntityUIModel(name, EntityUIDataType.PROJECTILE);
-		this.actionListener = actionListener;
-		this.setCollisionChecker(collisionChecker);
-		this.source = source;
-		this.target = target;
-		this.charactersHit = new Array <HitTracker>();
-		UUID id = UUID.randomUUID();
-		this.uuid = id.toString();
-		this.allegiance = source.getAllegiance();
+		
+		this.gameplayHitBox.setX(this.getxOffsetModifier() + this.imageHitBox.getX() + this.imageHitBox.getWidth() * ((1f - this.widthCoefficient) / 2));
+		this.gameplayHitBox.setY(this.getyOffsetModifier() + this.imageHitBox.getY() + this.imageHitBox.getHeight() * ((1f - this.heightCoefficient) / 2));
 	}
-
+	
 	public void update(float delta, TiledMapTileLayer collisionLayer) {
 		currentTime += delta;
 		this.changeStateCheck();
@@ -88,17 +112,16 @@ public class Projectile extends EntityModel implements EffectController{
 		if (this.didChangeState || this.settings.isTracks()) {
 			this.didChangeState = false;
 			this.determineAndSetVelocity(target, collisionLayer);
-			System.out.println(this.velocity);
 		}
 //		this.velocity.y -= this.settings.getGravity() * delta;
-		this.handleOverlapCooldown(delta);
+		this.handleCollisionRespectChecks();
 		this.setGameplaySize(delta);
-		if (this.settings.isHasCollisionDetection()) {
-			this.movementWithCollisionDetection(delta, collisionLayer);
-		}
-		else {
-			moveWithoutCollisionDetection(delta);
-		}
+//		if (this.settings.isHasCollisionDetection()) {
+		this.movementWithCollisionDetection(delta, collisionLayer);
+//		}
+//		else {
+//			moveWithoutCollisionDetection(delta);
+//		}
 		projectileUIModel.setCurrentFrame(this, delta, this.getVelocityAngle());
 		actionListener.processProjectile(this);
 		this.deletionCheck();
@@ -138,8 +161,8 @@ public class Projectile extends EntityModel implements EffectController{
 				//YPosition should never be negative.
 				float xTimeTillCollision = target.howLongTillXCollision(t, collisionLayer);
 				float xTimeTillAccelStops = Float.MAX_VALUE;
-				if (target.getCurrentMovement() != null) {
-					xTimeTillAccelStops = target.getCurrentMovement().remainingDuration();
+				if (target.getXMove() != null) {
+					xTimeTillAccelStops = target.getXMove().remainingDuration();
 				}
 				float xTime = Math.min(xTimeTillCollision, xTimeTillAccelStops);
 				float yTimeTillCollision = target.howLongTillYCollision(t, collisionLayer);
@@ -427,11 +450,22 @@ public class Projectile extends EntityModel implements EffectController{
 
 
 	@Override
-	public MovementEffectSettings getReplacementMovementForStagger() {
-		MovementEffectSettings mSettings = null;
+	public XMovementEffectSettings getXReplacementMovementForStagger() {
+		XMovementEffectSettings mSettings = null;
 		for (EffectSettings settings : this.settings.getTargetEffects()) {
-			if (settings instanceof MovementEffectSettings) {
-				mSettings = (MovementEffectSettings) settings;
+			if (settings instanceof XMovementEffectSettings) {
+				mSettings = (XMovementEffectSettings) settings;
+			}
+		}
+		return mSettings;
+	}
+	
+	@Override
+	public YMovementEffectSettings getYReplacementMovementForStagger() {
+		YMovementEffectSettings mSettings = null;
+		for (EffectSettings settings : this.settings.getTargetEffects()) {
+			if (settings instanceof YMovementEffectSettings) {
+				mSettings = (YMovementEffectSettings) settings;
 			}
 		}
 		return mSettings;

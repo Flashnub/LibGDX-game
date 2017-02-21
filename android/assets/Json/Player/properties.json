@@ -17,9 +17,9 @@
 				"key": "PlayerDash",
 				"typeOfAction": Ability
 			}
-			"windUpState": "Idle"
-			"actingState": "Walk"
-			"cooldownState": "Block"
+			"windUpState": "DashWindup"
+			"actingState": "DashActive"
+			"cooldownState": "DashActive"
 			"inputs": [
 				["MOVEMENTRELEASE"]
 			]
@@ -38,8 +38,8 @@
 				"typeOfAction": Ability
 			}
 			"windUpState": "Idle"
-			"actingState": "Walk"
-			"cooldownState": "Block"
+			"actingState": "Idle"
+			"cooldownState": "Idle"
 			"inputs": [
 				["SPECIAL"],
 				["LEFTSPECIAL"]

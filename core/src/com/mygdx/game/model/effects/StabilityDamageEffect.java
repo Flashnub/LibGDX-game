@@ -19,7 +19,7 @@ public class StabilityDamageEffect extends EntityEffect {
 	protected void processDuringActive(CharacterModel target, float delta) {
 		super.processDuringActive(target, delta);
 		float stabDamage = sEffectSettings.isInstantaneous().booleanValue() ? sEffectSettings.value : (sEffectSettings.value * Math.min((delta / sEffectSettings.getDuration()), 1f));
-		target.removeFromCurrentStability(stabDamage, getController().getReplacementMovementForStagger());
+		target.removeFromCurrentStability(stabDamage, getController().getXReplacementMovementForStagger(), getController().getYReplacementMovementForStagger());
 	}
 
 	@Override

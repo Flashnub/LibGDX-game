@@ -101,20 +101,27 @@ public class Enemy extends NPCCharacter{
 				this.stopHorizontalMovement(false);
 				return alreadyCollided;
 			}
-			else {
+			else if (this.isRespectingEntityCollision()){
 				EntityModel collidedEntity = this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds);
-				boolean entityCollision = this.respectEntityCollision() && collidedEntity != null;
+				boolean entityCollision = this.isRespectingEntityCollision() && collidedEntity != null;
 				if (entityCollision) {
 					this.stopHorizontalMovement(false);
 				}
 //				this.stopEntityOverlapIfNeeded(collidedEntity, tempGameplayBounds, tempImageBounds);
 				return entityCollision;
 			}
+			return false;
 		}
 		
 		@Override
 		public boolean handleAdditionalYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
-			return this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds) != null;
+			if (alreadyCollided) {
+				return alreadyCollided;
+			}
+			else if (this.isRespectingEntityCollision()){ 
+				return this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds) != null;
+			}
+			return false;
 		}
 		
 		

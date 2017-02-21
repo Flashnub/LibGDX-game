@@ -5,7 +5,8 @@ import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.EntityEffect;
 import com.mygdx.game.model.effects.EffectInitializer;
 import com.mygdx.game.model.effects.EffectSettings;
-import com.mygdx.game.model.effects.MovementEffectSettings;
+import com.mygdx.game.model.effects.XMovementEffectSettings;
+import com.mygdx.game.model.effects.YMovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.world.DialogueController;
 
@@ -40,17 +41,17 @@ public class DialogueAction extends ActionSegment {
 
 	@Override
 	public float getWindUpTime() {
-		return dialogue.windupTime;
+		return windupTime;
 	}
 
 	@Override
 	public float getWindUpPlusActionTime() {
-		return dialogue.windupTime + dialogue.getTimeToDisplayDialogue();
+		return windupTime + activeTime;
 	}
 
 	@Override
 	public float getTotalTime() {
-		return dialogue.windupTime + dialogue.getTimeToDisplayDialogue() + dialogue.cooldownTime;
+		return windupTime + activeTime + cooldownTime;
 	}
 
 	@Override
@@ -74,7 +75,12 @@ public class DialogueAction extends ActionSegment {
 	}
 
 	@Override
-	public MovementEffectSettings getReplacementMovementForStagger() {
+	public XMovementEffectSettings getXReplacementMovementForStagger() {
+		return null;
+	}
+	
+	@Override
+	public YMovementEffectSettings getYReplacementMovementForStagger() {
 		return null;
 	}
 
@@ -106,6 +112,13 @@ public class DialogueAction extends ActionSegment {
 	@Override
 	public boolean doesNeedDisruptionDuringActive() {
 		return false;
+	}
+	
+	@Override
+	public void setDurations(CharacterModel source) {
+		this.windupTime = dialogue.windupTime;
+		this.activeTime = dialogue.getTimeToDisplayDialogue();
+		this.cooldownTime = dialogue.cooldownTime;
 	}
 
 }

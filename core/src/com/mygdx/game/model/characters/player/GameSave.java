@@ -53,7 +53,7 @@ public class GameSave implements Serializable{
 		npcChapterIndices = json.readValue("npcChapterIndices", HashMap.class, jsonData);
 		controllerScheme = json.readValue("controlScheme", HashMap.class, jsonData);
 		KBMouseScheme = json.readValue("KBMouseScheme", HashMap.class, jsonData);
-
+		quickItemKeys = json.readValue("quickItemKeys", Array.class, jsonData);
 	}
 	
 	public Integer chapterIndexForNPCUUID(String UUID) {

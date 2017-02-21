@@ -90,7 +90,7 @@ public abstract class WorldObject extends EntityModel implements InteractableObj
 	}
 	
 	public void update(float delta, TiledMapTileLayer collisionLayer) {
-		this.handleOverlapCooldown(delta);
+		this.handleCollisionRespectChecks();
 		this.setGameplaySize(delta);
 		this.movementWithCollisionDetection(delta, collisionLayer);
 		if (this.didChangeState) {

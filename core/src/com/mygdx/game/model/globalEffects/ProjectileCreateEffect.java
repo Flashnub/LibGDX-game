@@ -11,14 +11,18 @@ public class ProjectileCreateEffect extends WorldEffect {
 	public static final String type = "ProjectileCreateEffect";
 	ProjectileCreateEffectSettings pSettings;
 	Projectile projectile;
+	CharacterModel target;
+	Vector2 originOverride;	
 
 	public ProjectileCreateEffect(WorldEffectSettings settings, EffectController retriever, CollisionChecker collisionChecker, CharacterModel source, CharacterModel target, Vector2 originOverride) {
-		super(settings, retriever, collisionChecker, source, originOverride);
+		super(settings, retriever, collisionChecker, source);
 		if (settings instanceof ProjectileCreateEffectSettings) {
 			this.pSettings = (ProjectileCreateEffectSettings) settings;
 		}
-		Projectile projectile = new Projectile(pSettings.projectileSettingKey, pSettings.origin, source, target, actionListener, collisionChecker, originOverride);
+		Projectile projectile = new Projectile(pSettings.projectileSettingKey, source, target, actionListener, collisionChecker);
 		this.projectile = projectile;
+		this.originOverride = originOverride;
+		this.target = target;
 	}
 
 	@Override
@@ -29,8 +33,8 @@ public class ProjectileCreateEffect extends WorldEffect {
 	@Override
 	protected void initialProcess() {
 		super.initialProcess();	
+		projectile.setStartingPosition(originOverride, pSettings.getOrigin(source.isFacingLeft()));
 		this.actionListener.addProjectile(projectile);
-		
 	}
 
 	@Override

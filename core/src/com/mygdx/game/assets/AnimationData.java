@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.JsonValue;
 public class AnimationData implements Serializable {
 	String name;
 	int numberOfFrames;
-	float duration;
+	float frameRate;
 	PlayMode playMode;
 	
 	public AnimationData() {
@@ -23,8 +23,8 @@ public class AnimationData implements Serializable {
 		return numberOfFrames;
 	}
 	
-	public float getDuration() {
-		return duration;
+	public float getFrameRate() {
+		return frameRate;
 	}
 	
 	public static String animationString(String name, AnimationData animationData) {
@@ -40,7 +40,7 @@ public class AnimationData implements Serializable {
 		// TODO Auto-generated method stub
 		json.writeValue("name", name);
 		json.writeValue("numberOfFrames", numberOfFrames);
-		json.writeValue("duration", duration);
+		json.writeValue("frameRate", frameRate);
 		json.writeValue("playMode", playMode);
 	}
 
@@ -49,7 +49,13 @@ public class AnimationData implements Serializable {
 		// TODO Auto-generated method stub
 		name = json.readValue("name", String.class, jsonData);
 		numberOfFrames = json.readValue("numberOfFrames", Integer.class, jsonData);
-		duration = json.readValue("duration", Float.class, jsonData);
+		Float frameRate = json.readValue("frameRate", Float.class, jsonData);
+		if (frameRate != null) {
+			this.frameRate = 1f / frameRate;
+		}
+		else {
+			this.frameRate = 1f / 15f;
+		}
 		playMode = json.readValue("playMode", PlayMode.class, jsonData);
 	}
 	

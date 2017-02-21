@@ -7,13 +7,13 @@
 		"class": com.mygdx.game.model.actions.ActionSequence,
 		"actionKey": {
 			"class": com.mygdx.game.model.actions.ActionSegmentKey,
-			"key": "Attack",
+			"key": "LightAtk1",
 			"typeOfAction": Attack
 		},
 		"chainableActionKeys": [
 			{
 				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": "Attack2",
+				"key": "MedAtk1",
 				"typeOfAction": Attack
 			},
 			{
@@ -27,15 +27,48 @@
 			["LIGHTATTACK"],
 			["LEFTLIGHTATTACK"]
 		]
-		"windupState": "Walk"
-		"actingState": "Backwalk"
-		"cooldownState": "Walk"
+		"windupState": "LightAtk1Windup"
+		"actingState": "LightAtk1Active"
+		"cooldownState": "LightAtk1Cooldown"
 	},
 	{
 		"class": com.mygdx.game.model.actions.ActionSequence,
 		"actionKey": {
 			"class": com.mygdx.game.model.actions.ActionSegmentKey,
-			"key": "Attack2",
+			"key": "MedAtk1",
+			"typeOfAction": Attack
+		},
+		"chainableActionKeys": [
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "Rushdown",
+				"typeOfAction": Attack
+			},
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "Launch",
+				"typeOfAction": Attack
+			},
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "MedAtk2",
+				"typeOfAction": Attack
+			}
+			
+		],
+		"inputs": [
+			["MEDIUMATTACK"],
+			["LEFTMEDIUMATTACK"]
+		]
+		"windupState": "MedAtk1Windup"
+		"actingState": "MedAtk1Active"
+		"cooldownState": "MedAtk1Cooldown"
+	},
+	{
+		"class": com.mygdx.game.model.actions.ActionSequence,
+		"actionKey": {
+			"class": com.mygdx.game.model.actions.ActionSegmentKey,
+			"key": "MedAtk2",
 			"typeOfAction": Attack
 		},
 		"chainableActionKeys": [
@@ -52,12 +85,11 @@
 			
 		],
 		"inputs": [
-			["MEDIUMATTACK"],
-			["LEFTMEDIUMATTACK"]
+			["DOWNMEDIUMATTACK"]
 		]
-		"windupState": "Walk"
-		"actingState": "Block"
-		"cooldownState": "Walk"
+		"windupState": "MedAtk2Windup"
+		"actingState": "MedAtk2Active"
+		"cooldownState": "MedAtk2Cooldown"
 	},
 	{
 		"class": com.mygdx.game.model.actions.ActionSequence,
@@ -69,9 +101,9 @@
 		"inputs": [
 			["DOWNHEAVYATTACK"]
 		]
-		"windupState": "Idle"
-		"actingState": "Idle"
-		"cooldownState": "Idle"
+		"windupState": "LaunchWindup"
+		"actingState": "LaunchActive"
+		"cooldownState": "LaunchCooldown"
 	},
 	{
 		"class": com.mygdx.game.model.actions.ActionSequence,
@@ -83,9 +115,9 @@
 		"inputs": [
 			["LEFTHEAVYATTACK"]
 		]
-		"windupState": "Idle"
-		"actingState": "Idle"
-		"cooldownState": "Idle"
+		"windupState": "RushdownWindup"
+		"actingState": "RushdownActive"
+		"cooldownState": "RushdownCooldown"
 	},
 	{
 		"class": com.mygdx.game.model.actions.ActionSequence,
@@ -104,9 +136,9 @@
 		"inputs": [
 			["LIGHTATTACK"]
 		]
-		"windupState": "Backwalk"
+		"windupState": "Walk"
 		"actingState": "Walk"
-		"cooldownState": "Backwalk"
+		"cooldownState": "Walk"
 		"useType": Aerial
 	},
 	{
@@ -126,9 +158,9 @@
 		"inputs": [
 			["MEDIUMATTACK"]
 		]
-		"windupState": "Block"
+		"windupState": "Walk"
 		"actingState": "Walk"
-		"cooldownState": "Block"
+		"cooldownState": "Walk"
 		"useType": Aerial
 	}
 	]

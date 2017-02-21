@@ -15,6 +15,10 @@ public abstract class EntityEffect extends Effect {
 	boolean staggered;
 	EntityEffectSettings eSettings;
 	
+	public static final int LowPriority = 3;
+	public static final int MediumPriority = 5;
+	public static final int HighPriority = 7;
+	
 	public EntityEffect(EffectSettings settings, EffectController controller) {
 		super(settings);
 		this.setController(controller);
@@ -35,6 +39,18 @@ public abstract class EntityEffect extends Effect {
 	public abstract void flipValuesIfNecessary(CharacterModel target, CharacterModel source);
 	public abstract boolean shouldAddIfIntercepted();
 	public abstract boolean isUniqueEffect();
+	
+	public int getPriority() {
+		return EntityEffect.LowPriority;
+	}
+	
+	public static Array <Integer> getPriorities() {
+		Array <Integer> priorities = new Array <Integer> ();
+		priorities.add(EntityEffect.LowPriority);
+		priorities.add(EntityEffect.MediumPriority);
+		priorities.add(EntityEffect.HighPriority);
+		return priorities;
+	}
 	
 	protected void initialProcess(CharacterModel target) {
 		super.initialProcess();

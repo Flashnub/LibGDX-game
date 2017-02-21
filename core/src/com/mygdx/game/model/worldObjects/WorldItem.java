@@ -64,4 +64,8 @@ public class WorldItem extends WorldObject {
 		return false;
 	}
 
+	public Item getItem() {
+		return item;
+	}
+
 }

@@ -5,21 +5,21 @@
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "Deactivated",
 			"numberOfFrames": 1,
-			"duration": 1,
+			"frameRate": 1,
 			"playMode": NORMAL,
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "Activated",
 			"numberOfFrames": 1,
-			"duration": 1,
+			"frameRate": 1,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "Activating",
 			"numberOfFrames": 3,
-			"duration": 1,
+			"frameRate": 1,
 			"playMode": NORMAL
 		}
 	]

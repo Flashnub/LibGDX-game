@@ -27,8 +27,12 @@ public abstract class ActionSegment implements EffectController {
 	boolean shouldChain;
 	CharacterModel source;
 	ActionState actionState;
-	float windupTime;
-	float activeTime;
+	float processedWindupTime;
+	float processedActiveTime;
+	
+	protected float windupTime;
+	protected float activeTime;
+	protected float cooldownTime;
 
 	ActionListener actionListener;
 	private Array <ActionSegmentListener> segmentListeners;
@@ -42,10 +46,11 @@ public abstract class ActionSegment implements EffectController {
 		hasProcessedInterruption = false;
 		hasProcessedCompletion = false;
 		shouldChain = false;
-		activeTime = 0f;
-		windupTime = 0f;			
+		processedActiveTime = 0f;
+		processedWindupTime = 0f;			
 		this.currentTime = 0f;
 		this.segmentListeners = new Array <ActionSegmentListener>();
+		
 	}
 	
 	public ActionSegment(ActionListener listener) {
@@ -100,13 +105,13 @@ public abstract class ActionSegment implements EffectController {
 				sourceActiveProcess(getSource());
 			}
 			sendActionToListener(actionListener, delta);
-			this.activeTime += delta;
+			this.processedActiveTime += delta;
 		}
 		else {
 			if (!this.hasProcessedWindupSource) {
 				sourceWindupProcess(source);
 			}
-			this.windupTime += delta;
+			this.processedWindupTime += delta;
 		}
 	}	
 	
@@ -162,6 +167,7 @@ public abstract class ActionSegment implements EffectController {
 		this.segmentListeners.add(listener);
 	}
 	
+	public abstract void setDurations(CharacterModel source);
 	public abstract void sendActionToListener(ActionListener actionListener, float delta);
 	public abstract void sourceActiveProcessWithoutSuper(CharacterModel source);
 	public abstract void sourceWindupProcessWithoutSuper(CharacterModel source);

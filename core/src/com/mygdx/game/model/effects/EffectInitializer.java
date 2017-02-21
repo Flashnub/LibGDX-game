@@ -21,8 +21,11 @@ public class EffectInitializer {
 		case HealingEffect.type:
 			effect = new HealingEffect(settings, controller);
 			break;
-		case MovementEffect.type:
-			effect = new MovementEffect(settings, controller);
+		case XMovementEffect.type:
+			effect = new XMovementEffect(settings, controller);
+			break;
+		case YMovementEffect.type:
+			effect = new XMovementEffect(settings, controller);
 			break;
 		case StabilityDamageEffect.type:
 			effect = new StabilityDamageEffect(settings, controller);
@@ -50,10 +53,10 @@ public class EffectInitializer {
 			effect = new ProjectileCreateEffect(settings, controller, collisionChecker, source, target, originOverride);
 			break;
 		case SpawnCharacterEffect.type:
-			effect = new SpawnCharacterEffect(settings, controller, collisionChecker, source, originOverride);
+			effect = new SpawnCharacterEffect(settings, controller, collisionChecker, source);
 			break;
 		case DeleteCharacterEffect.type:
-			effect = new DeleteCharacterEffect(settings, controller, collisionChecker, source, originOverride);
+			effect = new DeleteCharacterEffect(settings, controller, collisionChecker, source);
 			break;
 		}
 		return effect;

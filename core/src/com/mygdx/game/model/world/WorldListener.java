@@ -15,6 +15,6 @@ public interface WorldListener {
 	public void updateWithNearbyNPCs(Array <NPCCharacter> npcs);
 	public void handlePlayerInteractionWithObject(WorldObject object);
 	public void handleSuperAction(ActionSequence action);
-	public void handleSwitchedItem(Item item);
+	public void handleSwitchedItem(Item item, int numberOfItems);
 }	
 

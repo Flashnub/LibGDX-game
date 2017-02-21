@@ -5,87 +5,140 @@
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "Idle",
 			"numberOfFrames": 1,
-			"duration": 0.05,
 			"playMode": NORMAL
-		},
+		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "Walk",
-			"numberOfFrames": 7,
-			"duration": 0.06667,
+			"numberOfFrames": 12,
 			"playMode": LOOP
-		},
-		{
-			"class": com.mygdx.game.assets.AnimationData,
-			"name": "Backwalk",
-			"numberOfFrames": 11,
-			"duration": 0.07692,
-			"playMode": LOOP
-		},
-		{
-			"class": com.mygdx.game.assets.AnimationData,
-			"name": "Block",
-			"numberOfFrames": 4,
-			"duration": 0.05,
-			"playMode": NORMAL
-		},
+		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "Fall",
-			"numberOfFrames": 3,
-			"duration": 0.05,
+			"numberOfFrames": 2,
 			"playMode": NORMAL
-		},
+		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "Jump",
-			"numberOfFrames": 1,
-			"duration": 0.05,
+			"numberOfFrames": 4,
 			"playMode": NORMAL
-		},
+		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "TensionStaggerWindup",
 			"numberOfFrames": 1,
-			"duration": 0.05,
 			"playMode": NORMAL
-		},
+		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "TensionStagger",
 			"numberOfFrames": 1,
-			"duration": 0.05,
 			"playMode": NORMAL
-		},
+		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "TensionStaggerCooldown",
 			"numberOfFrames": 1,
-			"duration": 0.05,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
-			"name": "UseItemWindup",
-			"numberOfFrames": 1,
-			"duration": 0.05,
+			"name": "MedAtk1Windup",
+			"numberOfFrames": 4,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
-			"name": "UseItemActive",
-			"numberOfFrames": 1,
-			"duration": 0.05,
+			"name": "MedAtk1Active",
+			"numberOfFrames": 2,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
-			"name": "UseItemCooldown",
-			"numberOfFrames": 1,
-			"duration": 0.05,
+			"name": "MedAtk1Cooldown",
+			"numberOfFrames": 2,
 			"playMode": NORMAL
 		}
-		
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "MedAtk2Windup",
+			"numberOfFrames": 3,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "MedAtk2Active",
+			"numberOfFrames": 3,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "MedAtk2Cooldown",
+			"numberOfFrames": 2,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "HeavyAtk1Windup",
+			"numberOfFrames": 2,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "HeavyAtk1Active",
+			"numberOfFrames": 2,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "HeavyAtk1Cooldown",
+			"numberOfFrames": 2,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "LightAtk1Windup",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "LightAtk1Active",
+			"numberOfFrames": 2,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "LightAtk1Cooldown",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "LaunchWindup",
+			"numberOfFrames": 5,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "LaunchActive",
+			"numberOfFrames": 2,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "LaunchCooldown",
+			"numberOfFrames": 4,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Sprint",
+			"numberOfFrames": 10,
+			"playMode": NORMAL
+		}
 	]
 	"masterAtlasPath": "Sprites/Player/textures.atlas"
 }

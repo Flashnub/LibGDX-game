@@ -5,56 +5,48 @@
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "Idle",
 			"numberOfFrames": 1,
-			"duration": 0.05,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "Circle",
 			"numberOfFrames": 1,
-			"duration": 0.05,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "Triangle",
 			"numberOfFrames": 1,
-			"duration": 0.05,
 			"playMode": NORMAL
 		}		
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "StaggerWindup",
 			"numberOfFrames": 1,
-			"duration": 0.05,
 			"playMode": NORMAL
 		}		
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "Stagger",
 			"numberOfFrames": 1,
-			"duration": 0.05,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "StaggerCooldown",
 			"numberOfFrames": 1,
-			"duration": 0.05,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "Walk",
 			"numberOfFrames": 1,
-			"duration": 0.05,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "Backwalk",
 			"numberOfFrames": 1,
-			"duration": 0.05,
 			"playMode": NORMAL
 		}
 		

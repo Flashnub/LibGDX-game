@@ -81,6 +81,7 @@ public class WorldRenderer implements CoordinatesHelper{
 	        debugRenderer.setProjectionMatrix(camera.combined);
 	        debugRenderer.begin(ShapeType.Line);
 	        Polygon playerPoly = worldModel.getPlayer().getCharacterData().getGameplayHitBoxInPolygon();
+	      
 //	        debugRenderer.rect(worldModel.getPlayer().getCharacterData().getGameplayHitBox().x, 
 //	        		worldModel.getPlayer().getCharacterData().getGameplayHitBox().y, 
 //	        		worldModel.getPlayer().getCharacterData().getGameplayHitBox().width / 2, 
@@ -90,6 +91,8 @@ public class WorldRenderer implements CoordinatesHelper{
 //	        		1f, 1f,
 //	        		worldModel.getPlayer().getCharacterData().getVelocityAngle() );
 	        debugRenderer.polygon(playerPoly.getTransformedVertices());
+        	debugRenderer.rect(worldModel.getPlayer().getCharacterData().getImageHitBox().x, worldModel.getPlayer().getCharacterData().getImageHitBox().y, worldModel.getPlayer().getCharacterData().getImageHitBox().width, worldModel.getPlayer().getCharacterData().getImageHitBox().height);
+
 	        for (Projectile projectile : worldModel.getProjectiles()) {
 	        	Polygon poly = projectile.getGameplayHitBoxInPolygon();
 		        debugRenderer.polygon(poly.getTransformedVertices());
@@ -101,6 +104,10 @@ public class WorldRenderer implements CoordinatesHelper{
 //	        			projectile.getGameplayHitBox().height, 
 //	        			1.1f, 1.1f,
 //	        			projectile.getVelocityAngle());
+	        }
+	        
+	        for (WorldObject object : worldModel.getObjects()) {
+	        	debugRenderer.rect(object.getGameplayHitBox().x, object.getGameplayHitBox().y, object.getGameplayHitBox().width, object.getGameplayHitBox().height);
 	        }
 	        
 	        for (Enemy enemy : worldModel.getEnemies()) {

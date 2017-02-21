@@ -1,0 +1,286 @@
+{
+objectsInteractedHistory: []
+acquiredItemsHistory: [
+	{
+		class: java.lang.Integer
+		value: 100
+	}
+]
+inventoryItemKeys: [
+	{
+		class: java.lang.String
+		value: HealthPotion
+	}
+]
+npcChapterIndices: null
+controlScheme: {
+	AXIS_LEFT_Y_UP: {
+		class: java.lang.String
+		value: UP
+	}
+	AXIS_RIGHT_TRIGGERLEFT: {
+		class: java.lang.String
+		value: LEFTMOVEMENT
+	}
+	BUTTON_YLEFT: {
+		class: java.lang.String
+		value: LEFTMEDIUMATTACK
+	}
+	AXIS_RIGHT_TRIGGERRIGHT: {
+		class: java.lang.String
+		value: RIGHTMOVEMENT
+	}
+	AXIS_LEFT_X_RIGHT: {
+		class: java.lang.String
+		value: RIGHT
+	}
+	AXIS_LEFT_TRIGGER: {
+		class: java.lang.String
+		value: USEITEM
+	}
+	BUTTON_BUP: {
+		class: java.lang.String
+		value: UPHEAVYATTACK
+	}
+	BUTTON_RBUP: {
+		class: java.lang.String
+		value: UPSPECIAL
+	}
+	BUTTON_X: {
+		class: java.lang.String
+		value: LIGHTATTACK
+	}
+	AXIS_RIGHT_TRIGGERUP: {
+		class: java.lang.String
+		value: UPMOVEMENT
+	}
+	BUTTON_RB: {
+		class: java.lang.String
+		value: SPECIAL
+	}
+	BUTTON_XLEFT: {
+		class: java.lang.String
+		value: LEFTLIGHTATTACK
+	}
+	BUTTON_Y: {
+		class: java.lang.String
+		value: MEDIUMATTACK
+	}
+	BUTTON_BDOWN: {
+		class: java.lang.String
+		value: DOWNHEAVYATTACK
+	}
+	BUTTON_RBLEFT: {
+		class: java.lang.String
+		value: LEFTSPECIAL
+	}
+	BUTTON_YDOWN: {
+		class: java.lang.String
+		value: DOWNMEDIUMATTACK
+	}
+	AXIS_RIGHT_TRIGGER_NONE: {
+		class: java.lang.String
+		value: MOVEMENTRELEASE
+	}
+	AXIS_RIGHT_TRIGGERDOWN: {
+		class: java.lang.String
+		value: DOWNMOVEMENT
+	}
+	BUTTON_RBRIGHT: {
+		class: java.lang.String
+		value: RIGHTSPECIAL
+	}
+	BUTTON_YRIGHT: {
+		class: java.lang.String
+		value: RIGHTMEDIUMATTACK
+	}
+	AXIS_RIGHT_TRIGGER: {
+		class: java.lang.String
+		value: MOVEMENT
+	}
+	BUTTON_LB: {
+		class: java.lang.String
+		value: ACTIONCANCEL
+	}
+	BUTTON_XDOWN: {
+		class: java.lang.String
+		value: DOWNLIGHTATTACK
+	}
+	AXIS_LEFT_Y_DOWN: {
+		class: java.lang.String
+		value: DOWN
+	}
+	BUTTON_B: {
+		class: java.lang.String
+		value: HEAVYATTACK
+	}
+	BUTTON_A: {
+		class: java.lang.String
+		value: JUMP
+	}
+	BUTTON_XRIGHT: {
+		class: java.lang.String
+		value: RIGHTLIGHTATTACK
+	}
+	BUTTON_BRIGHT: {
+		class: java.lang.String
+		value: RIGHTHEAVYATTACK
+	}
+	BUTTON_BLEFT: {
+		class: java.lang.String
+		value: LEFTHEAVYATTACK
+	}
+	AXIS_LEFT_X_LEFT: {
+		class: java.lang.String
+		value: LEFT
+	}
+	BUTTON_XUP: {
+		class: java.lang.String
+		value: UPLIGHTATTACK
+	}
+	BUTTON_YUP: {
+		class: java.lang.String
+		value: UPMEDIUMATTACK
+	}
+	BUTTON_RBDOWN: {
+		class: java.lang.String
+		value: DOWNSPECIAL
+	}
+}
+KBMouseScheme: {
+	A: {
+		class: java.lang.String
+		value: LEFT
+	}
+	QLEFT: {
+		class: java.lang.String
+		value: LEFTMOVEMENT
+	}
+	XDOWN: {
+		class: java.lang.String
+		value: DOWNMEDIUMATTACK
+	}
+	C: {
+		class: java.lang.String
+		value: HEAVYATTACK
+	}
+	D: {
+		class: java.lang.String
+		value: RIGHT
+	}
+	E: {
+		class: java.lang.String
+		value: ACTIONCANCEL
+	}
+	Q: {
+		class: java.lang.String
+		value: MOVEMENT
+	}
+	R: {
+		class: java.lang.String
+		value: SPECIAL
+	}
+	S: {
+		class: java.lang.String
+		value: DOWN
+	}
+	QRIGHT: {
+		class: java.lang.String
+		value: RIGHTMOVEMENT
+	}
+	W: {
+		class: java.lang.String
+		value: UP
+	}
+	RDOWN: {
+		class: java.lang.String
+		value: DOWNSPECIAL
+	}
+	X: {
+		class: java.lang.String
+		value: MEDIUMATTACK
+	}
+	CLEFT: {
+		class: java.lang.String
+		value: LEFTHEAVYATTACK
+	}
+	Z: {
+		class: java.lang.String
+		value: LIGHTATTACK
+	}
+	ZRIGHT: {
+		class: java.lang.String
+		value: RIGHTLIGHTATTACK
+	}
+	CUP: {
+		class: java.lang.String
+		value: UPHEAVYATTACK
+	}
+	Space: {
+		class: java.lang.String
+		value: JUMP
+	}
+	CRIGHT: {
+		class: java.lang.String
+		value: RIGHTHEAVYATTACK
+	}
+	XLEFT: {
+		class: java.lang.String
+		value: LEFTMEDIUMATTACK
+	}
+	QDOWN: {
+		class: java.lang.String
+		value: DOWNMOVEMENT
+	}
+	ZDOWN: {
+		class: java.lang.String
+		value: DOWNLIGHTATTACK
+	}
+	RUP: {
+		class: java.lang.String
+		value: UPSPECIAL
+	}
+	QUP: {
+		class: java.lang.String
+		value: UPMOVEMENT
+	}
+	XUP: {
+		class: java.lang.String
+		value: UPMEDIUMATTACK
+	}
+	Tab: {
+		class: java.lang.String
+		value: USEITEM
+	}
+	ZUP: {
+		class: java.lang.String
+		value: UPLIGHTATTACK
+	}
+	XRIGHT: {
+		class: java.lang.String
+		value: RIGHTMEDIUMATTACK
+	}
+	CDOWN: {
+		class: java.lang.String
+		value: DOWNHEAVYATTACK
+	}
+	ZLEFT: {
+		class: java.lang.String
+		value: LEFTLIGHTATTACK
+	}
+	RRIGHT: {
+		class: java.lang.String
+		value: RIGHTSPECIAL
+	}
+	RLEFT: {
+		class: java.lang.String
+		value: LEFTSPECIAL
+	}
+}
+quickItemKeys: [
+	{
+		class: java.lang.String
+		value: HealthPotion
+	}
+]
+}

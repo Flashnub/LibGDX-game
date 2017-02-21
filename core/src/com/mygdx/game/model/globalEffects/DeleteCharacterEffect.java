@@ -11,8 +11,8 @@ public class DeleteCharacterEffect extends WorldEffect {
 	DeleteCharacterEffectSettings dSettings;
 
 	public DeleteCharacterEffect(WorldEffectSettings settings, EffectController retriever,
-			CollisionChecker collisionChecker, CharacterModel source, Vector2 originOverride) {
-		super(settings, retriever, collisionChecker, source, originOverride);
+			CollisionChecker collisionChecker, CharacterModel source) {
+		super(settings, retriever, collisionChecker, source);
 		if (settings instanceof DeleteCharacterEffectSettings) {
 			dSettings = (DeleteCharacterEffectSettings) settings;
 		}

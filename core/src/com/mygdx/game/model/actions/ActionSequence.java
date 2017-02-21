@@ -12,7 +12,8 @@ import com.mygdx.game.model.actions.nonhostile.DialogueSettings;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.conditions.ConditionInitializer;
 import com.mygdx.game.model.characters.EntityUIModel;
-import com.mygdx.game.model.effects.MovementEffectSettings;
+import com.mygdx.game.model.effects.XMovementEffectSettings;
+import com.mygdx.game.model.effects.YMovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.CollisionChecker;
 import com.mygdx.game.model.world.DialogueController;
@@ -116,7 +117,7 @@ public class ActionSequence implements Serializable {
 		sequence.rightInputs = new Array <Array <String>>();
 		sequence.conditionSettings = new Array <ActionConditionSettings>();
 		
-		sequence.createActionFromSettings(settings, null);
+		sequence.createActionFromSettings(settings, null, null);
 		
 		return sequence;
 	}
@@ -124,7 +125,7 @@ public class ActionSequence implements Serializable {
 	static final String staggerKey = "Stagger";
 	static final String tensionStaggerKey = "TensionStagger";
 	
-	public static ActionSequence createStaggerSequence(CharacterModel source, MovementEffectSettings overridingMovement, ActionListener actionListener, StaggerType staggerType) {
+	public static ActionSequence createStaggerSequence(CharacterModel source, XMovementEffectSettings xOverridingMovement, YMovementEffectSettings yOverridingMovement, ActionListener actionListener, StaggerType staggerType) {
 		ActionSequence sequence = new ActionSequence();
 		sequence.actionKey = new ActionSegmentKey(staggerType.getKeyForStaggerType(source.getNameForStaggerSeq(staggerType)), ActionType.Stagger);
 		sequence.isActive = true;
@@ -157,10 +158,10 @@ public class ActionSequence implements Serializable {
 		sequence.conditionSettings = new Array <ActionConditionSettings>();
 
 		if (staggerType.equals(StaggerType.Normal)) {
-			sequence.createActionFromSettings(null, overridingMovement);
+			sequence.createActionFromSettings(null, xOverridingMovement, yOverridingMovement);
 		}
 		else {
-			sequence.createActionFromSettings(null, null);
+			sequence.createActionFromSettings(null, null, null);
 		}
 			
 		return sequence;
@@ -281,7 +282,7 @@ public class ActionSequence implements Serializable {
 		sequence.actionListener = actionListener;
 		sequence.collisionChecker = collisionChecker;
 		sequence.useLeft = source.isFacingLeft();
-		sequence.createActionFromSettings(null, null);
+		sequence.createActionFromSettings(null, null, null);
 		return sequence;
 	}
 	
@@ -382,8 +383,8 @@ public class ActionSequence implements Serializable {
 
 	}
 	
-	private void createActionFromSettings(DialogueSettings potentialDialogue, MovementEffectSettings replacementMovement) {
-		ActionSegment action = 	this.getActionSegmentForKey(this.actionKey, potentialDialogue, replacementMovement);
+	private void createActionFromSettings(DialogueSettings potentialDialogue, XMovementEffectSettings xReplacementMovement, YMovementEffectSettings yReplacementMovement) {
+		ActionSegment action = 	this.getActionSegmentForKey(this.actionKey, potentialDialogue, xReplacementMovement, yReplacementMovement);
 		if (action != null) {
 			this.action = action;
 		}
@@ -393,7 +394,7 @@ public class ActionSequence implements Serializable {
 		return action.getEffectiveRange();
 	}
 	
-	private ActionSegment getActionSegmentForKey(ActionSegmentKey segmentKey, DialogueSettings potentialDialogue, MovementEffectSettings replacementMovement) {
+	private ActionSegment getActionSegmentForKey(ActionSegmentKey segmentKey, DialogueSettings potentialDialogue,  XMovementEffectSettings xReplacementMovement, YMovementEffectSettings yReplacementMovement) {
 		ActionSegment action = null;
 		switch (segmentKey.getTypeOfAction()) {
 			case Attack:
@@ -406,7 +407,7 @@ public class ActionSequence implements Serializable {
 				action = new Ability(source, JSONController.abilities.get(segmentKey.getKey()), this.actionListener);
 				break;
 			case Stagger:
-				action = new Ability(source, JSONController.abilities.get(segmentKey.getKey()), this.actionListener, replacementMovement);
+				action = new Ability(source, JSONController.abilities.get(segmentKey.getKey()), this.actionListener, xReplacementMovement, yReplacementMovement);
 				break;
 			case Dialogue:
 				action = new DialogueAction(potentialDialogue, this.dialogueController, this.actionListener, source, target);

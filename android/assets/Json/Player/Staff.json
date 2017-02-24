@@ -134,11 +134,12 @@
 			}				
 		],
 		"inputs": [
-			["LIGHTATTACK"]
+			["LIGHTATTACK"],
+			["LEFTLIGHTATTACK"]
 		]
-		"windupState": "Walk"
-		"actingState": "Walk"
-		"cooldownState": "Walk"
+		"windupState": "Aerial1Windup"
+		"actingState": "Aerial1Active"
+		"cooldownState": "Aerial1Cooldown"
 		"useType": Aerial
 	},
 	{
@@ -156,11 +157,12 @@
 			}				
 		]
 		"inputs": [
-			["MEDIUMATTACK"]
+			["MEDIUMATTACK"],
+			["LEFTMEDIUMATTACK"]
 		]
-		"windupState": "Walk"
-		"actingState": "Walk"
-		"cooldownState": "Walk"
+		"windupState": "Aerial2Windup"
+		"actingState": "Aerial2Active"
+		"cooldownState": "Aerial2Cooldown"
 		"useType": Aerial
 	}
 	]

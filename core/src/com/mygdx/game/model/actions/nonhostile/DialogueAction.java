@@ -121,4 +121,19 @@ public class DialogueAction extends ActionSegment {
 		this.cooldownTime = dialogue.cooldownTime;
 	}
 
+	@Override
+	public XMovementEffectSettings getSourceXMove() {
+		return null;
+	}
+
+	@Override
+	public YMovementEffectSettings getSourceYMove() {
+		return null;
+	}
+
+	@Override
+	public boolean chainsWithJump() {
+		return false;
+	}
+
 }

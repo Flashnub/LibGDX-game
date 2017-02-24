@@ -53,4 +53,7 @@ public class StabilityDamageEffect extends EntityEffect {
 		return false;
 	}
 
+	public int getPriority() {
+		return EntityEffect.HighPriority;
+	}
 }

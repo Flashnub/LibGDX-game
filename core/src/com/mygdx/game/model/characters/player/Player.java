@@ -400,7 +400,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 		public boolean handleButtonDown(Controller controller, int buttonCode) {
 			String inputType = this.inputConverter.convertButtonCodeToInputType(buttonCode, currentlyHeldDirection);
 			if (!inputType.equals("")) {
-//				System.out.println(inputType);
+				System.out.println(inputType);
 				this.inputs.addFirst(inputType);
 				if (this.queueUpActionFromInputs())
 				{
@@ -456,6 +456,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 			else if (axisCode == XBox360Pad.AXIS_LEFT_TRIGGER) {
 				String inputType = this.inputConverter.convertAxisTriggerToInputType(axisCode, value, currentlyHeldDirection);
 				if (inputType != null) {
+					System.out.println(inputType);
 					this.inputs.addFirst(inputType);
 					this.queueUpActionFromInputs();
 					switch (inputType) {

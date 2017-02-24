@@ -18,23 +18,13 @@
 				"value": 10
 			}
 			{
-				"class": "com.mygdx.game.model.effects.MovementEffectSettings",
+				"class": "com.mygdx.game.model.effects.XMovementEffectSettings",
 				"duration": 0.3,
 				"delayToActivate": 0,
-				"useGravity": false,
 				"isInstantaneous": false,
 				"value": 0,
-				"velocity": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": 100,
-					"y": 0
-				}
-				"acceleration": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": -200,
-					"y": 0
-				}
-			
+				"velocity": 100,
+				"acceleration": -200
 			}
 		]
 	}
@@ -57,23 +47,13 @@
 				"value": 100
 			}
 			{
-				"class": "com.mygdx.game.model.effects.MovementEffectSettings",
+				"class": "com.mygdx.game.model.effects.XMovementEffectSettings",
 				"duration": 0.3,
 				"delayToActivate": 0,
-				"useGravity": false,
 				"isInstantaneous": false,
 				"value": 0,
-				"velocity": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": 200,
-					"y": 0
-				}
-				"acceleration": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": -600,
-					"y": 0
-				}
-			
+				"velocity": 200,
+				"acceleration": -600
 			}
 		]
 	}
@@ -96,23 +76,13 @@
 				"value": 100
 			}
 			{
-				"class": "com.mygdx.game.model.effects.MovementEffectSettings",
+				"class": "com.mygdx.game.model.effects.XMovementEffectSettings",
 				"duration": 0.3,
 				"delayToActivate": 0,
-				"useGravity": false,
 				"isInstantaneous": false,
 				"value": 0,
-				"velocity": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": 200,
-					"y": 0
-				}
-				"acceleration": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": -600,
-					"y": 0
-				}
-			
+				"velocity": 200,
+				"acceleration": -600
 			}
 		]
 	}
@@ -131,22 +101,14 @@
 				"value": 2
 			}
 			{
-				"class": "com.mygdx.game.model.effects.MovementEffectSettings",
+				"class": "com.mygdx.game.model.effects.YMovementEffectSettings",
 				"duration": 0.5,
 				"delayToActivate": 0,
 				"isInstantaneous": false,
 				"useGravity": false,
 				"value": 0,
-				"velocity": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": 0,
-					"y": 500
-				}
-				"acceleration": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": 0,
-					"y": -300
-				}
+				"velocity": 600,
+				"acceleration": -500
 			}
 			{
 				"class": "com.mygdx.game.model.effects.StabilityDamageEffectSettings",
@@ -176,22 +138,27 @@
 				"value": 10
 			}
 			{
-				"class": "com.mygdx.game.model.effects.MovementEffectSettings",
+				"class": "com.mygdx.game.model.effects.YMovementEffectSettings",
+				"duration": 0.5,
+				"delayToActivate": 0,
+				"isInstantaneous": false,
+				"value": 0,
+				"velocity": 500,
+				"acceleration": -500,
+				"passiveConditions": [
+					{
+						"class": "com.mygdx.game.model.conditions.AerialConditionSettings"
+					}
+				]
+			}
+			{
+				"class": "com.mygdx.game.model.effects.XMovementEffectSettings",
 				"duration": 0.3,
 				"delayToActivate": 0,
 				"isInstantaneous": false,
 				"value": 0,
-				"velocity": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": 50,
-					"y": 200
-				}
-				"acceleration": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": -167.67,
-					"y": 0
-				}
-			
+				"velocity": 50,
+				"acceleration": -167.67
 			}
 		]
 	}
@@ -199,7 +166,7 @@
 		"class": "com.mygdx.game.model.actions.AttackSettings",
 		"originX": 10,
 		"originY": 0,
-		"width": 50,
+		"width": 200,
 		"height": 200,
 		"sourceEffectSettings": [
 
@@ -214,23 +181,27 @@
 				"value": 10
 			}
 			{
-				"class": "com.mygdx.game.model.effects.MovementEffectSettings",
-				"duration": 0.3,
+				"class": "com.mygdx.game.model.effects.YMovementEffectSettings",
+				"duration": 0.5,
 				"delayToActivate": 0,
-				"useGravity": false,
 				"isInstantaneous": false,
 				"value": 0,
-				"velocity": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": 50,
-					"y": 0
-				}
-				"acceleration": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": -167.67,
-					"y": 0
-				}
-			
+				"velocity": 500,
+				"acceleration": -500,
+				"passiveConditions": [
+					{
+						"class": "com.mygdx.game.model.conditions.AerialConditionSettings"
+					}
+				]
+			}
+			{
+				"class": "com.mygdx.game.model.effects.XMovementEffectSettings",
+				"duration": 0.3,
+				"delayToActivate": 0,
+				"isInstantaneous": false,
+				"value": 0,
+				"velocity": 50,
+				"acceleration": -167.67
 			}
 		]
 	}
@@ -243,22 +214,13 @@
 		"sourceRespectEntityCollisions": false,
 		"sourceEffectSettings": [
 			{
-				"class": "com.mygdx.game.model.effects.MovementEffectSettings",
+				"class": "com.mygdx.game.model.effects.XMovementEffectSettings",
 				"duration": 0.5,
 				"delayToActivate": 0,
 				"isInstantaneous": false,
-				"useGravity": false,
 				"value": 0,
-				"velocity": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": 500,
-					"y": 0
-				}
-				"acceleration": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": 0,
-					"y": 0
-				}
+				"velocity": 500,
+				"acceleration": 0
 			}
 		]
 		"targetEffectSettings": [

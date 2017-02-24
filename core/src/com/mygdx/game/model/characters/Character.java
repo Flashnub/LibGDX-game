@@ -78,7 +78,7 @@ public abstract class Character implements ModelListener {
 		public final String backWalkState = "Backwalk";
 		public final String jumpState = "Jump";
 		public final String fallState = "Fall";
-		final float slowingAccel = 500f;
+		final float slowingAccel = 1800;
 		
 		String state;
 		float currentHealth, maxHealth, currentWill, maxWill, attack, currentStability, maxStability, currentTension, maxTension;
@@ -93,7 +93,9 @@ public abstract class Character implements ModelListener {
 		boolean actionLocked;
 		boolean alreadyDead;
 		boolean isSlowingDown;
-	    public float injuryTime = 0f;
+		boolean injuredStaggering;
+		boolean queuedJump;
+	    public float injuryImmunityTime = 0f;
 	    float actionStaggerTime;
 	    float tempVelocityX;
 	    float tempVelocityY;
@@ -101,6 +103,7 @@ public abstract class Character implements ModelListener {
 		Direction lockedFacingDirection;
 	    protected boolean movementConditionActivated;
 	    float movementConditionActivatedTime;
+	    int currentJumpTokens, maxJumpTokens;
 		
 		
 		ActionListener actionListener;
@@ -136,6 +139,8 @@ public abstract class Character implements ModelListener {
 			alreadyDead = false;
 			isSlowingDown = false;
 			sprinting = false;
+			injuredStaggering = false;
+			queuedJump = false;
 			this.movementConditionActivated = false;
 			this.movementConditionActivatedTime = 0f;
 			stateTime = 0f;
@@ -170,6 +175,8 @@ public abstract class Character implements ModelListener {
 			setCurrentStability(properties.getMaxStability(), null, null);
 			setMaxTension(properties.getMaxTension());
 			setCurrentTension(0);
+			setMaxJumpTokens(properties.getMaxJumpTokens());
+			setCurrentJumpTokens(properties.getMaxJumpTokens());
 			acceleration.y = -properties.getGravity();
 			weapons = new Array <Weapon> ();
 			for (StringWrapper key : this.getCharacterProperties().getWeaponKeys()) {
@@ -240,10 +247,10 @@ public abstract class Character implements ModelListener {
 				this.didChangeState = false; 
 			}
 			if (this.isImmuneToInjury()) {
-				injuryTime += delta;
+				injuryImmunityTime += delta;
 			}
 			
-			if (this.injuryTime > this.properties.getInjuryImmunityTime()) {
+			if (this.injuryImmunityTime > this.properties.getInjuryImmunityTime()) {
 				this.setImmuneToInjury(false);
 			}
 			if (!isInAir && !walking && !this.isProcessingActiveSequences()) {
@@ -254,7 +261,6 @@ public abstract class Character implements ModelListener {
 			}
 		}
 		
-//		boolean isProcessing = false;
 		private void handleActionSequences(float delta) {
 			if (this.processingActionSequences != null) {
 				Iterator <ActionSequence> iterator = processingActionSequences.iterator();
@@ -262,23 +268,15 @@ public abstract class Character implements ModelListener {
 					ActionSequence actionSequence = iterator.next();
 					actionSequence.process(delta, actionListener);
 					if (actionSequence.isFinished()) {
-//						isProcessing = false;
-//						System.out.println("Finishing");
-//						System.out.println("Walking " + this.walking);
-//						System.out.println("Action Locked " + this.actionLocked);	
 						iterator.remove();
+//						if (queuedJump)
+//							queuedJump = false;
 						if (this instanceof PlayerModel){
 							PlayerModel model = (PlayerModel) this;
 							if (model.getCurrentlyHeldDirection().equals(DirectionalInput.LEFT) || model.getCurrentlyHeldDirection().equals(DirectionalInput.RIGHT))
 								horizontalMove(model.getCurrentlyHeldDirection().equals(DirectionalInput.LEFT));
 						}
 					}
-//					else if (!isProcessing){
-//						isProcessing = true;
-//						System.out.println("Processing");
-//						System.out.println("Walking " + this.walking);
-//						System.out.println("Action Locked " + this.actionLocked);					
-//					}
 				}
 
 			}
@@ -293,9 +291,6 @@ public abstract class Character implements ModelListener {
 				this.endActionStagger();
 				this.stopHorizontalMovement(true);
 				this.processingActionSequences.add(nextActiveActionSequences.poll());
-//				System.out.println("Adding action");
-//				System.out.println("Walking " + this.walking);
-//				System.out.println("Action Locked " + this.actionLocked);
 			}
 			
 		}
@@ -394,15 +389,6 @@ public abstract class Character implements ModelListener {
 	    	}
 		}
 		
-//		public MovementEffect getCurrentMovement() {
-//			for (EntityEffect effect : this.currentEffects) {
-//				if (effect instanceof MovementEffect) {
-//					return (MovementEffect) effect;
-//				}
-//			}
-//			return null;
-//		}
-		
 		public XMovementEffect getXMove() {
 			for (EntityEffect effect : this.currentEffects) {
 				if (effect instanceof XMovementEffect) {
@@ -488,20 +474,40 @@ public abstract class Character implements ModelListener {
 		}
 		
 		public void jump() {
-	        if (!isInAir && !actionLocked) {
-	            isInAir = true;
+			if (!actionLocked || (this.getCurrentActiveActionSeq() != null && this.getCurrentActiveActionSeq().chainsWithJump())) {
+//				if (!this.actionStaggering) {
+//					jumpCode();
+//				}
+//				else {
+//					this.forceEndForActiveAction();
+//					this.queuedJump = true;
+//				}
+				
+				if (!this.actionStaggering && this.getCurrentActiveActionSeq() == null) {
+					jumpCode();
+				}
+				else if (!this.actionStaggering && this.getCurrentActiveActionSeq() != null) {
+					this.queuedJump = true;
+				}
+				else if (this.actionStaggering){
+					this.forceActiveForActiveAction();
+					this.queuedJump = true;
+				}
+			}
+	    }
+		
+		private void jumpCode() {
+			if (this.currentJumpTokens > 0) {
+				this.forceEndForActiveAction();
+				if (!isInAir)
+					isInAir = true;
 	            this.setWalking(false);
 	            this.getVelocity().y = getJumpSpeed();
 		    	this.setMovementStatesIfNeeded();
-	        }
-	    }
-		
-	    public void stopJump() {
-	    	if (isInAir && this.getVelocity().y >= 0 && !this.actionLocked) {
-	    		this.getVelocity().y = 0;
-		    	this.setMovementStatesIfNeeded();
-	    	}
-	    }
+		    	this.currentJumpTokens -= 1;
+			}
+
+		}
 	    
 		public void horizontalMove(boolean left) {
 			if (!this.actionLocked) {
@@ -517,7 +523,7 @@ public abstract class Character implements ModelListener {
 			}
 		}
 		
-		public void setHorizontalSpeedForMovement(boolean movingLeft) {
+		private void setHorizontalSpeedForMovement(boolean movingLeft) {
 			if (this.sprinting) {
 				this.velocity.x = movingLeft ? -this.properties.getSprintSpeed() : this.properties.getSprintSpeed();
 			}
@@ -629,7 +635,15 @@ public abstract class Character implements ModelListener {
 		}
 		
 	    public void landed(boolean isFromEntityCollision) {
-	    	if (this.isInAir) {
+	    	if (this.injuredStaggering && this.isInAir && this.velocity.y < 0) {
+	    		//do wakeup action.
+	    		injuredStaggering = false;
+	    		ActionSequence wakeupSeq = ActionSequence.createWakeupSequence(this, this.actionListener, this.getCurrentActiveActionSeq());
+	    		this.forceEndForActiveAction();
+	    		this.isInAir = false;
+	    		this.addActionSequence(wakeupSeq);
+	    	}
+	    	else if (this.isInAir) {
 	    		if (!isFromEntityCollision)
 	    		{
 	    			this.forceEndForActiveAction();
@@ -646,6 +660,7 @@ public abstract class Character implements ModelListener {
 					this.setMovementStatesIfNeeded();
 				}
 	    	}
+	    	this.setCurrentJumpTokens(maxJumpTokens);;
 	    }
 		
 	    public void falling() {
@@ -685,11 +700,18 @@ public abstract class Character implements ModelListener {
 		
 		private void staggerAction(XMovementEffectSettings xPotentialMovementSettings, YMovementEffectSettings yPotentialMovementSettings) {
 			this.forceEndForActiveAction();
-			ActionSequence staggerAction = ActionSequence.createStaggerSequence(this, xPotentialMovementSettings, yPotentialMovementSettings, this.actionListener, StaggerType.Normal);
+			this.injuredStaggering = true;
+			StaggerType staggerType = this.isInAir() || (yPotentialMovementSettings != null && yPotentialMovementSettings.getVelocity() > 0) ? StaggerType.Aerial : StaggerType.Normal;
+			ActionSequence staggerAction = ActionSequence.createStaggerSequence(this, xPotentialMovementSettings, yPotentialMovementSettings, this.actionListener, staggerType);
     		this.addActionSequence(staggerAction);
     		this.actionStagger(true);
-    		this.setCurrentStability(this.maxStability, null, null);
+    		if (!this.isInAir && (yPotentialMovementSettings == null || (yPotentialMovementSettings.getVelocity() <= 0 && yPotentialMovementSettings.getAcceleration() <= 0))) {
+        		this.setCurrentStability(this.maxStability, null, null);
+    		}
+    		else {
+        		this.setCurrentStability(1, null, null);
 
+    		}
 		}
 		
 		public void shouldProjectileHit(Projectile projectile) {
@@ -804,6 +826,10 @@ public abstract class Character implements ModelListener {
 //				}
 				this.actionStaggering = false;
 				this.actionStaggerTime = 0f;
+				if (this.queuedJump) {
+					this.jumpCode();
+					this.queuedJump = false;
+				}
 			}
 
 		}
@@ -817,16 +843,21 @@ public abstract class Character implements ModelListener {
 			this.velocity.x = 0f;
 			this.velocity.y = 0f;
 			ActionSequence currentSeq = this.getCurrentActiveActionSeq();
-			if (currentSeq != null) {
-				currentSeq.stagger();
+			if (!this.queuedJump) {
+				if (currentSeq != null) {
+					currentSeq.stagger();
+				}
+				
+				for (EntityEffect effect : this.currentEffects) {
+					if (effect instanceof XMovementEffect || effect instanceof YMovementEffect)
+						effect.stagger();
+				}
+				
+				this.modelListener.actionStagger();
 			}
-			
-			for (EntityEffect effect : this.currentEffects) {
-				if (effect instanceof XMovementEffect || effect instanceof YMovementEffect)
-					effect.stagger();
+			else {
+				this.forceEndForActiveAction();
 			}
-			
-			this.modelListener.actionStagger();
 		}
 		
 		public void setWalking(boolean walking) {
@@ -871,6 +902,10 @@ public abstract class Character implements ModelListener {
 			if (realStability == 0) {
 				staggerAction(xPotentialMovement, yPotentialMovement);
 			}
+			else {
+				//only action stagger.
+			}
+			System.out.println("stability: " + this.currentStability);
 		}
 
 		public float getMaxStability() {
@@ -923,12 +958,11 @@ public abstract class Character implements ModelListener {
 		}
 
 		public void setState(String state) {
-			if (this.state == null || !this.state.equals(state)) {
+			if (this.state == null || (!this.state.equals(state))) {
 				this.state = state;
 				this.didChangeState = true;
 				this.stateTime = 0f;
 			}
-
 		}
 
 		public float getCurrentHealth() {
@@ -965,6 +999,23 @@ public abstract class Character implements ModelListener {
 			this.currentWill = maxWill;
 		}
 
+		public int getCurrentJumpTokens() {
+			return currentJumpTokens;
+		}
+
+		public void setCurrentJumpTokens(int currentJumpTokens) {
+			this.currentJumpTokens = Math.min(Math.max(0, currentJumpTokens), this.maxJumpTokens);
+		}
+
+		public int getMaxJumpTokens() {
+			return maxJumpTokens;
+		}
+
+		public void setMaxJumpTokens(int maxJumpTokens) {
+			this.maxJumpTokens = maxJumpTokens;
+			this.currentJumpTokens = maxJumpTokens;
+		}
+
 		public float getAttack() {
 			return attack;
 		}
@@ -977,10 +1028,16 @@ public abstract class Character implements ModelListener {
 			return name;
 		}
 		
-		public String getNameForStaggerSeq(StaggerType type) {
+		public String getNameForWakeupSeq() {
+			return this.properties.useDefaultWakeup ? "" : this.getName();
+		}
+		
+		public String getNameForStaggerSeq(StaggerType type, YMovementEffectSettings yOverridingMovement) {
 			if (type.equals(StaggerType.Normal)) {
 				return this.properties.useDefaultStagger ? "" : this.getName();
-
+			}
+			else if (type.equals(StaggerType.Aerial)) {
+				return this.properties.useDefaultAerialStagger ? "" : this.getName();
 			}
 			else if (type.equals(StaggerType.Tension)) {
 				return this.properties.useDefaultTensionStagger ? "" : this.getName();
@@ -1015,7 +1072,7 @@ public abstract class Character implements ModelListener {
 
 		public void setImmuneToInjury(boolean isImmuneToInjury) {
 			this.isImmuneToInjury = isImmuneToInjury;
-			injuryTime = 0f;
+			injuryImmunityTime = 0f;
 		}
 		
 		public ActionListener getActionListener() {
@@ -1089,6 +1146,10 @@ public abstract class Character implements ModelListener {
 
 		public boolean isSprinting() {
 			return sprinting;
+		}
+
+		public boolean isInjuredStaggering() {
+			return injuredStaggering;
 		}
 		
 	}

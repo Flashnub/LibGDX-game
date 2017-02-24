@@ -33,12 +33,14 @@ public class ActionSequence implements Serializable {
 	}
 	
 	public enum StaggerType {
-		Normal, Tension;
+		Normal, Aerial, Tension;
 		
 		public String getKeyForStaggerType(String namePrefix) {
-			switch(this) {
+			switch(this) { //Ground stagger 1s, Aerial stagger indefinite
 			case Normal:
 				return namePrefix + ActionSequence.staggerKey;
+			case Aerial:
+				return namePrefix + ActionSequence.aerialStaggerKey;
 			case Tension: 
 				return namePrefix + ActionSequence.tensionStaggerKey;
 			}
@@ -76,13 +78,13 @@ public class ActionSequence implements Serializable {
 	private float staggerTime;
 	private ActionSegment action;
 	private boolean isStaggered;
-	private boolean cannotBeOverriden;
+	private boolean highPriority;
 	private boolean shouldOverridePrevAction;
 
 	
 	public ActionSequence() {
 		this.isStaggered = false;
-		this.cannotBeOverriden = false;
+		this.highPriority = false;
 		this.shouldOverridePrevAction = false;
 		this.staggerTime = 0f;
 		this.probabilityToActivate = 0f;
@@ -110,7 +112,7 @@ public class ActionSequence implements Serializable {
 		sequence.target = target;
 		sequence.dialogueController = dialogueController;
 		sequence.actionListener = actionListener;
-		sequence.cannotBeOverriden = true;
+		sequence.highPriority = true;
 		sequence.shouldOverridePrevAction = true;
 		sequence.useType = UseType.Either;
 		sequence.leftInputs = new Array <Array <String>>();
@@ -123,17 +125,58 @@ public class ActionSequence implements Serializable {
 	}
 	
 	static final String staggerKey = "Stagger";
+	static final String aerialStaggerKey = "AerialStagger";
 	static final String tensionStaggerKey = "TensionStagger";
+	
+	public static ActionSequence createWakeupSequence(CharacterModel source, ActionListener actionListener, ActionSequence previousActionSequence) {
+		ActionSequence sequence = new ActionSequence();
+		sequence.actionKey = new ActionSegmentKey(source.getNameForWakeupSeq() + "Wakeup", ActionType.Stagger);
+		sequence.isActive = true;
+		sequence.strategy = ActionStrategy.Story;
+		sequence.windupState = "WakeupWindup";
+		sequence.actingState = "WakeupActive";
+		sequence.cooldownState = "WakeupCooldown";
+		
+		sequence.leftWindupState = sequence.windupState;
+		sequence.leftActingState = sequence.actingState;
+		sequence.leftCooldownState = sequence.cooldownState;
+		sequence.useLeft = source.isFacingLeft();
+		sequence.highPriority = true; //Shouldn't remove action for tension
+		
+		sequence.source = source;
+		sequence.actionListener = actionListener;
+		sequence.useType = UseType.Ground;
+		sequence.leftInputs = new Array <Array <String>>();
+		sequence.rightInputs = new Array <Array <String>>();
+		sequence.conditionSettings = new Array <ActionConditionSettings>();
+		
+		if (previousActionSequence != null) {
+			XMovementEffectSettings xMovement = previousActionSequence.getAction().getSourceXMove();
+			xMovement.getPassiveConditions().clear(); //Makes sure that the movement effect occurs only for wakeups
+			sequence.createActionFromSettings(null, xMovement, null);
+		}
+		else {
+			sequence.createActionFromSettings(null, null, null);
+		}
+		
+		
+		return sequence;
+	}
 	
 	public static ActionSequence createStaggerSequence(CharacterModel source, XMovementEffectSettings xOverridingMovement, YMovementEffectSettings yOverridingMovement, ActionListener actionListener, StaggerType staggerType) {
 		ActionSequence sequence = new ActionSequence();
-		sequence.actionKey = new ActionSegmentKey(staggerType.getKeyForStaggerType(source.getNameForStaggerSeq(staggerType)), ActionType.Stagger);
+		sequence.actionKey = new ActionSegmentKey(staggerType.getKeyForStaggerType(source.getNameForStaggerSeq(staggerType, yOverridingMovement)), ActionType.Stagger);
 		sequence.isActive = true;
 		sequence.strategy = ActionStrategy.Story;
 		if (staggerType.equals(StaggerType.Tension)) {
 			sequence.windupState = "TensionStaggerWindup";
 			sequence.actingState = "TensionStagger";
 			sequence.cooldownState = "TensionStaggerCooldown";
+		}
+		else if (source.isInAir() || (yOverridingMovement != null && yOverridingMovement.getVelocity() > 0)){
+			sequence.windupState = "AerialStaggerWindup";
+			sequence.actingState = "AerialStagger";
+			sequence.cooldownState = "AerialStaggerCooldown";
 		}
 		else {
 			sequence.windupState = "StaggerWindup";
@@ -146,8 +189,8 @@ public class ActionSequence implements Serializable {
 		sequence.leftActingState = sequence.actingState;
 		sequence.leftCooldownState = sequence.cooldownState;
 		sequence.useLeft = source.isFacingLeft();
-		sequence.cannotBeOverriden = true; //Shouldn't remove action for tension
-		sequence.shouldOverridePrevAction = staggerType.equals(StaggerType.Normal);
+		sequence.highPriority = true; //Shouldn't remove action for tension
+		sequence.shouldOverridePrevAction = staggerType.equals(StaggerType.Normal) || staggerType.equals(StaggerType.Aerial);
 
 		
 		sequence.source = source;
@@ -387,6 +430,7 @@ public class ActionSequence implements Serializable {
 		ActionSegment action = 	this.getActionSegmentForKey(this.actionKey, potentialDialogue, xReplacementMovement, yReplacementMovement);
 		if (action != null) {
 			this.action = action;
+			action.shouldLockControls = this.isActive;
 		}
 	}
 
@@ -434,6 +478,11 @@ public class ActionSequence implements Serializable {
 	public void stagger() {
 		this.isStaggered = true;
 		this.staggerTime = 0f;
+	}
+	
+	public void stagger(float staggerTime) {
+		this.isStaggered = true;
+		this.staggerTime = staggerTime;
 	}
 	
 	public boolean doInputsMatch(Queue <String> inputs, CharacterModel source, boolean onlyFirstInput) {
@@ -488,7 +537,11 @@ public class ActionSequence implements Serializable {
 	}
 	
 	public boolean cannotBeOverriden() {
-		return cannotBeOverriden;
+		return highPriority;
+	}
+	
+	public boolean chainsWithJump() {
+		return action.chainsWithJump();
 	}
 	
 	//For Enemy AIs

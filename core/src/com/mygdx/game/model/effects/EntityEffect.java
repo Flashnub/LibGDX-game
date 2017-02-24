@@ -14,6 +14,7 @@ public abstract class EntityEffect extends Effect {
 	float staggerTime;
 	boolean staggered;
 	EntityEffectSettings eSettings;
+	boolean checkedConditions;
 	
 	public static final int LowPriority = 3;
 	public static final int MediumPriority = 5;
@@ -24,7 +25,7 @@ public abstract class EntityEffect extends Effect {
 		this.setController(controller);
 		this.passiveConditions = new Array <PassiveCondition>();
 		for (PassiveConditionSettings conditionSettings : this.settings.getPassiveConditions()) {
-			PassiveCondition condition = ConditionInitializer.initializePassiveCondition(this.getController().getSource(), conditionSettings);
+			PassiveCondition condition = ConditionInitializer.initializePassiveCondition(conditionSettings);
 			this.passiveConditions.add(condition);
 		}
 		staggerTime = 0f;
@@ -32,6 +33,7 @@ public abstract class EntityEffect extends Effect {
 		if (settings instanceof EntityEffectSettings) {
 			this.eSettings = (EntityEffectSettings) settings;
 		}
+		this.checkedConditions = false;
 	}
 	
 	public abstract boolean shouldReciprocateToSource(CharacterModel target, ActionListener listener);
@@ -46,9 +48,9 @@ public abstract class EntityEffect extends Effect {
 	
 	public static Array <Integer> getPriorities() {
 		Array <Integer> priorities = new Array <Integer> ();
-		priorities.add(EntityEffect.LowPriority);
-		priorities.add(EntityEffect.MediumPriority);
 		priorities.add(EntityEffect.HighPriority);
+		priorities.add(EntityEffect.MediumPriority);
+		priorities.add(EntityEffect.LowPriority);
 		return priorities;
 	}
 	
@@ -74,17 +76,23 @@ public abstract class EntityEffect extends Effect {
 			return false;
 		}
 		boolean isFinished = false;
-		boolean conditionsMet = true;
-		for (PassiveCondition condition : this.passiveConditions) {
-			conditionsMet = conditionsMet && condition.isConditionMet();
-			if (!conditionsMet && this.isActive && condition.endIfNotMet()) {
-				this.setForceEnd(true);
+		if (!this.checkedConditions) {
+			boolean conditionsMet = true;
+			for (PassiveCondition condition : this.passiveConditions) {
+				conditionsMet = conditionsMet && condition.isConditionMet(target);
+				if (!conditionsMet) {
+					this.setForceEnd(true);
+					isFinished = true;
+					return isFinished;
+				}
 			}
+			this.checkedConditions = true;
 		}
+
 		if ((getCurrentTime() >= settings.getDelayToActivate() || settings.isInstantaneous()) && !this.hasProcessedInitial()) {
 			this.initialProcess(target);
 		}
-		if ((getCurrentTime() > settings.getDelayToActivate() && getCurrentTime() < settings.getDuration() + settings.getDelayToActivate()) || settings.isInstantaneous() && conditionsMet) {
+		if ((getCurrentTime() > settings.getDelayToActivate() && getCurrentTime() < settings.getDuration() + settings.getDelayToActivate()) || settings.isInstantaneous()) {
 			this.processDuringActive(target, delta);
 		}
 		if ((getCurrentTime() >= (settings.getDuration() + settings.getDelayToActivate()) || settings.isInstantaneous() || this.isForceEnd()) && !this.hasProcessedCompletion()) {

@@ -63,6 +63,24 @@
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Aerial2Windup",
+			"numberOfFrames": 4,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Aerial2Active",
+			"numberOfFrames": 2,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Aerial2Cooldown",
+			"numberOfFrames": 2,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
 			"name": "MedAtk2Windup",
 			"numberOfFrames": 3,
 			"playMode": NORMAL
@@ -117,6 +135,24 @@
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Aerial1Windup",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Aerial1Active",
+			"numberOfFrames": 2,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Aerial1Cooldown",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
 			"name": "LaunchWindup",
 			"numberOfFrames": 5,
 			"playMode": NORMAL
@@ -137,6 +173,24 @@
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "Sprint",
 			"numberOfFrames": 10,
+			"playMode": NORMAL
+		}
+				{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "DashWindup",
+			"numberOfFrames": 3,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "DashActive",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "DashCooldown",
+			"numberOfFrames": 1,
 			"playMode": NORMAL
 		}
 	]

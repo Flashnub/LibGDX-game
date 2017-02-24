@@ -4,6 +4,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.EffectController;
+import com.mygdx.game.model.effects.XMovementEffectSettings;
+import com.mygdx.game.model.effects.YMovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
 
 public abstract class ActionSegment implements EffectController {
@@ -29,7 +31,7 @@ public abstract class ActionSegment implements EffectController {
 	ActionState actionState;
 	float processedWindupTime;
 	float processedActiveTime;
-	
+	boolean shouldLockControls;
 	protected float windupTime;
 	protected float activeTime;
 	protected float cooldownTime;
@@ -46,6 +48,7 @@ public abstract class ActionSegment implements EffectController {
 		hasProcessedInterruption = false;
 		hasProcessedCompletion = false;
 		shouldChain = false;
+		shouldLockControls = false;
 		processedActiveTime = 0f;
 		processedWindupTime = 0f;			
 		this.currentTime = 0f;
@@ -72,7 +75,7 @@ public abstract class ActionSegment implements EffectController {
 		hasProcessedWindupSource = true;
 		this.setActionState(ActionState.WINDUP);
 		sourceWindupProcessWithoutSuper(source);
-		if (!source.isActionLock()) {
+		if (!source.isActionLock() && this.shouldLockControls) {
 			source.lockControls();
 		}
 		for (ActionSegmentListener listener : this.segmentListeners) {
@@ -81,7 +84,9 @@ public abstract class ActionSegment implements EffectController {
 	}
 	
 	public void completionBlock(CharacterModel source) {
-		this.setActionState(ActionState.COOLDOWN);
+		if (!forceEnd)
+			this.setActionState(ActionState.COOLDOWN);
+		
 		this.hasProcessedCompletion = true;
 		this.sourceCompletionWithoutSuper(source);
 		for (ActionSegmentListener listener : this.segmentListeners) {
@@ -181,4 +186,7 @@ public abstract class ActionSegment implements EffectController {
 	public abstract boolean shouldRespectEntityCollisions();
 	public abstract boolean doesNeedDisruptionDuringWindup();
 	public abstract boolean doesNeedDisruptionDuringActive();
+	public abstract XMovementEffectSettings getSourceXMove();
+	public abstract YMovementEffectSettings getSourceYMove();
+	public abstract boolean chainsWithJump();
 }

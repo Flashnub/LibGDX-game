@@ -1,31 +1,21 @@
 {
-	"PlayerDash": {
+	"Dash": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
-		"duration": 0.5,
 		"sourceRespectEntityCollisions": false,
 		"sourceEffectSettings": [
 			{
-				"class": "com.mygdx.game.model.effects.MovementEffectSettings",
+				"class": "com.mygdx.game.model.effects.XMovementEffectSettings",
 				"duration": 0.5,
 				"delayToActivate": 0.0,
 				"isInstantaneous": false,
 				"value": 0,
-				"velocity": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": 400,
-					"y": 0
-				}
-				"acceleration": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": -800,
-					"y": 0
-				}
+				"velocity": 400,
+				"acceleration": -800
 			}
 		]
 	}
 	"PlayerBlock": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
-		"duration": 1,
 		"sourceEffectSettings": [
 			{
 				"class": "com.mygdx.game.model.effects.BlockEffectSettings",
@@ -43,57 +33,52 @@
 				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
 				"value": 0
 			}
-		],
-		"windupTime": 1,
-		"cooldownTime": 1,
-		"duration": 1
+		]
 	}
 	"Stagger": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
-		"duration": 1,
 		"sourceEffectSettings": [
 			{
-				"class": "com.mygdx.game.model.effects.MovementEffectSettings",
+				"class": "com.mygdx.game.model.effects.XMovementEffectSettings",
 				"duration": .5,
-				"delayToActivate": 0.3,
 				"isInstantaneous": false,
 				"value": 0,
-				"velocity": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": 50,
-					"y": 0
-				}
-				"acceleration": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": -100,
-					"y": 0
-				}
+				"velocity": 50,
+				"acceleration": -100
 			}
 		]
 	}
+	"AerialStagger": {
+		"class": "com.mygdx.game.model.actions.AbilitySettings",
+		"activeTillDisruption": true
+		"sourceEffectSettings": [
+			{
+				"class": "com.mygdx.game.model.effects.XMovementEffectSettings",
+				"duration": .5,
+				"isInstantaneous": false,
+				"value": 0,
+				"velocity": 50,
+				"acceleration": -100
+			}
+		]
+	}
+	"Wakeup": {
+		"class": "com.mygdx.game.model.actions.AbilitySettings",
+	}
 	"PlayerTensionStagger": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
-		"duration": 1
 	}
 	"PlayerDeath": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
-		"duration": 1
 	}
 	"BasicEnemyDeath": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
-		"windupTime": 1,
-		"cooldownTime": 1,
-		"duration": 1
 	}
 	"BasicEnemyTensionStagger": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
-		"duration": 1
 	}
 	"HealthPotion": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
-		"windupTime": 1,
-		"cooldownTime": 1,
-		"duration": 1
 		"sourceEffectSettings": [
 			{
 				"class": com.mygdx.game.model.effects.HealingEffectSettings,

@@ -47,7 +47,7 @@ public class YMovementEffect extends EntityEffect{
 	}
 
 	public int getPriority() {
-		return EntityEffect.HighPriority;
+		return EntityEffect.MediumPriority;
 	}
 
 	@Override

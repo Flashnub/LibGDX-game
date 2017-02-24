@@ -54,7 +54,7 @@ public class AnimationData implements Serializable {
 			this.frameRate = 1f / frameRate;
 		}
 		else {
-			this.frameRate = 1f / 15f;
+			this.frameRate = 1f / 24f;
 		}
 		playMode = json.readValue("playMode", PlayMode.class, jsonData);
 	}

@@ -30,9 +30,6 @@ public class Attack extends ActionSegment {
 		super(listener);
 		this.source = source;
 		this.allegiance = source.getAllegiance();
-		if (settings == null) {
-			System.out.println("");
-		}
 		this.attackSettings = settings.deepCopy();
 		this.activeSourceEffects = new Array <EntityEffect>();
 		this.windupSourceEffects = new Array <EntityEffect>();
@@ -299,8 +296,33 @@ public class Attack extends ActionSegment {
 	
 	@Override
 	public void setDurations(CharacterModel source) {
-		this.windupTime = source.getUiModel().getTimeForAnimation(this.attackSettings.name, "Windup");
-		this.activeTime = source.getUiModel().getTimeForAnimation(this.attackSettings.name, "Active");
+		this.windupTime = this.attackSettings.windupTillDisruption ? Float.MAX_VALUE : source.getUiModel().getTimeForAnimation(this.attackSettings.name, "Windup");
+		this.activeTime = this.attackSettings.activeTillDisruption ? Float.MAX_VALUE : source.getUiModel().getTimeForAnimation(this.attackSettings.name, "Active");
 		this.cooldownTime = source.getUiModel().getTimeForAnimation(this.attackSettings.name, "Cooldown");
+	}
+	
+	@Override
+	public XMovementEffectSettings getSourceXMove() {
+		for(EffectSettings effect : this.attackSettings.sourceEffectSettings) {
+			if (effect instanceof XMovementEffectSettings) {
+				return (XMovementEffectSettings) effect.deepCopy();
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public YMovementEffectSettings getSourceYMove() {
+		for(EffectSettings effect : this.attackSettings.sourceEffectSettings) {
+			if (effect instanceof YMovementEffectSettings) {
+				return (YMovementEffectSettings) effect.deepCopy();
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public boolean chainsWithJump() {
+		return attackSettings.chainsWithJump;
 	}
 }

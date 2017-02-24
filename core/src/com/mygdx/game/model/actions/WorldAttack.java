@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.EffectInitializer;
+import com.mygdx.game.model.effects.EffectSettings;
 import com.mygdx.game.model.effects.EntityEffect;
 import com.mygdx.game.model.effects.XMovementEffectSettings;
 import com.mygdx.game.model.effects.YMovementEffectSettings;
@@ -193,8 +194,33 @@ public class WorldAttack extends ActionSegment{
 
 	@Override
 	public void setDurations(CharacterModel source) {
-		this.windupTime = source.getUiModel().getTimeForAnimation(this.worldAttackSettings.getAbilitySettings().name, "Windup");
-		this.activeTime = source.getUiModel().getTimeForAnimation(this.worldAttackSettings.getAbilitySettings().name, "Active");
+		this.windupTime = this.worldAttackSettings.getAbilitySettings().windupTillDisruption ? Float.MAX_VALUE : source.getUiModel().getTimeForAnimation(this.worldAttackSettings.getAbilitySettings().name, "Windup");
+		this.activeTime = this.worldAttackSettings.getAbilitySettings().activeTillDisruption ? Float.MAX_VALUE : source.getUiModel().getTimeForAnimation(this.worldAttackSettings.getAbilitySettings().name, "Active");
 		this.cooldownTime = source.getUiModel().getTimeForAnimation(this.worldAttackSettings.getAbilitySettings().name, "Cooldown");
+	}
+	
+	@Override
+	public XMovementEffectSettings getSourceXMove() {
+		for(EffectSettings effect : this.worldAttackSettings.getAbilitySettings().sourceEffectSettings) {
+			if (effect instanceof XMovementEffectSettings) {
+				return (XMovementEffectSettings) effect.deepCopy();
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public YMovementEffectSettings getSourceYMove() {
+		for(EffectSettings effect : this.worldAttackSettings.getAbilitySettings().sourceEffectSettings) {
+			if (effect instanceof YMovementEffectSettings) {
+				return (YMovementEffectSettings) effect.deepCopy();
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public boolean chainsWithJump() {
+		return worldAttackSettings.getAbilitySettings().chainsWithJump;
 	}
 }

@@ -35,11 +35,14 @@ public class CharacterProperties implements Serializable {
 	HashMap<String, ActionSequence> actions;
 	Array <StringWrapper> weaponKeys;
 	Array <ActionSequence> sequencesSortedByInputSize;
+	boolean useDefaultWakeup;
 	boolean useDefaultStagger;
+	boolean useDefaultAerialStagger;
 	boolean useDefaultTensionStagger;
 	boolean shouldRespectEntityCollisions;
 	boolean shouldRespectTileCollisions;
 	boolean shouldRespectObjectCollisions;
+	int maxJumpTokens;
 	
 	Float xOffsetModifier;
 	Float yOffsetModifier;
@@ -196,6 +199,14 @@ public class CharacterProperties implements Serializable {
 			this.useDefaultStagger = true;
 		}
 		
+		Boolean useDefaultAerialStagger = json.readValue("useDefaultAerialStagger", Boolean.class, jsonData);
+		if (useDefaultAerialStagger != null) {
+			this.useDefaultAerialStagger = useDefaultAerialStagger;
+		}
+		else {
+			this.useDefaultAerialStagger = true;
+		}
+		
 		Boolean useDefaultTensionStagger = json.readValue("useDefaultTensionStagger", Boolean.class, jsonData);
 		if (useDefaultTensionStagger != null) {
 			this.useDefaultTensionStagger = useDefaultStagger;
@@ -225,6 +236,22 @@ public class CharacterProperties implements Serializable {
 			ActionSequence.addSequenceToSortedArray(sequencesSortedByInputSize, sequence);
 		}
 		
+		Boolean useDefaultWakeup = json.readValue("useDefaultWakeup", Boolean.class, jsonData);
+		if (useDefaultWakeup != null) {
+			this.useDefaultWakeup = useDefaultWakeup;
+		}
+		else {
+			this.useDefaultWakeup = true;
+		}	
+		
+		Integer maxJumpTokens = json.readValue("maxJumpTokens", Integer.class, jsonData); 
+		if (maxJumpTokens != null) {
+			this.maxJumpTokens = maxJumpTokens;
+		}
+		else {
+			this.maxJumpTokens = 2;
+		}
+		
 	}
 
 	public CharacterProperties cloneProperties() {
@@ -251,6 +278,9 @@ public class CharacterProperties implements Serializable {
 		properties.shouldRespectTileCollisions = this.shouldRespectTileCollisions;
 		properties.xOffsetModifier = this.xOffsetModifier;
 		properties.yOffsetModifier = this.yOffsetModifier;
+		properties.useDefaultAerialStagger = this.useDefaultAerialStagger;
+		properties.useDefaultWakeup = this.useDefaultWakeup;
+		properties.maxJumpTokens = this.maxJumpTokens;
 		//iterate through actions.
 		HashMap <String, ActionSequence> clonedActions = new HashMap<String, ActionSequence> ();
 		for (Map.Entry<String, ActionSequence> entry : actions.entrySet()) {
@@ -387,6 +417,10 @@ public class CharacterProperties implements Serializable {
 
 	public boolean shouldRespectObjectCollisions() {
 		return shouldRespectObjectCollisions;
+	}
+
+	public int getMaxJumpTokens() {
+		return maxJumpTokens;
 	}
 	
 	

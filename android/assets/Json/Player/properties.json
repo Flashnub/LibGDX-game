@@ -10,11 +10,11 @@
 	"useDefaultStagger": true,
 	"useDefaultTensionStagger": false,
 	"actions": {
-		"PlayerDash": {
+		"Dash": {
 			"class": com.mygdx.game.model.actions.ActionSequence,
 			"actionKey": {
 				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": "PlayerDash",
+				"key": "Dash",
 				"typeOfAction": Ability
 			}
 			"windUpState": "DashWindup"

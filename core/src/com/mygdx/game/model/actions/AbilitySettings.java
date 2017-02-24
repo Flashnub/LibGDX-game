@@ -20,6 +20,7 @@ public class AbilitySettings implements Serializable {
 	boolean activeTillDisruption;
 	boolean windupTillDisruption;
 	boolean sourceRespectEntityCollisions; //if this is false, the action ignores all entity collisions.
+	boolean chainsWithJump;
 	Float tempWidthModifier;
 	Float tempHeightModifier;
 	Float xOffsetModifier;
@@ -112,6 +113,13 @@ public class AbilitySettings implements Serializable {
 			this.sourceRespectEntityCollisions = true;
 		}		
 		
+		Boolean chainsWithJump = json.readValue("chainsWithJump", Boolean.class, jsonData);
+		if (chainsWithJump != null) {
+			this.chainsWithJump = chainsWithJump;
+		}
+		else {
+			this.chainsWithJump = true;
+		}	
 	}
 
 	public boolean activeTillDisruption() {
@@ -125,36 +133,28 @@ public class AbilitySettings implements Serializable {
 	public void replaceXMovementIfNecessary(XMovementEffectSettings xMovementSettings) {
 		if (xMovementSettings != null) {
 			Iterator <EffectSettings> iterator = this.sourceEffectSettings.iterator();
-			boolean hasMovement = false;
 			while (iterator.hasNext()) {
 				EffectSettings settings = iterator.next();
 				if (settings instanceof XMovementEffectSettings) {
 					iterator.remove();
-					hasMovement = true;
 					break;
 				}
 			}
-			if (hasMovement) {
-				this.sourceEffectSettings.add(xMovementSettings);
-			}
+			this.sourceEffectSettings.add(xMovementSettings);	
 		}
 	}
 	
 	public void replaceYMovementIfNecessary(YMovementEffectSettings yMovementSettings) {
 		if (yMovementSettings != null) {
 			Iterator <EffectSettings> iterator = this.sourceEffectSettings.iterator();
-			boolean hasMovement = false;
 			while (iterator.hasNext()) {
 				EffectSettings settings = iterator.next();
 				if (settings instanceof YMovementEffectSettings) {
 					iterator.remove();
-					hasMovement = true;
 					break;
 				}
 			}
-			if (hasMovement) {
-				this.sourceEffectSettings.add(yMovementSettings);
-			}
+			this.sourceEffectSettings.add(yMovementSettings);
 		}
 	}
 	
@@ -187,6 +187,7 @@ public class AbilitySettings implements Serializable {
 		this.xOffsetModifier = settings.xOffsetModifier;
 		this.yOffsetModifier = settings.yOffsetModifier;
 		this.name = settings.name;
+		this.chainsWithJump = settings.chainsWithJump;
 	}
 	
 	public AbilitySettings deepCopy() {
@@ -196,6 +197,7 @@ public class AbilitySettings implements Serializable {
 //		copy.cooldownTime = this.cooldownTime;
 		copy.activeTillDisruption = this.activeTillDisruption;
 		copy.windupTillDisruption = this.windupTillDisruption;
+		copy.chainsWithJump = this.chainsWithJump;
 //		copy.duration = this.duration;
 		copy.tempHeightModifier = this.tempHeightModifier;
 		copy.tempWidthModifier = this.tempWidthModifier;

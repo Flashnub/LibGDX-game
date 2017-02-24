@@ -3,6 +3,7 @@ package com.mygdx.game.model.actions;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.EntityEffect;
+import com.mygdx.game.model.effects.EntityEffectSettings;
 import com.mygdx.game.model.effects.EffectSettings;
 import com.mygdx.game.model.effects.XMovementEffectSettings;
 import com.mygdx.game.model.effects.YMovementEffectSettings;
@@ -163,9 +164,34 @@ public class Ability extends ActionSegment{
 
 	@Override
 	public void setDurations(CharacterModel source) {
-		this.windupTime = source.getUiModel().getTimeForAnimation(this.settings.name, "Windup");
-		this.activeTime = source.getUiModel().getTimeForAnimation(this.settings.name, "Active");
+		this.windupTime = this.settings.windupTillDisruption ? Float.MAX_VALUE : source.getUiModel().getTimeForAnimation(this.settings.name, "Windup");
+		this.activeTime = this.settings.activeTillDisruption ? Float.MAX_VALUE : source.getUiModel().getTimeForAnimation(this.settings.name, "Active");
 		this.cooldownTime = source.getUiModel().getTimeForAnimation(this.settings.name, "Cooldown");
+	}
+
+	@Override
+	public XMovementEffectSettings getSourceXMove() {
+		for(EffectSettings effect : this.settings.sourceEffectSettings) {
+			if (effect instanceof XMovementEffectSettings) {
+				return (XMovementEffectSettings) effect.deepCopy();
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public YMovementEffectSettings getSourceYMove() {
+		for(EffectSettings effect : this.settings.sourceEffectSettings) {
+			if (effect instanceof YMovementEffectSettings) {
+				return (YMovementEffectSettings) effect.deepCopy();
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public boolean chainsWithJump() {
+		return settings.chainsWithJump;
 	}
 
 

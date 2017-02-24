@@ -25,7 +25,7 @@ public class EffectInitializer {
 			effect = new XMovementEffect(settings, controller);
 			break;
 		case YMovementEffect.type:
-			effect = new XMovementEffect(settings, controller);
+			effect = new YMovementEffect(settings, controller);
 			break;
 		case StabilityDamageEffect.type:
 			effect = new StabilityDamageEffect(settings, controller);

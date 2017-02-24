@@ -9,9 +9,17 @@ import com.mygdx.game.model.characters.Character.CharacterModel;
 
 public class ConditionInitializer {
 	
-	public static PassiveCondition initializePassiveCondition(CharacterModel source, PassiveConditionSettings settings) {
+	public static PassiveCondition initializePassiveCondition(PassiveConditionSettings settings) {
 		PassiveCondition condition = null;
-
+		switch (settings.getType()) {
+		case InjuredStaggerCondition.type:
+			condition = new InjuredStaggerCondition(settings);
+			break;
+		case AerialCondition.type:
+			condition = new AerialCondition(settings);
+			break;
+		}
+			
 		return condition;
 	}
 	

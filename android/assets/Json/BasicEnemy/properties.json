@@ -2,7 +2,7 @@
 	"class": com.mygdx.game.model.characters.CharacterProperties,
 	"maxHealth": 20,
 	"maxWill": 20,
-	"maxStability": 50,
+	"maxStability": 5,
 	"maxTension": 10,
 	"attack": 1,
 	"horizontalSpeed": 300,

@@ -1,19 +1,20 @@
 package com.mygdx.game.model.effects;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.mygdx.game.model.conditions.InjuredStaggerConditionSettings;
 
 public class YMovementEffectSettings extends EntityEffectSettings{
 
 	@Override
-	public EffectSettings deepCopy() {
+	public YMovementEffectSettings deepCopy() {
 		YMovementEffectSettings copy = new YMovementEffectSettings();
 		this.setBaseFieldsForSettings(copy);
 		copy.velocity = this.velocity;
 		copy.acceleration = this.acceleration;
 		copy.maxVelocity = this.maxVelocity;
 		copy.useGravity = this.useGravity;
+		copy.applyOnlyIfInjuredStaggered = this.applyOnlyIfInjuredStaggered;
 		return copy;
 	}
 	
@@ -22,6 +23,7 @@ public class YMovementEffectSettings extends EntityEffectSettings{
 	float acceleration;
 	boolean useGravity;
 	boolean startWithStagger;
+	boolean applyOnlyIfInjuredStaggered;
 
 	@Override
 	public void write(Json json) {
@@ -54,6 +56,17 @@ public class YMovementEffectSettings extends EntityEffectSettings{
 
 		this.setType(YMovementEffect.type);
 		startWithStagger = false;
+		
+		Boolean applyOnlyIfInjuredStaggered = json.readValue("applyOnlyIfInjuredStaggered", Boolean.class, jsonData);
+		if (applyOnlyIfInjuredStaggered != null) {
+			this.applyOnlyIfInjuredStaggered = applyOnlyIfInjuredStaggered.booleanValue();
+		}
+		else {
+			this.applyOnlyIfInjuredStaggered = true;
+		}
+		if (this.applyOnlyIfInjuredStaggered) {
+			this.passiveConditions.add(new InjuredStaggerConditionSettings());
+		}
 	}
 	
 	public float getEstimatedDistance() {
@@ -68,4 +81,14 @@ public class YMovementEffectSettings extends EntityEffectSettings{
 	public void setStartWithStagger(boolean startWithStagger) {
 		this.startWithStagger = startWithStagger;
 	}
+
+	public float getVelocity() {
+		return velocity;
+	}
+
+	public float getAcceleration() {
+		return acceleration;
+	}
+	
+	
 }

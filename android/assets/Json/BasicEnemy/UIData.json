@@ -49,7 +49,27 @@
 			"numberOfFrames": 1,
 			"playMode": NORMAL
 		}
-		
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "WakeupWindup",
+			"frameRate": 4
+			"numberOfFrames": 4,
+			"playMode": NORMAL
+		}		
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "WakeupActive",
+			"frameRate": 4
+			"numberOfFrames": 4,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "WakeupCooldown",
+			"frameRate": 4
+			"numberOfFrames": 4,
+			"playMode": NORMAL
+		}
 	]
 	"masterAtlasPath": "Sprites/BasicEnemy/textures.atlas"
 }

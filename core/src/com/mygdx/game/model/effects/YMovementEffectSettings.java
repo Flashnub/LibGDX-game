@@ -36,7 +36,6 @@ public class YMovementEffectSettings extends EntityEffectSettings{
 	public void read(Json json, JsonValue jsonData) {
 		super.read(json, jsonData);
 		velocity = json.readValue("velocity", Float.class, jsonData);
-		acceleration = json.readValue("acceleration", Float.class, jsonData);
 		
 		Float maxVelocity = json.readValue("maxVelocityX", Float.class, jsonData);
 		if (maxVelocity != null) {
@@ -49,6 +48,8 @@ public class YMovementEffectSettings extends EntityEffectSettings{
 		Boolean useGravity = json.readValue("useGravity", Boolean.class, jsonData);
 		if (useGravity != null) {
 			this.useGravity = useGravity.booleanValue();
+			if (!this.useGravity)
+				acceleration = json.readValue("acceleration", Float.class, jsonData);
 		}
 		else {
 			this.useGravity = true;

@@ -17,17 +17,21 @@ import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.model.actions.ActionSegment;
 import com.mygdx.game.model.characters.Character;
+import com.mygdx.game.model.characters.NPCCharacter;
 import com.mygdx.game.model.characters.enemies.Enemy;
 import com.mygdx.game.model.characters.player.Player;
 import com.mygdx.game.model.projectiles.Explosion;
 import com.mygdx.game.model.projectiles.Projectile;
+import com.mygdx.game.model.world.WorldListener;
 import com.mygdx.game.model.world.WorldModel;
+import com.mygdx.game.model.worldObjects.Item;
 import com.mygdx.game.model.worldObjects.WorldObject;
 import com.mygdx.game.views.ResourceBar;
 import com.mygdx.game.views.ResourceBar.ResourceBarType;
 
-public class WorldRenderer implements CoordinatesHelper{
+public class WorldRenderer implements CoordinatesHelper, WorldListener{
 	
 		//Game world sprite stuff
 		SpriteBatch gameBatch;
@@ -226,6 +230,54 @@ public class WorldRenderer implements CoordinatesHelper{
 			
 			Vector2 position = new Vector2(xOffset, yOffset);
 			return position;
+		}
+		
+		@Override
+		public void handleSuperAction(ActionSegment action) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void handleDeletedEnemy(Enemy enemy) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void handleAddedEnemy(Enemy enemy) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void handleAddedObjectToWorld(WorldObject object) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void updateWithNearbyObjects(Array<WorldObject> objects) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void updateWithNearbyNPCs(Array<NPCCharacter> npcs) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void handlePlayerInteractionWithObject(WorldObject object) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void handleSwitchedItem(Item item, int numberOfItems) {
+			// TODO Auto-generated method stub
+			
 		}
 		
 

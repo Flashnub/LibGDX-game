@@ -485,6 +485,10 @@ public class ActionSequence implements Serializable {
 		this.staggerTime = staggerTime;
 	}
 	
+	public boolean isStaggered() {
+		return this.isStaggered;
+	}
+	
 	public boolean doInputsMatch(Queue <String> inputs, CharacterModel source, boolean onlyFirstInput) {
 		boolean useLeftInputs = source.isFacingLeft();
 		boolean shouldAdd = this.shouldAddGivenSource(source);

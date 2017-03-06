@@ -15,6 +15,7 @@ import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.constants.SaveController;
+import com.mygdx.game.model.actions.ActionSegment;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.Attack;
 import com.mygdx.game.model.characters.Character;
@@ -332,12 +333,12 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     }
     
 	@Override
-	public void superActivatedFrom(CharacterModel source, ActionSequence sequence) {
+	public void superActivatedFrom(CharacterModel source, ActionSegment segment) {
 		this.freezeWorld = true;
 		this.characterImmuneToFreeze = source;
-		this.freezeWorldDuration = sequence.getAction().getWindUpTime();
+		this.freezeWorldDuration = segment.getWindUpTime();
 		for (WorldListener listener : this.worldListeners) {
-			listener.handleSuperAction(sequence);
+			listener.handleSuperAction(segment);
 		}
 	}
 
@@ -650,7 +651,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	public void triggerSave() {
 		this.saveController.save();
 	}
-
+	
 	public Array<Projectile> getProjectiles() {
 		return projectiles;
 	}
@@ -694,4 +695,6 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	public TiledMapTileLayer getCollisionLayer() {
 		return this.collisionLayer;
 	}
+
+
 }

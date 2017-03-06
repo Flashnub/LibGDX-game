@@ -1,6 +1,7 @@
 package com.mygdx.game.model.effects;
 
 import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.characters.CollisionCheck;
 import com.mygdx.game.model.events.ActionListener;
 
 public class XMovementEffect  extends EntityEffect{
@@ -53,20 +54,22 @@ public class XMovementEffect  extends EntityEffect{
 
 	@Override
 	public boolean shouldReciprocateToSource(CharacterModel target, ActionListener listener) {
-		// TODO Auto-generated method stub
-		return false;
+		//Miniscule amount of time, should only reciprocate if target is next to wall.
+		CollisionCheck collisionCheck = target.checkForXCollision(0.1f, listener.getCollisionLayer(), this.mSettings.velocity, this.mSettings.acceleration, false);
+		return collisionCheck.doesCollide();
 	}
 
 	@Override
 	public void flipValues() {
-		// TODO Auto-generated method stub
-		
+		this.mSettings.velocity = -this.mSettings.velocity;
+		this.mSettings.acceleration = -this.mSettings.acceleration;		
 	}
 
 	@Override
 	public void flipValuesIfNecessary(CharacterModel target, CharacterModel source) {
-		// TODO Auto-generated method stub
-		
+		if (target.gameplayHitBox.x <= source.gameplayHitBox.x && source.isFacingLeft()) {
+			flipValues();
+		}		
 	}
 
 	@Override

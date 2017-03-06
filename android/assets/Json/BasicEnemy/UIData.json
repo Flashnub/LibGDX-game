@@ -9,6 +9,12 @@
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
+			"name": "IdleDrawn",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
 			"name": "Circle",
 			"numberOfFrames": 1,
 			"playMode": NORMAL
@@ -21,19 +27,19 @@
 		}		
 		{
 			"class": com.mygdx.game.assets.AnimationData,
-			"name": "StaggerWindup",
+			"name": "StaggerW",
 			"numberOfFrames": 1,
 			"playMode": NORMAL
 		}		
 		{
 			"class": com.mygdx.game.assets.AnimationData,
-			"name": "Stagger",
+			"name": "StaggerA",
 			"numberOfFrames": 1,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
-			"name": "StaggerCooldown",
+			"name": "StaggerC",
 			"numberOfFrames": 1,
 			"playMode": NORMAL
 		}
@@ -51,21 +57,21 @@
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
-			"name": "WakeupWindup",
+			"name": "WakeupW",
 			"frameRate": 4
 			"numberOfFrames": 4,
 			"playMode": NORMAL
 		}		
 		{
 			"class": com.mygdx.game.assets.AnimationData,
-			"name": "WakeupActive",
+			"name": "WakeupA",
 			"frameRate": 4
 			"numberOfFrames": 4,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
-			"name": "WakeupCooldown",
+			"name": "WakeupC",
 			"frameRate": 4
 			"numberOfFrames": 4,
 			"playMode": NORMAL

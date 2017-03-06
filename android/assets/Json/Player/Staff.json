@@ -7,7 +7,7 @@
 		"class": com.mygdx.game.model.actions.ActionSequence,
 		"actionKey": {
 			"class": com.mygdx.game.model.actions.ActionSegmentKey,
-			"key": "LightAtk1",
+			"key": "Light1",
 			"typeOfAction": Attack
 		},
 		"chainableActionKeys": [
@@ -27,9 +27,9 @@
 			["LIGHTATTACK"],
 			["LEFTLIGHTATTACK"]
 		]
-		"windupState": "LightAtk1Windup"
-		"actingState": "LightAtk1Active"
-		"cooldownState": "LightAtk1Cooldown"
+		"windupState": "Light1W"
+		"actingState": "Light1A"
+		"cooldownState": "Light1C"
 	},
 	{
 		"class": com.mygdx.game.model.actions.ActionSequence,
@@ -60,9 +60,9 @@
 			["MEDIUMATTACK"],
 			["LEFTMEDIUMATTACK"]
 		]
-		"windupState": "MedAtk1Windup"
-		"actingState": "MedAtk1Active"
-		"cooldownState": "MedAtk1Cooldown"
+		"windupState": "MedAtk1W"
+		"actingState": "MedAtk1A"
+		"cooldownState": "MedAtk1C"
 	},
 	{
 		"class": com.mygdx.game.model.actions.ActionSequence,
@@ -87,9 +87,9 @@
 		"inputs": [
 			["DOWNMEDIUMATTACK"]
 		]
-		"windupState": "MedAtk2Windup"
-		"actingState": "MedAtk2Active"
-		"cooldownState": "MedAtk2Cooldown"
+		"windupState": "MedAtk2W"
+		"actingState": "MedAtk2A"
+		"cooldownState": "MedAtk2C"
 	},
 	{
 		"class": com.mygdx.game.model.actions.ActionSequence,
@@ -101,9 +101,9 @@
 		"inputs": [
 			["DOWNHEAVYATTACK"]
 		]
-		"windupState": "LaunchWindup"
-		"actingState": "LaunchActive"
-		"cooldownState": "LaunchCooldown"
+		"windupState": "LaunchW"
+		"actingState": "LaunchA"
+		"cooldownState": "LaunchC"
 	},
 	{
 		"class": com.mygdx.game.model.actions.ActionSequence,
@@ -115,21 +115,26 @@
 		"inputs": [
 			["LEFTHEAVYATTACK"]
 		]
-		"windupState": "RushdownWindup"
-		"actingState": "RushdownActive"
-		"cooldownState": "RushdownCooldown"
+		"windupState": "RushdownW"
+		"actingState": "RushdownA"
+		"cooldownState": "RushdownC"
 	},
 	{
 		"class": com.mygdx.game.model.actions.ActionSequence,
 		"actionKey": {
 			"class": com.mygdx.game.model.actions.ActionSegmentKey,
-			"key": "Aerial1",
+			"key": "AirLightAtk1",
 			"typeOfAction": Attack
 		},
 		"chainableActionKeys": [
 			{
 				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": "Aerial2",
+				"key": "AirHvyAtk1",
+				"typeOfAction": Attack
+			}	
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "AirMedAtk2",
 				"typeOfAction": Attack
 			}				
 		],
@@ -137,32 +142,55 @@
 			["LIGHTATTACK"],
 			["LEFTLIGHTATTACK"]
 		]
-		"windupState": "Aerial1Windup"
-		"actingState": "Aerial1Active"
-		"cooldownState": "Aerial1Cooldown"
+		"windupState": "AirLightAtk1W"
+		"actingState": "AirLightAtk1A"
+		"cooldownState": "AirLightAtk1C"
 		"useType": Aerial
 	},
 	{
 		"class": com.mygdx.game.model.actions.ActionSequence,
 		"actionKey": {
 			"class": com.mygdx.game.model.actions.ActionSegmentKey,
-			"key": "Aerial2",
+			"key": "AirMedAtk2",
 			"typeOfAction": Attack
 		},
 		"chainableActionKeys": [
 			{
 				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": "Aerial1",
+				"key": "AirHvyAtk1",
 				"typeOfAction": Attack
 			}				
-		]
+		],
 		"inputs": [
 			["MEDIUMATTACK"],
 			["LEFTMEDIUMATTACK"]
 		]
-		"windupState": "Aerial2Windup"
-		"actingState": "Aerial2Active"
-		"cooldownState": "Aerial2Cooldown"
+		"windupState": "AirMedAtk2W"
+		"actingState": "AirMedAtk2A"
+		"cooldownState": "AirMedAtk2C"
+		"useType": Aerial
+	},
+	{
+		"class": com.mygdx.game.model.actions.ActionSequence,
+		"actionKey": {
+			"class": com.mygdx.game.model.actions.ActionSegmentKey,
+			"key": "AirHvyAtk1",
+			"typeOfAction": Attack
+		},
+		"chainableActionKeys": [
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "AirMedAtk2",
+				"typeOfAction": Attack
+			}				
+		]
+		"inputs": [
+			["HEAVYATTACK"],
+			["LEFTHEAVYATTACK"]
+		]
+		"windupState": "AirHvyAtk1W"
+		"actingState": "AirHvyAtk1A"
+		"cooldownState": "AirHvyAtk1C"
 		"useType": Aerial
 	}
 	]

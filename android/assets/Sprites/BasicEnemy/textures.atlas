@@ -18,28 +18,35 @@ Idle1
   orig: 100, 200
   offset: 0, 0
   index: -1
-WakeupActive1
+IdleDrawn1
   rotate: false
   xy: 2, 406
   size: 100, 200
   orig: 100, 200
   offset: 0, 0
   index: -1
-WakeupActive2
+WakeupA1
   rotate: false
   xy: 2, 406
   size: 100, 200
   orig: 100, 200
   offset: 0, 0
   index: -1
-WakeupActive3
+WakeupA2
   rotate: false
   xy: 2, 406
   size: 100, 200
   orig: 100, 200
   offset: 0, 0
   index: -1
-WakeupActive4
+WakeupA3
+  rotate: false
+  xy: 2, 406
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+WakeupA4
   rotate: false
   xy: 2, 406
   size: 100, 200
@@ -60,49 +67,49 @@ Circle1
   orig: 100, 200
   offset: 0, 0
   index: -1
-WakeupWindup1
+WakeupW1
   rotate: false
   xy: 2, 204
   size: 100, 200
   orig: 100, 200
   offset: 0, 0
   index: -1
-WakeupWindup2
+WakeupW2
   rotate: false
   xy: 2, 204
   size: 100, 200
   orig: 100, 200
   offset: 0, 0
   index: -1
-WakeupWindup3
+WakeupW3
   rotate: false
   xy: 2, 204
   size: 100, 200
   orig: 100, 200
   offset: 0, 0
   index: -1
-WakeupWindup4
+WakeupW4
   rotate: false
   xy: 2, 204
   size: 100, 200
   orig: 100, 200
   offset: 0, 0
   index: -1
-Stagger1
+StaggerA1
   rotate: false
   xy: 104, 406
   size: 100, 200
   orig: 100, 200
   offset: 0, 0
   index: -1
-StaggerCooldown1
+StaggerC1
   rotate: false
   xy: 2, 2
   size: 100, 200
   orig: 100, 200
   offset: 0, 0
   index: -1
-StaggerWindup1
+StaggerW1
   rotate: false
   xy: 2, 2
   size: 100, 200
@@ -116,28 +123,28 @@ Triangle1
   orig: 100, 200
   offset: 0, 0
   index: -1
-WakeupCooldown1
+WakeupC1
   rotate: false
   xy: 2, 2
   size: 100, 200
   orig: 100, 200
   offset: 0, 0
   index: -1
-WakeupCooldown2
+WakeupC2
   rotate: false
   xy: 2, 2
   size: 100, 200
   orig: 100, 200
   offset: 0, 0
   index: -1
-WakeupCooldown3
+WakeupC3
   rotate: false
   xy: 2, 2
   size: 100, 200
   orig: 100, 200
   offset: 0, 0
   index: -1
-WakeupCooldown4
+WakeupC4
   rotate: false
   xy: 2, 2
   size: 100, 200

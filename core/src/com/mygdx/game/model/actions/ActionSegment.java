@@ -17,6 +17,11 @@ public abstract class ActionSegment implements EffectController {
 	public static int StoryPriority = 1;
 	public static int CombatPriority = 2;
 	
+	public static String Windup = "W";
+	public static String Active = "A";
+	public static String Cooldown = "C";
+
+	
 	Float currentTime;
 	boolean hasProcessedActiveSource;
 	boolean hasProcessedWindupSource;
@@ -189,4 +194,5 @@ public abstract class ActionSegment implements EffectController {
 	public abstract XMovementEffectSettings getSourceXMove();
 	public abstract YMovementEffectSettings getSourceYMove();
 	public abstract boolean chainsWithJump();
+	public abstract boolean isSuper();
 }

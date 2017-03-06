@@ -10,9 +10,12 @@ public class CollisionCheck {
 	CollisionType collisionType;
 	float timeUntilCollision;
 	float pointOfReturn;
+	boolean isVelocityPositive;
+	EntityCollisionData entityCollisionData;
 	
-	public CollisionCheck(boolean doesCollide, float timeUntilCollision, CollisionType collisionType, float pointOfReturn) {
+	public CollisionCheck(boolean doesCollide, boolean isVelocityPositive, float timeUntilCollision, CollisionType collisionType, float pointOfReturn) {
 		this.doesCollide = doesCollide;
+		this.isVelocityPositive = isVelocityPositive;
 		this.timeUntilCollision = timeUntilCollision;
 		this.collisionType = collisionType;
 		this.pointOfReturn = pointOfReturn;

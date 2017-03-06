@@ -1,5 +1,5 @@
 {
-	"LightAtk1": {
+	"Light1": {
 		"class": "com.mygdx.game.model.actions.AttackSettings",
 		"originX": 10,
 		"originY": 0,
@@ -105,10 +105,9 @@
 				"duration": 0.5,
 				"delayToActivate": 0,
 				"isInstantaneous": false,
-				"useGravity": false,
 				"value": 0,
-				"velocity": 600,
-				"acceleration": -500
+				"velocity": 1250,
+				"useGravity": true
 			}
 			{
 				"class": "com.mygdx.game.model.effects.StabilityDamageEffectSettings",
@@ -116,7 +115,7 @@
 			}
 		]
 	}
-	"Aerial1": {
+	"AirMedAtk2": {
 		"class": "com.mygdx.game.model.actions.AttackSettings",
 		"originX": 10,
 		"originY": 0,
@@ -162,7 +161,53 @@
 			}
 		]
 	}
-	"Aerial2": {
+	"AirLightAtk1": {
+		"class": "com.mygdx.game.model.actions.AttackSettings",
+		"originX": 50,
+		"originY": 0,
+		"width": 80,
+		"height": 80,
+		"windupEffectSettings": [
+
+		]
+		"sourceEffectSettings": [
+
+		]
+		"targetEffectSettings": [
+			{
+				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
+				"value": 2
+			}
+			{
+				"class": "com.mygdx.game.model.effects.StabilityDamageEffectSettings",
+				"value": 10
+			}
+			{
+				"class": "com.mygdx.game.model.effects.YMovementEffectSettings",
+				"duration": 0.5,
+				"delayToActivate": 0,
+				"isInstantaneous": false,
+				"value": 0,
+				"velocity": 500,
+				"useGravity": true,
+				"passiveConditions": [
+					{
+						"class": "com.mygdx.game.model.conditions.AerialConditionSettings"
+					}
+				]
+			}
+			{
+				"class": "com.mygdx.game.model.effects.XMovementEffectSettings",
+				"duration": 0.3,
+				"delayToActivate": 0,
+				"isInstantaneous": false,
+				"value": 0,
+				"velocity": 50,
+				"acceleration": -167.67
+			}
+		]
+	}
+	"AirHvyAtk1": {
 		"class": "com.mygdx.game.model.actions.AttackSettings",
 		"originX": 10,
 		"originY": 0,
@@ -188,6 +233,7 @@
 				"value": 0,
 				"velocity": 500,
 				"acceleration": -500,
+				"useGravity": true,
 				"passiveConditions": [
 					{
 						"class": "com.mygdx.game.model.conditions.AerialConditionSettings"

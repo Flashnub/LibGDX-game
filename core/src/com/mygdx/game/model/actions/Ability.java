@@ -164,9 +164,9 @@ public class Ability extends ActionSegment{
 
 	@Override
 	public void setDurations(CharacterModel source) {
-		this.windupTime = this.settings.windupTillDisruption ? Float.MAX_VALUE : source.getUiModel().getTimeForAnimation(this.settings.name, "Windup");
-		this.activeTime = this.settings.activeTillDisruption ? Float.MAX_VALUE : source.getUiModel().getTimeForAnimation(this.settings.name, "Active");
-		this.cooldownTime = source.getUiModel().getTimeForAnimation(this.settings.name, "Cooldown");
+		this.windupTime = this.settings.windupTillDisruption ? Float.MAX_VALUE : source.getUiModel().getTimeForAnimation(this.settings.name, ActionSegment.Windup);
+		this.activeTime = this.settings.activeTillDisruption ? Float.MAX_VALUE : source.getUiModel().getTimeForAnimation(this.settings.name, ActionSegment.Active);
+		this.cooldownTime = source.getUiModel().getTimeForAnimation(this.settings.name, ActionSegment.Cooldown);
 	}
 
 	@Override
@@ -192,6 +192,11 @@ public class Ability extends ActionSegment{
 	@Override
 	public boolean chainsWithJump() {
 		return settings.chainsWithJump;
+	}
+
+	@Override
+	public boolean isSuper() {
+		return this.settings.isSuper;
 	}
 
 

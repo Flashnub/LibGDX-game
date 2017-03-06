@@ -135,5 +135,10 @@ public class DialogueAction extends ActionSegment {
 	public boolean chainsWithJump() {
 		return false;
 	}
+	
+	@Override
+	public boolean isSuper() {
+		return false;
+	}
 
 }

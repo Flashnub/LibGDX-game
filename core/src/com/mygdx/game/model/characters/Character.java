@@ -67,17 +67,22 @@ public abstract class Character implements ModelListener {
 		this.characterUIData.stagger();
 	}
 	
+	public void endActionStagger() {
+		this.characterUIData.endStagger();
+	}
+	
 	//=============================================================//
 	//----------------------------MODEL----------------------------//
 	//=============================================================//
 
 	public abstract class CharacterModel extends EntityModel{
 		
-		public final String idleState = "Idle";
+		public final String idleState = "IdleDrawn";
 		public final String walkState = "Walk";
 		public final String backWalkState = "Backwalk";
 		public final String jumpState = "Jump";
 		public final String fallState = "Fall";
+		public final String sprintState = "Sprint";
 		final float slowingAccel = 1800;
 		
 		String state;
@@ -256,7 +261,7 @@ public abstract class Character implements ModelListener {
 			if (!isInAir && !walking && !this.isProcessingActiveSequences()) {
 				setState(idleState);
 			}
-			else if (isInAir && this.velocity.y < -3f && (this.state.equals(jumpState) || this.state.equals(idleState))) {
+			else if (isInAir && this.velocity.y < -3f && (this.getCurrentActiveActionSeq() == null)) {
 				setState(fallState);
 			}
 		}
@@ -264,16 +269,23 @@ public abstract class Character implements ModelListener {
 		private void handleActionSequences(float delta) {
 			if (this.processingActionSequences != null) {
 				Iterator <ActionSequence> iterator = processingActionSequences.iterator();
+				if (processingActionSequences.size() > 1) {
+					System.out.println("");
+				}
 				while (iterator.hasNext()) {
 					ActionSequence actionSequence = iterator.next();
 					actionSequence.process(delta, actionListener);
 					if (actionSequence.isFinished()) {
+						if (actionSequence.isStaggered()) {
+							this.modelListener.endActionStagger();
+						}
+						else {
+							this.queuedJump = false; //Attack missed, so end the queued jump
+						}
 						iterator.remove();
-//						if (queuedJump)
-//							queuedJump = false;
 						if (this instanceof PlayerModel){
 							PlayerModel model = (PlayerModel) this;
-							if (model.getCurrentlyHeldDirection().equals(DirectionalInput.LEFT) || model.getCurrentlyHeldDirection().equals(DirectionalInput.RIGHT))
+							if (model.getCurrentlyHeldDirection().equals(DirectionalInput.LEFT) || model.getCurrentlyHeldDirection().equals(DirectionalInput.RIGHT) && !iterator.hasNext())
 								horizontalMove(model.getCurrentlyHeldDirection().equals(DirectionalInput.LEFT));
 						}
 					}
@@ -290,7 +302,11 @@ public abstract class Character implements ModelListener {
 				}
 				this.endActionStagger();
 				this.stopHorizontalMovement(true);
-				this.processingActionSequences.add(nextActiveActionSequences.poll());
+				ActionSequence nextSequence = nextActiveActionSequences.poll();
+//				if (this.actionStaggering) {
+//					nextSequence.stagger(this.actionStaggerTime);
+//				}
+				this.processingActionSequences.add(nextSequence);
 			}
 			
 		}
@@ -418,14 +434,21 @@ public abstract class Character implements ModelListener {
 			return interceptedAttack;
 		}
 		
-		protected void setMovementStatesIfNeeded() {
+		public void setMovementStatesIfNeeded() {
+			this.setMovementStatesIfNeeded(false);
+		}
+		
+		public void setMovementStatesIfNeeded(boolean overrideDuplicateState) {
 			if (this.isInAir) {
 				if (this.velocity.y > 0) {
-					this.setState(jumpState);
+					this.setState(jumpState, overrideDuplicateState);
 				}
 				else {
 					this.setState(fallState);
 				}
+			}
+			else if (this.sprinting) {
+				this.setState(sprintState);
 			}
 			else if (this.walking) {
 				if (this.directionLock) {
@@ -503,7 +526,7 @@ public abstract class Character implements ModelListener {
 					isInAir = true;
 	            this.setWalking(false);
 	            this.getVelocity().y = getJumpSpeed();
-		    	this.setMovementStatesIfNeeded();
+		    	this.setMovementStatesIfNeeded(true);
 		    	this.currentJumpTokens -= 1;
 			}
 
@@ -518,8 +541,8 @@ public abstract class Character implements ModelListener {
 				}
 
 				setHorizontalSpeedForMovement(left);
-
 				this.setMovementStatesIfNeeded();
+				
 			}
 		}
 		
@@ -595,18 +618,28 @@ public abstract class Character implements ModelListener {
 				this.getVelocity().x = 0;
 				this.getAcceleration().x = 0;
 			}
-			else if (!isTryingToMoveHorizontally().equals(Direction.NaN)) {
+			else if (!isTryingToMoveHorizontally().equals(Direction.NaN) && !this.actionLocked) {
 				boolean left = isTryingToMoveHorizontally().equals(Direction.LEFT);
 				this.setHorizontalSpeedForMovement(left);
+				this.setMovementStatesIfNeeded();
 			}
 
 			CollisionCheck collisionY = this.checkForYCollision(delta, collisionLayer, this.velocity.y, true, true);
 			if (collisionY.doesCollide) {
 				if (this.getVelocity().y < 0) {
 					landed(collisionY.getCollisionType().equals(CollisionType.Entity));
+
 				}
 				if (!collisionY.getCollisionType().equals(CollisionType.Entity)) {
-					this.getVelocity().y = 0;
+					if (collisionY.isVelocityPositive) {
+						this.getVelocity().y = -5f;
+//						System.out.println("Zero");
+
+					}
+					else {
+						this.getVelocity().y = 0;
+//						System.out.println("Zero");
+					}
 				}
 			}
 			else if (!isInAir && this.getVelocity().y < -3f) {
@@ -843,22 +876,18 @@ public abstract class Character implements ModelListener {
 			this.velocity.x = 0f;
 			this.velocity.y = 0f;
 			ActionSequence currentSeq = this.getCurrentActiveActionSeq();
-			if (!this.queuedJump) {
-				if (currentSeq != null) {
-					currentSeq.stagger();
-				}
-				
-				for (EntityEffect effect : this.currentEffects) {
-					if (effect instanceof XMovementEffect || effect instanceof YMovementEffect)
-						effect.stagger();
-				}
-				
-				this.modelListener.actionStagger();
+			if (currentSeq != null) {
+				currentSeq.stagger();
 			}
-			else {
-				this.forceEndForActiveAction();
+				
+			for (EntityEffect effect : this.currentEffects) {
+				if (effect instanceof XMovementEffect || effect instanceof YMovementEffect)
+					effect.stagger();
 			}
+				
+			this.modelListener.actionStagger();
 		}
+
 		
 		public void setWalking(boolean walking) {
 			if (walking) {
@@ -956,9 +985,18 @@ public abstract class Character implements ModelListener {
 		public void setActionListener(ActionListener attackListener) {
 			this.actionListener = attackListener;
 		}
-
+		
 		public void setState(String state) {
+			this.setState(state, false);
+		}
+
+		public void setState(String state, boolean overrideDuplicate) {
 			if (this.state == null || (!this.state.equals(state))) {
+				this.state = state;
+				this.didChangeState = true;
+				this.stateTime = 0f;
+			}
+			else if (overrideDuplicate) {
 				this.state = state;
 				this.didChangeState = true;
 				this.stateTime = 0f;

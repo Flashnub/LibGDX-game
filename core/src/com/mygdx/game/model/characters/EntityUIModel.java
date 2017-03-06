@@ -55,9 +55,9 @@ public class EntityUIModel {
 					TextureRegion rightFrame = playerAtlas.findRegion(SpriteUtils.animationStringWithData(animationData, i+1));
 					rightAnimationFrames.add(rightFrame);
 					
-//					if (leftFrame == null) {
-//						System.out.println("");
-//					}
+					if (rightFrame == null) {
+						System.out.println("");
+					}
 					TextureRegion leftFrame = new TextureRegion(rightFrame);
 
 					leftFrame.flip(true, false);
@@ -131,6 +131,11 @@ public class EntityUIModel {
 	
 	public void stagger() {
 		this.shouldStagger = true;
+		this.staggerTime = 0f;
+	}
+	
+	public void endStagger() {
+		this.shouldStagger = false;
 		this.staggerTime = 0f;
 	}
 	

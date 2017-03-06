@@ -17,9 +17,9 @@
 				"key": "Dash",
 				"typeOfAction": Ability
 			}
-			"windUpState": "DashWindup"
-			"actingState": "DashActive"
-			"cooldownState": "DashActive"
+			"windUpState": "DashW"
+			"actingState": "DashA"
+			"cooldownState": "DashC"
 			"inputs": [
 				["MOVEMENTRELEASE"]
 			]

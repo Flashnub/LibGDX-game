@@ -296,9 +296,9 @@ public class Attack extends ActionSegment {
 	
 	@Override
 	public void setDurations(CharacterModel source) {
-		this.windupTime = this.attackSettings.windupTillDisruption ? Float.MAX_VALUE : source.getUiModel().getTimeForAnimation(this.attackSettings.name, "Windup");
-		this.activeTime = this.attackSettings.activeTillDisruption ? Float.MAX_VALUE : source.getUiModel().getTimeForAnimation(this.attackSettings.name, "Active");
-		this.cooldownTime = source.getUiModel().getTimeForAnimation(this.attackSettings.name, "Cooldown");
+		this.windupTime = this.attackSettings.windupTillDisruption ? Float.MAX_VALUE : source.getUiModel().getTimeForAnimation(this.attackSettings.name, ActionSegment.Windup);
+		this.activeTime = this.attackSettings.activeTillDisruption ? Float.MAX_VALUE : source.getUiModel().getTimeForAnimation(this.attackSettings.name, ActionSegment.Active);
+		this.cooldownTime = source.getUiModel().getTimeForAnimation(this.attackSettings.name, ActionSegment.Cooldown);
 	}
 	
 	@Override
@@ -324,5 +324,10 @@ public class Attack extends ActionSegment {
 	@Override
 	public boolean chainsWithJump() {
 		return attackSettings.chainsWithJump;
+	}
+	
+	@Override
+	public boolean isSuper() {
+		return this.attackSettings.isSuper;
 	}
 }

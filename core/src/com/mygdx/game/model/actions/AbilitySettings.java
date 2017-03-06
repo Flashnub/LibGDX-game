@@ -21,6 +21,7 @@ public class AbilitySettings implements Serializable {
 	boolean windupTillDisruption;
 	boolean sourceRespectEntityCollisions; //if this is false, the action ignores all entity collisions.
 	boolean chainsWithJump;
+	boolean isSuper;
 	Float tempWidthModifier;
 	Float tempHeightModifier;
 	Float xOffsetModifier;
@@ -36,6 +37,7 @@ public class AbilitySettings implements Serializable {
 //		json.writeValue("duration", duration);		
 		json.writeValue("sourceRespectEntityCollisions", sourceRespectEntityCollisions);
 		json.writeValue("name", name);
+		json.writeValue("isSuper", isSuper);
 	}
 	
 	@Override
@@ -77,6 +79,9 @@ public class AbilitySettings implements Serializable {
 //		}
 		Boolean windupTillDuration = json.readValue("windupTillDuration", Boolean.class, jsonData);
 		this.windupTillDisruption = windupTillDuration != null ? windupTillDuration.booleanValue() : false;
+		
+		Boolean isSuper = json.readValue("isSuper", Boolean.class, jsonData);
+		this.isSuper = isSuper != null ? isSuper.booleanValue() : false;
 //		Float windupTime = json.readValue("windUpTime", Float.class, jsonData);
 //		if (windupTillDuration != null && windupTillDuration.booleanValue()) {
 //			this.windupTime = Float.MAX_VALUE;
@@ -188,6 +193,7 @@ public class AbilitySettings implements Serializable {
 		this.yOffsetModifier = settings.yOffsetModifier;
 		this.name = settings.name;
 		this.chainsWithJump = settings.chainsWithJump;
+		this.isSuper = settings.isSuper;
 	}
 	
 	public AbilitySettings deepCopy() {
@@ -203,6 +209,8 @@ public class AbilitySettings implements Serializable {
 		copy.tempWidthModifier = this.tempWidthModifier;
 		copy.xOffsetModifier = this.xOffsetModifier;
 		copy.yOffsetModifier = this.yOffsetModifier;
+		copy.isSuper = this.isSuper;
+		copy.sourceEffectSettings = this.sourceEffectSettings;
 		if (sourceEffectSettings != null) {
 			Array <EffectSettings> effectSettingsCopy = new Array <EffectSettings> ();
 			for (EffectSettings eSettings : this.sourceEffectSettings) {

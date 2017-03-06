@@ -194,9 +194,9 @@ public class WorldAttack extends ActionSegment{
 
 	@Override
 	public void setDurations(CharacterModel source) {
-		this.windupTime = this.worldAttackSettings.getAbilitySettings().windupTillDisruption ? Float.MAX_VALUE : source.getUiModel().getTimeForAnimation(this.worldAttackSettings.getAbilitySettings().name, "Windup");
-		this.activeTime = this.worldAttackSettings.getAbilitySettings().activeTillDisruption ? Float.MAX_VALUE : source.getUiModel().getTimeForAnimation(this.worldAttackSettings.getAbilitySettings().name, "Active");
-		this.cooldownTime = source.getUiModel().getTimeForAnimation(this.worldAttackSettings.getAbilitySettings().name, "Cooldown");
+		this.windupTime = this.worldAttackSettings.getAbilitySettings().windupTillDisruption ? Float.MAX_VALUE : source.getUiModel().getTimeForAnimation(this.worldAttackSettings.getAbilitySettings().name, ActionSegment.Windup);
+		this.activeTime = this.worldAttackSettings.getAbilitySettings().activeTillDisruption ? Float.MAX_VALUE : source.getUiModel().getTimeForAnimation(this.worldAttackSettings.getAbilitySettings().name, ActionSegment.Active);
+		this.cooldownTime = source.getUiModel().getTimeForAnimation(this.worldAttackSettings.getAbilitySettings().name, ActionSegment.Cooldown);
 	}
 	
 	@Override
@@ -222,5 +222,10 @@ public class WorldAttack extends ActionSegment{
 	@Override
 	public boolean chainsWithJump() {
 		return worldAttackSettings.getAbilitySettings().chainsWithJump;
+	}
+	
+	@Override
+	public boolean isSuper() {
+		return this.worldAttackSettings.getAbilitySettings().isSuper;
 	}
 }

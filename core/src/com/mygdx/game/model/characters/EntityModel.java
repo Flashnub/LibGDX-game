@@ -74,10 +74,15 @@ public abstract class EntityModel {
 	
 	public void handleCollisionRespectChecks() {
 		if (!this.lockEntityCollisionBehavior && 
-			this.isRespectingEntityCollision != this.shouldRespectEntityCollision
-			&& this.collisionChecker.checkIfEntityCollidesWithOthers(this, this.gameplayHitBox) == null) 
+			this.isRespectingEntityCollision != this.shouldRespectEntityCollision)
 		{
-			this.isRespectingEntityCollision = shouldRespectEntityCollision;
+			EntityModel collidingEntity = this.collisionChecker.checkIfEntityCollidesWithOthers(this, this.gameplayHitBox);
+			if (collidingEntity != null) {
+				collidingEntity.setRespectingEntityCollision(false);
+			}
+			else {
+				this.isRespectingEntityCollision = shouldRespectEntityCollision;
+			}
 		}
 //		if (this.hasProcessedOverlapCorrection)
 //		{
@@ -106,7 +111,7 @@ public abstract class EntityModel {
 		
 		Rectangle tempImageBounds = new Rectangle(this.imageHitBox);
 		Rectangle tempGameplayBounds = new Rectangle(this.gameplayHitBox);
-		Array <CellWrapper> tilesToCheckForWorldObjects = new Array<CellWrapper>();
+//		Array <CellWrapper> tilesToCheckForWorldObjects = new Array<CellWrapper>();
 		float tempVelocity = yVelocity;
 		float tempMaxTime = maxTime;
 		float increment;
@@ -161,9 +166,9 @@ public abstract class EntityModel {
 					pointOfReturn = bottomRightYIndex * tileHeight + tileHeight;
 				}
 				
-				tilesToCheckForWorldObjects.add(new CellWrapper(bottomLeftBlock, new Vector2(bottomLeftXIndex * tileWidth, bottomLeftYIndex * tileHeight)));
-				tilesToCheckForWorldObjects.add(new CellWrapper(bottomMiddleBlock, new Vector2(bottomMiddleXIndex * tileWidth, bottomMiddleYIndex * tileHeight)));
-				tilesToCheckForWorldObjects.add(new CellWrapper(bottomRightBlock, new Vector2(bottomRightXIndex * tileWidth, bottomRightYIndex * tileHeight)));
+//				tilesToCheckForWorldObjects.add(new CellWrapper(bottomLeftBlock, new Vector2(bottomLeftXIndex * tileWidth, bottomLeftYIndex * tileHeight)));
+//				tilesToCheckForWorldObjects.add(new CellWrapper(bottomMiddleBlock, new Vector2(bottomMiddleXIndex * tileWidth, bottomMiddleYIndex * tileHeight)));
+//				tilesToCheckForWorldObjects.add(new CellWrapper(bottomRightBlock, new Vector2(bottomRightXIndex * tileWidth, bottomRightYIndex * tileHeight)));
 		
 			} 
 			else if (this.isRespectingTileCollision && tempVelocity > 0) {
@@ -201,9 +206,9 @@ public abstract class EntityModel {
 					pointOfReturn = topRightYIndex * tileHeight  - this.gameplayHitBox.height;
 				}
 				
-				tilesToCheckForWorldObjects.add(new CellWrapper(topLeftBlock, new Vector2(topLeftXIndex * tileWidth, topLeftYIndex * tileHeight)));
-				tilesToCheckForWorldObjects.add(new CellWrapper(topMiddleBlock, new Vector2(topMiddleXIndex * tileWidth, topMiddleYIndex * tileHeight)));
-				tilesToCheckForWorldObjects.add(new CellWrapper(topRightBlock, new Vector2(topRightXIndex * tileWidth, topRightYIndex * tileHeight)));
+//				tilesToCheckForWorldObjects.add(new CellWrapper(topLeftBlock, new Vector2(topLeftXIndex * tileWidth, topLeftYIndex * tileHeight)));
+//				tilesToCheckForWorldObjects.add(new CellWrapper(topMiddleBlock, new Vector2(topMiddleXIndex * tileWidth, topMiddleYIndex * tileHeight)));
+//				tilesToCheckForWorldObjects.add(new CellWrapper(topRightBlock, new Vector2(topRightXIndex * tileWidth, topRightYIndex * tileHeight)));
 			}
 			if (collisionY) {
 				collisionType = CollisionType.World;
@@ -221,6 +226,7 @@ public abstract class EntityModel {
 			if (!collisionY && additionalCollisionY) {
 				collisionY = true;
 				collisionType = CollisionType.Entity;
+				//Make sure the solution doesn't include another entity/World/object collision.
 			}
 
 			
@@ -228,14 +234,16 @@ public abstract class EntityModel {
 			{
 				break;
 			}
-			else {
-				tilesToCheckForWorldObjects.clear();
-			}
+//			else {
+//				tilesToCheckForWorldObjects.clear();
+//			}
 			
 			time += increment;
 			tempMaxTime -= increment;
 		}
-
+		
+		//Get the entityCollisionData and put it here, and figure out if the reposition
+		//would interfere with object/world/entity collisions. If it does, 
 		if (shouldMove && !collisionY) {
 			this.gameplayHitBox.y = tempGameplayBounds.y;
 			this.imageHitBox.y = tempImageBounds.y;
@@ -247,7 +255,7 @@ public abstract class EntityModel {
 		}
 
 		//react to X collision
-		return new CollisionCheck(collisionY, time, collisionType, pointOfReturn);
+		return new CollisionCheck(collisionY, tempVelocity > 0, time, collisionType, pointOfReturn);
 	}
 	
 	public abstract boolean handleAdditionalXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided);
@@ -284,7 +292,7 @@ public abstract class EntityModel {
 		
 		Rectangle tempImageBounds = new Rectangle(this.imageHitBox);
 		Rectangle tempGameplayBounds = new Rectangle(this.gameplayHitBox);
-		Array <CellWrapper> tilesToCheckForWorldObjects = new Array<CellWrapper>();
+//		Array <CellWrapper> tilesToCheckForWorldObjects = new Array<CellWrapper>();
 		float tempVelocity = xVelocity;
 		float tempMaxTime = maxTime;
 		float increment;
@@ -339,9 +347,9 @@ public abstract class EntityModel {
 					pointOfReturn = lowerLeftXIndex * tileWidth + tileWidth;
 				}
 				
-				tilesToCheckForWorldObjects.add(new CellWrapper(topLeftBlock, new Vector2(topLeftXIndex * tileWidth, topLeftYIndex * tileHeight)));
-				tilesToCheckForWorldObjects.add(new CellWrapper(middleLeftBlock, new Vector2(middleLeftXIndex * tileWidth, middleLeftYIndex * tileHeight)));
-				tilesToCheckForWorldObjects.add(new CellWrapper(lowerLeftBlock, new Vector2(lowerLeftXIndex * tileWidth, lowerLeftYIndex * tileHeight)));
+//				tilesToCheckForWorldObjects.add(new CellWrapper(topLeftBlock, new Vector2(topLeftXIndex * tileWidth, topLeftYIndex * tileHeight)));
+//				tilesToCheckForWorldObjects.add(new CellWrapper(middleLeftBlock, new Vector2(middleLeftXIndex * tileWidth, middleLeftYIndex * tileHeight)));
+//				tilesToCheckForWorldObjects.add(new CellWrapper(lowerLeftBlock, new Vector2(lowerLeftXIndex * tileWidth, lowerLeftYIndex * tileHeight)));
 
 			}
 			else if (this.isRespectingTileCollision && tempVelocity > 0) {
@@ -379,10 +387,10 @@ public abstract class EntityModel {
 	
 					pointOfReturn = lowerRightXIndex * tileWidth - (this.gameplayHitBox.width + 0.25f);
 				}
-				
-				tilesToCheckForWorldObjects.add(new CellWrapper(topRightBlock, new Vector2(topRightXIndex * tileWidth, topRightYIndex * tileHeight)));
-				tilesToCheckForWorldObjects.add(new CellWrapper(middleRightBlock, new Vector2(middleRightXIndex * tileWidth, middleRightYIndex * tileHeight)));
-				tilesToCheckForWorldObjects.add(new CellWrapper(lowerRightBlock, new Vector2(lowerRightXIndex * tileWidth, lowerRightYIndex * tileHeight)));
+
+//				tilesToCheckForWorldObjects.add(new CellWrapper(topRightBlock, new Vector2(topRightXIndex * tileWidth, topRightYIndex * tileHeight)));
+//				tilesToCheckForWorldObjects.add(new CellWrapper(middleRightBlock, new Vector2(middleRightXIndex * tileWidth, middleRightYIndex * tileHeight)));
+//				tilesToCheckForWorldObjects.add(new CellWrapper(lowerRightBlock, new Vector2(lowerRightXIndex * tileWidth, lowerRightYIndex * tileHeight)));
 			}
 			
 			if (collisionX) {
@@ -410,9 +418,9 @@ public abstract class EntityModel {
 			{
 				break;
 			}
-			else {
-				tilesToCheckForWorldObjects.clear();
-			}
+//			else {
+//				tilesToCheckForWorldObjects.clear();
+//			}
 			
 			time += increment;
 			tempMaxTime -= increment;
@@ -428,7 +436,7 @@ public abstract class EntityModel {
 			this.imageHitBox.x = -1f * (this.xOffsetModifier + (this.imageHitBox.width * ((1f - this.widthCoefficient) / 2)) - this.gameplayHitBox.x );
 		}
 		//react to X collision
-		return new CollisionCheck(collisionX, time, collisionType, pointOfReturn);
+		return new CollisionCheck(collisionX, tempVelocity > 0, time, collisionType, pointOfReturn);
 	}
 	
 //	public void stopEntityOverlapIfNeeded(EntityModel entity, Rectangle tempGameplayBounds, Rectangle tempImageBounds) {

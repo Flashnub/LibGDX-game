@@ -2,6 +2,7 @@ package com.mygdx.game.model.worldObjects;
 
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.math.Rectangle;
+import com.mygdx.game.model.characters.EntityCollisionData;
 import com.mygdx.game.model.characters.player.GameSave.UUIDType;
 import com.mygdx.game.model.events.ObjectListener;
 import com.mygdx.game.model.events.SaveListener;
@@ -41,7 +42,7 @@ public class WorldLever extends WorldObject {
 	}
 
 	@Override
-	public boolean shouldCollideWithCharacter() {
+	public boolean shouldCollideWithEntity() {
 		return false;
 	}
 
@@ -56,15 +57,13 @@ public class WorldLever extends WorldObject {
 	}
 
 	@Override
-	public boolean handleAdditionalXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
-		// TODO Auto-generated method stub
-		return false;
+	public EntityCollisionData handleEntityXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+		return null;
 	}
 
 	@Override
-	public boolean handleAdditionalYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
-		// TODO Auto-generated method stub
-		return false;
+	public EntityCollisionData handleEntityYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+		return null;
 	}
 
 

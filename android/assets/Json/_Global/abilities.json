@@ -8,6 +8,7 @@
 				"duration": 0.5,
 				"delayToActivate": 0.0,
 				"isInstantaneous": false,
+				"applyOnlyIfInjuredStaggered": false,
 				"value": 0,
 				"velocity": 400,
 				"acceleration": -800

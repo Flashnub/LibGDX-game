@@ -55,7 +55,7 @@ public abstract class WorldObject extends EntityModel implements InteractableObj
 	}
 	public abstract boolean shouldDeleteIfActivated();
 	public abstract boolean shouldMove();
-	public abstract boolean shouldCollideWithCharacter();
+	public abstract boolean shouldCollideWithEntity();
 	public abstract UUIDType getUUIDType();
 	
 	public void activateObjectOnWorld(WorldModel world) {

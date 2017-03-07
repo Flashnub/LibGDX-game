@@ -226,13 +226,13 @@
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "DashA",
-			"numberOfFrames": 1,
+			"numberOfFrames": 6,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "DashC",
-			"numberOfFrames": 6,
+			"numberOfFrames": 1,
 			"playMode": NORMAL
 		}
 		{

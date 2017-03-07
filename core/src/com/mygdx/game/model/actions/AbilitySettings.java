@@ -211,6 +211,7 @@ public class AbilitySettings implements Serializable {
 		copy.yOffsetModifier = this.yOffsetModifier;
 		copy.isSuper = this.isSuper;
 		copy.sourceEffectSettings = this.sourceEffectSettings;
+		copy.sourceRespectEntityCollisions = this.sourceRespectEntityCollisions;
 		if (sourceEffectSettings != null) {
 			Array <EffectSettings> effectSettingsCopy = new Array <EffectSettings> ();
 			for (EffectSettings eSettings : this.sourceEffectSettings) {

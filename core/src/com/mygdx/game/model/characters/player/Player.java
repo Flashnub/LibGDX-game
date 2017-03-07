@@ -24,6 +24,7 @@ import com.mygdx.game.model.actions.ActionSequence.StaggerType;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.nonhostile.ConditionalDialogueSettings;
 import com.mygdx.game.model.characters.Character;
+import com.mygdx.game.model.characters.EntityCollisionData;
 import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.characters.EntityUIModel;
 import com.mygdx.game.model.characters.ModelListener;
@@ -544,37 +545,37 @@ public class Player extends Character implements InputProcessor, ControllerListe
 
 
 		@Override
-		public boolean handleAdditionalXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds,  boolean alreadyCollided) {
+		public EntityCollisionData handleEntityXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds,  boolean alreadyCollided) {
 			if (alreadyCollided) {
 				if (this.walking) {
 					this.stopHorizontalMovement(false);
 				}
-				return alreadyCollided;
+				return null;
 			}
 			else if (this.isRespectingEntityCollision()){
-				EntityModel collidedEntity = this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds);
-				boolean entityCollision = collidedEntity != null;
+				EntityCollisionData entityCollisionData = this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds);
+				boolean entityCollision = entityCollisionData != null;
 				if (entityCollision) {
 					this.stopHorizontalMovement(false);
 				}
 //				if (!this.hasProcessedOverlapCorrection()) {
 //					this.stopEntityOverlapIfNeeded(collidedEntity, tempGameplayBounds, tempImageBounds);
 //				}
-				return entityCollision;
+				return entityCollisionData;
 			}
 			
-			return false;
+			return null;
 		}
 		
 		@Override
-		public boolean handleAdditionalYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+		public EntityCollisionData handleEntityYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
 			if (alreadyCollided) {
-				return alreadyCollided;
+				return null;
 			}
 			else if (this.isRespectingEntityCollision()){ 
-				return this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds) != null;
+				return this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds);
 			}
-			return false;
+			return null;
 		}
 
 		public void setDialogueController(DialogueController dialogueController) {

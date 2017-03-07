@@ -20,6 +20,7 @@ import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.Attack;
 import com.mygdx.game.model.characters.Character;
 import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.characters.EntityCollisionData;
 import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.characters.NPCCharacter;
 import com.mygdx.game.model.characters.NPCCharacter.NPCCharacterModel;
@@ -528,28 +529,45 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 		return projectile.isActive();
 	}
 	
+	public EntityCollisionData checkIfEntityCollidesWithOthers(EntityModel entity, Rectangle tempGameplayBounds) {
+		return this.checkIfEntityCollidesWithOthers(entity, tempGameplayBounds, true);
+	}
+	
 	@Override
-	public EntityModel checkIfEntityCollidesWithOthers(EntityModel entity, Rectangle tempGameplayBounds) {
-		EntityModel collidingEntity = null;
+	public EntityCollisionData checkIfEntityCollidesWithOthers(EntityModel entity, Rectangle tempGameplayBounds, boolean useRespect) {
+		EntityCollisionData collidingEntity = null;
 		if (entity.getAllegiance() == Player.allegiance) {
 			for (Enemy enemy : this.enemies) {
-				if (enemy.getCharacterData().getAllegiance() != Player.allegiance && enemy.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds)) {
-					collidingEntity = enemy.getCharacterData();
-					break;
+				if (enemy.getCharacterData().getAllegiance() != Player.allegiance 
+				&& enemy.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds)) {
+					if ((useRespect && player.getCharacterData().isRespectingEntityCollision() 
+						&& enemy.getCharacterData().isRespectingEntityCollision()) || !useRespect) {
+						collidingEntity = new EntityCollisionData(entity, enemy.getCharacterData(), tempGameplayBounds);
+						break;
+					}
 				}
 			}
 
 		}
 		else if (entity instanceof NPCCharacterModel){
 			for (Enemy enemy : this.enemies) {
-				if (enemy.getCharacterData().getAllegiance() != entity.getAllegiance() && enemy.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds)) {
-					collidingEntity = enemy.getCharacterData();
-					break;
+				if (enemy.getCharacterData().getAllegiance() != entity.getAllegiance() 
+				&& enemy.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds)) {
+					if ((useRespect && player.getCharacterData().isRespectingEntityCollision() 
+						&& enemy.getCharacterData().isRespectingEntityCollision()) || !useRespect) {
+						collidingEntity = new EntityCollisionData(entity, enemy.getCharacterData(), tempGameplayBounds);
+						break;
+					}
+					
 				}
 			}
 			if (collidingEntity == null && entity.getAllegiance() != Player.allegiance) {
-				if (player.getCharacterData().getAllegiance() != entity.getAllegiance() && player.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds)) {
-					collidingEntity = player.getCharacterData();
+				if (player.getCharacterData().getAllegiance() != entity.getAllegiance() 
+				&& player.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds)) {
+					if ((useRespect && player.getCharacterData().isRespectingEntityCollision() 
+						&& entity.isRespectingEntityCollision()) || !useRespect) {
+						collidingEntity = new EntityCollisionData(entity, player.getCharacterData(), tempGameplayBounds);
+					}
 				}
 
 			}
@@ -561,7 +579,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	public boolean checkIfEntityCollidesWithObjects(EntityModel entity, Rectangle tempGameplayBounds) {
 		boolean isColliding = false;
 		for (WorldObject object : this.objects) {
-			if (object.shouldCollideWithCharacter() && object.getGameplayHitBox().overlaps(tempGameplayBounds)) {
+			if (object.shouldCollideWithEntity() && object.getGameplayHitBox().overlaps(tempGameplayBounds)) {
 				isColliding = true;
 				break;
 			}

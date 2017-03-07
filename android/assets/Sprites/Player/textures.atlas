@@ -186,42 +186,42 @@ DashA1
   orig: 350, 267
   offset: 0, 0
   index: -1
+DashA2
+  rotate: false
+  xy: 2, 4575
+  size: 350, 267
+  orig: 350, 267
+  offset: 0, 0
+  index: -1
+DashA3
+  rotate: false
+  xy: 2, 4575
+  size: 350, 267
+  orig: 350, 267
+  offset: 0, 0
+  index: -1
+DashA4
+  rotate: false
+  xy: 2, 4575
+  size: 350, 267
+  orig: 350, 267
+  offset: 0, 0
+  index: -1
+DashA5
+  rotate: false
+  xy: 2, 4575
+  size: 350, 267
+  orig: 350, 267
+  offset: 0, 0
+  index: -1
+DashA6
+  rotate: false
+  xy: 2, 4575
+  size: 350, 267
+  orig: 350, 267
+  offset: 0, 0
+  index: -1
 DashC1
-  rotate: false
-  xy: 2, 4575
-  size: 350, 267
-  orig: 350, 267
-  offset: 0, 0
-  index: -1
-DashC2
-  rotate: false
-  xy: 2, 4575
-  size: 350, 267
-  orig: 350, 267
-  offset: 0, 0
-  index: -1
-DashC3
-  rotate: false
-  xy: 2, 4575
-  size: 350, 267
-  orig: 350, 267
-  offset: 0, 0
-  index: -1
-DashC4
-  rotate: false
-  xy: 2, 4575
-  size: 350, 267
-  orig: 350, 267
-  offset: 0, 0
-  index: -1
-DashC5
-  rotate: false
-  xy: 2, 4575
-  size: 350, 267
-  orig: 350, 267
-  offset: 0, 0
-  index: -1
-DashC6
   rotate: false
   xy: 2, 4575
   size: 350, 267

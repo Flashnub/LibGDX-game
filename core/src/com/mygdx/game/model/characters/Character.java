@@ -269,9 +269,6 @@ public abstract class Character implements ModelListener {
 		private void handleActionSequences(float delta) {
 			if (this.processingActionSequences != null) {
 				Iterator <ActionSequence> iterator = processingActionSequences.iterator();
-				if (processingActionSequences.size() > 1) {
-					System.out.println("");
-				}
 				while (iterator.hasNext()) {
 					ActionSequence actionSequence = iterator.next();
 					actionSequence.process(delta, actionListener);
@@ -633,18 +630,15 @@ public abstract class Character implements ModelListener {
 				if (!collisionY.getCollisionType().equals(CollisionType.Entity)) {
 					if (collisionY.isVelocityPositive) {
 						this.getVelocity().y = -5f;
-//						System.out.println("Zero");
 
 					}
 					else {
 						this.getVelocity().y = 0;
-//						System.out.println("Zero");
 					}
 				}
 			}
 			else if (!isInAir && this.getVelocity().y < -3f) {
 				this.falling();
-//				System.out.println("falling");
 			}
 
 		}
@@ -693,7 +687,11 @@ public abstract class Character implements ModelListener {
 					this.setMovementStatesIfNeeded();
 				}
 	    	}
-	    	this.setCurrentJumpTokens(maxJumpTokens);;
+    		if (!isFromEntityCollision) {
+    			this.setCurrentJumpTokens(maxJumpTokens);
+    			this.entityCollisionRepositionTokens = 1;
+
+    		}
 	    }
 		
 	    public void falling() {

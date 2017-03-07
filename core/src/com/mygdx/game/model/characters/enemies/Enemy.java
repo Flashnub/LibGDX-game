@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Json;
+import com.mygdx.game.model.characters.EntityCollisionData;
 import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.characters.EntityUIModel;
 import com.mygdx.game.model.characters.ModelListener;
@@ -96,32 +97,36 @@ public class Enemy extends NPCCharacter{
 
 		
 		@Override
-		public boolean handleAdditionalXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+		public EntityCollisionData handleEntityXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
 			if (alreadyCollided) {
-				this.stopHorizontalMovement(false);
-				return alreadyCollided;
+				if (this.walking) {
+					this.stopHorizontalMovement(false);
+				}
+				return null;
 			}
 			else if (this.isRespectingEntityCollision()){
-				EntityModel collidedEntity = this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds);
-				boolean entityCollision = this.isRespectingEntityCollision() && collidedEntity != null;
+				EntityCollisionData collidedEntity = this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds);
+				boolean entityCollision = collidedEntity != null;
 				if (entityCollision) {
 					this.stopHorizontalMovement(false);
 				}
 //				this.stopEntityOverlapIfNeeded(collidedEntity, tempGameplayBounds, tempImageBounds);
-				return entityCollision;
+				return collidedEntity;
 			}
-			return false;
+			return null;
 		}
 		
 		@Override
-		public boolean handleAdditionalYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+		public EntityCollisionData handleEntityYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
 			if (alreadyCollided) {
-				return alreadyCollided;
+				return null;
 			}
-			else if (this.isRespectingEntityCollision()){ 
-				return this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds) != null;
+			else if (this.isRespectingEntityCollision()){
+				EntityCollisionData collidedEntity = this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds);
+				boolean entityCollision = collidedEntity != null;
+				return collidedEntity;
 			}
-			return false;
+			return null;
 		}
 		
 		

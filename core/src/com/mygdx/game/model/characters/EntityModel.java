@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.characters.CollisionCheck.CollisionType;
 import com.mygdx.game.model.events.CollisionChecker;
 import com.mygdx.game.utils.CellWrapper;
+import com.mygdx.game.utils.CellWrapper.CellType;
 
 public abstract class EntityModel {
 	
@@ -38,6 +39,7 @@ public abstract class EntityModel {
 	boolean shouldRespectTileCollision;
 	boolean shouldRespectObjectCollision;
 	boolean shouldRespectEntityCollision;
+	int entityCollisionRepositionTokens;
 	
 	
 	public EntityModel() {
@@ -64,6 +66,7 @@ public abstract class EntityModel {
 		this.heightCoefficient = 1f;
 		this.xOffsetModifier = 0f;
 		this.yOffsetModifier = 0f;
+		this.entityCollisionRepositionTokens = 1;
 	}
 	
 	//Not used by projectiles.
@@ -76,35 +79,222 @@ public abstract class EntityModel {
 		if (!this.lockEntityCollisionBehavior && 
 			this.isRespectingEntityCollision != this.shouldRespectEntityCollision)
 		{
-			EntityModel collidingEntity = this.collisionChecker.checkIfEntityCollidesWithOthers(this, this.gameplayHitBox);
-			if (collidingEntity != null) {
-				collidingEntity.setRespectingEntityCollision(false);
+			EntityCollisionData entityCollisionData = this.collisionChecker.checkIfEntityCollidesWithOthers(this, this.gameplayHitBox, false);
+			if (entityCollisionData != null) {
+				entityCollisionData.source.setRespectingEntityCollision(false);
 			}
 			else {
+				System.out.println("stop respecting " + this.toString());
 				this.isRespectingEntityCollision = shouldRespectEntityCollision;
 			}
 		}
-//		if (this.hasProcessedOverlapCorrection)
-//		{
-//			this.timeSinceOverlapCorrection += delta;
-//			if (this.timeSinceOverlapCorrection > EntityModel.averageOverlapCooldown) {
-//				this.hasProcessedOverlapCorrection = false;
-//				this.timeSinceOverlapCorrection = 0f;
-//			}
-//		}
 	}
 	
-//	public void moveWithoutCollisionDetection(float delta) {
-//		this.imageHitBox.x = this.imageHitBox.x + this.velocity.x * delta;
-//		this.imageHitBox.y = this.imageHitBox.y + this.velocity.y * delta;
-//		this.gameplayHitBox.x = this.xOffsetModifier + (this.imageHitBox.x + this.imageHitBox.width * ((1f - this.widthCoefficient) / 2));
-//		this.gameplayHitBox.y = this.yOffsetModifier + (this.imageHitBox.y + this.imageHitBox.height * ((1f - this.heightCoefficient) / 2));
-//	}
-	
-	public CollisionCheck checkForYCollision(float maxTime, TiledMapTileLayer collisionLayer, float yVelocity, boolean shouldMove, boolean applyGravity) {
+	public CollisionInfo singletonYCheckWithoutVelocity(TiledMapTileLayer collisionLayer, Rectangle tempGameplayBounds) {
+		return this.singletonXCheckForTileCollision(collisionLayer, tempGameplayBounds, false, 1);
+	}
+
+	public CollisionInfo singletonYCheckForTileCollision(TiledMapTileLayer collisionLayer, Rectangle tempGameplayBounds, boolean useVelocityOptimization, float yTempVelocity) {
+		
+		boolean collision = false;
+		float pointOfReturn = tempGameplayBounds.y;
 		float tileWidth = collisionLayer.getTileWidth();
 		float tileHeight = collisionLayer.getTileHeight();
+		Array <CellWrapper> tilesToCheck = new Array <CellWrapper>();
 		
+		int bottomLeftXIndex = (int) (tempGameplayBounds.x / tileWidth);
+		int bottomLeftYIndex = (int) ((tempGameplayBounds.y) / tileHeight);
+			
+		Cell bottomLeftBlock = collisionLayer.getCell(bottomLeftXIndex, bottomLeftYIndex);
+			
+		int bottomMiddleXIndex = (int) ((tempGameplayBounds.x + tempGameplayBounds.width / 2) / tileWidth);
+		int bottomMiddleYIndex = (int) (tempGameplayBounds.y / tileHeight);
+			
+		Cell bottomMiddleBlock = collisionLayer.getCell(bottomMiddleXIndex, bottomMiddleYIndex);
+			
+		int bottomRightXIndex = (int) ((tempGameplayBounds.x + tempGameplayBounds.width) / tileWidth);
+		int bottomRightYIndex = (int) (tempGameplayBounds.y / tileHeight);
+			
+		Cell bottomRightBlock = collisionLayer.getCell(bottomRightXIndex, bottomRightYIndex);
+		int topLeftXIndex = (int) (tempGameplayBounds.x / tileWidth);
+		int topLeftYIndex = (int) ((tempGameplayBounds.y + tempGameplayBounds.height) / tileHeight);
+			
+		Cell topLeftBlock = collisionLayer.getCell(topLeftXIndex, topLeftYIndex);
+			
+		int topMiddleXIndex = (int) ((tempGameplayBounds.x + tempGameplayBounds.width / 2) / tileWidth);
+		int topMiddleYIndex = (int) ((tempGameplayBounds.y + tempGameplayBounds.height) / tileHeight);
+			
+		Cell topMiddleBlock = collisionLayer.getCell(topMiddleXIndex, topMiddleYIndex);
+			
+		int topRightXIndex = (int) ((tempGameplayBounds.x + tempGameplayBounds.width) / tileWidth);
+		int topRightYIndex = (int) ((tempGameplayBounds.y + tempGameplayBounds.height) / tileHeight);
+			
+		Cell topRightBlock = collisionLayer.getCell(topRightXIndex, topRightYIndex);
+
+		if (useVelocityOptimization) {
+			if (this.isRespectingTileCollision && yTempVelocity < 0)
+			{			
+				if (bottomLeftBlock != null)
+					tilesToCheck.add(new CellWrapper(bottomLeftBlock, new Vector2(bottomLeftXIndex, bottomLeftYIndex), CellType.Bottom));
+				if (bottomMiddleBlock != null)
+					tilesToCheck.add(new CellWrapper(bottomMiddleBlock, new Vector2(bottomMiddleXIndex, bottomMiddleYIndex), CellType.Bottom));
+				if (bottomRightBlock != null)
+					tilesToCheck.add(new CellWrapper(bottomRightBlock, new Vector2(bottomRightXIndex, bottomRightYIndex), CellType.Bottom));
+			}
+			else if (this.isRespectingTileCollision && yTempVelocity > 0) {		
+				if (topLeftBlock != null)
+					tilesToCheck.add(new CellWrapper(topLeftBlock, new Vector2(topLeftXIndex, topLeftYIndex), CellType.Top));
+				if (topMiddleBlock != null)
+					tilesToCheck.add(new CellWrapper(topMiddleBlock, new Vector2(topMiddleXIndex, topMiddleYIndex), CellType.Top));
+				if (topRightBlock != null)
+					tilesToCheck.add(new CellWrapper(topRightBlock, new Vector2(topRightXIndex, topRightYIndex), CellType.Top));
+			}
+		}
+		else {
+			if (topLeftBlock != null)
+				tilesToCheck.add(new CellWrapper(topLeftBlock, new Vector2(topLeftXIndex, topLeftYIndex), CellType.Top));
+			if (topMiddleBlock != null)
+				tilesToCheck.add(new CellWrapper(topMiddleBlock, new Vector2(topMiddleXIndex, topMiddleYIndex), CellType.Top));
+			if (topRightBlock != null)
+				tilesToCheck.add(new CellWrapper(topRightBlock, new Vector2(topRightXIndex, topRightYIndex), CellType.Top));
+			if (bottomLeftBlock != null)
+				tilesToCheck.add(new CellWrapper(bottomLeftBlock, new Vector2(bottomLeftXIndex, bottomLeftYIndex), CellType.Bottom));
+			if (bottomMiddleBlock != null)
+				tilesToCheck.add(new CellWrapper(bottomMiddleBlock, new Vector2(bottomMiddleXIndex, bottomMiddleYIndex), CellType.Bottom));
+			if (bottomRightBlock != null)
+				tilesToCheck.add(new CellWrapper(bottomRightBlock, new Vector2(bottomRightXIndex, bottomRightYIndex), CellType.Bottom));
+		}
+		
+		for (CellWrapper tile : tilesToCheck) {
+			if (collision) {
+				break;
+			}
+			collision = ((Boolean)tile.getCell().getTile().getProperties().get("Impassable")).equals(true);
+			switch (tile.cellType()) {
+			case Left:
+				pointOfReturn = tile.getOrigin().x * tileWidth + tileWidth;
+				break;
+			case Bottom:
+				pointOfReturn = tile.getOrigin().y * tileHeight + tileHeight;
+				break;
+			case Top:
+				pointOfReturn = tile.getOrigin().y * tileHeight - tempGameplayBounds.height;
+				break;
+			case Right: 
+				pointOfReturn = tile.getOrigin().x * tileWidth - (this.gameplayHitBox.width + 0.25f);
+				break;
+			}
+		}
+		
+		return new CollisionInfo(pointOfReturn, collision);
+	}
+	
+	public CollisionInfo singletonXCheckWithoutVelocity(TiledMapTileLayer collisionLayer, Rectangle tempGameplayBounds) {
+		return this.singletonXCheckForTileCollision(collisionLayer, tempGameplayBounds, false, 1);
+	}
+	
+	public CollisionInfo singletonXCheckForTileCollision(TiledMapTileLayer collisionLayer, Rectangle tempGameplayBounds, boolean useVelocityOptimization, float xTempVelocity) {
+		boolean collision = false;
+		float pointOfReturn = tempGameplayBounds.y;
+		float tileWidth = collisionLayer.getTileWidth();
+		float tileHeight = collisionLayer.getTileHeight();
+		Array <CellWrapper> tilesToCheck = new Array <CellWrapper>();
+		
+		//left blocks
+		int topLeftXIndex = ((int) (tempGameplayBounds.x / tileWidth));
+		int topLeftYIndex = ((int) ((tempGameplayBounds.y + tempGameplayBounds.height) / tileHeight));
+
+		Cell topLeftBlock = collisionLayer.getCell(topLeftXIndex, topLeftYIndex);
+			
+		int middleLeftXIndex = ((int) (tempGameplayBounds.x / tileWidth));
+		int middleLeftYIndex = ((int) ((tempGameplayBounds.y + tempGameplayBounds.height / 2) / tileHeight));
+			
+		Cell middleLeftBlock = collisionLayer.getCell(middleLeftXIndex, middleLeftYIndex);
+			
+		int lowerLeftXIndex = ((int) (tempGameplayBounds.x / tileWidth));
+		int lowerLeftYIndex = ((int) ((tempGameplayBounds.y) / tileHeight));
+			
+		Cell lowerLeftBlock = collisionLayer.getCell(lowerLeftXIndex, lowerLeftYIndex);
+		
+
+		//right blocks
+		int topRightXIndex = (int) ((tempGameplayBounds.x + tempGameplayBounds.width) / tileWidth);
+		int topRightYIndex = (int) ((tempGameplayBounds.y + tempGameplayBounds.height) / tileHeight);
+			
+		Cell topRightBlock = collisionLayer.getCell(topRightXIndex, topRightYIndex);
+			
+		int middleRightXIndex = (int) ((tempGameplayBounds.x + tempGameplayBounds.width) / tileWidth);
+		int middleRightYIndex = (int) ((tempGameplayBounds.y + tempGameplayBounds.height / 2) / tileHeight);
+			
+		Cell middleRightBlock = collisionLayer.getCell(middleRightXIndex, middleRightYIndex);
+			
+		int lowerRightXIndex = (int) ((tempGameplayBounds.x + tempGameplayBounds.width) / tileWidth);
+		int lowerRightYIndex = (int) ((tempGameplayBounds.y) / tileHeight);
+			
+		Cell lowerRightBlock = collisionLayer.getCell(lowerRightXIndex, lowerRightYIndex);
+		
+		if (useVelocityOptimization) {
+			if (this.isRespectingTileCollision && xTempVelocity < 0) {
+				//left blocks
+				if (topLeftBlock != null)
+					tilesToCheck.add(new CellWrapper(topLeftBlock, new Vector2(topLeftXIndex, topLeftYIndex), CellType.Left));
+				if (middleLeftBlock != null)
+					tilesToCheck.add(new CellWrapper(middleLeftBlock, new Vector2(middleLeftXIndex, middleLeftYIndex), CellType.Left));
+				if (lowerLeftBlock != null)
+					tilesToCheck.add(new CellWrapper(lowerLeftBlock, new Vector2(lowerLeftXIndex, lowerLeftYIndex), CellType.Left));
+			}
+			else if (this.isRespectingTileCollision && xTempVelocity > 0) {
+				//right blocks			
+				if (topRightBlock != null)
+					tilesToCheck.add(new CellWrapper(topRightBlock, new Vector2(topRightXIndex, topRightYIndex), CellType.Right));
+				if (middleRightBlock != null)
+					tilesToCheck.add(new CellWrapper(middleRightBlock, new Vector2(middleRightXIndex, middleRightYIndex), CellType.Right));
+				if (lowerRightBlock != null)
+					tilesToCheck.add(new CellWrapper(lowerRightBlock, new Vector2(lowerRightXIndex, lowerRightYIndex), CellType.Right));
+
+			}
+		}
+		else {
+			//left blocks
+			if (topLeftBlock != null)
+				tilesToCheck.add(new CellWrapper(topLeftBlock, new Vector2(topLeftXIndex, topLeftYIndex), CellType.Left));
+			if (middleLeftBlock != null)
+				tilesToCheck.add(new CellWrapper(middleLeftBlock, new Vector2(middleLeftXIndex, middleLeftYIndex), CellType.Left));
+			if (lowerLeftBlock != null)
+				tilesToCheck.add(new CellWrapper(lowerLeftBlock, new Vector2(lowerLeftXIndex, lowerLeftYIndex), CellType.Left));
+			if (topRightBlock != null)
+				tilesToCheck.add(new CellWrapper(topRightBlock, new Vector2(topRightXIndex, topRightYIndex), CellType.Right));
+			if (middleRightBlock != null)
+				tilesToCheck.add(new CellWrapper(middleRightBlock, new Vector2(middleRightXIndex, middleRightYIndex), CellType.Right));
+			if (lowerRightBlock != null)
+				tilesToCheck.add(new CellWrapper(lowerRightBlock, new Vector2(lowerRightXIndex, lowerRightYIndex), CellType.Right));
+		}
+		
+		for (CellWrapper tile : tilesToCheck) {
+			if (collision) {
+				break;
+			}
+			collision = ((Boolean)tile.getCell().getTile().getProperties().get("Impassable")).equals(true);
+			switch (tile.cellType()) {
+			case Left:
+				pointOfReturn = tile.getOrigin().x * tileWidth + tileWidth;
+				break;
+			case Bottom:
+				pointOfReturn = tile.getOrigin().y * tileHeight + tileHeight;
+				break;
+			case Top:
+				pointOfReturn = tile.getOrigin().y * tileHeight - tempGameplayBounds.height;
+				break;
+			case Right: 
+				pointOfReturn = tile.getOrigin().x * tileWidth - (this.gameplayHitBox.width + 0.25f);
+				break;
+			}
+		}
+			
+		return new CollisionInfo(pointOfReturn, collision);
+	}
+	
+	public CollisionCheck checkForYCollision(float maxTime, TiledMapTileLayer collisionLayer, float yVelocity, boolean shouldMove, boolean applyGravity) {
 		boolean collisionY = false;
 		float pointOfReturn = 0f;
 		float time = 0f;
@@ -115,6 +305,7 @@ public abstract class EntityModel {
 		float tempVelocity = yVelocity;
 		float tempMaxTime = maxTime;
 		float increment;
+		EntityCollisionData entityCollisionData = null;
 		CollisionType collisionType = CollisionType.None;
 		
 		while (tempMaxTime > 0f) {
@@ -130,102 +321,32 @@ public abstract class EntityModel {
 			
 			tempImageBounds.setY(tempImageBounds.getY() + tempVelocity * increment);
 			tempGameplayBounds.setY(this.yOffsetModifier + tempImageBounds.getY() + tempImageBounds.getHeight() * ((1f - this.heightCoefficient) / 2));
-
 			
+			//Tile
+			CollisionInfo info = this.singletonYCheckForTileCollision(collisionLayer, tempGameplayBounds, true, tempVelocity);
+			collisionY = info.didCollide;
+			pointOfReturn = info.pointOfReturn;
 
-			if (this.isRespectingTileCollision && tempVelocity < 0) {
-				int bottomLeftXIndex = (int) (tempGameplayBounds.x / tileWidth);
-				int bottomLeftYIndex = (int) ((tempGameplayBounds.y) / tileHeight);
-				
-				Cell bottomLeftBlock = collisionLayer.getCell(bottomLeftXIndex, bottomLeftYIndex);
-				
-				int bottomMiddleXIndex = (int) ((tempGameplayBounds.x + tempGameplayBounds.width / 2) / tileWidth);
-				int bottomMiddleYIndex = (int) (tempGameplayBounds.y / tileHeight);
-				
-				Cell bottomMiddleBlock = collisionLayer.getCell(bottomMiddleXIndex, bottomMiddleYIndex);
-				
-				int bottomRightXIndex = (int) ((tempGameplayBounds.x + tempGameplayBounds.width) / tileWidth);
-				int bottomRightYIndex = (int) (tempGameplayBounds.y / tileHeight);
-				
-				Cell bottomRightBlock = collisionLayer.getCell(bottomRightXIndex, bottomRightYIndex);
-				//bottom left block
-				if (bottomLeftBlock != null) {
-					collisionY = ((Boolean)bottomLeftBlock.getTile().getProperties().get("Impassable")).equals(true);
-					pointOfReturn = bottomLeftYIndex * tileHeight + tileHeight;
-				}
-					
-				//bottom middle block
-				if(!collisionY && bottomMiddleBlock != null) {
-					collisionY = ((Boolean)bottomMiddleBlock.getTile().getProperties().get("Impassable")).equals(true);
-					pointOfReturn = bottomMiddleYIndex * tileHeight + tileHeight;
-				}
-				
-				//bottom right block
-				if(!collisionY && bottomRightBlock != null) {
-					collisionY = ((Boolean)bottomRightBlock.getTile().getProperties().get("Impassable")).equals(true);
-					pointOfReturn = bottomRightYIndex * tileHeight + tileHeight;
-				}
-				
-//				tilesToCheckForWorldObjects.add(new CellWrapper(bottomLeftBlock, new Vector2(bottomLeftXIndex * tileWidth, bottomLeftYIndex * tileHeight)));
-//				tilesToCheckForWorldObjects.add(new CellWrapper(bottomMiddleBlock, new Vector2(bottomMiddleXIndex * tileWidth, bottomMiddleYIndex * tileHeight)));
-//				tilesToCheckForWorldObjects.add(new CellWrapper(bottomRightBlock, new Vector2(bottomRightXIndex * tileWidth, bottomRightYIndex * tileHeight)));
-		
-			} 
-			else if (this.isRespectingTileCollision && tempVelocity > 0) {
-				
-				int topLeftXIndex = (int) (tempGameplayBounds.x / tileWidth);
-				int topLeftYIndex = (int) ((tempGameplayBounds.y + tempGameplayBounds.height) / tileHeight);
-				
-				Cell topLeftBlock = collisionLayer.getCell(topLeftXIndex, topLeftYIndex);
-				
-				int topMiddleXIndex = (int) ((tempGameplayBounds.x + tempGameplayBounds.width / 2) / tileWidth);
-				int topMiddleYIndex = (int) ((tempGameplayBounds.y + tempGameplayBounds.height) / tileHeight);
-				
-				Cell topMiddleBlock = collisionLayer.getCell(topMiddleXIndex, topMiddleYIndex);
-				
-				int topRightXIndex = (int) ((tempGameplayBounds.x + tempGameplayBounds.width) / tileWidth);
-				int topRightYIndex = (int) ((tempGameplayBounds.y + tempGameplayBounds.height) / tileHeight);
-				
-				Cell topRightBlock = collisionLayer.getCell(topRightXIndex, topRightYIndex);
-				
-				//top left block
-				if (topLeftBlock != null) {
-					collisionY = ((Boolean)topLeftBlock.getTile().getProperties().get("Impassable")).equals(true);
-					pointOfReturn = topLeftYIndex * tileHeight - this.gameplayHitBox.height;
-				}
-				
-				//top middle block
-				if(!collisionY && topMiddleBlock != null) {
-					collisionY = ((Boolean)topMiddleBlock.getTile().getProperties().get("Impassable")).equals(true);
-					pointOfReturn = topMiddleYIndex * tileHeight - this.gameplayHitBox.height;
-				}
-				
-				//top right block
-				if(!collisionY && topRightBlock != null) {
-					collisionY = ((Boolean)topRightBlock.getTile().getProperties().get("Impassable")).equals(true);
-					pointOfReturn = topRightYIndex * tileHeight  - this.gameplayHitBox.height;
-				}
-				
-//				tilesToCheckForWorldObjects.add(new CellWrapper(topLeftBlock, new Vector2(topLeftXIndex * tileWidth, topLeftYIndex * tileHeight)));
-//				tilesToCheckForWorldObjects.add(new CellWrapper(topMiddleBlock, new Vector2(topMiddleXIndex * tileWidth, topMiddleYIndex * tileHeight)));
-//				tilesToCheckForWorldObjects.add(new CellWrapper(topRightBlock, new Vector2(topRightXIndex * tileWidth, topRightYIndex * tileHeight)));
-			}
 			if (collisionY) {
 				collisionType = CollisionType.World;
 			}
 			
-			if (this.isRespectingObjectCollision) {
-				collisionY = collisionY	|| this.collisionChecker.checkIfEntityCollidesWithObjects(this, tempGameplayBounds);
+			//WorldObject
+			if (!collisionY && this.isRespectingObjectCollision) {
+				collisionY = this.collisionChecker.checkIfEntityCollidesWithObjects(this, tempGameplayBounds);
 				if (collisionY && collisionType.equals(CollisionType.None)) {
 					collisionType = CollisionType.Object;
 				}
 			}
 
-			
-			boolean additionalCollisionY = this.handleAdditionalYCollisionLogic(tempGameplayBounds, tempImageBounds, collisionY);
-			if (!collisionY && additionalCollisionY) {
-				collisionY = true;
-				collisionType = CollisionType.Entity;
+			//EntityCollision
+			if (!collisionY) {
+				EntityCollisionData additionalCollisionY = this.handleEntityYCollisionLogic(tempGameplayBounds, tempImageBounds, collisionY);
+				if (additionalCollisionY != null) {
+					collisionY = true;
+					collisionType = CollisionType.Entity;
+					entityCollisionData = additionalCollisionY;
+				}
 				//Make sure the solution doesn't include another entity/World/object collision.
 			}
 
@@ -251,15 +372,51 @@ public abstract class EntityModel {
 		}
 		else if (shouldMove && collisionType.equals(CollisionType.World)) {
 			this.gameplayHitBox.y = pointOfReturn;
-			this.imageHitBox.y = -1f * (this.yOffsetModifier + (this.imageHitBox.height * ((1f - this.heightCoefficient) / 2)) - this.gameplayHitBox.y );
+//			this.imageHitBox.y = -1f * (this.yOffsetModifier + (this.imageHitBox.height * ((1f - this.heightCoefficient) / 2)) - this.gameplayHitBox.y );
+			this.refreshImageHitBoxY();
+		}
+		else if (shouldMove && collisionType.equals(CollisionType.Entity))
+		{
+			//Figure out reposition AND MAKE SURE IT DOESN'T HAVE TILE/OBJECT COLLISION ISSUE. If it does, just do
+			//the stop movement thing.
+			Rectangle sourceHitBox = new Rectangle(this.gameplayHitBox);
+			Rectangle collidedEntityHitBox = new Rectangle(entityCollisionData.collidedEntity.gameplayHitBox);
+			switch(entityCollisionData.collisionLocation) {
+			case Left:
+				sourceHitBox.x = collidedEntityHitBox.x - sourceHitBox.width - 2f; //buffer.
+				CollisionInfo xCheckInfo = this.singletonXCheckWithoutVelocity(collisionLayer, sourceHitBox);
+				CollisionInfo yCheckInfo = this.singletonYCheckWithoutVelocity(collisionLayer, sourceHitBox);
+				boolean objectCheck = this.collisionChecker.checkIfEntityCollidesWithObjects(this, sourceHitBox);
+				//May need to reenable this....
+//				EntityCollisionData extraEntityCheck = this.collisionChecker.checkIfEntityCollidesWithOthers(this, sourceHitBox);
+				if (!xCheckInfo.didCollide && !yCheckInfo.didCollide && !objectCheck && entityCollisionRepositionTokens > 0) {
+					this.gameplayHitBox.x = sourceHitBox.x;
+					this.refreshImageHitBoxX();
+					entityCollisionRepositionTokens -= 1;
+				}
+				break;
+			case Right:
+				sourceHitBox.x = collidedEntityHitBox.x + collidedEntityHitBox.width + 2f; //buffer.
+				CollisionInfo xCheckInfo2 = this.singletonXCheckWithoutVelocity(collisionLayer, sourceHitBox);
+				CollisionInfo yCheckInfo2 = this.singletonYCheckWithoutVelocity(collisionLayer, sourceHitBox);
+				boolean objectCheck2 = this.collisionChecker.checkIfEntityCollidesWithObjects(this, sourceHitBox);
+				//May need to reenable this....
+//				EntityCollisionData extraEntityCheck2 = this.collisionChecker.checkIfEntityCollidesWithOthers(this, sourceHitBox);
+				if (!xCheckInfo2.didCollide && !yCheckInfo2.didCollide && !objectCheck2 && entityCollisionRepositionTokens > 0) {
+					this.gameplayHitBox.x = sourceHitBox.x;
+					this.refreshImageHitBoxX();
+					entityCollisionRepositionTokens -= 1;
+				}
+				break;
+			}
 		}
 
 		//react to X collision
 		return new CollisionCheck(collisionY, tempVelocity > 0, time, collisionType, pointOfReturn);
 	}
 	
-	public abstract boolean handleAdditionalXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided);
-	public abstract boolean handleAdditionalYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided);
+	public abstract EntityCollisionData handleEntityXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided);
+	public abstract EntityCollisionData handleEntityYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided);
 
 	public abstract int getAllegiance();
 	public abstract boolean isFacingLeft();
@@ -283,8 +440,6 @@ public abstract class EntityModel {
 
 	
 	public CollisionCheck checkForXCollision(float maxTime, TiledMapTileLayer collisionLayer, float xVelocity, float xAcceleration, boolean shouldMove) {
-		float tileWidth = collisionLayer.getTileWidth();
-		float tileHeight = collisionLayer.getTileHeight();
 		
 		boolean collisionX = false;
 		float pointOfReturn = 0f;
@@ -292,10 +447,10 @@ public abstract class EntityModel {
 		
 		Rectangle tempImageBounds = new Rectangle(this.imageHitBox);
 		Rectangle tempGameplayBounds = new Rectangle(this.gameplayHitBox);
-//		Array <CellWrapper> tilesToCheckForWorldObjects = new Array<CellWrapper>();
 		float tempVelocity = xVelocity;
 		float tempMaxTime = maxTime;
 		float increment;
+		EntityCollisionData entityCollisionData = null;
 		CollisionType collisionType = CollisionType.None;
 		
 		while (tempMaxTime > 0f) {
@@ -311,116 +466,40 @@ public abstract class EntityModel {
 			tempImageBounds.setX(tempImageBounds.getX() + tempVelocity * increment);
 			tempGameplayBounds.setX(this.xOffsetModifier + tempImageBounds.getX() + tempImageBounds.getWidth() * ((1f - this.widthCoefficient) / 2));
 
-			
+			//Tile
+			CollisionInfo info = this.singletonXCheckForTileCollision(collisionLayer, tempGameplayBounds, true, tempVelocity);
+			collisionX = info.didCollide;
+			pointOfReturn = info.pointOfReturn;
 
-			if (this.isRespectingTileCollision && tempVelocity < 0) {
-				//left blocks
-				int topLeftXIndex = ((int) (tempGameplayBounds.x / tileWidth));
-				int topLeftYIndex = ((int) ((tempGameplayBounds.y + tempGameplayBounds.height) / tileHeight));
-
-				Cell topLeftBlock = collisionLayer.getCell(topLeftXIndex, topLeftYIndex);
-				
-				int middleLeftXIndex = ((int) (tempGameplayBounds.x / tileWidth));
-				int middleLeftYIndex = ((int) ((tempGameplayBounds.y + tempGameplayBounds.height / 2) / tileHeight));
-				
-				Cell middleLeftBlock = collisionLayer.getCell(middleLeftXIndex, middleLeftYIndex);
-				
-				int lowerLeftXIndex = ((int) (tempGameplayBounds.x / tileWidth));
-				int lowerLeftYIndex = ((int) ((tempGameplayBounds.y) / tileHeight));
-				
-				Cell lowerLeftBlock = collisionLayer.getCell(lowerLeftXIndex, lowerLeftYIndex);
-				
-				if (topLeftBlock != null) {
-					collisionX = ((Boolean)topLeftBlock.getTile().getProperties().get("Impassable")).equals(true);
-					pointOfReturn = topLeftXIndex * tileWidth + tileWidth;
-				}
-					
-				//middle left block
-				if(!collisionX && middleLeftBlock != null) {
-					collisionX = ((Boolean)middleLeftBlock.getTile().getProperties().get("Impassable")).equals(true);
-					pointOfReturn = middleLeftXIndex * tileWidth + tileWidth;
-				}
-				
-				//lower left block
-				if(!collisionX && lowerLeftBlock != null ) {
-					collisionX = ((Boolean)lowerLeftBlock.getTile().getProperties().get("Impassable")).equals(true);
-					pointOfReturn = lowerLeftXIndex * tileWidth + tileWidth;
-				}
-				
-//				tilesToCheckForWorldObjects.add(new CellWrapper(topLeftBlock, new Vector2(topLeftXIndex * tileWidth, topLeftYIndex * tileHeight)));
-//				tilesToCheckForWorldObjects.add(new CellWrapper(middleLeftBlock, new Vector2(middleLeftXIndex * tileWidth, middleLeftYIndex * tileHeight)));
-//				tilesToCheckForWorldObjects.add(new CellWrapper(lowerLeftBlock, new Vector2(lowerLeftXIndex * tileWidth, lowerLeftYIndex * tileHeight)));
-
-			}
-			else if (this.isRespectingTileCollision && tempVelocity > 0) {
-				//right blocks
-				int topRightXIndex = (int) ((tempGameplayBounds.x + tempGameplayBounds.width) / tileWidth);
-				int topRightYIndex = (int) ((tempGameplayBounds.y + tempGameplayBounds.height) / tileHeight);
-				
-				Cell topRightBlock = collisionLayer.getCell(topRightXIndex, topRightYIndex);
-				
-				int middleRightXIndex = (int) ((tempGameplayBounds.x + tempGameplayBounds.width) / tileWidth);
-				int middleRightYIndex = (int) ((tempGameplayBounds.y + tempGameplayBounds.height / 2) / tileHeight);
-				
-				Cell middleRightBlock = collisionLayer.getCell(middleRightXIndex, middleRightYIndex);
-				
-				int lowerRightXIndex = (int) ((tempGameplayBounds.x + tempGameplayBounds.width) / tileWidth);
-				int lowerRightYIndex = (int) ((tempGameplayBounds.y) / tileHeight);
-				
-				Cell lowerRightBlock = collisionLayer.getCell(lowerRightXIndex, lowerRightYIndex);
-				
-				// top right block
-				if (topRightBlock != null) {
-					collisionX = ((Boolean)topRightBlock.getTile().getProperties().get("Impassable")).equals(true);
-					pointOfReturn = topRightXIndex * tileWidth - (this.gameplayHitBox.width + 0.25f);
-				}
-				
-				//middle right block
-				if(!collisionX && middleRightBlock != null) {
-					collisionX = ((Boolean)middleRightBlock.getTile().getProperties().get("Impassable")).equals(true);
-					pointOfReturn = middleRightXIndex * tileWidth - (this.gameplayHitBox.width + 0.25f);
-				}
-				
-				//lower right block
-				if(!collisionX && lowerRightBlock != null) {
-					collisionX = ((Boolean)lowerRightBlock.getTile().getProperties().get("Impassable")).equals(true);
-	
-					pointOfReturn = lowerRightXIndex * tileWidth - (this.gameplayHitBox.width + 0.25f);
-				}
-
-//				tilesToCheckForWorldObjects.add(new CellWrapper(topRightBlock, new Vector2(topRightXIndex * tileWidth, topRightYIndex * tileHeight)));
-//				tilesToCheckForWorldObjects.add(new CellWrapper(middleRightBlock, new Vector2(middleRightXIndex * tileWidth, middleRightYIndex * tileHeight)));
-//				tilesToCheckForWorldObjects.add(new CellWrapper(lowerRightBlock, new Vector2(lowerRightXIndex * tileWidth, lowerRightYIndex * tileHeight)));
-			}
 			
 			if (collisionX) {
 				collisionType = CollisionType.World;
 			}
 			
-			if (this.isRespectingObjectCollision) {
-				collisionX = collisionX 
-						|| this.collisionChecker.checkIfEntityCollidesWithObjects(this, tempGameplayBounds);
+			//WorldObject
+			if (!collisionX && this.isRespectingObjectCollision) {
+				collisionX = this.collisionChecker.checkIfEntityCollidesWithObjects(this, tempGameplayBounds);
 				
 				if (collisionX && collisionType.equals(CollisionType.None)) {
 					collisionType = CollisionType.Object;
 				}
 			}
 
-			
-			boolean additionalCollisionX = this.handleAdditionalXCollisionLogic(tempGameplayBounds, tempImageBounds, collisionX);
-			
-			if (!collisionX && additionalCollisionX) {
-				collisionX = true;
-				collisionType = CollisionType.Entity;
+			//Entity
+			if (!collisionX) {
+				EntityCollisionData additionalCollisionX = this.handleEntityXCollisionLogic(tempGameplayBounds, tempImageBounds, collisionX);
+				if (additionalCollisionX != null) {
+					collisionX = true;
+					collisionType = CollisionType.Entity;
+					entityCollisionData = additionalCollisionX;
+				}
+				
 			}
 			
 			if (collisionX)
 			{
 				break;
 			}
-//			else {
-//				tilesToCheckForWorldObjects.clear();
-//			}
 			
 			time += increment;
 			tempMaxTime -= increment;
@@ -433,37 +512,55 @@ public abstract class EntityModel {
 		}
 		else if (shouldMove && collisionType.equals(CollisionType.World)) {
 			this.gameplayHitBox.x = pointOfReturn;
-			this.imageHitBox.x = -1f * (this.xOffsetModifier + (this.imageHitBox.width * ((1f - this.widthCoefficient) / 2)) - this.gameplayHitBox.x );
+			this.refreshImageHitBoxX();
 		}
-		//react to X collision
+		else if (shouldMove && collisionType.equals(CollisionType.Entity))
+		{
+			//Figure out reposition AND MAKE SURE IT DOESN'T HAVE TILE/OBJECT COLLISION ISSUE. If it does, just do
+			//the stop movement thing.
+			Rectangle sourceHitBox = new Rectangle(this.gameplayHitBox);
+			Rectangle collidedEntityHitBox = new Rectangle(entityCollisionData.collidedEntity.gameplayHitBox);
+			switch(entityCollisionData.collisionLocation) {
+			case Left:
+				sourceHitBox.x = collidedEntityHitBox.x - sourceHitBox.width - 2f; //buffer.
+				CollisionInfo xCheckInfo = this.singletonXCheckWithoutVelocity(collisionLayer, sourceHitBox);
+				CollisionInfo yCheckInfo = this.singletonYCheckWithoutVelocity(collisionLayer, sourceHitBox);
+				boolean objectCheck = this.collisionChecker.checkIfEntityCollidesWithObjects(this, sourceHitBox);
+				//May need to reenable this....
+//				EntityCollisionData extraEntityCheck = this.collisionChecker.checkIfEntityCollidesWithOthers(this, sourceHitBox);
+				if (!xCheckInfo.didCollide && !yCheckInfo.didCollide && !objectCheck && entityCollisionRepositionTokens > 0) {
+					this.gameplayHitBox.x = sourceHitBox.x;
+					this.refreshImageHitBoxX();
+					entityCollisionRepositionTokens -= 1;
+				}
+				break;
+			case Right:
+				sourceHitBox.x = collidedEntityHitBox.x + collidedEntityHitBox.width + 2f; //buffer.
+				CollisionInfo xCheckInfo2 = this.singletonXCheckWithoutVelocity(collisionLayer, sourceHitBox);
+				CollisionInfo yCheckInfo2 = this.singletonYCheckWithoutVelocity(collisionLayer, sourceHitBox);
+				boolean objectCheck2 = this.collisionChecker.checkIfEntityCollidesWithObjects(this, sourceHitBox);
+				//May need to reenable this....
+//				EntityCollisionData extraEntityCheck2 = this.collisionChecker.checkIfEntityCollidesWithOthers(this, sourceHitBox);
+				if (!xCheckInfo2.didCollide && !yCheckInfo2.didCollide && !objectCheck2 && entityCollisionRepositionTokens > 0) {
+					this.gameplayHitBox.x = sourceHitBox.x;
+					this.refreshImageHitBoxX();
+					entityCollisionRepositionTokens -= 1;
+				}
+				break;
+			}
+		}
+
 		return new CollisionCheck(collisionX, tempVelocity > 0, time, collisionType, pointOfReturn);
+
 	}
 	
-//	public void stopEntityOverlapIfNeeded(EntityModel entity, Rectangle tempGameplayBounds, Rectangle tempImageBounds) {
-//		if (entity != null && this.respectEntityCollision && entity.respectEntityCollision && this.gameplayHitBox.overlaps(entity.gameplayHitBox) && tempGameplayBounds.overlaps(entity.gameplayHitBox) && (this.velocity.x == 0 || entity.velocity.x == 0)) {
-//			if (tempGameplayBounds.x > entity.gameplayHitBox.x){
-//			
-//				float positionalDifference = tempGameplayBounds.x - entity.gameplayHitBox.x;
-//				if (positionalDifference + tempGameplayBounds.x + tempGameplayBounds.width > entity.gameplayHitBox.x + entity.gameplayHitBox.width) {
-//					this.imageHitBox.x += tempGameplayBounds.width;
-//				}
-//				else {
-//					this.imageHitBox.x += entity.gameplayHitBox.width;
-//				}
-//			}
-//			else {
-//				float positionalDifference = tempGameplayBounds.x - entity.gameplayHitBox.x;
-//				if (positionalDifference + tempGameplayBounds.x + tempGameplayBounds.width < entity.gameplayHitBox.x + entity.gameplayHitBox.width) {
-//					this.imageHitBox.x -= tempGameplayBounds.width;
-//				}
-//				else {
-//					this.imageHitBox.x -= entity.gameplayHitBox.width;
-//				}
-//			}
-//			this.gameplayHitBox.x = this.imageHitBox.x + this.imageHitBox.getWidth() * ((1f - this.widthCoefficient) / 2);		
-//			this.hasProcessedOverlapCorrection = true;
-//		}
-//	}
+	public void refreshImageHitBoxX() {
+		this.imageHitBox.x = -1f * (this.xOffsetModifier + (this.imageHitBox.width * ((1f - this.widthCoefficient) / 2)) - this.gameplayHitBox.x );
+	}
+	
+	public void refreshImageHitBoxY() {
+		this.imageHitBox.y = -1f * (this.yOffsetModifier + (this.imageHitBox.height * ((1f - this.heightCoefficient) / 2)) - this.gameplayHitBox.y );
+	}
 	
 	public boolean isHitBoxModified() {
 		return this.xOffsetModifier != 0 || this.yOffsetModifier != 0;

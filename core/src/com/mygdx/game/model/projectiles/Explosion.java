@@ -15,6 +15,7 @@ import com.mygdx.game.model.effects.XMovementEffectSettings;
 import com.mygdx.game.model.effects.YMovementEffectSettings;
 import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.characters.CollisionCheck;
+import com.mygdx.game.model.characters.EntityCollisionData;
 import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.characters.EntityUIDataType;
 import com.mygdx.game.model.characters.EntityUIModel;
@@ -90,13 +91,13 @@ public class Explosion extends EntityModel implements EffectController {
 	}
 
 	@Override
-	public boolean handleAdditionalXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
-		return false;
+	public EntityCollisionData handleEntityXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+		return null;
 	}
 
 	@Override
-	public boolean handleAdditionalYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
-		return false;
+	public EntityCollisionData handleEntityYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+		return null;
 	}
 
 

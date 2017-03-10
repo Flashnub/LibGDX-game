@@ -143,7 +143,7 @@ public class CharacterProperties implements Serializable {
 			this.jumpSpeed = jumpSpeed;
 		}
 		else {
-			this.jumpSpeed = 1150f;
+			this.jumpSpeed = 1300f;
 		}
 		
 		Float gravity = json.readValue("gravity", Float.class, jsonData);
@@ -151,7 +151,7 @@ public class CharacterProperties implements Serializable {
 			this.gravity = gravity;
 		}
 		else {
-			this.gravity = 2500f;
+			this.gravity = 3500f;
 		}
 		
 		Float injuryImmunityTime = json.readValue("injuryImmunityTime", Float.class, jsonData);

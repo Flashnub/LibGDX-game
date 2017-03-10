@@ -62,7 +62,9 @@ public class Attack extends ActionSegment {
 		}
 	
 		target.actionStagger(false);
-		source.actionStagger(false);
+		if (!source.isActionStaggering()) {
+			source.actionStagger(false);
+		}
 		this.shouldChain = true;
 		
 		//Stop movementEffect if attack respects collision with target
@@ -110,10 +112,10 @@ public class Attack extends ActionSegment {
 			source.setHeightCoefficient(this.attackSettings.tempHeightModifier.floatValue());
 		}
 		if (this.attackSettings.xOffsetModifier != null) {
-			source.setxOffsetModifier(this.attackSettings.xOffsetModifier.floatValue());
+//			source.setxOffsetModifier(this.attackSettings.xOffsetModifier.floatValue());
 		}
 		if (this.attackSettings.yOffsetModifier != null) {
-			source.setyOffsetModifier(this.attackSettings.yOffsetModifier.floatValue());
+//			source.setyOffsetModifier(this.attackSettings.yOffsetModifier.floatValue());
 		}
 		if (!this.shouldRespectEntityCollisions()) {
 			source.setRespectingEntityCollision(false);
@@ -138,8 +140,8 @@ public class Attack extends ActionSegment {
 	public void sourceCompletionWithoutSuper(CharacterModel source) {
 		source.setWidthCoefficient(source.getCharacterProperties().getWidthCoefficient());
 		source.setHeightCoefficient(source.getCharacterProperties().getHeightCoefficient());
-		source.setxOffsetModifier(0f);
-		source.setyOffsetModifier(0f);
+//		source.setxOffsetModifier(0f);
+//		source.setyOffsetModifier(0f);
 //		if (!this.shouldRespectEntityCollisions())
 //			source.setRespectEntityCollision(true);
 		source.unlockEntityCollisionBehavior();
@@ -244,10 +246,10 @@ public class Attack extends ActionSegment {
 	
 	public void updateHitBox() {
 		if (source.isFacingLeft()) {
-			this.hitBox.x = source.getGameplayHitBox().x + attackSettings.originX - 10 - this.attackSettings.width;
+			this.hitBox.x = source.getGameplayHitBox().x - attackSettings.originX - this.attackSettings.width;
 		}
 		else {
-			this.hitBox.x = source.getGameplayHitBox().x + attackSettings.originX + 10;
+			this.hitBox.x = source.getGameplayHitBox().x + attackSettings.originX + source.getGameplayHitBox().width;
 		}
 		this.hitBox.y = source.getGameplayHitBox().y + attackSettings.originY;
 

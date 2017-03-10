@@ -6,502 +6,509 @@ filter: Nearest,Nearest
 repeat: none
 AirHvyAtk1A1
   rotate: false
-  xy: 2, 6189
+  xy: 2, 6458
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 AirHvyAtk1A2
   rotate: false
-  xy: 2, 5920
+  xy: 2, 6189
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 AirHvyAtk1A3
   rotate: false
-  xy: 354, 6189
+  xy: 354, 6458
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 AirHvyAtk1C1
   rotate: false
-  xy: 2, 5651
+  xy: 2, 5920
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 AirHvyAtk1C2
   rotate: false
-  xy: 354, 5920
+  xy: 354, 6189
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 AirHvyAtk1C3
   rotate: false
-  xy: 706, 6189
+  xy: 706, 6458
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 AirHvyAtk1C4
   rotate: false
-  xy: 2, 5382
+  xy: 2, 5651
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 AirHvyAtk1C5
   rotate: false
-  xy: 354, 5651
+  xy: 354, 5920
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 AirHvyAtk1W1
   rotate: false
-  xy: 706, 5920
+  xy: 706, 6189
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 AirHvyAtk1W2
   rotate: false
-  xy: 1058, 6189
+  xy: 1058, 6458
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 AirHvyAtk1W3
   rotate: false
-  xy: 2, 5113
+  xy: 2, 5382
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
-AirLightAtkA1
+AirLightAtk1A1
   rotate: false
-  xy: 354, 5382
+  xy: 354, 5651
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
-AirLightAtkC1
+AirLightAtk1C1
   rotate: false
-  xy: 706, 5651
+  xy: 706, 5920
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
-AirLightAtkW1
+AirLightAtk1W1
   rotate: false
-  xy: 706, 5651
+  xy: 706, 5920
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
-AirLightAtkW2
+AirLightAtk1W2
   rotate: false
-  xy: 1058, 5920
+  xy: 1058, 6189
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 AirMedAtk2A1
   rotate: false
-  xy: 1410, 6189
+  xy: 1410, 6458
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 AirMedAtk2A2
   rotate: false
-  xy: 2, 4844
+  xy: 2, 5113
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 AirMedAtk2C1
   rotate: false
-  xy: 354, 5113
+  xy: 354, 5382
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 AirMedAtk2C2
   rotate: false
-  xy: 354, 5113
+  xy: 354, 5382
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 AirMedAtk2C3
   rotate: false
-  xy: 354, 5113
+  xy: 354, 5382
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 AirMedAtk2C4
   rotate: false
-  xy: 706, 5382
-  size: 350, 267
-  orig: 350, 267
-  offset: 0, 0
-  index: -1
-AirMedAtk2W2
-  rotate: false
-  xy: 706, 5382
+  xy: 706, 5651
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 AirMedAtk2C5
   rotate: false
-  xy: 1058, 5651
+  xy: 1058, 5920
+  size: 350, 267
+  orig: 350, 267
+  offset: 0, 0
+  index: -1
+AirMedAtk2W2
+  rotate: false
+  xy: 1058, 5920
+  size: 350, 267
+  orig: 350, 267
+  offset: 0, 0
+  index: -1
+AirMedAtk2C6
+  rotate: false
+  xy: 1410, 6189
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 AirMedAtk2W1
   rotate: false
-  xy: 1058, 5651
+  xy: 1410, 6189
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 AirMedAtk2W3
   rotate: false
-  xy: 1410, 5920
+  xy: 2, 4844
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 DashA1
   rotate: false
-  xy: 2, 4575
+  xy: 354, 5113
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 DashA2
   rotate: false
-  xy: 2, 4575
+  xy: 354, 5113
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 DashA3
   rotate: false
-  xy: 2, 4575
+  xy: 354, 5113
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 DashA4
   rotate: false
-  xy: 2, 4575
+  xy: 354, 5113
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 DashA5
   rotate: false
-  xy: 2, 4575
+  xy: 354, 5113
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 DashA6
   rotate: false
-  xy: 2, 4575
+  xy: 354, 5113
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 DashC1
   rotate: false
-  xy: 2, 4575
+  xy: 354, 5113
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 DashW1
   rotate: false
-  xy: 354, 4844
+  xy: 706, 5382
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 DashW2
   rotate: false
-  xy: 706, 5113
+  xy: 1058, 5651
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 DashW3
   rotate: false
-  xy: 1058, 5382
+  xy: 1410, 5920
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 Fall1
   rotate: false
-  xy: 1410, 5651
-  size: 350, 267
-  orig: 350, 267
-  offset: 0, 0
-  index: -1
-Jump3
-  rotate: false
-  xy: 1410, 5651
+  xy: 2, 4575
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 Fall2
   rotate: false
-  xy: 2, 4306
+  xy: 354, 4844
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 Heavy1A1
   rotate: false
-  xy: 354, 4575
+  xy: 706, 5113
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 Heavy1C1
   rotate: false
-  xy: 706, 4844
+  xy: 1058, 5382
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 Heavy1C2
   rotate: false
-  xy: 1058, 5113
+  xy: 1410, 5651
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 Heavy1W2
   rotate: false
-  xy: 1058, 5113
+  xy: 1410, 5651
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 Heavy1C3
   rotate: false
-  xy: 1410, 5382
+  xy: 2, 4306
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 Heavy1W1
   rotate: false
-  xy: 1410, 5382
+  xy: 2, 4306
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 HvyAtk2A1
   rotate: false
-  xy: 2, 4037
+  xy: 354, 4575
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 HvyAtk2A2
   rotate: false
-  xy: 354, 4306
+  xy: 706, 4844
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 HvyAtk2C1
   rotate: false
-  xy: 706, 4575
+  xy: 1058, 5113
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 HvyAtk2C2
   rotate: false
-  xy: 706, 4575
+  xy: 1058, 5113
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 HvyAtk2W1
   rotate: false
-  xy: 1058, 4844
+  xy: 1410, 5382
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 HvyAtk2W2
   rotate: false
-  xy: 1410, 5113
+  xy: 2, 4037
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 HvyAtk2W3
   rotate: false
-  xy: 2, 3768
+  xy: 354, 4306
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 Idle1
   rotate: false
-  xy: 354, 4037
+  xy: 706, 4575
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 TensionStagger1
   rotate: false
-  xy: 354, 4037
+  xy: 706, 4575
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 TensionStaggerCooldown1
   rotate: false
-  xy: 354, 4037
+  xy: 706, 4575
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 TensionStaggerWindup1
   rotate: false
-  xy: 354, 4037
+  xy: 706, 4575
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 IdleDrawn1
   rotate: false
-  xy: 706, 4306
+  xy: 1058, 4844
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 Jump1
   rotate: false
-  xy: 1058, 4575
+  xy: 1410, 5113
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 Jump2
   rotate: false
-  xy: 1410, 4844
+  xy: 2, 3768
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 SpikeC4
   rotate: false
-  xy: 1410, 4844
+  xy: 2, 3768
+  size: 350, 267
+  orig: 350, 267
+  offset: 0, 0
+  index: -1
+Jump3
+  rotate: false
+  xy: 354, 4037
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 Jump4
   rotate: false
-  xy: 2, 3499
+  xy: 706, 4306
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 LaunchA1
   rotate: false
-  xy: 354, 3768
+  xy: 1058, 4575
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 LaunchC1
   rotate: false
-  xy: 706, 4037
+  xy: 1410, 4844
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 LaunchC2
   rotate: false
-  xy: 1058, 4306
-  size: 350, 267
-  orig: 350, 267
-  offset: 0, 0
-  index: -1
-LaunchW5
-  rotate: false
-  xy: 1058, 4306
+  xy: 2, 3499
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 LaunchC3
   rotate: false
-  xy: 1410, 4575
-  size: 350, 267
-  orig: 350, 267
-  offset: 0, 0
-  index: -1
-LaunchW4
-  rotate: false
-  xy: 1410, 4575
+  xy: 354, 3768
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 LaunchC4
   rotate: false
-  xy: 2, 3230
+  xy: 706, 4037
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 LaunchC5
   rotate: false
-  xy: 354, 3499
+  xy: 1058, 4306
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 LaunchW2
   rotate: false
-  xy: 354, 3499
+  xy: 1058, 4306
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 LaunchC6
   rotate: false
-  xy: 706, 3768
+  xy: 1410, 4575
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 LaunchW1
   rotate: false
-  xy: 706, 3768
+  xy: 2, 3230
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
 LaunchW3
+  rotate: false
+  xy: 354, 3499
+  size: 350, 267
+  orig: 350, 267
+  offset: 0, 0
+  index: -1
+LaunchW4
+  rotate: false
+  xy: 706, 3768
+  size: 350, 267
+  orig: 350, 267
+  offset: 0, 0
+  index: -1
+LaunchW5
   rotate: false
   xy: 1058, 4037
   size: 350, 267

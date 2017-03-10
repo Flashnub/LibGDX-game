@@ -87,7 +87,7 @@ public abstract class Character implements ModelListener {
 		
 		String state;
 		float currentHealth, maxHealth, currentWill, maxWill, attack, currentStability, maxStability, currentTension, maxTension;
-		boolean isImmuneToInjury, attacking, directionLock;
+		boolean isImmuneToInjury, attacking;
 		protected boolean isInAir;
 		protected boolean walking;
 		float walkingTime;
@@ -105,7 +105,6 @@ public abstract class Character implements ModelListener {
 	    float tempVelocityX;
 	    float tempVelocityY;
 		String name, uuid; 
-		Direction lockedFacingDirection;
 	    protected boolean movementConditionActivated;
 	    float movementConditionActivatedTime;
 	    int currentJumpTokens, maxJumpTokens;
@@ -137,10 +136,8 @@ public abstract class Character implements ModelListener {
 			attacking = false;
 			isInAir = true;
 			facingLeft = false;
-			lockedFacingDirection = Direction.RIGHT;
 			actionLocked = false;
 			walking = false;
-			directionLock = false;
 			alreadyDead = false;
 			isSlowingDown = false;
 			sprinting = false;
@@ -448,61 +445,18 @@ public abstract class Character implements ModelListener {
 				this.setState(sprintState);
 			}
 			else if (this.walking) {
-				if (this.directionLock) {
-					if (this.velocity.x >= 0 && this.lockedFacingDirection.equals(Direction.LEFT)) {
-		    			this.setState(backWalkState);
-		    		}
-		    		else if (this.velocity.x < 0 && this.lockedFacingDirection.equals(Direction.LEFT)) {
-		    			this.setState(walkState);
-		    		}
-		    		else if (this.velocity.x >= 0 && this.lockedFacingDirection.equals(Direction.RIGHT)) {
-		    			this.setState(walkState);
-		    		}
-		    		else if (this.velocity.x < 0 && this.lockedFacingDirection.equals(Direction.RIGHT)) {
-		    			this.setState(backWalkState);
-		    		}
-				}
-				else {
-					this.setState(walkState);
-				}
+				this.setState(walkState);
 			}
 			
 		}
-		
-	    public void lockDirection() {
-	    	this.directionLock = true;
-	    	this.lockedFacingDirection = this.isFacingLeft() ? Direction.LEFT : Direction.RIGHT;
-	    	//change walk if necessary
-	    	this.setMovementStatesIfNeeded();
-	    }
-	    
-	    public void unlockDirection() {
-	    	this.directionLock = false;
-	    	if (this.lockedFacingDirection.equals(Direction.LEFT) && this.velocity.x > 0) {
-		    	this.setFacingLeft(false);
-	    	}
-	    	else if (this.lockedFacingDirection.equals(Direction.RIGHT) && this.velocity.x < 0) {
-		    	this.setFacingLeft(true);
-	    	}
-	    	this.lockedFacingDirection = Direction.NaN; 
-	    	//change walk if necessary
-	    	this.setMovementStatesIfNeeded();
-	    }
-		
+			
 		public boolean isTargetToLeft(CharacterModel target) {
 			return this.gameplayHitBox.x > target.gameplayHitBox.x; 
 		}
 		
 		public void jump() {
 			if (!actionLocked || (this.getCurrentActiveActionSeq() != null && this.getCurrentActiveActionSeq().chainsWithJump())) {
-//				if (!this.actionStaggering) {
-//					jumpCode();
-//				}
-//				else {
-//					this.forceEndForActiveAction();
-//					this.queuedJump = true;
-//				}
-				
+			
 				if (!this.actionStaggering && this.getCurrentActiveActionSeq() == null) {
 					jumpCode();
 				}
@@ -653,12 +607,6 @@ public abstract class Character implements ModelListener {
 		public float howLongTillXCollision(float maxTime, TiledMapTileLayer collisionLayer) {
 			CollisionCheck collisionX = this.checkForXCollision(maxTime, collisionLayer, this.velocity.x, this.acceleration.x, false);
 			return collisionX.timeUntilCollision;
-		}
-		
-		public boolean isHitBoxModified() {
-			return super.isHitBoxModified() 
-					|| this.widthCoefficient != this.getCharacterProperties().getWidthCoefficient()
-					|| this.heightCoefficient != this.getCharacterProperties().getHeightCoefficient();
 		}
 		
 	    public void landed(boolean isFromEntityCollision) {
@@ -911,10 +859,6 @@ public abstract class Character implements ModelListener {
 			return actionStaggering;
 		}
 
-		public boolean isLockDirection() {
-			return directionLock;
-		}
-
 		public float getCurrentStability() {
 			return currentStability;
 		}
@@ -932,7 +876,7 @@ public abstract class Character implements ModelListener {
 			else {
 				//only action stagger.
 			}
-			System.out.println("stability: " + this.currentStability);
+//			System.out.println("stability: " + this.currentStability);
 		}
 
 		public float getMaxStability() {
@@ -1136,10 +1080,10 @@ public abstract class Character implements ModelListener {
 		}
 
 		public void setFacingLeft(boolean facingLeft) {
-			if (!this.directionLock) {
-				this.facingLeft = facingLeft;
-				this.xOffsetModifier = facingLeft ? this.xOffsetModifier : -this.xOffsetModifier;
-			}
+			this.facingLeft = facingLeft;
+//			this.xOffsetModifier = facingLeft ? this.xOffsetModifier : -this.xOffsetModifier;
+			System.out.println(facingLeft);
+			System.out.println("Changing xOffset");
 		}
 
 		public EntityUIModel getUiModel() {

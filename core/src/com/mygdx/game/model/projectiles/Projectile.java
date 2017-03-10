@@ -100,7 +100,7 @@ public class Projectile extends EntityModel implements EffectController{
 			this.imageHitBox.y = source.getImageHitBox().y + (source.getImageHitBox().height / 2f);
 		}
 		
-		this.gameplayHitBox.setX(this.getxOffsetModifier() + this.imageHitBox.getX() + this.imageHitBox.getWidth() * ((1f - this.widthCoefficient) / 2));
+		this.gameplayHitBox.setX(this.getXOffsetModifier() + this.imageHitBox.getX() + this.imageHitBox.getWidth() * ((1f - this.widthCoefficient) / 2));
 		this.gameplayHitBox.setY(this.getyOffsetModifier() + this.imageHitBox.getY() + this.imageHitBox.getHeight() * ((1f - this.heightCoefficient) / 2));
 	}
 	

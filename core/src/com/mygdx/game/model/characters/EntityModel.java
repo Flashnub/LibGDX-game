@@ -84,7 +84,7 @@ public abstract class EntityModel {
 				entityCollisionData.source.setRespectingEntityCollision(false);
 			}
 			else {
-				System.out.println("stop respecting " + this.toString());
+//				System.out.println("stop respecting " + this.toString());
 				this.isRespectingEntityCollision = shouldRespectEntityCollision;
 			}
 		}
@@ -319,8 +319,11 @@ public abstract class EntityModel {
 			if (applyGravity)
 				tempVelocity += this.acceleration.y * increment;
 			
-			tempImageBounds.setY(tempImageBounds.getY() + tempVelocity * increment);
-			tempGameplayBounds.setY(this.yOffsetModifier + tempImageBounds.getY() + tempImageBounds.getHeight() * ((1f - this.heightCoefficient) / 2));
+			tempGameplayBounds.setY(tempGameplayBounds.getY() + tempVelocity * increment);
+			tempImageBounds.y = -1f * (this.yOffsetModifier + (tempImageBounds.height * ((1f - this.heightCoefficient) / 2)) - tempGameplayBounds.y );
+
+//			tempImageBounds.setY(tempImageBounds.getY() + tempVelocity * increment);
+//			tempGameplayBounds.setY(this.yOffsetModifier + tempImageBounds.getY() + tempImageBounds.getHeight() * ((1f - this.heightCoefficient) / 2));
 			
 			//Tile
 			CollisionInfo info = this.singletonYCheckForTileCollision(collisionLayer, tempGameplayBounds, true, tempVelocity);
@@ -463,8 +466,10 @@ public abstract class EntityModel {
 			}
 			
 			tempVelocity += xAcceleration * increment;
-			tempImageBounds.setX(tempImageBounds.getX() + tempVelocity * increment);
-			tempGameplayBounds.setX(this.xOffsetModifier + tempImageBounds.getX() + tempImageBounds.getWidth() * ((1f - this.widthCoefficient) / 2));
+			tempGameplayBounds.setX(tempGameplayBounds.getX() + tempVelocity * increment);
+			tempImageBounds.x = -1f * (getXOffsetModifier() + (tempImageBounds.width * ((1f - this.widthCoefficient) / 2)) - tempGameplayBounds.x );
+//			tempImageBounds.setX(tempImageBounds.getX() + tempVelocity * increment);
+//			tempGameplayBounds.setX(this.xOffsetModifier + tempImageBounds.getX() + tempImageBounds.getWidth() * ((1f - this.widthCoefficient) / 2));
 
 			//Tile
 			CollisionInfo info = this.singletonXCheckForTileCollision(collisionLayer, tempGameplayBounds, true, tempVelocity);
@@ -555,15 +560,15 @@ public abstract class EntityModel {
 	}
 	
 	public void refreshImageHitBoxX() {
-		this.imageHitBox.x = -1f * (this.xOffsetModifier + (this.imageHitBox.width * ((1f - this.widthCoefficient) / 2)) - this.gameplayHitBox.x );
+		this.imageHitBox.x = -1f * (getXOffsetModifier() + (this.imageHitBox.width * ((1f - this.widthCoefficient) / 2)) - this.gameplayHitBox.x );
 	}
 	
 	public void refreshImageHitBoxY() {
 		this.imageHitBox.y = -1f * (this.yOffsetModifier + (this.imageHitBox.height * ((1f - this.heightCoefficient) / 2)) - this.gameplayHitBox.y );
 	}
 	
-	public boolean isHitBoxModified() {
-		return this.xOffsetModifier != 0 || this.yOffsetModifier != 0;
+	public float getXOffsetModifier() {
+		return isFacingLeft() ? this.xOffsetModifier : -this.xOffsetModifier; 
 	}
 	
 	public Vector2 getVelocity() {
@@ -619,14 +624,6 @@ public abstract class EntityModel {
 
 	public void setHeightCoefficient(float heightCoefficient) {
 		this.heightCoefficient = heightCoefficient;
-	}
-
-	public float getxOffsetModifier() {
-		return xOffsetModifier;
-	}
-
-	public void setxOffsetModifier(float xOffsetModifier) {
-		this.xOffsetModifier = xOffsetModifier;
 	}
 
 	public float getyOffsetModifier() {

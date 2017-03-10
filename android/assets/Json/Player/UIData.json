@@ -17,6 +17,7 @@
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "Walk",
 			"numberOfFrames": 12,
+			"frameRate": 15,
 			"playMode": LOOP
 		}
 		{
@@ -154,7 +155,7 @@
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "AirMedAtk2C",
-			"numberOfFrames": 5,
+			"numberOfFrames": 6,
 			"playMode": NORMAL
 		}
 		{
@@ -177,19 +178,19 @@
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
-			"name": "AirLightAtkW",
+			"name": "AirLightAtk1W",
 			"numberOfFrames": 2,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
-			"name": "AirLightAtkA",
+			"name": "AirLightAtk1A",
 			"numberOfFrames": 1,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
-			"name": "AirLightAtkC",
+			"name": "AirLightAtk1C",
 			"numberOfFrames": 1,
 			"playMode": NORMAL
 		}

@@ -65,10 +65,10 @@ public class WorldRenderer implements CoordinatesHelper, WorldListener{
 	        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 	        
 			camera.position.set(
-					worldModel.getPlayer().getCharacterData().getImageHitBox().getX() + 
-					worldModel.getPlayer().getCharacterData().getImageHitBox().getWidth() / 2, 
-					worldModel.getPlayer().getCharacterData().getImageHitBox().getY() + 
-					worldModel.getPlayer().getCharacterData().getImageHitBox().getHeight() / 2, 0);
+					worldModel.getPlayer().getCharacterData().getGameplayHitBox().getX() + 
+					worldModel.getPlayer().getCharacterData().getGameplayHitBox().getWidth() / 2, 
+					worldModel.getPlayer().getCharacterData().getGameplayHitBox().getY() + 
+					worldModel.getPlayer().getCharacterData().getGameplayHitBox().getHeight() / 2, 0);
 			if (camera.position.x < camera.viewportWidth / 2)
 				camera.position.x = camera.viewportWidth / 2;
 			else if (camera.position.x > ((TiledMapTileLayer) tiledMap.getLayers().get(0)).getTileWidth() * ((TiledMapTileLayer) tiledMap.getLayers().get(0)).getWidth() - camera.viewportWidth / 2)

@@ -548,7 +548,7 @@ public class ActionSequence implements Serializable {
 		return action.chainsWithJump();
 	}
 	
-	//For Enemy AIs
+	//UNIMPLEMENTED: For Enemy AIs
 	public boolean shouldChain() {
 		return this.action.shouldChain();
 	}

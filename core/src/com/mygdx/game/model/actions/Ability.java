@@ -49,8 +49,8 @@ public class Ability extends ActionSegment{
 	public void sourceCompletionWithoutSuper(CharacterModel source) {
 		source.setWidthCoefficient(source.getCharacterProperties().getWidthCoefficient());
 		source.setHeightCoefficient(source.getCharacterProperties().getHeightCoefficient());
-		source.setxOffsetModifier(0f);
-		source.setyOffsetModifier(0f);
+//		source.setxOffsetModifier(0f);
+//		source.setyOffsetModifier(0f);
 //		if (!this.shouldRespectEntityCollisions())
 //			source.setRespectEntityCollision(true);
 		source.unlockEntityCollisionBehavior();
@@ -65,10 +65,10 @@ public class Ability extends ActionSegment{
 			source.setHeightCoefficient(this.settings.tempHeightModifier.floatValue());
 		}
 		if (this.settings.xOffsetModifier != null) {
-			source.setxOffsetModifier(this.settings.xOffsetModifier.floatValue());
+//			source.setxOffsetModifier(this.settings.xOffsetModifier.floatValue());
 		}
 		if (this.settings.yOffsetModifier != null) {
-			source.setyOffsetModifier(this.settings.yOffsetModifier.floatValue());
+//			source.setyOffsetModifier(this.settings.yOffsetModifier.floatValue());
 		}
 		if (!this.shouldRespectEntityCollisions()) {
 			source.setRespectingEntityCollision(false);

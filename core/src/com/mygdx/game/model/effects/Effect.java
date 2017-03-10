@@ -30,11 +30,11 @@ public abstract class Effect {
 	
 
 	public EffectController getController() {
-		return retriever;
+		return getRetriever();
 	}
 
 	public void setController(EffectController retriever) {
-		this.retriever = retriever;
+		this.setRetriever(retriever);
 	}
 
 	
@@ -101,5 +101,13 @@ public abstract class Effect {
 
 	public void setHasProcessedCompletion(boolean hasProcessedCompletion) {
 		this.hasProcessedCompletion = hasProcessedCompletion;
+	}
+
+	public EffectController getRetriever() {
+		return retriever;
+	}
+
+	public void setRetriever(EffectController retriever) {
+		this.retriever = retriever;
 	}
 }

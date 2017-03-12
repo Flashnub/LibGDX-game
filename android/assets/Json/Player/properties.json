@@ -5,9 +5,9 @@
 	"maxStability": 5,
 	"maxTension": 4,
 	"attack": 1,
-	"xOffsetModifier": 120,
+	"xOffsetModifier": 80,
 	"widthCoefficient": 0.2,
-	"heightCoefficient": 0.6,
+	"heightCoefficient": 0.7,
 	"useDefaultStagger": true,
 	"useDefaultTensionStagger": false,
 	"actions": {

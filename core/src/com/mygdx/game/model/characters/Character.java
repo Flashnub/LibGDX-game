@@ -591,7 +591,7 @@ public abstract class Character implements ModelListener {
 					}
 				}
 			}
-			else if (!isInAir && this.getVelocity().y < -3f) {
+			else if (!isInAir && this.getVelocity().y < -100f) {
 				this.falling();
 			}
 
@@ -1081,9 +1081,6 @@ public abstract class Character implements ModelListener {
 
 		public void setFacingLeft(boolean facingLeft) {
 			this.facingLeft = facingLeft;
-//			this.xOffsetModifier = facingLeft ? this.xOffsetModifier : -this.xOffsetModifier;
-			System.out.println(facingLeft);
-			System.out.println("Changing xOffset");
 		}
 
 		public EntityUIModel getUiModel() {

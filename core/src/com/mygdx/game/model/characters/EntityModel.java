@@ -17,6 +17,10 @@ public abstract class EntityModel {
 	public static final String windupState = "Windup";
 	public static final String cooldownState = "Cooldown";
 	
+	public static final String Impassable = "Impassable";
+	public static final String RightSlopeHeight = "RightSlopeHeight";
+	public static final String LeftSlopeHeight = "LeftSlopeHeight";
+	
 	public Vector2 velocity, acceleration;
 	public Rectangle gameplayHitBox;
 	public Rectangle imageHitBox;
@@ -135,55 +139,60 @@ public abstract class EntityModel {
 			if (this.isRespectingTileCollision && yTempVelocity < 0)
 			{			
 				if (bottomLeftBlock != null)
-					tilesToCheck.add(new CellWrapper(bottomLeftBlock, new Vector2(bottomLeftXIndex, bottomLeftYIndex), CellType.Bottom));
+					tilesToCheck.add(new CellWrapper(bottomLeftBlock, new Vector2(bottomLeftXIndex, bottomLeftYIndex), CellType.Bottom, tileWidth, tileHeight));
 				if (bottomMiddleBlock != null)
-					tilesToCheck.add(new CellWrapper(bottomMiddleBlock, new Vector2(bottomMiddleXIndex, bottomMiddleYIndex), CellType.Bottom));
+					tilesToCheck.add(new CellWrapper(bottomMiddleBlock, new Vector2(bottomMiddleXIndex, bottomMiddleYIndex), CellType.Bottom, tileWidth, tileHeight));
 				if (bottomRightBlock != null)
-					tilesToCheck.add(new CellWrapper(bottomRightBlock, new Vector2(bottomRightXIndex, bottomRightYIndex), CellType.Bottom));
+					tilesToCheck.add(new CellWrapper(bottomRightBlock, new Vector2(bottomRightXIndex, bottomRightYIndex), CellType.Bottom, tileWidth, tileHeight));
 			}
 			else if (this.isRespectingTileCollision && yTempVelocity > 0) {		
 				if (topLeftBlock != null)
-					tilesToCheck.add(new CellWrapper(topLeftBlock, new Vector2(topLeftXIndex, topLeftYIndex), CellType.Top));
+					tilesToCheck.add(new CellWrapper(topLeftBlock, new Vector2(topLeftXIndex, topLeftYIndex), CellType.Top, tileWidth, tileHeight));
 				if (topMiddleBlock != null)
-					tilesToCheck.add(new CellWrapper(topMiddleBlock, new Vector2(topMiddleXIndex, topMiddleYIndex), CellType.Top));
+					tilesToCheck.add(new CellWrapper(topMiddleBlock, new Vector2(topMiddleXIndex, topMiddleYIndex), CellType.Top, tileWidth, tileHeight));
 				if (topRightBlock != null)
-					tilesToCheck.add(new CellWrapper(topRightBlock, new Vector2(topRightXIndex, topRightYIndex), CellType.Top));
+					tilesToCheck.add(new CellWrapper(topRightBlock, new Vector2(topRightXIndex, topRightYIndex), CellType.Top, tileWidth, tileHeight));
 			}
 		}
 		else {
 			if (topLeftBlock != null)
-				tilesToCheck.add(new CellWrapper(topLeftBlock, new Vector2(topLeftXIndex, topLeftYIndex), CellType.Top));
+				tilesToCheck.add(new CellWrapper(topLeftBlock, new Vector2(topLeftXIndex, topLeftYIndex), CellType.Top, tileWidth, tileHeight));
 			if (topMiddleBlock != null)
-				tilesToCheck.add(new CellWrapper(topMiddleBlock, new Vector2(topMiddleXIndex, topMiddleYIndex), CellType.Top));
+				tilesToCheck.add(new CellWrapper(topMiddleBlock, new Vector2(topMiddleXIndex, topMiddleYIndex), CellType.Top, tileWidth, tileHeight));
 			if (topRightBlock != null)
-				tilesToCheck.add(new CellWrapper(topRightBlock, new Vector2(topRightXIndex, topRightYIndex), CellType.Top));
+				tilesToCheck.add(new CellWrapper(topRightBlock, new Vector2(topRightXIndex, topRightYIndex), CellType.Top, tileWidth, tileHeight));
 			if (bottomLeftBlock != null)
-				tilesToCheck.add(new CellWrapper(bottomLeftBlock, new Vector2(bottomLeftXIndex, bottomLeftYIndex), CellType.Bottom));
+				tilesToCheck.add(new CellWrapper(bottomLeftBlock, new Vector2(bottomLeftXIndex, bottomLeftYIndex), CellType.Bottom, tileWidth, tileHeight));
 			if (bottomMiddleBlock != null)
-				tilesToCheck.add(new CellWrapper(bottomMiddleBlock, new Vector2(bottomMiddleXIndex, bottomMiddleYIndex), CellType.Bottom));
+				tilesToCheck.add(new CellWrapper(bottomMiddleBlock, new Vector2(bottomMiddleXIndex, bottomMiddleYIndex), CellType.Bottom, tileWidth, tileHeight));
 			if (bottomRightBlock != null)
-				tilesToCheck.add(new CellWrapper(bottomRightBlock, new Vector2(bottomRightXIndex, bottomRightYIndex), CellType.Bottom));
+				tilesToCheck.add(new CellWrapper(bottomRightBlock, new Vector2(bottomRightXIndex, bottomRightYIndex), CellType.Bottom, tileWidth, tileHeight));
 		}
 		
 		for (CellWrapper tile : tilesToCheck) {
 			if (collision) {
 				break;
 			}
-			collision = ((Boolean)tile.getCell().getTile().getProperties().get("Impassable")).equals(true);
-			switch (tile.cellType()) {
-			case Left:
-				pointOfReturn = tile.getOrigin().x * tileWidth + tileWidth;
-				break;
-			case Bottom:
-				pointOfReturn = tile.getOrigin().y * tileHeight + tileHeight;
-				break;
-			case Top:
-				pointOfReturn = tile.getOrigin().y * tileHeight - tempGameplayBounds.height;
-				break;
-			case Right: 
-				pointOfReturn = tile.getOrigin().x * tileWidth - (this.gameplayHitBox.width + 0.25f);
-				break;
-			}
+
+				collision = ((Boolean)tile.getCell().getTile().getProperties().get(EntityModel.Impassable)).equals(true);
+				if (collision) {
+					switch (tile.cellType()) {
+					case Left:
+						pointOfReturn = tile.getOrigin().x * tileWidth + tileWidth;
+						break;
+					case Bottom:
+						pointOfReturn = tile.getOrigin().y * tileHeight + tileHeight;
+						break;
+					case Top:
+						pointOfReturn = tile.getOrigin().y * tileHeight - tempGameplayBounds.height;
+						break;
+					case Right: 
+						pointOfReturn = tile.getOrigin().x * tileWidth - (this.gameplayHitBox.width + 0.25f);
+						break;
+					}
+				}
+			
+		
 		}
 		
 		return new CollisionInfo(pointOfReturn, collision);
@@ -237,44 +246,45 @@ public abstract class EntityModel {
 			if (this.isRespectingTileCollision && xTempVelocity < 0) {
 				//left blocks
 				if (topLeftBlock != null)
-					tilesToCheck.add(new CellWrapper(topLeftBlock, new Vector2(topLeftXIndex, topLeftYIndex), CellType.Left));
+					tilesToCheck.add(new CellWrapper(topLeftBlock, new Vector2(topLeftXIndex, topLeftYIndex), CellType.Left, tileWidth, tileHeight));
 				if (middleLeftBlock != null)
-					tilesToCheck.add(new CellWrapper(middleLeftBlock, new Vector2(middleLeftXIndex, middleLeftYIndex), CellType.Left));
+					tilesToCheck.add(new CellWrapper(middleLeftBlock, new Vector2(middleLeftXIndex, middleLeftYIndex), CellType.Left, tileWidth, tileHeight));
 				if (lowerLeftBlock != null)
-					tilesToCheck.add(new CellWrapper(lowerLeftBlock, new Vector2(lowerLeftXIndex, lowerLeftYIndex), CellType.Left));
+					tilesToCheck.add(new CellWrapper(lowerLeftBlock, new Vector2(lowerLeftXIndex, lowerLeftYIndex), CellType.Left, tileWidth, tileHeight));
 			}
 			else if (this.isRespectingTileCollision && xTempVelocity > 0) {
 				//right blocks			
 				if (topRightBlock != null)
-					tilesToCheck.add(new CellWrapper(topRightBlock, new Vector2(topRightXIndex, topRightYIndex), CellType.Right));
+					tilesToCheck.add(new CellWrapper(topRightBlock, new Vector2(topRightXIndex, topRightYIndex), CellType.Right, tileWidth, tileHeight));
 				if (middleRightBlock != null)
-					tilesToCheck.add(new CellWrapper(middleRightBlock, new Vector2(middleRightXIndex, middleRightYIndex), CellType.Right));
+					tilesToCheck.add(new CellWrapper(middleRightBlock, new Vector2(middleRightXIndex, middleRightYIndex), CellType.Right, tileWidth, tileHeight));
 				if (lowerRightBlock != null)
-					tilesToCheck.add(new CellWrapper(lowerRightBlock, new Vector2(lowerRightXIndex, lowerRightYIndex), CellType.Right));
+					tilesToCheck.add(new CellWrapper(lowerRightBlock, new Vector2(lowerRightXIndex, lowerRightYIndex), CellType.Right, tileWidth, tileHeight));
 
 			}
 		}
 		else {
 			//left blocks
 			if (topLeftBlock != null)
-				tilesToCheck.add(new CellWrapper(topLeftBlock, new Vector2(topLeftXIndex, topLeftYIndex), CellType.Left));
+				tilesToCheck.add(new CellWrapper(topLeftBlock, new Vector2(topLeftXIndex, topLeftYIndex), CellType.Left, tileWidth, tileHeight));
 			if (middleLeftBlock != null)
-				tilesToCheck.add(new CellWrapper(middleLeftBlock, new Vector2(middleLeftXIndex, middleLeftYIndex), CellType.Left));
+				tilesToCheck.add(new CellWrapper(middleLeftBlock, new Vector2(middleLeftXIndex, middleLeftYIndex), CellType.Left, tileWidth, tileHeight));
 			if (lowerLeftBlock != null)
-				tilesToCheck.add(new CellWrapper(lowerLeftBlock, new Vector2(lowerLeftXIndex, lowerLeftYIndex), CellType.Left));
+				tilesToCheck.add(new CellWrapper(lowerLeftBlock, new Vector2(lowerLeftXIndex, lowerLeftYIndex), CellType.Left, tileWidth, tileHeight));
 			if (topRightBlock != null)
-				tilesToCheck.add(new CellWrapper(topRightBlock, new Vector2(topRightXIndex, topRightYIndex), CellType.Right));
+				tilesToCheck.add(new CellWrapper(topRightBlock, new Vector2(topRightXIndex, topRightYIndex), CellType.Right, tileWidth, tileHeight));
 			if (middleRightBlock != null)
-				tilesToCheck.add(new CellWrapper(middleRightBlock, new Vector2(middleRightXIndex, middleRightYIndex), CellType.Right));
+				tilesToCheck.add(new CellWrapper(middleRightBlock, new Vector2(middleRightXIndex, middleRightYIndex), CellType.Right, tileWidth, tileHeight));
 			if (lowerRightBlock != null)
-				tilesToCheck.add(new CellWrapper(lowerRightBlock, new Vector2(lowerRightXIndex, lowerRightYIndex), CellType.Right));
+				tilesToCheck.add(new CellWrapper(lowerRightBlock, new Vector2(lowerRightXIndex, lowerRightYIndex), CellType.Right, tileWidth, tileHeight));
 		}
 		
 		for (CellWrapper tile : tilesToCheck) {
 			if (collision) {
 				break;
 			}
-			collision = ((Boolean)tile.getCell().getTile().getProperties().get("Impassable")).equals(true);
+			
+			collision = ((Boolean)tile.getCell().getTile().getProperties().get(EntityModel.Impassable)).equals(true);
 			switch (tile.cellType()) {
 			case Left:
 				pointOfReturn = tile.getOrigin().x * tileWidth + tileWidth;
@@ -325,10 +335,62 @@ public abstract class EntityModel {
 //			tempImageBounds.setY(tempImageBounds.getY() + tempVelocity * increment);
 //			tempGameplayBounds.setY(this.yOffsetModifier + tempImageBounds.getY() + tempImageBounds.getHeight() * ((1f - this.heightCoefficient) / 2));
 			
-			//Tile
-			CollisionInfo info = this.singletonYCheckForTileCollision(collisionLayer, tempGameplayBounds, true, tempVelocity);
-			collisionY = info.didCollide;
-			pointOfReturn = info.pointOfReturn;
+			//If on slope then make sure that gravity moves character down or moves up.
+			//If on slope, then forgo tile collision till off of slope.
+			int rightSideXIndex = ((int) ((tempGameplayBounds.x + tempGameplayBounds.width) / collisionLayer.getTileWidth()));
+			int leftSideXIndex = ((int) ((tempGameplayBounds.x) / collisionLayer.getTileWidth()));
+			int yIndex = ((int) ((this.gameplayHitBox.y) / collisionLayer.getTileHeight()));
+			
+
+			Cell leftSideCell = collisionLayer.getCell(leftSideXIndex, yIndex);
+			Cell rightSideCell = collisionLayer.getCell(rightSideXIndex, yIndex);
+			if (leftSideCell.getTile().getProperties().containsKey(EntityModel.LeftSlopeHeight) && tempVelocity <= 0) {
+				//figure out how far up/down
+				float leftSlope = (Float) leftSideCell.getTile().getProperties().get(EntityModel.LeftSlopeHeight);
+				float rightSlope = (Float) leftSideCell.getTile().getProperties().get(EntityModel.RightSlopeHeight);
+				
+				float differenceInSlope = Math.max(leftSlope, rightSlope) - Math.min(leftSlope, rightSlope);
+				float howFarEntityIsInSlopeTile = (tempGameplayBounds.x) % collisionLayer.getTileWidth();
+				float verticalEntityDistance = 0f;
+				if (rightSlope > leftSlope) {
+					float proportionOfDistance = howFarEntityIsInSlopeTile / collisionLayer.getTileWidth();
+					verticalEntityDistance = differenceInSlope * proportionOfDistance + yIndex * collisionLayer.getTileHeight();
+				}
+				else {
+					float proportionOfDistance = 1f - (howFarEntityIsInSlopeTile / collisionLayer.getTileWidth());
+					verticalEntityDistance = differenceInSlope * proportionOfDistance + yIndex * collisionLayer.getTileHeight();
+				}
+
+				pointOfReturn = verticalEntityDistance;
+				collisionY = true;
+
+			}
+			else if (rightSideCell.getTile().getProperties().containsKey(EntityModel.LeftSlopeHeight) && tempVelocity <= 0) {
+				//figure out how far up/down
+				float leftSlope = (Float) rightSideCell.getTile().getProperties().get(EntityModel.LeftSlopeHeight);
+				float rightSlope = (Float) rightSideCell.getTile().getProperties().get(EntityModel.RightSlopeHeight);
+				
+				float differenceInSlope = Math.max(leftSlope, rightSlope) - Math.min(leftSlope, rightSlope);
+				float howFarEntityIsInSlopeTile = (tempGameplayBounds.x + tempGameplayBounds.width) % collisionLayer.getTileWidth();
+				float verticalEntityDistance = 0f;
+				if (rightSlope > leftSlope) {
+					float proportionOfDistance = howFarEntityIsInSlopeTile / collisionLayer.getTileWidth();
+					verticalEntityDistance = differenceInSlope * proportionOfDistance + yIndex * collisionLayer.getTileHeight();
+				}
+				else {
+					float proportionOfDistance = 1f - (howFarEntityIsInSlopeTile / collisionLayer.getTileWidth());
+					verticalEntityDistance = differenceInSlope * proportionOfDistance + yIndex * collisionLayer.getTileHeight();
+				}
+				
+				pointOfReturn = verticalEntityDistance;
+				collisionY = true;
+			}
+			else {
+				//Tile
+				CollisionInfo info = this.singletonYCheckForTileCollision(collisionLayer, tempGameplayBounds, true, tempVelocity);
+				collisionY = info.didCollide;
+				pointOfReturn = info.pointOfReturn;
+			}
 
 			if (collisionY) {
 				collisionType = CollisionType.World;
@@ -375,7 +437,6 @@ public abstract class EntityModel {
 		}
 		else if (shouldMove && collisionType.equals(CollisionType.World)) {
 			this.gameplayHitBox.y = pointOfReturn;
-//			this.imageHitBox.y = -1f * (this.yOffsetModifier + (this.imageHitBox.height * ((1f - this.heightCoefficient) / 2)) - this.gameplayHitBox.y );
 			this.refreshImageHitBoxY();
 		}
 		else if (shouldMove && collisionType.equals(CollisionType.Entity))
@@ -471,10 +532,20 @@ public abstract class EntityModel {
 //			tempImageBounds.setX(tempImageBounds.getX() + tempVelocity * increment);
 //			tempGameplayBounds.setX(this.xOffsetModifier + tempImageBounds.getX() + tempImageBounds.getWidth() * ((1f - this.widthCoefficient) / 2));
 
-			//Tile
-			CollisionInfo info = this.singletonXCheckForTileCollision(collisionLayer, tempGameplayBounds, true, tempVelocity);
-			collisionX = info.didCollide;
-			pointOfReturn = info.pointOfReturn;
+			//If on slope, then forgo tile collision till off of slope.
+			int gameplayHitBoxXIndex = ((int) ((isFacingLeft() ? gameplayHitBox.x : gameplayHitBox.x + gameplayHitBox.width) / collisionLayer.getTileWidth()));
+			int gameplayHitBoxYIndex = ((int) ((tempGameplayBounds.y) / collisionLayer.getTileHeight()));
+
+			Cell gameplayHitBoxCell = collisionLayer.getCell(gameplayHitBoxXIndex, gameplayHitBoxYIndex);
+			if (!gameplayHitBoxCell.getTile().getProperties().containsKey(EntityModel.LeftSlopeHeight)) {
+				//has slope, don't check X collision
+				CollisionInfo info = this.singletonXCheckForTileCollision(collisionLayer, tempGameplayBounds, true, tempVelocity);
+				collisionX = info.didCollide;
+				pointOfReturn = info.pointOfReturn;
+			}
+
+			
+
 
 			
 			if (collisionX) {

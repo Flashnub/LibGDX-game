@@ -271,5 +271,10 @@ public class NPCCharacter extends Character{
 			
 		}
 
+		@Override
+		public boolean canBeActedOn() {
+			return true;
+		}
+
 	}
 }

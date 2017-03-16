@@ -1,6 +1,7 @@
 package com.mygdx.game.model.effects;
 
 import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.characters.player.Player.PlayerModel;
 import com.mygdx.game.model.events.ActionListener;
 
@@ -19,7 +20,7 @@ public class ItemEffect extends EntityEffect {
 	}
 	
 	@Override
-	protected void processDuringActive(CharacterModel target, float delta) {
+	protected void processDuringActive(EntityModel target, float delta) {
 		super.processDuringActive(target, delta);
 		if (target instanceof PlayerModel) {
 			PlayerModel pTarget = (PlayerModel) target;
@@ -34,9 +35,13 @@ public class ItemEffect extends EntityEffect {
 	public String getType() {
 		return ItemEffect.type;
 	}
+	
+	public boolean onlyForCharacters() {
+		return true;
+	}
 
 	@Override
-	public boolean shouldReciprocateToSource(CharacterModel target, ActionListener listener) {
+	public boolean shouldReciprocateToSource(EntityModel target, ActionListener listener) {
 		return false;
 	}
 
@@ -51,7 +56,7 @@ public class ItemEffect extends EntityEffect {
 	}
 
 	@Override
-	public void flipValuesIfNecessary(CharacterModel target, CharacterModel source) {
+	public void flipValuesIfNecessary(EntityModel target, EntityModel source) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -500,7 +500,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 		
 
 		private boolean actOnObject() {
-			if (nearbyObject != null) {
+			if (nearbyObject != null && nearbyObject.canBeActedOn()) {
 				this.nearbyObject.actOnThis(this);
 				nearbyObject = null;
 				return true;

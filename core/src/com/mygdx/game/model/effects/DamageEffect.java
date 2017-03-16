@@ -1,6 +1,7 @@
 package com.mygdx.game.model.effects;
 
 import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.characters.enemies.Enemy.EnemyModel;
 import com.mygdx.game.model.events.ActionListener;
 
@@ -15,7 +16,7 @@ public class DamageEffect extends EntityEffect{
 		}
 	}
 
-	protected void processDuringActive(CharacterModel target, float delta) {
+	protected void processDuringActive(EntityModel target, float delta) {
 		super.processDuringActive(target, delta);
 		float damage = dSettings.isInstantaneous().booleanValue() ? dSettings.value : (dSettings.value * Math.min((delta / dSettings.getDuration()), 1f));
 		target.removeFromCurrentHealth(damage);
@@ -31,7 +32,7 @@ public class DamageEffect extends EntityEffect{
 	}
 
 	@Override
-	public boolean shouldReciprocateToSource(CharacterModel target, ActionListener listener) {
+	public boolean shouldReciprocateToSource(EntityModel target, ActionListener listener) {
 		return false;
 	}
 
@@ -46,7 +47,7 @@ public class DamageEffect extends EntityEffect{
 	}
 
 	@Override
-	public void flipValuesIfNecessary(CharacterModel target, CharacterModel source) {
+	public void flipValuesIfNecessary(EntityModel target, EntityModel source) {
 		// TODO Auto-generated method stub
 		
 	}

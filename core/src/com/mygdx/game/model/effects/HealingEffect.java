@@ -1,6 +1,7 @@
 package com.mygdx.game.model.effects;
 
 import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.events.ActionListener;
 
 public class HealingEffect extends EntityEffect {
@@ -15,7 +16,7 @@ public class HealingEffect extends EntityEffect {
 	}
 	
 	@Override
-	protected void processDuringActive(CharacterModel target, float delta) {
+	protected void processDuringActive(EntityModel target, float delta) {
 		super.processDuringActive(target, delta);
 		float healing = hSettings.isInstantaneous().booleanValue() ? hSettings.value : (hSettings.value * Math.min((delta / hSettings.getDuration()), 1f));
 		target.addToCurrentHealth(healing);
@@ -28,7 +29,7 @@ public class HealingEffect extends EntityEffect {
 	}
 
 	@Override
-	public boolean shouldReciprocateToSource(CharacterModel target, ActionListener listener) {
+	public boolean shouldReciprocateToSource(EntityModel target, ActionListener listener) {
 		return false;
 	}
 
@@ -43,7 +44,7 @@ public class HealingEffect extends EntityEffect {
 	}
 
 	@Override
-	public void flipValuesIfNecessary(CharacterModel target, CharacterModel source) {
+	public void flipValuesIfNecessary(EntityModel target, EntityModel source) {
 		
 	}
 

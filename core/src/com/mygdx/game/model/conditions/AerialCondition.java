@@ -1,6 +1,6 @@
 package com.mygdx.game.model.conditions;
 
-import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.characters.EntityModel;
 
 public class AerialCondition extends PassiveCondition{
 	
@@ -12,7 +12,7 @@ public class AerialCondition extends PassiveCondition{
 	}
 
 	@Override
-	public boolean isConditionMet(CharacterModel target) {
+	public boolean isConditionMet(EntityModel target) {
 		return target.isInAir();
 	}
 

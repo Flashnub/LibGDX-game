@@ -1,12 +1,23 @@
 package com.mygdx.game.model.characters;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.model.actions.Attack;
 import com.mygdx.game.model.characters.CollisionCheck.CollisionType;
+import com.mygdx.game.model.effects.EntityEffect;
+import com.mygdx.game.model.effects.EntityEffectSettings;
+import com.mygdx.game.model.effects.XMovementEffect;
+import com.mygdx.game.model.effects.XMovementEffectSettings;
+import com.mygdx.game.model.effects.YMovementEffect;
+import com.mygdx.game.model.effects.YMovementEffectSettings;
+import com.mygdx.game.model.events.AssaultInterceptor;
 import com.mygdx.game.model.events.CollisionChecker;
 import com.mygdx.game.utils.CellWrapper;
 import com.mygdx.game.utils.CellWrapper.CellType;
@@ -46,6 +57,10 @@ public abstract class EntityModel {
 	int entityCollisionRepositionTokens;
 	boolean onSlope;
 	
+	ArrayList <EntityEffect> currentEffects;
+	ArrayList <Integer> indicesToRemove;
+
+	
 	
 	public EntityModel() {
 		super();
@@ -72,6 +87,11 @@ public abstract class EntityModel {
 		this.xOffsetModifier = 0f;
 		this.yOffsetModifier = 0f;
 		this.entityCollisionRepositionTokens = 1;
+		
+		this.currentEffects = new ArrayList <EntityEffect>();
+		this.indicesToRemove = new ArrayList<Integer>();
+
+
 	}
 	
 	//Not used by projectiles.
@@ -337,43 +357,17 @@ public abstract class EntityModel {
 			
 			tempGameplayBounds.setY(tempGameplayBounds.getY() + tempVelocity * increment);
 			tempImageBounds.y = -1f * (this.yOffsetModifier + (tempImageBounds.height * ((1f - this.heightCoefficient) / 2)) - tempGameplayBounds.y );
-
-//			tempImageBounds.setY(tempImageBounds.getY() + tempVelocity * increment);
-//			tempGameplayBounds.setY(this.yOffsetModifier + tempImageBounds.getY() + tempImageBounds.getHeight() * ((1f - this.heightCoefficient) / 2));
-			
+		
 			//If on slope then make sure that gravity moves character down or moves up.
 			//If on slope, then forgo tile collision till off of slope.
 			int rightSideXIndex = ((int) ((tempGameplayBounds.x + tempGameplayBounds.width) / collisionLayer.getTileWidth()));
 			int leftSideXIndex = ((int) ((tempGameplayBounds.x) / collisionLayer.getTileWidth()));
-//			int xIndex = (int) ((tempGameplayBounds.x + (tempGameplayBounds.width / 2f)) / collisionLayer.getTileWidth());
 			int yIndex = (int) ((this.gameplayHitBox.y) / collisionLayer.getTileHeight());
 			
 
 			Cell leftSideCell = collisionLayer.getCell(leftSideXIndex, yIndex);
 			Cell rightSideCell = collisionLayer.getCell(rightSideXIndex, yIndex);
-//			Cell middleCell = collisionLayer.getCell(xIndex, yIndex);
-//			if (middleCell.getTile().getProperties().containsKey(EntityModel.LeftSlopeHeight) && tempVelocity <= 0 && this.onSlope) {
-//				//figure out how far up/down
-//				float leftSlope = (Float) middleCell.getTile().getProperties().get(EntityModel.LeftSlopeHeight);
-//				float rightSlope = (Float) middleCell.getTile().getProperties().get(EntityModel.RightSlopeHeight);
-//				
-//				float differenceInSlope = Math.max(leftSlope, rightSlope) - Math.min(leftSlope, rightSlope);
-//				float howFarEntityIsInSlopeTile = (tempGameplayBounds.x + tempGameplayBounds.width) % collisionLayer.getTileWidth();
-//				float verticalEntityDistance = 0f;
-//				if (rightSlope > leftSlope) {
-//					float proportionOfDistance = howFarEntityIsInSlopeTile / collisionLayer.getTileWidth();
-//					verticalEntityDistance = differenceInSlope * proportionOfDistance + yIndex * collisionLayer.getTileHeight() + Math.min(leftSlope, rightSlope);
-//				}
-//				else {
-//					float proportionOfDistance = 1f - (howFarEntityIsInSlopeTile / collisionLayer.getTileWidth());
-//					verticalEntityDistance = differenceInSlope * proportionOfDistance + yIndex * collisionLayer.getTileHeight() + Math.min(leftSlope, rightSlope);
-//				}
-//				
-//				pointOfReturn = verticalEntityDistance;
-//				collisionY = true;
-//				slopeType = SlopeType.Right;
-//			}
-//			
+
 			if (this.isFacingLeft()) {
 				if (leftSideCell.getTile().getProperties().containsKey(EntityModel.LeftSlopeHeight) && tempVelocity <= 0) {
 					//figure out how far up/down
@@ -466,9 +460,6 @@ public abstract class EntityModel {
 			}
 			if (!collisionY) {
 				//Tile
-				if (this.onSlope) {
-					System.out.println("Slope");
-				}
 				this.onSlope = false;
 				CollisionInfo info = this.singletonYCheckForTileCollision(collisionLayer, tempGameplayBounds, true, tempVelocity);
 				collisionY = info.didCollide;
@@ -560,6 +551,79 @@ public abstract class EntityModel {
 
 		//react to X collision
 		return new CollisionCheck(collisionY, tempVelocity > 0, time, collisionType, pointOfReturn);
+	}
+	
+	public XMovementEffect getXMove() {
+		for (EntityEffect effect : this.currentEffects) {
+			if (effect instanceof XMovementEffect) {
+				return (XMovementEffect) effect;
+			}
+		}
+		return null;
+	}
+	
+	public YMovementEffect getYMove() {
+		for (EntityEffect effect : this.currentEffects) {
+			if (effect instanceof YMovementEffect) {
+				return (YMovementEffect) effect;
+			}
+		}
+		return null;
+	}
+	
+	protected void handleEffects(float delta) {
+		this.indicesToRemove.clear();
+		for (Integer priority : EntityEffect.getPriorities()) {
+			processEffectsOfPriority(priority.intValue(), delta);
+		}
+
+	}
+	
+	private void processEffectsOfPriority(int priority, float delta) {
+		for(Iterator<EntityEffect> iterator = this.currentEffects.iterator(); iterator.hasNext();) {
+			EntityEffect effect = iterator.next();
+			if (effect.getPriority() == priority) {
+				boolean isFinished = effect.process(this, delta);
+				if (isFinished) {
+					iterator.remove();
+				}
+			}
+		}
+	}
+	
+	public void addEffect(EntityEffect effect) {
+		if (effect.isUniqueEffect()) {
+			for (EntityEffect currentEffect : this.currentEffects) {
+				if (currentEffect.getClass().equals(effect.getClass())) {
+					currentEffect.setForceEnd(true);
+				}
+			}
+		}
+		currentEffects.add(effect);
+	}
+	
+	public void removeEffectByID(Integer effectID) {
+		if (effectID.intValue() != EntityEffectSettings.defaultID) {
+			for(Iterator<EntityEffect> iterator = this.currentEffects.iterator(); iterator.hasNext();) {
+				EntityEffect effect = iterator.next();
+				if (effect.getSpecificID().intValue() == effectID.intValue() && effect.getSpecificID().intValue() != EntityEffectSettings.defaultID) {
+					effect.setForceEnd(true);
+					return;
+				}
+			}
+		}
+	}
+	
+	public boolean checkIfIntercepted(Attack attack) {
+		boolean interceptedAttack = false;
+		for (EntityEffect effect : this.currentEffects) {
+			if (effect instanceof AssaultInterceptor && effect.isActive()) {
+//				AssaultInterceptor attackInterceptor = (AssaultInterceptor) effect;
+//				interceptedAttack = attackInterceptor.didInterceptAttack(this, attack);
+				interceptedAttack = true;
+			}
+		}
+		return interceptedAttack;
 	}
 	
 	public abstract EntityCollisionData handleEntityXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided);
@@ -725,6 +789,39 @@ public abstract class EntityModel {
 		return isFacingLeft() ? this.xOffsetModifier : -this.xOffsetModifier; 
 	}
 	
+	public boolean isInAir() {
+		//Nothing.
+		return false;
+	}
+	
+	public void addToCurrentWill(float value) {
+		
+	}
+	
+	public void setIsInAir(boolean isInAir) {
+		//Nothing
+	}
+	
+	public void addToCurrentHealth(float healing) {
+		//nothing.
+	}
+
+	public void removeFromCurrentHealth(float removal) {
+		//nothing.
+	}
+	
+	public void addToCurrentTension(float tension) {
+		
+	}
+	
+	public void removeFromCurrentStability(float stability, XMovementEffectSettings xReplacementMovementEffect, YMovementEffectSettings yReplacementMovementEffect) {
+		
+	}
+	
+	public void actionStagger(boolean stabilityStaggering) {
+		
+	}
+	
 	public Vector2 getVelocity() {
 		return velocity;
 	}
@@ -763,6 +860,9 @@ public abstract class EntityModel {
 		this.isRespectingEntityCollision = isRespectingEntityCollision;
 	}
 	
+	public ArrayList<EntityEffect> getCurrentEffects() {
+		return currentEffects;
+	}
 	
 	public void lockEntityCollisionBehavior() {
 		lockEntityCollisionBehavior = true;

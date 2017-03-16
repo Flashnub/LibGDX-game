@@ -1,6 +1,7 @@
 package com.mygdx.game.model.conditions;
 
 import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.characters.EntityModel;
 
 public class InjuredStaggerCondition extends PassiveCondition{
 	
@@ -11,8 +12,12 @@ public class InjuredStaggerCondition extends PassiveCondition{
 	}
 
 	@Override
-	public boolean isConditionMet(CharacterModel target) {
-		return target.isInjuredStaggering();
+	public boolean isConditionMet(EntityModel target) {
+		if (target instanceof CharacterModel)
+		{
+			return ((CharacterModel)target).isInjuredStaggering();
+		}
+		return false;
 	}
 
 }

@@ -29,7 +29,7 @@ public class Explosion extends EntityModel implements EffectController {
 	ActionListener actionListener;
 	EntityUIModel explosionUIModel;
 	String uuid;
-	Array <CharacterModel> alreadyHitCharacters;
+	Array <EntityModel> alreadyHitCharacters;
 	String state;
 	CharacterModel source;
 	 
@@ -169,7 +169,7 @@ public class Explosion extends EntityModel implements EffectController {
 		return settings;
 	}
 
-	public Array<CharacterModel> getAlreadyHitCharacters() {
+	public Array<EntityModel> getAlreadyHitCharacters() {
 		return alreadyHitCharacters;
 	}
 

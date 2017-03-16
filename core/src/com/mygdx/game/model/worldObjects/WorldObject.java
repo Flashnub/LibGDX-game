@@ -2,6 +2,7 @@ package com.mygdx.game.model.worldObjects;
 
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.mygdx.game.model.actions.Attack;
 import com.mygdx.game.model.characters.CollisionCheck;
 import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.characters.EntityUIDataType;
@@ -20,8 +21,12 @@ public abstract class WorldObject extends EntityModel implements InteractableObj
 	final String activatedState = "Activated";
 	public static final String WorldObjUUIDKey = "UUID";
 	private final String WorldObjUIKey = "UIKey";
+	final String isStrikeableKey = "IsStrikeable";
+	final String maxHealthKey = "maxHealth";
 	static float defaultGravity = 300f;
 	public static int allegiance = 0;
+	boolean isStrikeable;
+	float maxHealth, currentHealth;
 	
 	EntityUIModel itemUIModel;
 	Integer uuid;
@@ -35,7 +40,19 @@ public abstract class WorldObject extends EntityModel implements InteractableObj
 		isFacingLeft = false;
 		didChangeState = false;
 		itemUIModel = new EntityUIModel((String) properties.get(WorldObjUIKey), EntityUIDataType.WORLDOBJECT);
-		this.uuid = (Integer) properties.get(WorldObjUUIDKey);
+		if (properties.get(WorldObjUUIDKey) != null) {
+			this.uuid = (Integer) properties.get(WorldObjUUIDKey);
+		}
+		if (properties.get(this.maxHealthKey)!= null) {
+			this.isStrikeable = true;
+			this.maxHealth = (Float) properties.get(this.maxHealthKey);
+			this.currentHealth = maxHealth;
+		}
+		else {
+			this.isStrikeable = false;
+			this.maxHealth = 0f;
+			this.currentHealth = 0f;
+		}
 		this.setObjListener(objListener);
 		this.saveListener = saveListener;
 		this.acceleration.y = -defaultGravity;
@@ -58,13 +75,25 @@ public abstract class WorldObject extends EntityModel implements InteractableObj
 	public abstract boolean shouldCollideWithEntity();
 	public abstract UUIDType getUUIDType();
 	
+	public void shouldAttackHit(Attack attack) {
+		if (this.isStrikeable && !this.isActivated) {
+			attack.processAttackOnEntity(this);
+		}
+	}
+	
+	public boolean isStrikeable() {
+		return this.isStrikeable;
+	}
+	
 	public void activateObjectOnWorld(WorldModel world) {
 		this.setState(this.activatingState);
 		if (shouldDeleteIfActivated()) {
 			this.getObjListener().deleteObjectFromWorld(this);
 		}
-		saveListener.addUUIDToSave(this.uuid, this.getUUIDType());
-		saveListener.triggerSave();
+		if (this.uuid != null) {
+			saveListener.addUUIDToSave(this.uuid, this.getUUIDType());
+			saveListener.triggerSave();
+		}
 	}
 	
 	public void activateAlreadyActivatedObject(WorldModel world) {
@@ -93,6 +122,7 @@ public abstract class WorldObject extends EntityModel implements InteractableObj
 		this.handleCollisionRespectChecks();
 		this.setGameplaySize(delta);
 		this.movementWithCollisionDetection(delta, collisionLayer);
+		this.handleEffects(delta);
 		if (this.didChangeState) {
 			this.itemUIModel.setAnimationTime(0f);
 			this.didChangeState = false; 
@@ -102,15 +132,40 @@ public abstract class WorldObject extends EntityModel implements InteractableObj
 			this.setState(this.activatedState);
 			this.isActivated = true;
 		}
+		if (this.currentHealth == 0 && this.isStrikeable && !this.isActivated) {
+			this.objListener.objectToActOn(this);
+		}
 	}
 	
-	@Override
-	public boolean equals(Object other){ 
-		if (other instanceof WorldObject) {
-			return ((WorldObject) other).getUuid().equals(this.uuid);
-		}
-		return false;
+	public void addToCurrentHealth(float healing) {
+		this.setCurrentHealth(this.currentHealth + healing);
+
 	}
+
+	public void removeFromCurrentHealth(float removal) {
+		this.setCurrentHealth(this.currentHealth - removal);
+	}
+	
+	public void setCurrentHealth (float value) {
+		this.currentHealth = Math.min(Math.max(0, value), this.maxHealth);
+	}
+	
+	
+//	@Override
+//	public boolean equals(Object other){ 
+//		if (other instanceof WorldObject) {
+//			if ((((WorldObject) other).getUuid() == null && this.getUuid() != null) 
+//					|| (((WorldObject) other).getUuid() != null && this.getUuid() == null)
+//					|| ((WorldObject) other).getUuid() == null && this.getUuid() == null) {
+//				return super.equals(other);
+//			}
+//			else {
+//				return ((WorldObject) other).getUuid().equals(this.uuid);
+//			}
+//		}
+//		return super.equals(other);
+//	}
+	
 	public Integer getUuid() {
 		return uuid;
 	}
@@ -153,8 +208,13 @@ public abstract class WorldObject extends EntityModel implements InteractableObj
 	
 	@Override 
 	public void actOnThis(PlayerModel player) {
-		this.objListener.objectToActOn(this);
-
+		if (!this.isStrikeable && !this.isActivated) {
+			this.objListener.objectToActOn(this);
+		}
+	}
+	
+	public boolean canBeActedOn() {
+		return !this.isStrikeable && !this.isActivated;
 	}
 
 }

@@ -5,6 +5,7 @@ import java.util.Iterator;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.effects.EntityEffect;
 import com.mygdx.game.model.effects.EffectSettings;
 import com.mygdx.game.model.effects.XMovementEffect;
@@ -40,9 +41,9 @@ public class Attack extends ActionSegment {
 		this.setDurations(source);
 	}
 	
-	public void processAttackOnCharacter(CharacterModel target) {
+	public void processAttackOnEntity(EntityModel target) {
 		for (HitTracker tracker : this.alreadyHitCharacters) {
-			if (tracker.characterHit.equals(target)){
+			if (tracker.entityHit.equals(target)){
 				return;
 			}
 		}
@@ -80,7 +81,7 @@ public class Attack extends ActionSegment {
 		}
 		
 		this.alreadyHitCharacters.add(new HitTracker(target));
-	}
+	} 
 	
 	@Override
 	public ActionSegment cloneActionSegmentWithSourceAndTarget(CharacterModel source, CharacterModel target) {

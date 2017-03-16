@@ -116,8 +116,6 @@ public abstract class Character implements ModelListener {
 		
 		EntityUIModel uiModel;
 		CharacterProperties properties;
-		ArrayList <EntityEffect> currentEffects;
-		ArrayList <Integer> indicesToRemove;
 		ArrayList <ActionSequence> processingActionSequences;
 		ArrayDeque <ActionSequence> nextActiveActionSequences;
 		Array <Weapon> weapons;
@@ -127,8 +125,6 @@ public abstract class Character implements ModelListener {
 		float stateTime;
 		
 		public CharacterModel(String characterName, EntityUIModel uiModel, ModelListener modelListener) {
-			this.currentEffects = new ArrayList <EntityEffect>();
-			this.indicesToRemove = new ArrayList<Integer>();
 			this.nextActiveActionSequences = new ArrayDeque<ActionSequence>();
 			this.processingActionSequences = new ArrayList <ActionSequence>();
 			setState(idleState);
@@ -345,48 +341,7 @@ public abstract class Character implements ModelListener {
 	    	return this.isProcessingActiveSequences();
 	    }
 		
-		private void handleEffects(float delta) {
-			this.indicesToRemove.clear();
-			for (Integer priority : EntityEffect.getPriorities()) {
-				processEffectsOfPriority(priority.intValue(), delta);
-			}
 
-		}
-		
-		private void processEffectsOfPriority(int priority, float delta) {
-			for(Iterator<EntityEffect> iterator = this.currentEffects.iterator(); iterator.hasNext();) {
-				EntityEffect effect = iterator.next();
-				if (effect.getPriority() == priority) {
-					boolean isFinished = effect.process(this, delta);
-					if (isFinished) {
-						iterator.remove();
-					}
-				}
-			}
-		}
-		
-		public void addEffect(EntityEffect effect) {
-			if (effect.isUniqueEffect()) {
-				for (EntityEffect currentEffect : this.currentEffects) {
-					if (currentEffect.getClass().equals(effect.getClass())) {
-						currentEffect.setForceEnd(true);
-					}
-				}
-			}
-			currentEffects.add(effect);
-		}
-		
-		public void removeEffectByID(Integer effectID) {
-			if (effectID.intValue() != EntityEffectSettings.defaultID) {
-				for(Iterator<EntityEffect> iterator = this.currentEffects.iterator(); iterator.hasNext();) {
-					EntityEffect effect = iterator.next();
-					if (effect.getSpecificID().intValue() == effectID.intValue() && effect.getSpecificID().intValue() != EntityEffectSettings.defaultID) {
-						effect.setForceEnd(true);
-						return;
-					}
-				}
-			}
-		}
 		
 		public void lockControls() {
 			this.actionLocked = true;
@@ -399,34 +354,8 @@ public abstract class Character implements ModelListener {
 	    	}
 		}
 		
-		public XMovementEffect getXMove() {
-			for (EntityEffect effect : this.currentEffects) {
-				if (effect instanceof XMovementEffect) {
-					return (XMovementEffect) effect;
-				}
-			}
-			return null;
-		}
-		
-		public YMovementEffect getYMove() {
-			for (EntityEffect effect : this.currentEffects) {
-				if (effect instanceof YMovementEffect) {
-					return (YMovementEffect) effect;
-				}
-			}
-			return null;
-		}
-		
-		public boolean checkIfIntercepted(Attack attack) {
-			boolean interceptedAttack = false;
-			for (EntityEffect effect : this.currentEffects) {
-				if (effect instanceof AssaultInterceptor) {
-					AssaultInterceptor attackInterceptor = (AssaultInterceptor) effect;
-					interceptedAttack = attackInterceptor.didInterceptAttack(this, attack);
-				}
-			}
-			return interceptedAttack;
-		}
+
+
 		
 		public void setMovementStatesIfNeeded() {
 			this.setMovementStatesIfNeeded(false);
@@ -456,7 +385,6 @@ public abstract class Character implements ModelListener {
 		
 		public void jump() {
 			if (!actionLocked || (this.getCurrentActiveActionSeq() != null && this.getCurrentActiveActionSeq().chainsWithJump())) {
-			
 				if (!this.actionStaggering && this.getCurrentActiveActionSeq() == null) {
 					jumpCode();
 				}
@@ -680,7 +608,7 @@ public abstract class Character implements ModelListener {
 		private void staggerAction(XMovementEffectSettings xPotentialMovementSettings, YMovementEffectSettings yPotentialMovementSettings) {
 			this.forceEndForActiveAction();
 			this.injuredStaggering = true;
-			StaggerType staggerType = this.isInAir() || (yPotentialMovementSettings != null && yPotentialMovementSettings.getVelocity() > 0) ? StaggerType.Aerial : StaggerType.Normal;
+			StaggerType staggerType = this.isInAir() || (yPotentialMovementSettings != null && yPotentialMovementSettings.getVelocity() > 0 && !yPotentialMovementSettings.onlyWhenInAir()) ? StaggerType.Aerial : StaggerType.Normal;
 			ActionSequence staggerAction = ActionSequence.createStaggerSequence(this, xPotentialMovementSettings, yPotentialMovementSettings, this.actionListener, staggerType);
     		this.addActionSequence(staggerAction);
     		this.actionStagger(true);
@@ -732,7 +660,7 @@ public abstract class Character implements ModelListener {
 					}
 				}
 				if (!didInterceptAttack) {
-					attack.processAttackOnCharacter(this);
+					attack.processAttackOnEntity(this);
 				}
 			}
 		}
@@ -1117,9 +1045,7 @@ public abstract class Character implements ModelListener {
 			this.currentTension = 0;
 		}
 
-		public ArrayList<EntityEffect> getCurrentEffects() {
-			return currentEffects;
-		}
+
 
 		public boolean isSprinting() {
 			return sprinting;

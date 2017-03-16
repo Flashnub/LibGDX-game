@@ -173,7 +173,7 @@ public class ActionSequence implements Serializable {
 			sequence.actingState = "TensionStagger";
 			sequence.cooldownState = "TensionStaggerCooldown";
 		}
-		else if (source.isInAir() || (yOverridingMovement != null && yOverridingMovement.getVelocity() > 0)){
+		else if (source.isInAir() || (yOverridingMovement != null && yOverridingMovement.getVelocity() > 0 && !yOverridingMovement.onlyWhenInAir())){
 			sequence.windupState = "AerialStaggerWindup";
 			sequence.actingState = "AerialStagger";
 			sequence.cooldownState = "AerialStaggerCooldown";

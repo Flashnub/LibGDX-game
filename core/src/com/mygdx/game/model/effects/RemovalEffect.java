@@ -1,6 +1,7 @@
 package com.mygdx.game.model.effects;
 
 import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.events.ActionListener;
 
 public class RemovalEffect extends EntityEffect{
@@ -16,7 +17,7 @@ public class RemovalEffect extends EntityEffect{
 	}
 	
 	@Override
-	protected void initialProcess(CharacterModel target) {
+	protected void initialProcess(EntityModel target) {
 		super.initialProcess(target);
 		if (rSettings.getIdToRemove() != null) {
 			target.removeEffectByID(rSettings.getIdToRemove());
@@ -24,7 +25,7 @@ public class RemovalEffect extends EntityEffect{
 	}
 
 	@Override
-	public boolean shouldReciprocateToSource(CharacterModel target, ActionListener listener) {
+	public boolean shouldReciprocateToSource(EntityModel target, ActionListener listener) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -36,7 +37,7 @@ public class RemovalEffect extends EntityEffect{
 	}
 
 	@Override
-	public void flipValuesIfNecessary(CharacterModel target, CharacterModel source) {
+	public void flipValuesIfNecessary(EntityModel target, EntityModel source) {
 		// TODO Auto-generated method stub
 		
 	}

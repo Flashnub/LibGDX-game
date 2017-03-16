@@ -227,7 +227,10 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     private WorldObject getObjectFromString(String typeOfObject, MapProperties properties) {
     	WorldObject worldObject = null;
     	if (properties != null) {
-    		Integer uuid = (Integer) properties.get(WorldObject.WorldObjUUIDKey);
+    		Integer uuid = null;
+    		if (properties.get(WorldObject.WorldObjUUIDKey) != null) {
+    			uuid = (Integer) properties.get(WorldObject.WorldObjUUIDKey);
+    		}
 			boolean isAlreadyActivated = ((PlayerModel)player.getCharacterData()).isUUIDInSave(uuid);
 			if (typeOfObject != null) {
 				boolean shouldAddAnyway = WorldObject.shouldAddIfActivated(typeOfObject);
@@ -446,6 +449,9 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 				checkIfAttackLands(enemies.get(i), attack);
 			}
 		}
+		for (int i = 0; i < this.objects.size; i++) {
+			checkIfAttackLands(objects.get(i), attack);
+		}
 	}
 
 	@Override
@@ -506,6 +512,12 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	private void checkIfAttackLands(Character character, Attack attack) {
 		if (attack.getHitBox().overlaps(character.getCharacterData().getGameplayHitBox())) {
 			character.getCharacterData().shouldAttackHit(attack);
+		}
+	}
+	
+	private void checkIfAttackLands(WorldObject object, Attack attack) {
+		if (attack.getHitBox().overlaps(object.getGameplayHitBox())) {
+			object.shouldAttackHit(attack);
 		}
 	}
 	
@@ -579,7 +591,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	public boolean checkIfEntityCollidesWithObjects(EntityModel entity, Rectangle tempGameplayBounds) {
 		boolean isColliding = false;
 		for (WorldObject object : this.objects) {
-			if (object.shouldCollideWithEntity() && object.getGameplayHitBox().overlaps(tempGameplayBounds)) {
+			if (object.shouldCollideWithEntity() && object.getGameplayHitBox().overlaps(tempGameplayBounds) && !object.equals(entity)) {
 				isColliding = true;
 				break;
 			}
@@ -591,7 +603,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	private void checkIfPlayerIsNearObjects() {
 		nearbyObjects.clear();
 		for (WorldObject object : this.objects) {
-			if (object.getGameplayHitBox().overlaps(player.getCharacterData().getGameplayHitBox())) {
+			if (object.getGameplayHitBox().overlaps(player.getCharacterData().getGameplayHitBox()) && object.canBeActedOn()) {
 				nearbyObjects.add(object);
 			}
 		}
@@ -610,7 +622,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	private void checkIfPlayerIsNearNPCs() {
 		this.nearbyNPCs.clear();
 		for (NPCCharacter character : this.npcCharacters) {
-			if (character.getCharacterData().getGameplayHitBox().overlaps(player.getCharacterData().getGameplayHitBox())) {
+			if (character.getCharacterData().getGameplayHitBox().overlaps(player.getCharacterData().getGameplayHitBox()) && ((NPCCharacterModel) character.getCharacterData()).canBeActedOn()) {
 				nearbyNPCs.add(character);
 			}
 		}

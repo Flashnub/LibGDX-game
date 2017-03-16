@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.actions.Attack;
 import com.mygdx.game.model.actions.HitTracker;
 import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.AssaultInterceptor;
 import com.mygdx.game.model.projectiles.Explosion;
@@ -24,7 +25,7 @@ public class BlockEffect extends EntityEffect implements AssaultInterceptor{
 	}
 
 	@Override
-	protected void processDuringActive(CharacterModel target, float delta) {
+	protected void processDuringActive(EntityModel target, float delta) {
 		super.processDuringActive(target, delta);
 		if (isPerfect && isActive && this.getActiveTime() > this.bSettings.perfectBlockTime) {
 			isPerfect = false;
@@ -32,7 +33,7 @@ public class BlockEffect extends EntityEffect implements AssaultInterceptor{
 	}
 	
 	@Override
-	public boolean didInterceptAttack(CharacterModel target, Attack attack) {
+	public boolean didInterceptAttack(EntityModel target, Attack attack) {
 		if (this.isActive) {
 			float potentialWill = this.calculateWillFromEffects(attack.getAttackSettings().getTargetEffectSettings());
 			target.addToCurrentWill(potentialWill);
@@ -47,7 +48,7 @@ public class BlockEffect extends EntityEffect implements AssaultInterceptor{
 	}
 	
 	@Override
-	public boolean didInterceptProjectile(CharacterModel target, Projectile projectile) {
+	public boolean didInterceptProjectile(EntityModel target, Projectile projectile) {
 		if (this.isActive) {
 			float potentialWill = this.calculateWillFromEffects(projectile.getSettings().getTargetEffects());
 			target.addToCurrentWill(potentialWill);
@@ -72,7 +73,7 @@ public class BlockEffect extends EntityEffect implements AssaultInterceptor{
 	}
 
 	@Override
-	public boolean didInterceptExplosion(CharacterModel target, Explosion explosion) {
+	public boolean didInterceptExplosion(EntityModel target, Explosion explosion) {
 		if (this.isActive) {
 			float potentialWill = this.calculateWillFromEffects(explosion.getExplosionSettings().getTargetEffects());
 			target.addToCurrentWill(potentialWill);
@@ -92,7 +93,7 @@ public class BlockEffect extends EntityEffect implements AssaultInterceptor{
 	}
 
 	@Override
-	public boolean shouldReciprocateToSource(CharacterModel target, ActionListener listener) {
+	public boolean shouldReciprocateToSource(EntityModel target, ActionListener listener) {
 		return false;
 	}
 
@@ -107,7 +108,7 @@ public class BlockEffect extends EntityEffect implements AssaultInterceptor{
 	}
 
 	@Override
-	public void flipValuesIfNecessary(CharacterModel target, CharacterModel source) {
+	public void flipValuesIfNecessary(EntityModel target, EntityModel source) {
 		// TODO Auto-generated method stub
 		
 	}

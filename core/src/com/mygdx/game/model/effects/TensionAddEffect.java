@@ -1,6 +1,7 @@
 package com.mygdx.game.model.effects;
 
 import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.events.ActionListener;
 
 public class TensionAddEffect extends EntityEffect {
@@ -15,14 +16,14 @@ public class TensionAddEffect extends EntityEffect {
 		}
 	}
 	
-	protected void processDuringActive(CharacterModel target, float delta) {
+	protected void processDuringActive(EntityModel target, float delta) {
 		super.processDuringActive(target, delta);
 		float tensionDamage = tSettings.isInstantaneous().booleanValue() ? tSettings.value : (tSettings.value * Math.min((delta / tSettings.getDuration()), 1f));
 		target.addToCurrentTension(tensionDamage);
 	}
 
 	@Override
-	public boolean shouldReciprocateToSource(CharacterModel target, ActionListener listener) {
+	public boolean shouldReciprocateToSource(EntityModel target, ActionListener listener) {
 		return false;
 	}
 
@@ -32,7 +33,7 @@ public class TensionAddEffect extends EntityEffect {
 	}
 
 	@Override
-	public void flipValuesIfNecessary(CharacterModel target, CharacterModel source) {
+	public void flipValuesIfNecessary(EntityModel target, EntityModel source) {
 		
 	}
 

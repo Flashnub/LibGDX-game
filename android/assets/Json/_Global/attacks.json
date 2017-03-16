@@ -23,8 +23,22 @@
 				"delayToActivate": 0,
 				"isInstantaneous": false,
 				"value": 0,
-				"velocity": 100,
-				"acceleration": -200
+				"velocity": 50,
+				"acceleration": -167.67
+			}
+			{
+				"class": "com.mygdx.game.model.effects.YMovementEffectSettings",
+				"duration": 0.5,
+				"delayToActivate": 0,
+				"isInstantaneous": false,
+				"value": 0,
+				"velocity": 250,
+				"useGravity": true,
+				"passiveConditions": [
+					{
+						"class": "com.mygdx.game.model.conditions.AerialConditionSettings"
+					}
+				]
 			}
 		]
 	}
@@ -52,8 +66,22 @@
 				"delayToActivate": 0,
 				"isInstantaneous": false,
 				"value": 0,
-				"velocity": 200,
-				"acceleration": -600
+				"velocity": 50,
+				"acceleration": -167.67
+			}
+			{
+				"class": "com.mygdx.game.model.effects.YMovementEffectSettings",
+				"duration": 0.5,
+				"delayToActivate": 0,
+				"isInstantaneous": false,
+				"value": 0,
+				"velocity": 500,
+				"useGravity": true,
+				"passiveConditions": [
+					{
+						"class": "com.mygdx.game.model.conditions.AerialConditionSettings"
+					}
+				]
 			}
 		]
 	}
@@ -81,8 +109,22 @@
 				"delayToActivate": 0,
 				"isInstantaneous": false,
 				"value": 0,
-				"velocity": 200,
-				"acceleration": -600
+				"velocity": 50,
+				"acceleration": -167.67
+			}
+			{
+				"class": "com.mygdx.game.model.effects.YMovementEffectSettings",
+				"duration": 0.5,
+				"delayToActivate": 0,
+				"isInstantaneous": false,
+				"value": 0,
+				"velocity": 500,
+				"useGravity": true,
+				"passiveConditions": [
+					{
+						"class": "com.mygdx.game.model.conditions.AerialConditionSettings"
+					}
+				]
 			}
 		]
 	}
@@ -113,6 +155,15 @@
 				"class": "com.mygdx.game.model.effects.StabilityDamageEffectSettings",
 				"value": 10
 			}
+			{
+				"class": "com.mygdx.game.model.effects.XMovementEffectSettings",
+				"duration": 0.3,
+				"delayToActivate": 0,
+				"isInstantaneous": false,
+				"value": 0,
+				"velocity": 50,
+				"acceleration": -167.67
+			}
 		]
 	}
 	"AirMedAtk2": {
@@ -130,7 +181,7 @@
 		"targetEffectSettings": [
 			{
 				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
-				"value": 2
+				"value": 200
 			}
 			{
 				"class": "com.mygdx.game.model.effects.StabilityDamageEffectSettings",

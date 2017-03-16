@@ -110,4 +110,8 @@ public abstract class Effect {
 	public void setRetriever(EffectController retriever) {
 		this.retriever = retriever;
 	}
+	
+	public boolean isActive() {
+		return this.isActive;
+	}
 }

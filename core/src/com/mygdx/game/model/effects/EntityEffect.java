@@ -3,6 +3,7 @@ package com.mygdx.game.model.effects;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.characters.EntityUIModel;
 import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.conditions.PassiveCondition;
 import com.mygdx.game.model.conditions.PassiveConditionSettings;
 import com.mygdx.game.model.events.ActionListener;
@@ -36,11 +37,15 @@ public abstract class EntityEffect extends Effect {
 		this.checkedConditions = false;
 	}
 	
-	public abstract boolean shouldReciprocateToSource(CharacterModel target, ActionListener listener);
+	public abstract boolean shouldReciprocateToSource(EntityModel target, ActionListener listener);
 	public abstract void flipValues();
-	public abstract void flipValuesIfNecessary(CharacterModel target, CharacterModel source);
+	public abstract void flipValuesIfNecessary(EntityModel target, EntityModel source);
 	public abstract boolean shouldAddIfIntercepted();
 	public abstract boolean isUniqueEffect();
+	
+	public boolean shouldUseFor(EntityModel target) {
+		return true;
+	}
 	
 	public int getPriority() {
 		return EntityEffect.LowPriority;
@@ -54,19 +59,19 @@ public abstract class EntityEffect extends Effect {
 		return priorities;
 	}
 	
-	protected void initialProcess(CharacterModel target) {
+	protected void initialProcess(EntityModel target) {
 		super.initialProcess();
 	}
 	
-	protected void processDuringActive(CharacterModel target, float delta) {
+	protected void processDuringActive(EntityModel target, float delta) {
 		super.processDuringActive(delta);
 	}
 	
-	protected void completion(CharacterModel target) {
+	protected void completion(EntityModel target) {
 		super.completion();
 	}
 	
-	public boolean process(CharacterModel target, float delta) {
+	public boolean process(EntityModel target, float delta) {
 		if (this.staggered) {
 			this.staggerTime += delta;
 			if (staggerTime > EntityUIModel.standardStaggerDuration) {
@@ -76,6 +81,10 @@ public abstract class EntityEffect extends Effect {
 			return false;
 		}
 		boolean isFinished = false;
+		if (!this.shouldUseFor(target)) {
+			isFinished = true;
+			return isFinished;
+		}
 		if (!this.checkedConditions) {
 			boolean conditionsMet = true;
 			for (PassiveCondition condition : this.passiveConditions) {

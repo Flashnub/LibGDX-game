@@ -2,7 +2,9 @@ package com.mygdx.game.model.effects;
 
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.mygdx.game.model.conditions.AerialConditionSettings;
 import com.mygdx.game.model.conditions.InjuredStaggerConditionSettings;
+import com.mygdx.game.model.conditions.PassiveConditionSettings;
 
 public class YMovementEffectSettings extends EntityEffectSettings{
 
@@ -68,6 +70,15 @@ public class YMovementEffectSettings extends EntityEffectSettings{
 		if (this.applyOnlyIfInjuredStaggered) {
 			this.passiveConditions.add(new InjuredStaggerConditionSettings());
 		}
+	}
+	
+	public boolean onlyWhenInAir() {
+		for (PassiveConditionSettings condition : this.passiveConditions) {
+			if (condition instanceof AerialConditionSettings) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public float getEstimatedDistance() {

@@ -1,6 +1,7 @@
 package com.mygdx.game.model.effects;
 
 import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.events.ActionListener;
 
 public class YMovementEffect extends EntityEffect{
@@ -17,16 +18,17 @@ public class YMovementEffect extends EntityEffect{
 	}
 	
 	@Override
-	protected void completion(CharacterModel target) {
+	protected void completion(EntityModel target) {
 		super.completion(target);
-		target.acceleration.y = oldAccel;
 		
+		target.acceleration.y = oldAccel;
+
 	}
 	
 	@Override
-	protected void initialProcess(CharacterModel target) {
+	protected void initialProcess(EntityModel target) {
 		super.initialProcess(target);
-		
+			
 		target.getVelocity().y = this.mSettings.velocity;
 		if (this.mSettings.velocity > 0 && !target.isInAir()) {
 			target.setIsInAir(true);
@@ -49,9 +51,13 @@ public class YMovementEffect extends EntityEffect{
 	public int getPriority() {
 		return EntityEffect.MediumPriority;
 	}
+	
+	public boolean shouldUseFor(EntityModel target) {
+		return target instanceof CharacterModel;
+	}
 
 	@Override
-	public boolean shouldReciprocateToSource(CharacterModel target, ActionListener listener) {
+	public boolean shouldReciprocateToSource(EntityModel target, ActionListener listener) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -63,8 +69,7 @@ public class YMovementEffect extends EntityEffect{
 	}
 
 	@Override
-	public void flipValuesIfNecessary(CharacterModel target, CharacterModel source) {
-		// TODO Auto-generated method stub
+	public void flipValuesIfNecessary(EntityModel target, EntityModel source) {
 		
 	}
 
@@ -72,6 +77,10 @@ public class YMovementEffect extends EntityEffect{
 	public boolean shouldAddIfIntercepted() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+	
+	public boolean onlyForCharacters() {
+		return true;
 	}
 
 	@Override

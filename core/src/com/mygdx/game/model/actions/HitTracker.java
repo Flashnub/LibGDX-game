@@ -1,15 +1,15 @@
 package com.mygdx.game.model.actions;
 
-import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.characters.EntityModel;
 
 public class HitTracker {
 	float timeSinceHit;
-	CharacterModel characterHit;
+	EntityModel entityHit;
 	
-	public HitTracker(CharacterModel characterHit)
+	public HitTracker(EntityModel characterHit)
 	{
 		timeSinceHit = 0f;
-		this.characterHit = characterHit;
+		this.entityHit = characterHit;
 	}
 	
 	public boolean update(float delta, float sourceHitRate) {

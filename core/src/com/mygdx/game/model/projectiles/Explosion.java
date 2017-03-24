@@ -230,4 +230,8 @@ public class Explosion extends EntityModel implements EffectController {
 	public CharacterModel getSource() {
 		return this.source;
 	}
+	
+	public boolean checkSlopes() {
+		return false;
+	}
 }

@@ -169,19 +169,19 @@ public class ActionSequence implements Serializable {
 		sequence.isActive = true;
 		sequence.strategy = ActionStrategy.Story;
 		if (staggerType.equals(StaggerType.Tension)) {
-			sequence.windupState = "TensionStaggerWindup";
-			sequence.actingState = "TensionStagger";
-			sequence.cooldownState = "TensionStaggerCooldown";
+			sequence.windupState = "TensionStaggerW";
+			sequence.actingState = "TensionStaggerA";
+			sequence.cooldownState = "TensionStaggerC";
 		}
 		else if (source.isInAir() || (yOverridingMovement != null && yOverridingMovement.getVelocity() > 0 && !yOverridingMovement.onlyWhenInAir())){
-			sequence.windupState = "AerialStaggerWindup";
-			sequence.actingState = "AerialStagger";
-			sequence.cooldownState = "AerialStaggerCooldown";
+			sequence.windupState = "AerialStaggerW";
+			sequence.actingState = "AerialStaggerA";
+			sequence.cooldownState = "AerialStaggerC";
 		}
 		else {
-			sequence.windupState = "StaggerWindup";
-			sequence.actingState = "Stagger";
-			sequence.cooldownState = "StaggerCooldown";
+			sequence.windupState = "StaggerW";
+			sequence.actingState = "StaggerA";
+			sequence.cooldownState = "StaggerC";
 		}
 
 		

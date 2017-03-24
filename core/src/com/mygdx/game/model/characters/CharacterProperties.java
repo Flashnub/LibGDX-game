@@ -43,6 +43,9 @@ public class CharacterProperties implements Serializable {
 	boolean shouldRespectTileCollisions;
 	boolean shouldRespectObjectCollisions;
 	int maxJumpTokens;
+	boolean boltedDown;
+	float xRotationCoefficient;
+	float yRotationCoefficient;
 	
 	Float xOffsetModifier;
 	Float yOffsetModifier;
@@ -251,7 +254,30 @@ public class CharacterProperties implements Serializable {
 		else {
 			this.maxJumpTokens = 2;
 		}
+			
+		Boolean boltedDown = json.readValue("boltedDown", Boolean.class, jsonData);
+		if (boltedDown != null) {
+			this.boltedDown = boltedDown;
+		}
+		else {
+			this.boltedDown = false;
+		}
+
+		Float xRotationCoefficient = json.readValue("xRotationCoefficient", Float.class, jsonData);
+		if (xRotationCoefficient != null) {
+			this.xRotationCoefficient = xRotationCoefficient; 
+		}
+		else {
+			this.xRotationCoefficient = 0.5f;
+		}
 		
+		Float yRotationCoefficient = json.readValue("yRotationCoefficient", Float.class, jsonData);
+		if (yRotationCoefficient != null) {
+			this.yRotationCoefficient = yRotationCoefficient; 
+		}
+		else {
+			this.yRotationCoefficient = 0.5f;
+		}
 	}
 
 	public CharacterProperties cloneProperties() {
@@ -281,6 +307,9 @@ public class CharacterProperties implements Serializable {
 		properties.useDefaultAerialStagger = this.useDefaultAerialStagger;
 		properties.useDefaultWakeup = this.useDefaultWakeup;
 		properties.maxJumpTokens = this.maxJumpTokens;
+		properties.boltedDown = this.boltedDown;
+		properties.xRotationCoefficient = this.xRotationCoefficient;
+		properties.yRotationCoefficient = this.yRotationCoefficient;
 		//iterate through actions.
 		HashMap <String, ActionSequence> clonedActions = new HashMap<String, ActionSequence> ();
 		for (Map.Entry<String, ActionSequence> entry : actions.entrySet()) {
@@ -322,7 +351,7 @@ public class CharacterProperties implements Serializable {
 		
 		return result;
 	}
-
+	
 	public float getHeightCoefficient() {
 		return heightCoefficient;
 	}

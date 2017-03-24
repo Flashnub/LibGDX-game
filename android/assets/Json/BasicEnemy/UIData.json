@@ -15,16 +15,43 @@
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
-			"name": "Circle",
+			"name": "DeathW",
 			"numberOfFrames": 1,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
-			"name": "Triangle",
+			"name": "DeathA",
 			"numberOfFrames": 1,
 			"playMode": NORMAL
 		}		
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "DeathC",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}	
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "BasicAttackW",
+			"numberOfFrames": 1,
+			"frameRate": 5,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "BasicAttackA",
+			"numberOfFrames": 1,
+			"frameRate": 5,
+			"playMode": NORMAL
+		}		
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "BasicAttackC",
+			"numberOfFrames": 1,
+			"frameRate": 5,
+			"playMode": NORMAL
+		}	
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "StaggerW",
@@ -40,6 +67,24 @@
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "StaggerC",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "AerialStaggerW",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}		
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "AerialStaggerA",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "AerialStaggerC",
 			"numberOfFrames": 1,
 			"playMode": NORMAL
 		}

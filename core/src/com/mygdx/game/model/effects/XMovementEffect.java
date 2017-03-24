@@ -32,7 +32,7 @@ public class XMovementEffect  extends EntityEffect{
 		
 		if (!target.isInAir()) {
 			target.velocity.x = 0;
-			System.out.println("Completion: " + target.getVelocity().x);
+//			System.out.println("Completion: " + target.getVelocity().x);
 		}
 	}
 	
@@ -40,7 +40,7 @@ public class XMovementEffect  extends EntityEffect{
 	protected void initialProcess(EntityModel target) {
 		super.initialProcess(target);
 		target.getVelocity().x = shouldBeLeft ? -this.mSettings.velocity : this.mSettings.velocity;
-		System.out.println("Initial Process: " + target.getVelocity().x );
+//		System.out.println("Initial Process: " + target.getVelocity().x );
 
 		XMovementEffect targetMovement = target.getXMove();
 		if (targetMovement != null && !targetMovement.equals(this)) {

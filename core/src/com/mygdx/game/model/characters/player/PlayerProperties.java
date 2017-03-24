@@ -43,7 +43,7 @@ public class PlayerProperties implements Serializable{
 			Item itemToAdd = null;
 			int numberOfItems = 0;
 			for (Item item : inventory) {
-				if (itemKey.equals(item.getKey())) {
+				if (itemKey.equals(item.getName())) {
 					if (itemToAdd == null) {
 						itemToAdd = item;
 					}

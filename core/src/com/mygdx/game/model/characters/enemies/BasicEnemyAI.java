@@ -47,8 +47,6 @@ public class BasicEnemyAI extends EnemyAI {
 				}
 			}
 			if (nextSeq != null) {
-//				this.source.stopHorizontalMovement();
-//				this.nextActionSequences.add(currentSeq);
 				this.source.addActionSequence(nextSeq);
 			}
 			else if (!this.source.isProcessingActiveSequences()){ 

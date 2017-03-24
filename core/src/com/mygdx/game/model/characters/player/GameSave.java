@@ -113,8 +113,8 @@ public class GameSave implements Serializable{
 		gameSave.objectsInteractedHistory = new Array<Integer>();
 		gameSave.quickItemKeys = new Array <String>();
 		
-		gameSave.inventoryItemKeys.add("HealthPotion");
-		gameSave.quickItemKeys.add("HealthPotion");
+		gameSave.inventoryItemKeys.add("Health Potion");
+		gameSave.quickItemKeys.add("Health Potion");
 		
 		//GamePad Scheme
 		gameSave.controllerScheme = new HashMap <String, String>();

@@ -21,6 +21,7 @@
 	}
 	"Death": {
 		"class": com.mygdx.game.model.actions.WorldAttackSettings,
+		"abilitySettingKey": "Death",
 		"worldEffectSettings": [
 			{
 				"class": com.mygdx.game.model.globalEffects.DeleteCharacterEffectSettings,

@@ -124,7 +124,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     }
     
     private void makeCharacterFromTile(Cell tile, int x, int y) {
-    	if (tile.getTile().getProperties().containsKey(kSpawnPoint)) {
+    	if (tile != null && tile.getTile().getProperties().containsKey(kSpawnPoint)) {
 			String entityName = (String) tile.getTile().getProperties().get(kSpawnPoint);
 			String entityType = (String) tile.getTile().getProperties().get(kEntityType);
 			Character character = getCharacterFromString(entityName, entityType); 

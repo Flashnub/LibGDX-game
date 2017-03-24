@@ -22,6 +22,9 @@ public abstract class EnemyAI implements PlayerObserver {
 	float currentLoopRate;
 	WorldModel world;
 	CharacterModel currentTarget;
+	boolean shouldTurnTowardsTarget;
+	boolean shouldRotateTowardsTarget;
+	float turnAngle;
 	
 	public EnemyAI(EnemyModel source, WorldModel world) {
 		this.source = source;
@@ -32,6 +35,9 @@ public abstract class EnemyAI implements PlayerObserver {
 		this.observationBlocks = new ArrayList <ObservationBlock> ();
 		this.possibleActionsToTake = new ArrayList <ActionSequence> ();
 		this.nextActionSequences = new ArrayList <ActionSequence> ();
+		this.shouldTurnTowardsTarget = true;
+		this.shouldRotateTowardsTarget = false;
+		this.turnAngle = 0f;
 	}
 	
 	public void process(float delta) {
@@ -48,6 +54,7 @@ public abstract class EnemyAI implements PlayerObserver {
 			this.pollWorldForObservations();
 			checkIfShouldDeAggro();
 			findTargetIfDocile();
+			turnIfNeeded();
 			this.setNextActionSequences(this.figureOutPossibleMoves());
 		
 			if (nextActionSequences.size() > 0) {
@@ -108,6 +115,27 @@ public abstract class EnemyAI implements PlayerObserver {
 		return loopRate;
 	}
 	
+	protected void turnIfNeeded() {
+		if (!isDocile() && !this.source.isAlreadyDead()) {
+			for (ObservationBlock block : this.observationBlocks) {
+				if (this.currentTarget.equals(block.sourceOfObservation)) {
+					for (Observation observation : block.observations.values()) {
+						if (observation instanceof PositionalObservation) {
+							PositionalObservation positionalObservation = (PositionalObservation) observation;
+							if (this.shouldTurnTowardsTarget) {
+								source.setFacingLeft(positionalObservation.isTargetToLeft());
+							}
+							if (this.shouldRotateTowardsTarget) {
+								float updatedTurnAngle = positionalObservation.getAngleTowardsTarget();
+								source.setTurnAngle(updatedTurnAngle);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
 	protected void pollWorldForObservations() {
 		observationBlocks.clear();
 		Array <Enemy> enemies = world.getEnemies();
@@ -146,7 +174,7 @@ public abstract class EnemyAI implements PlayerObserver {
 					if (observation instanceof PositionalObservation && !observation.sourceOfObservation.equals(this.source)) {
 						PositionalObservation positionalObservation = (PositionalObservation) observation;
 						float distance = positionalObservation.getHypotenuse();
-						if (!positionalObservation.isFacingTarget) {
+						if (!positionalObservation.isFacingTarget && !this.shouldTurnTowardsTarget) {
 							distance = distance * source.enemyProperties.awarenessFactor;
 						}
 						if (distance < source.enemyProperties.distanceToRecognize && this.source.getAllegiance() != positionalObservation.sourceOfObservation.getAllegiance()) {
@@ -163,13 +191,7 @@ public abstract class EnemyAI implements PlayerObserver {
 	protected ObservationBlock createObservationBlockFromCharacter(CharacterModel characterModel) {
 		ObservationBlock observationBlock = new ObservationBlock(characterModel);
 		//Get Distance.
-		PositionalObservation positionalObservation = new PositionalObservation(characterModel);
-		positionalObservation.xDelta = source.getGameplayHitBox().x - characterModel.getGameplayHitBox().x;
-		positionalObservation.yDelta = source.getGameplayHitBox().y - characterModel.getGameplayHitBox().y;
-		positionalObservation.isTargetToLeft = positionalObservation.xDelta <= 0;
-		positionalObservation.isBelowTarget = positionalObservation.yDelta <= 0;
-		positionalObservation.isFacingTarget = (positionalObservation.isTargetToLeft && source.isFacingLeft()) || (!positionalObservation.isTargetToLeft && !source.isFacingLeft());
-		positionalObservation.sourceOfObservation = characterModel;
+		PositionalObservation positionalObservation = new PositionalObservation(this.source, characterModel);
 		observationBlock.addObservation(positionalObservation);
 			
 		return observationBlock;
@@ -177,5 +199,9 @@ public abstract class EnemyAI implements PlayerObserver {
 	
 	public boolean isDocile() {
 		return this.currentTarget == null;
+	}
+
+	public CharacterModel getCurrentTarget() {
+		return currentTarget;
 	}
 }

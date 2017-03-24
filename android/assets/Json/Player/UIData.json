@@ -34,19 +34,55 @@
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
-			"name": "TensionStaggerWindup",
+			"name": "AerialStaggerW",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}		
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "AerialStaggerA",
 			"numberOfFrames": 1,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
-			"name": "TensionStagger",
+			"name": "AerialStaggerC",
 			"numberOfFrames": 1,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
-			"name": "TensionStaggerCooldown",
+			"name": "TensionStaggerW",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "TensionStaggerA",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "TensionStaggerC",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "StaggerW",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "StaggerA",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "StaggerC",
 			"numberOfFrames": 1,
 			"playMode": NORMAL
 		}
@@ -270,6 +306,42 @@
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "SpikeC",
 			"numberOfFrames": 5,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "BlockW",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "BlockA",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "BlockC",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "DeathW",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "DeathA",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "DeathC",
+			"numberOfFrames": 1,
 			"playMode": NORMAL
 		}
 	]

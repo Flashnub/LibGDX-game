@@ -208,7 +208,7 @@ public abstract class WorldObject extends EntityModel implements InteractableObj
 	
 	@Override 
 	public void actOnThis(PlayerModel player) {
-		if (!this.isStrikeable && !this.isActivated) {
+		if (canBeActedOn()) {
 			this.objListener.objectToActOn(this);
 		}
 	}

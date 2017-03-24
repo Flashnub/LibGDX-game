@@ -13,7 +13,6 @@ public class Item implements Serializable, ActionSegmentListener {
 	ActionSequence itemSequence;
 	String name;
 	String desc;
-	String key;
 	ItemUIModel uiModel;
 	boolean expiresOnUse;
 	
@@ -37,7 +36,6 @@ public class Item implements Serializable, ActionSegmentListener {
 		json.writeValue("desc", desc);
 		json.writeValue("itemSequence", itemSequence);
 		json.writeValue("uiModel", uiModel);
-		json.writeValue("key", key);
 		json.writeValue("expiresOnUse", expiresOnUse);
 	}
 
@@ -47,7 +45,6 @@ public class Item implements Serializable, ActionSegmentListener {
 		itemSequence = json.readValue("itemSequence", ActionSequence.class, jsonData);
 		name = json.readValue("name", String.class, jsonData);
 		desc = json.readValue("desc", String.class, jsonData);
-		key = json.readValue("key", String.class, jsonData);
 		uiModel = json.readValue("uiModel", ItemUIModel.class, jsonData);
 		Boolean expiresOnUse = json.readValue("expiresOnUse", Boolean.class, jsonData);
 		if (expiresOnUse != null) {
@@ -67,11 +64,6 @@ public class Item implements Serializable, ActionSegmentListener {
 		return name;
 	}
 	
-	public String getKey() {
-		return key;
-	}
-
-
 	@Override
 	public boolean equals(Object other) {
 		if (other instanceof Item) {
@@ -102,6 +94,9 @@ public class Item implements Serializable, ActionSegmentListener {
 		
 	}
 
+	public boolean isUseable() {
+		return this.itemSequence != null;
+	}
 
 	public boolean expiresOnUse() {
 		return expiresOnUse;

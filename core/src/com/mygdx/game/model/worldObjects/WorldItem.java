@@ -13,7 +13,7 @@ import com.mygdx.game.model.world.WorldModel;
 
 public class WorldItem extends WorldObject {
 	
-	private final String typeName = "itemName";
+	private final String typeName = "ItemName";
 
 	final String fadingState = "Fading";
 	

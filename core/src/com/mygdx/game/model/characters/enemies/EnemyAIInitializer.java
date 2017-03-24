@@ -8,11 +8,17 @@ public class EnemyAIInitializer {
 		EnemyAI enemyAI = null;
 		switch (enemyAIKey) {
 			case BasicEnemyAI.name:
-			enemyAI = new BasicEnemyAI(source, world);
-			break;
+				enemyAI = new BasicEnemyAI(source, world);
+				break;
 			case DummyAI.name:
-			enemyAI = new DummyAI(source, world);
-			break;
+				enemyAI = new DummyAI(source, world);
+				break;
+			case WalkerAI.name:
+				enemyAI = new WalkerAI(source, world);
+				break;
+			case GunAI.name:
+				enemyAI = new GunAI(source, world);
+				break;
 		}
 		return enemyAI;
 	}

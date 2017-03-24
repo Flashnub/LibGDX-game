@@ -4,7 +4,6 @@
 		"name": "Basic",
 		"disappearOnImpact": true,
 		"useSmartAim": true,
-		"gravity": 200,
 		"tracks": false,
 		"bounces": false,
 		"hasCollisionDetection": true,
@@ -12,8 +11,30 @@
 		"windupSpeed": 100,
 		"cooldownSpeed": 0,
 		"activeTillDisruption": true,
-		"windupTime": 1,
 		"cooldownTime": 0.1,
+		"inheritAngleFromSource": true,
+		"explosionName": "BasicExplosion",
+		"targetEffects": [
+			{
+				"class": com.mygdx.game.model.effects.DamageEffectSettings,
+				"value": 2
+			}
+		]
+	}
+	"Basic3": {
+		"class": com.mygdx.game.model.projectiles.ProjectileSettings,
+		"name": "Basic",
+		"disappearOnImpact": true,
+		"useSmartAim": true,
+		"tracks": false,
+		"bounces": false,
+		"hasCollisionDetection": true,
+		"activeSpeed": 300,
+		"windupSpeed": 100,
+		"cooldownSpeed": 0,
+		"activeTillDisruption": true,
+		"cooldownTime": 0.1,
+		"inheritAngleFromSource": true,
 		"explosionName": "BasicExplosion",
 		"targetEffects": [
 			{

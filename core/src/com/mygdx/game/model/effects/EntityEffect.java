@@ -20,6 +20,7 @@ public abstract class EntityEffect extends Effect {
 	public static final int LowPriority = 3;
 	public static final int MediumPriority = 5;
 	public static final int HighPriority = 7;
+	public static final int UltraPriority = 9;
 	
 	public EntityEffect(EffectSettings settings, EffectController controller) {
 		super(settings);
@@ -53,6 +54,7 @@ public abstract class EntityEffect extends Effect {
 	
 	public static Array <Integer> getPriorities() {
 		Array <Integer> priorities = new Array <Integer> ();
+		priorities.add(EntityEffect.UltraPriority);
 		priorities.add(EntityEffect.HighPriority);
 		priorities.add(EntityEffect.MediumPriority);
 		priorities.add(EntityEffect.LowPriority);

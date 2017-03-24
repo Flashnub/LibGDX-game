@@ -30,10 +30,7 @@
 	"BasicProjectileAttack": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
 		"sourceEffectSettings": [
-			{
-				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
-				"value": 0
-			}
+	
 		]
 	}
 	"Stagger": {
@@ -69,16 +66,13 @@
 	"PlayerTensionStagger": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
 	}
-	"PlayerDeath": {
-		"class": "com.mygdx.game.model.actions.AbilitySettings",
-	}
-	"BasicEnemyDeath": {
+	"Death": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
 	}
 	"BasicEnemyTensionStagger": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
 	}
-	"HealthPotion": {
+	"Health Potion": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
 		"sourceEffectSettings": [
 			{

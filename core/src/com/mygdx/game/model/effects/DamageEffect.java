@@ -25,7 +25,11 @@ public class DamageEffect extends EntityEffect{
 			enemyTarget.checkIfShouldAggroTarget(this.getController().getSource(), damage);
 		}
 	}
-
+	
+	public int getPriority() {
+		return EntityEffect.UltraPriority;
+	}
+	
 	@Override
 	public String getType() {
 		return DamageEffect.type;

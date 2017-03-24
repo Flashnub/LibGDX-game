@@ -191,6 +191,16 @@ public class Projectile extends EntityModel implements EffectController{
 			this.velocity.x = xVelocity;
 			this.velocity.y = yVelocity;
 		}
+		else if (this.settings.inheritAngleFromSource()) {
+			boolean isTargetToLeft = source.isTargetToLeft(target);
+			float angleOfVelocity = isTargetToLeft ? 180f - this.source.convertTurnAngleToFloat() : this.source.convertTurnAngleToFloat();
+			float angleInRadians = (float) Math.toRadians(angleOfVelocity);
+			float xVelocity = (float) (this.projectileSpeed() * Math.cos(angleInRadians));
+			float yVelocity = (float) (this.projectileSpeed() * Math.sin(angleInRadians));
+			
+			this.velocity.x = xVelocity;
+			this.velocity.y = yVelocity;
+		}
 		else {
 			Vector2 expectedPositionOfTarget;
 
@@ -321,6 +331,9 @@ public class Projectile extends EntityModel implements EffectController{
 		}
 	}
 	
+	public boolean checkSlopes() {
+		return false;
+	}
 		
 	private void deletionCheck() {
 		if (this.currentTime > this.getTotalTime() || forceEnd) {

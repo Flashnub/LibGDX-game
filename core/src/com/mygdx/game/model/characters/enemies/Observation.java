@@ -5,8 +5,10 @@ import com.mygdx.game.model.characters.Character.CharacterModel;
 public abstract class Observation {
 	ObservableDataType dataType;
 	CharacterModel sourceOfObservation;
+	CharacterModel observer;
 	
-	public Observation(CharacterModel sourceOfObservation) {
+	public Observation(CharacterModel observer, CharacterModel sourceOfObservation) {
+		this.observer = observer;
 		this.sourceOfObservation = sourceOfObservation;
 	}
 

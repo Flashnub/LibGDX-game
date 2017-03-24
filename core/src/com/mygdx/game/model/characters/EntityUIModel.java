@@ -9,6 +9,7 @@ import com.mygdx.game.assets.AnimationData;
 import com.mygdx.game.assets.EntityUIData;
 import com.mygdx.game.assets.SpriteUtils;
 import com.mygdx.game.constants.JSONController;
+import com.mygdx.game.model.characters.Character.CharacterModel;
 
 //=============================================================//
 //-----------------------------UI------------------------------//
@@ -22,7 +23,7 @@ public class EntityUIModel {
 	private float animationTime;
 	private float angleOfRotation;
 	private boolean shouldStagger;
-	public static final float standardStaggerDuration = 0.25f;
+	public static final float standardStaggerDuration = 0.15f;
 	private float staggerTime;
 		
 	public EntityUIModel(String name, EntityUIDataType type) {
@@ -56,7 +57,8 @@ public class EntityUIModel {
 					rightAnimationFrames.add(rightFrame);
 					
 					if (rightFrame == null) {
-						System.out.println("");
+						System.out.println(SpriteUtils.animationStringWithData(animationData, i+1));
+						System.out.println(entityUIData.getMasterAtlasPath());
 					}
 					TextureRegion leftFrame = new TextureRegion(rightFrame);
 
@@ -100,8 +102,7 @@ public class EntityUIModel {
 		if (frame != null) {
 			currentFrame = frame;
 		}
-
-		
+	
 		entity.getImageHitBox().width = currentFrame.getRegionWidth();
 		entity.getImageHitBox().height = currentFrame.getRegionHeight();
 		

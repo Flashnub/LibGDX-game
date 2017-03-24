@@ -9,16 +9,16 @@
 	"useDefaultStagger": true,
 	"useDefaultTensionStagger": false,
 	actions: {
-		"BasicProjectileAttack": {
+		"BasicAttack": {
 			"class": com.mygdx.game.model.actions.ActionSequence,
 			"actionKey": {
 				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": "BasicProjectileAttack",
-				"typeOfAction": WorldAttack
+				"key": "BasicAttack",
+				"typeOfAction": Attack
 			}
-			"windupState": "Triangle"
-			"actingState": "Idle"
-			"cooldownState": "Circle"
+			"windUpState": "BasicAttackW"
+			"actingState": "BasicAttackA"
+			"cooldownState": "BasicAttackC"
 		}
 		"Death": {
 			"class": com.mygdx.game.model.actions.ActionSequence,
@@ -28,9 +28,9 @@
 				"overridingAbilitySettingsKey": "BasicEnemyDeath",
 				"typeOfAction": WorldAttack
 			}
-			"windupState": "Triangle"
-			"actingState": "Idle"
-			"cooldownState": "Circle"
+			"windupState": "DeathW"
+			"actingState": "DeathA"
+			"cooldownState": "DeathC"
 		}
 	}
 }

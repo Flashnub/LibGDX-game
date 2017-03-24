@@ -167,8 +167,13 @@ public class WorldRenderer implements CoordinatesHelper, WorldListener{
 			    	batch.draw(texture, 
 			    			enemy.getCharacterData().getImageHitBox().x,
 			    			enemy.getCharacterData().getImageHitBox().y,  
+			    			enemy.getCharacterData().getImageHitBox().width * enemy.getCharacterData().getXRotationCoefficient(), 
+			    			enemy.getCharacterData().getImageHitBox().height * enemy.getCharacterData().getYRotationCoefficient(), 
 			    			enemy.getCharacterData().getImageHitBox().width, 
-			    			enemy.getCharacterData().getImageHitBox().height);
+			    			enemy.getCharacterData().getImageHitBox().height,
+			    			1f, 
+	    					1f,
+	    					enemy.getCharacterData().isFacingLeft() ? -enemy.getCharacterData().convertTurnAngleToFloat() : enemy.getCharacterData().convertTurnAngleToFloat());
 	    		}
 	    	}
 	    	

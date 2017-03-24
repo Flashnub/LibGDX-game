@@ -11,6 +11,7 @@ import com.mygdx.game.model.effects.XMovementEffectSettings;
 import com.mygdx.game.model.effects.YMovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.CollisionChecker;
+import com.mygdx.game.model.globalEffects.DeleteCharacterEffect;
 import com.mygdx.game.model.globalEffects.WorldEffect;
 import com.mygdx.game.model.globalEffects.WorldEffectSettings;
 

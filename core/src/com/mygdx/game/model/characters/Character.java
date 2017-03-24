@@ -15,12 +15,8 @@ import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.Attack;
 import com.mygdx.game.model.characters.CollisionCheck.CollisionType;
 import com.mygdx.game.model.characters.player.Player.PlayerModel;
-import com.mygdx.game.model.actions.ActionSegment.ActionState;
-import com.mygdx.game.model.actions.ActionSequence.ActionType;
 import com.mygdx.game.model.actions.ActionSequence.StaggerType;
-import com.mygdx.game.model.effects.EffectInitializer;
 import com.mygdx.game.model.effects.EntityEffect;
-import com.mygdx.game.model.effects.EntityEffectSettings;
 import com.mygdx.game.model.effects.XMovementEffect;
 import com.mygdx.game.model.effects.XMovementEffectSettings;
 import com.mygdx.game.model.effects.YMovementEffect;
@@ -28,11 +24,9 @@ import com.mygdx.game.model.effects.YMovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.AssaultInterceptor;
 import com.mygdx.game.model.events.ObjectListener;
-import com.mygdx.game.model.globalEffects.WorldEffectSettings;
 import com.mygdx.game.model.projectiles.Explosion;
 import com.mygdx.game.model.projectiles.Projectile;
 import com.mygdx.game.model.weapons.Weapon;
-import com.mygdx.game.model.worldObjects.Item;
 import com.mygdx.game.wrappers.StringWrapper;
 
 public abstract class Character implements ModelListener {
@@ -42,6 +36,10 @@ public abstract class Character implements ModelListener {
 	
 	public enum Direction {
 		LEFT, RIGHT, NaN;
+	}
+	
+	public enum TurnAngle {
+	   ZERO, FOURTYFIVE, NEGFOURTYFIVE, NINETY, NEGNINETY;
 	}
 	
 	public Character(String characterName) {
@@ -108,6 +106,7 @@ public abstract class Character implements ModelListener {
 	    protected boolean movementConditionActivated;
 	    float movementConditionActivatedTime;
 	    int currentJumpTokens, maxJumpTokens;
+	    TurnAngle turnAngle;
 		
 		
 		ActionListener actionListener;
@@ -121,12 +120,15 @@ public abstract class Character implements ModelListener {
 		Array <Weapon> weapons;
 		Weapon currentWeapon;
 		
+
+		
 		//Debug
 		float stateTime;
 		
 		public CharacterModel(String characterName, EntityUIModel uiModel, ModelListener modelListener) {
 			this.nextActiveActionSequences = new ArrayDeque<ActionSequence>();
 			this.processingActionSequences = new ArrayList <ActionSequence>();
+			this.turnAngle = TurnAngle.ZERO;
 			setState(idleState);
 			isImmuneToInjury = false;
 			attacking = false;
@@ -210,7 +212,6 @@ public abstract class Character implements ModelListener {
 				sprinting = false;
 			}
 
-			this.deathCheck();
 			//Debug
 			this.stateTime += delta;
 		}
@@ -477,6 +478,13 @@ public abstract class Character implements ModelListener {
 			if (this.actionStaggering) {
 				return;
 			}
+			if (this.properties.boltedDown) {
+				this.velocity.x = 0f;
+				this.velocity.y = 0f;
+				this.acceleration.x = 0f;
+				this.acceleration.y = 0f;
+				return;
+			}
 			
 			if (this.walking) {
 				this.walkingTime += delta;
@@ -725,6 +733,40 @@ public abstract class Character implements ModelListener {
 			return sourcePosition;
 		}
 		
+		public void setTurnAngle(float turnAngle) {
+			if (turnAngle <= -80f) {
+				this.turnAngle = TurnAngle.NEGNINETY;
+			}
+			else if (turnAngle > -80f && turnAngle <= -30f) {
+				this.turnAngle = TurnAngle.NEGFOURTYFIVE;
+			}
+			else if (turnAngle > -30f && turnAngle <= 30f) {
+				this.turnAngle = TurnAngle.ZERO;
+			}
+			else if (turnAngle > 30f && turnAngle <= 80f) {
+				this.turnAngle = TurnAngle.FOURTYFIVE;
+			}
+			else if (turnAngle > 80f){
+				this.turnAngle = TurnAngle.NINETY;
+			}
+		}
+		
+		public float convertTurnAngleToFloat() {
+			switch (this.turnAngle) {
+			case NEGNINETY:
+				return -90f;
+			case NEGFOURTYFIVE:
+				return -45f;
+			case ZERO:
+				return 0f;
+			case FOURTYFIVE: 
+				return 45f;
+			case NINETY: 
+				return 90f;
+			}
+			return 0f;
+		}
+		
 		public void endActionStagger() {
 			if (actionStaggering) {
 //				if (this.getCurrentMovement() == null) {
@@ -798,11 +840,12 @@ public abstract class Character implements ModelListener {
 		public void setCurrentStability(float currentStability, XMovementEffectSettings xPotentialMovement, YMovementEffectSettings yPotentialMovement) {
 			float realStability = Math.max(0, currentStability);
 			this.currentStability = Math.min(realStability, this.maxStability);
-			if (realStability == 0) {
+			if (realStability == 0 && !alreadyDead && !this.getCharacterProperties().boltedDown) {
 				staggerAction(xPotentialMovement, yPotentialMovement);
 			}
-			else {
+			else if (!alreadyDead){
 				//only action stagger.
+	    		this.actionStagger(true);
 			}
 //			System.out.println("stability: " + this.currentStability);
 		}
@@ -879,6 +922,7 @@ public abstract class Character implements ModelListener {
 
 		public void setCurrentHealth(float currentHealth) {
 			this.currentHealth = Math.min(Math.max(0, currentHealth), this.maxHealth);
+			this.deathCheck();
 		}
 
 		public float getMaxHealth() {
@@ -1055,6 +1099,13 @@ public abstract class Character implements ModelListener {
 			return injuredStaggering;
 		}
 		
+		public float getXRotationCoefficient() {
+			return this.getCharacterProperties().xRotationCoefficient;
+		}
+		
+		public float getYRotationCoefficient() {
+			return this.getCharacterProperties().yRotationCoefficient;
+		}
 	}
 	
 	@Override 

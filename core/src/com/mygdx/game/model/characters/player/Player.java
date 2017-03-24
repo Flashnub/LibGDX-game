@@ -630,6 +630,15 @@ public class Player extends Character implements InputProcessor, ControllerListe
 			}
 			return numberOfItems;
 		}
+		
+		public boolean hasItem(String itemName) {
+			for (Item item : this.playerProperties.getInventory()) {
+				if (item.getName().equals(itemName)) {
+					return true;
+				}
+			}
+			return false;
+		}
 
 		public DirectionalInput getCurrentlyHeldDirection() {
 			return currentlyHeldDirection;

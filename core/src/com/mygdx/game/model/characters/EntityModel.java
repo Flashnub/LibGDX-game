@@ -24,6 +24,10 @@ import com.mygdx.game.utils.CellWrapper.CellType;
 
 public abstract class EntityModel {
 	
+	enum SlopeSide {
+		LEFT, RIGHT, NAN
+	}
+	
 	public static final String activeState = "Active";
 	public static final String windupState = "Windup";
 	public static final String cooldownState = "Cooldown";
@@ -55,7 +59,9 @@ public abstract class EntityModel {
 	boolean shouldRespectObjectCollision;
 	boolean shouldRespectEntityCollision;
 	int entityCollisionRepositionTokens;
-	boolean onSlope;
+	SlopeSide slopeSide;
+	
+
 	
 	ArrayList <EntityEffect> currentEffects;
 	ArrayList <Integer> indicesToRemove;
@@ -90,7 +96,7 @@ public abstract class EntityModel {
 		
 		this.currentEffects = new ArrayList <EntityEffect>();
 		this.indicesToRemove = new ArrayList<Integer>();
-
+		this.slopeSide = SlopeSide.NAN;
 
 	}
 	
@@ -368,7 +374,7 @@ public abstract class EntityModel {
 			Cell leftSideCell = collisionLayer.getCell(leftSideXIndex, yIndex);
 			Cell rightSideCell = collisionLayer.getCell(rightSideXIndex, yIndex);
 
-			if (this.isFacingLeft()) {
+			if (this.isFacingLeft() && this.checkSlopes()) {
 				if (leftSideCell.getTile().getProperties().containsKey(EntityModel.LeftSlopeHeight) && tempVelocity <= 0) {
 					//figure out how far up/down
 					float leftSlope = (Float) leftSideCell.getTile().getProperties().get(EntityModel.LeftSlopeHeight);
@@ -388,7 +394,7 @@ public abstract class EntityModel {
 
 					pointOfReturn = verticalEntityDistance;
 					collisionY = true;
-					this.onSlope = true;
+					this.slopeSide = SlopeSide.LEFT;
 
 				}
 				else if (rightSideCell.getTile().getProperties().containsKey(EntityModel.LeftSlopeHeight) && tempVelocity <= 0) {
@@ -410,10 +416,107 @@ public abstract class EntityModel {
 					
 					pointOfReturn = verticalEntityDistance;
 					collisionY = true;
-					this.onSlope = true;
+					this.slopeSide = SlopeSide.RIGHT;
+				}
+				else if (!this.slopeSide.equals(SlopeSide.NAN)) {
+					if (this.slopeSide.equals(SlopeSide.RIGHT)) {
+						Cell aboveRightSideCell = collisionLayer.getCell(rightSideXIndex, yIndex + 1);
+						Cell belowRightSideCell = collisionLayer.getCell(rightSideXIndex, yIndex - 1);
+						
+
+						if (aboveRightSideCell.getTile().getProperties().containsKey(EntityModel.LeftSlopeHeight)) {
+							//figure out how far up/down
+							float leftSlope = (Float) aboveRightSideCell.getTile().getProperties().get(EntityModel.LeftSlopeHeight);
+							float rightSlope = (Float) aboveRightSideCell.getTile().getProperties().get(EntityModel.RightSlopeHeight);
+							
+							float differenceInSlope = Math.max(leftSlope, rightSlope) - Math.min(leftSlope, rightSlope);
+							float howFarEntityIsInSlopeTile = (tempGameplayBounds.x + tempGameplayBounds.width) % collisionLayer.getTileWidth();
+							float verticalEntityDistance = 0f;
+							if (rightSlope > leftSlope) {
+								float proportionOfDistance = howFarEntityIsInSlopeTile / collisionLayer.getTileWidth();
+								verticalEntityDistance = differenceInSlope * proportionOfDistance + yIndex * collisionLayer.getTileHeight() + Math.min(leftSlope, rightSlope);
+							}
+							else {
+								float proportionOfDistance = 1f - (howFarEntityIsInSlopeTile / collisionLayer.getTileWidth());
+								verticalEntityDistance = differenceInSlope * proportionOfDistance + yIndex * collisionLayer.getTileHeight() + Math.min(leftSlope, rightSlope);
+							}
+							
+							pointOfReturn = verticalEntityDistance;
+							collisionY = true;
+							this.slopeSide = SlopeSide.RIGHT;
+						}
+						else if (belowRightSideCell.getTile().getProperties().containsKey(EntityModel.LeftSlopeHeight)) {
+							//figure out how far up/down
+							float leftSlope = (Float) belowRightSideCell.getTile().getProperties().get(EntityModel.LeftSlopeHeight);
+							float rightSlope = (Float) belowRightSideCell.getTile().getProperties().get(EntityModel.RightSlopeHeight);
+							
+							float differenceInSlope = Math.max(leftSlope, rightSlope) - Math.min(leftSlope, rightSlope);
+							float howFarEntityIsInSlopeTile = (tempGameplayBounds.x + tempGameplayBounds.width) % collisionLayer.getTileWidth();
+							float verticalEntityDistance = 0f;
+							if (rightSlope > leftSlope) {
+								float proportionOfDistance = howFarEntityIsInSlopeTile / collisionLayer.getTileWidth();
+								verticalEntityDistance = differenceInSlope * proportionOfDistance + yIndex * collisionLayer.getTileHeight() + Math.min(leftSlope, rightSlope);
+							}
+							else {
+								float proportionOfDistance = 1f - (howFarEntityIsInSlopeTile / collisionLayer.getTileWidth());
+								verticalEntityDistance = differenceInSlope * proportionOfDistance + yIndex * collisionLayer.getTileHeight() + Math.min(leftSlope, rightSlope);
+							}
+							
+							pointOfReturn = verticalEntityDistance;
+							collisionY = true;
+							this.slopeSide = SlopeSide.RIGHT;
+						}
+					}
+					else if (this.slopeSide.equals(SlopeSide.LEFT)) {
+						Cell aboveLeftSideCell = collisionLayer.getCell(leftSideXIndex, yIndex + 1);
+						Cell belowLeftSideCell = collisionLayer.getCell(leftSideXIndex, yIndex - 1);
+
+						if (aboveLeftSideCell.getTile().getProperties().containsKey(EntityModel.LeftSlopeHeight)) {
+							//figure out how far up/down
+							float leftSlope = (Float) aboveLeftSideCell.getTile().getProperties().get(EntityModel.LeftSlopeHeight);
+							float rightSlope = (Float) aboveLeftSideCell.getTile().getProperties().get(EntityModel.RightSlopeHeight);
+							
+							float differenceInSlope = Math.max(leftSlope, rightSlope) - Math.min(leftSlope, rightSlope);
+							float howFarEntityIsInSlopeTile = (tempGameplayBounds.x + tempGameplayBounds.width) % collisionLayer.getTileWidth();
+							float verticalEntityDistance = 0f;
+							if (rightSlope > leftSlope) {
+								float proportionOfDistance = howFarEntityIsInSlopeTile / collisionLayer.getTileWidth();
+								verticalEntityDistance = differenceInSlope * proportionOfDistance + yIndex * collisionLayer.getTileHeight() + Math.min(leftSlope, rightSlope);
+							}
+							else {
+								float proportionOfDistance = 1f - (howFarEntityIsInSlopeTile / collisionLayer.getTileWidth());
+								verticalEntityDistance = differenceInSlope * proportionOfDistance + yIndex * collisionLayer.getTileHeight() + Math.min(leftSlope, rightSlope);
+							}
+							
+							pointOfReturn = verticalEntityDistance;
+							collisionY = true;
+							this.slopeSide = SlopeSide.LEFT;
+						}
+						else if (belowLeftSideCell.getTile().getProperties().containsKey(EntityModel.LeftSlopeHeight)) {
+							//figure out how far up/down
+							float leftSlope = (Float) belowLeftSideCell.getTile().getProperties().get(EntityModel.LeftSlopeHeight);
+							float rightSlope = (Float) belowLeftSideCell.getTile().getProperties().get(EntityModel.RightSlopeHeight);
+							
+							float differenceInSlope = Math.max(leftSlope, rightSlope) - Math.min(leftSlope, rightSlope);
+							float howFarEntityIsInSlopeTile = (tempGameplayBounds.x + tempGameplayBounds.width) % collisionLayer.getTileWidth();
+							float verticalEntityDistance = 0f;
+							if (rightSlope > leftSlope) {
+								float proportionOfDistance = howFarEntityIsInSlopeTile / collisionLayer.getTileWidth();
+								verticalEntityDistance = differenceInSlope * proportionOfDistance + yIndex * collisionLayer.getTileHeight() + Math.min(leftSlope, rightSlope);
+							}
+							else {
+								float proportionOfDistance = 1f - (howFarEntityIsInSlopeTile / collisionLayer.getTileWidth());
+								verticalEntityDistance = differenceInSlope * proportionOfDistance + yIndex * collisionLayer.getTileHeight() + Math.min(leftSlope, rightSlope);
+							}
+							
+							pointOfReturn = verticalEntityDistance;
+							collisionY = true;
+							this.slopeSide = SlopeSide.LEFT;
+						}
+					}
 				}
 			}
-			else {
+			else if (this.checkSlopes()){
 				if (rightSideCell.getTile().getProperties().containsKey(EntityModel.LeftSlopeHeight) && tempVelocity <= 0) {
 					//figure out how far up/down
 					float leftSlope = (Float) rightSideCell.getTile().getProperties().get(EntityModel.LeftSlopeHeight);
@@ -433,7 +536,7 @@ public abstract class EntityModel {
 					
 					pointOfReturn = verticalEntityDistance;
 					collisionY = true;
-					this.onSlope = true;
+					this.slopeSide = SlopeSide.RIGHT;
 				}
 				else if (leftSideCell.getTile().getProperties().containsKey(EntityModel.LeftSlopeHeight) && tempVelocity <= 0) {
 					//figure out how far up/down
@@ -454,16 +557,136 @@ public abstract class EntityModel {
 
 					pointOfReturn = verticalEntityDistance;
 					collisionY = true;
-					this.onSlope = true;
+					this.slopeSide = SlopeSide.LEFT;
 
+				}
+				else if (!this.slopeSide.equals(SlopeSide.NAN)) {
+					if (this.slopeSide.equals(SlopeSide.RIGHT)) {
+						Cell aboveRightSideCell = collisionLayer.getCell(rightSideXIndex, yIndex + 1);
+						Cell belowRightSideCell = collisionLayer.getCell(rightSideXIndex, yIndex - 1);
+						
+
+						if (aboveRightSideCell.getTile().getProperties().containsKey(EntityModel.LeftSlopeHeight)) {
+							//figure out how far up/down
+							float leftSlope = (Float) aboveRightSideCell.getTile().getProperties().get(EntityModel.LeftSlopeHeight);
+							float rightSlope = (Float) aboveRightSideCell.getTile().getProperties().get(EntityModel.RightSlopeHeight);
+							
+							float differenceInSlope = Math.max(leftSlope, rightSlope) - Math.min(leftSlope, rightSlope);
+							float howFarEntityIsInSlopeTile = (tempGameplayBounds.x + tempGameplayBounds.width) % collisionLayer.getTileWidth();
+							float verticalEntityDistance = 0f;
+							if (rightSlope > leftSlope) {
+								float proportionOfDistance = howFarEntityIsInSlopeTile / collisionLayer.getTileWidth();
+								verticalEntityDistance = differenceInSlope * proportionOfDistance + yIndex * collisionLayer.getTileHeight() + Math.min(leftSlope, rightSlope);
+							}
+							else {
+								float proportionOfDistance = 1f - (howFarEntityIsInSlopeTile / collisionLayer.getTileWidth());
+								verticalEntityDistance = differenceInSlope * proportionOfDistance + yIndex * collisionLayer.getTileHeight() + Math.min(leftSlope, rightSlope);
+							}
+							
+							pointOfReturn = verticalEntityDistance;
+							collisionY = true;
+							this.slopeSide = SlopeSide.RIGHT;
+						}
+						else if (belowRightSideCell.getTile().getProperties().containsKey(EntityModel.LeftSlopeHeight)) {
+							//figure out how far up/down
+							float leftSlope = (Float) belowRightSideCell.getTile().getProperties().get(EntityModel.LeftSlopeHeight);
+							float rightSlope = (Float) belowRightSideCell.getTile().getProperties().get(EntityModel.RightSlopeHeight);
+							
+							float differenceInSlope = Math.max(leftSlope, rightSlope) - Math.min(leftSlope, rightSlope);
+							float howFarEntityIsInSlopeTile = (tempGameplayBounds.x + tempGameplayBounds.width) % collisionLayer.getTileWidth();
+							float verticalEntityDistance = 0f;
+							if (rightSlope > leftSlope) {
+								float proportionOfDistance = howFarEntityIsInSlopeTile / collisionLayer.getTileWidth();
+								verticalEntityDistance = differenceInSlope * proportionOfDistance + yIndex * collisionLayer.getTileHeight() + Math.min(leftSlope, rightSlope);
+							}
+							else {
+								float proportionOfDistance = 1f - (howFarEntityIsInSlopeTile / collisionLayer.getTileWidth());
+								verticalEntityDistance = differenceInSlope * proportionOfDistance + yIndex * collisionLayer.getTileHeight() + Math.min(leftSlope, rightSlope);
+							}
+							
+							pointOfReturn = verticalEntityDistance;
+							collisionY = true;
+							this.slopeSide = SlopeSide.RIGHT;
+						}
+					}
+					else if (this.slopeSide.equals(SlopeSide.LEFT)) {
+						Cell aboveLeftSideCell = collisionLayer.getCell(leftSideXIndex, yIndex + 1);
+						Cell belowLeftSideCell = collisionLayer.getCell(leftSideXIndex, yIndex - 1);
+
+						if (aboveLeftSideCell.getTile().getProperties().containsKey(EntityModel.LeftSlopeHeight)) {
+							//figure out how far up/down
+							float leftSlope = (Float) aboveLeftSideCell.getTile().getProperties().get(EntityModel.LeftSlopeHeight);
+							float rightSlope = (Float) aboveLeftSideCell.getTile().getProperties().get(EntityModel.RightSlopeHeight);
+							
+							float differenceInSlope = Math.max(leftSlope, rightSlope) - Math.min(leftSlope, rightSlope);
+							float howFarEntityIsInSlopeTile = (tempGameplayBounds.x + tempGameplayBounds.width) % collisionLayer.getTileWidth();
+							float verticalEntityDistance = 0f;
+							if (rightSlope > leftSlope) {
+								float proportionOfDistance = howFarEntityIsInSlopeTile / collisionLayer.getTileWidth();
+								verticalEntityDistance = differenceInSlope * proportionOfDistance + yIndex * collisionLayer.getTileHeight() + Math.min(leftSlope, rightSlope);
+							}
+							else {
+								float proportionOfDistance = 1f - (howFarEntityIsInSlopeTile / collisionLayer.getTileWidth());
+								verticalEntityDistance = differenceInSlope * proportionOfDistance + yIndex * collisionLayer.getTileHeight() + Math.min(leftSlope, rightSlope);
+							}
+							
+							pointOfReturn = verticalEntityDistance;
+							collisionY = true;
+							this.slopeSide = SlopeSide.LEFT;
+						}
+						else if (belowLeftSideCell.getTile().getProperties().containsKey(EntityModel.LeftSlopeHeight)) {
+							//figure out how far up/down
+							float leftSlope = (Float) belowLeftSideCell.getTile().getProperties().get(EntityModel.LeftSlopeHeight);
+							float rightSlope = (Float) belowLeftSideCell.getTile().getProperties().get(EntityModel.RightSlopeHeight);
+							
+							float differenceInSlope = Math.max(leftSlope, rightSlope) - Math.min(leftSlope, rightSlope);
+							float howFarEntityIsInSlopeTile = (tempGameplayBounds.x + tempGameplayBounds.width) % collisionLayer.getTileWidth();
+							float verticalEntityDistance = 0f;
+							if (rightSlope > leftSlope) {
+								float proportionOfDistance = howFarEntityIsInSlopeTile / collisionLayer.getTileWidth();
+								verticalEntityDistance = differenceInSlope * proportionOfDistance + yIndex * collisionLayer.getTileHeight() + Math.min(leftSlope, rightSlope);
+							}
+							else {
+								float proportionOfDistance = 1f - (howFarEntityIsInSlopeTile / collisionLayer.getTileWidth());
+								verticalEntityDistance = differenceInSlope * proportionOfDistance + yIndex * collisionLayer.getTileHeight() + Math.min(leftSlope, rightSlope);
+							}
+							
+							pointOfReturn = verticalEntityDistance;
+							collisionY = true;
+							this.slopeSide = SlopeSide.LEFT;
+						}
+					}
 				}
 			}
 			if (!collisionY) {
 				//Tile
-				this.onSlope = false;
-				CollisionInfo info = this.singletonYCheckForTileCollision(collisionLayer, tempGameplayBounds, true, tempVelocity);
-				collisionY = info.didCollide;
-				pointOfReturn = info.pointOfReturn;
+				if (!this.slopeSide.equals(SlopeSide.NAN)) {
+//					boolean checkIfSlopesAreAround = false;
+//					checkIfSlopesAreAround = checkIfSlopesAreAround || rightSideCell.getTile().getProperties().containsKey(EntityModel.LeftSlopeHeight);
+//					rightSideCell = collisionLayer.getCell(rightSideXIndex, yIndex - 1);
+//					checkIfSlopesAreAround = checkIfSlopesAreAround || rightSideCell.getTile().getProperties().containsKey(EntityModel.LeftSlopeHeight);
+//					rightSideCell = collisionLayer.getCell(rightSideXIndex, yIndex + 1);
+//					checkIfSlopesAreAround = checkIfSlopesAreAround || rightSideCell.getTile().getProperties().containsKey(EntityModel.LeftSlopeHeight);
+//					checkIfSlopesAreAround = checkIfSlopesAreAround || leftSideCell.getTile().getProperties().containsKey(EntityModel.LeftSlopeHeight);
+//					leftSideCell = collisionLayer.getCell(leftSideXIndex, yIndex - 1);
+//					checkIfSlopesAreAround = checkIfSlopesAreAround || leftSideCell.getTile().getProperties().containsKey(EntityModel.LeftSlopeHeight);
+//					leftSideCell = collisionLayer.getCell(leftSideXIndex, yIndex + 1);
+//					checkIfSlopesAreAround = checkIfSlopesAreAround || leftSideCell.getTile().getProperties().containsKey(EntityModel.LeftSlopeHeight);
+//					
+//					if (checkIfSlopesAreAround) {
+//						System.out.println("Around");
+//					}
+//					if (!checkIfSlopesAreAround) {
+					this.slopeSide = SlopeSide.NAN;
+					System.out.println("Slope");
+//					}
+
+				}
+				else {
+					CollisionInfo info = this.singletonYCheckForTileCollision(collisionLayer, tempGameplayBounds, true, tempVelocity);
+					collisionY = info.didCollide;
+					pointOfReturn = info.pointOfReturn;
+				}
 			}
 
 			if (collisionY) {
@@ -684,7 +907,7 @@ public abstract class EntityModel {
 //			int gameplayHitBoxYIndex = ((int) ((tempGameplayBounds.y) / collisionLayer.getTileHeight()));
 //
 //			Cell gameplayHitBoxCell = collisionLayer.getCell(gameplayHitBoxXIndex, gameplayHitBoxYIndex);
-			if (!this.onSlope) {
+			if (!this.slopeSide.equals(SlopeSide.NAN)) {
 				//has slope, don't check X collision
 				CollisionInfo info = this.singletonXCheckForTileCollision(collisionLayer, tempGameplayBounds, true, tempVelocity);
 				collisionX = info.didCollide;
@@ -775,6 +998,10 @@ public abstract class EntityModel {
 
 		return new CollisionCheck(collisionX, tempVelocity > 0, time, collisionType, pointOfReturn);
 
+	}
+	
+	public boolean checkSlopes() {
+		return true;
 	}
 	
 	public void refreshImageHitBoxX() {

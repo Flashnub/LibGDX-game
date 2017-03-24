@@ -27,6 +27,7 @@ public class ProjectileSettings extends AbilitySettings{
 	private Vector2 size;
 	private Vector2 origin;
 	private Float angleOfVelocity; //use this to fire projectile in a direction rather than at a target.
+	private boolean inheritAngleFromSource;
 	private Float widthCoefficient;
 	private Float heightCoefficient;
 	private Float hitRate;
@@ -59,6 +60,7 @@ public class ProjectileSettings extends AbilitySettings{
 		copy.widthCoefficient = this.widthCoefficient;
 		copy.heightCoefficient = this.heightCoefficient;
 		copy.shouldRotate = this.shouldRotate;
+		copy.inheritAngleFromSource = this.inheritAngleFromSource;
 		
 		Array <WorldEffectSettings> newWorldEffects = new Array <WorldEffectSettings>();
 		for (WorldEffectSettings wSettings : this.worldEffectSettings) {
@@ -205,6 +207,14 @@ public class ProjectileSettings extends AbilitySettings{
 		else {
 			this.cooldownTime = 0f;
 		}
+		
+		Boolean inheritAngleFromSource = json.readValue("inheritAngleFromSource", Boolean.class, jsonData);
+		if (inheritAngleFromSource != null) {
+			this.inheritAngleFromSource = inheritAngleFromSource;
+		}
+		else {
+			this.inheritAngleFromSource = false;
+		}
 	}
 	
 	
@@ -260,6 +270,10 @@ public class ProjectileSettings extends AbilitySettings{
 			return this.cooldownSpeed;
 		}
 		return activeSpeed;
+	}
+	
+	public boolean inheritAngleFromSource() {
+		return inheritAngleFromSource;
 	}
 
 	public Float getGravity() {

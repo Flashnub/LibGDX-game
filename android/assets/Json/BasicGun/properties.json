@@ -1,0 +1,37 @@
+{
+	"class": com.mygdx.game.model.characters.CharacterProperties,
+	"maxHealth": 20,
+	"maxWill": 20,
+	"maxStability": 5,
+	"maxTension": 10,
+	"attack": 1,
+	"horizontalSpeed": 300,
+	"useDefaultStagger": true,
+	"useDefaultTensionStagger": false,
+	"boltedDown": true,
+	"xRotationCoefficient": 0.2,
+	actions: {
+		"BasicProjectileAttack": {
+			"class": com.mygdx.game.model.actions.ActionSequence,
+			"actionKey": {
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "BasicProjectileAttack",
+				"typeOfAction": WorldAttack
+			}
+			"windUpState": "BasicProjectileAttackW"
+			"actingState": "BasicProjectileAttackA"
+			"cooldownState": "BasicProjectileAttackC"
+		}
+		"Death": {
+			"class": com.mygdx.game.model.actions.ActionSequence,
+			"actionKey": {
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "Death",
+				"typeOfAction": WorldAttack
+			}
+			"windupState": "DeathW"
+			"actingState": "DeathA"
+			"cooldownState": "DeathC"
+		}
+	}
+}

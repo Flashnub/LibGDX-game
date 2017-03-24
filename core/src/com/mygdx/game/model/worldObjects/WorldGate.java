@@ -4,15 +4,23 @@ import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.math.Rectangle;
 import com.mygdx.game.model.characters.EntityCollisionData;
 import com.mygdx.game.model.characters.player.GameSave.UUIDType;
+import com.mygdx.game.model.characters.player.Player.PlayerModel;
 import com.mygdx.game.model.events.ObjectListener;
 import com.mygdx.game.model.events.SaveListener;
 
 public class WorldGate extends WorldObject {
+	final String keyNameKey = "keyName";
+	String keyName;
 
 	public WorldGate(String typeOfObject, MapProperties properties, ObjectListener objListener,
 			SaveListener saveListener) {
 		super(typeOfObject, properties, objListener, saveListener);
-		// TODO Auto-generated constructor stub
+		if (properties.containsKey(keyNameKey)) {
+			keyName = (String) properties.get(keyNameKey);
+		}
+		else {
+			keyName = "";
+		}
 	}
 
 	@Override
@@ -48,5 +56,12 @@ public class WorldGate extends WorldObject {
 		return null;
 	}
 
-
+	@Override 
+	public void actOnThis(PlayerModel player) {
+		if (this.canBeActedOn()) {
+			if ((!this.keyName.equals("") && player.hasItem(keyName)) || this.keyName.equals("")) {
+				this.objListener.objectToActOn(this);
+			}
+		}
+	}
 }

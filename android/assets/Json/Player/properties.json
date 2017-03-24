@@ -31,16 +31,16 @@
 				}
 			]
 		},
-		"PlayerBlock": {
+		"Block": {
 			"class": com.mygdx.game.model.actions.ActionSequence,
 			"actionKey": {
 				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": "PlayerBlock",
+				"key": "Block",
 				"typeOfAction": Ability
 			}
-			"windUpState": "Idle"
-			"actingState": "Idle"
-			"cooldownState": "Idle"
+			"windUpState": "BlockW"
+			"actingState": "BlockA"
+			"cooldownState": "BlockC"
 			"inputs": [
 				["SPECIAL"],
 				["LEFTSPECIAL"]
@@ -51,12 +51,11 @@
 			"actionKey": {
 				"class": com.mygdx.game.model.actions.ActionSegmentKey,
 				"key": "Death",
-				"overridingAbilitySettingsKey": "PlayerDeath",
 				"typeOfAction": WorldAttack
 			}
-			"windupState": "Idle"
-			"actingState": "Idle"
-			"cooldownState": "Idle"
+			"windupState": "DeathW"
+			"actingState": "DeathA"
+			"cooldownState": "DeathC"
 		}
 		
 	},

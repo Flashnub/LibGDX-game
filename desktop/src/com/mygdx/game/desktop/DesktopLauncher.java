@@ -26,6 +26,7 @@ public class DesktopLauncher {
         ArrayList <String> characterNames = new ArrayList<String>();
         characterNames.add("Player");
         characterNames.add("BasicEnemy");
+        characterNames.add("BasicGun");
         characterNames.add("BasicNPC");
     	
     	for (String characterName : characterNames) {
@@ -65,6 +66,7 @@ public class DesktopLauncher {
     	objectNames.add("Item");
     	objectNames.add("Lever");
     	objectNames.add("Gate");
+    	objectNames.add("BreakableRunway");
 
     	for (String objectName : objectNames) {
         	String inputDir = parentInputDir + objectName;
@@ -85,8 +87,8 @@ public class DesktopLauncher {
         }
     	
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.width = 800;
-		config.height = 600;
+		config.width = 1600;
+		config.height = 900;
 		new LwjglApplication(new MyGdxGame(), config);
 	}
 }

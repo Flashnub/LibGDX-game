@@ -103,21 +103,21 @@
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "WakeupW",
-			"frameRate": 4
+			"frameRate": 24,
 			"numberOfFrames": 4,
 			"playMode": NORMAL
 		}		
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "WakeupA",
-			"frameRate": 4
+			"frameRate": 4,
 			"numberOfFrames": 4,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "WakeupC",
-			"frameRate": 4
+			"frameRate": 4,
 			"numberOfFrames": 4,
 			"playMode": NORMAL
 		}

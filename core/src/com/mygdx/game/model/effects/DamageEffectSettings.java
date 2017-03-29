@@ -5,6 +5,11 @@ import com.badlogic.gdx.utils.JsonValue;
 
 public class DamageEffectSettings extends EntityEffectSettings implements WillGenerator {
 	
+	public void fillInDefaults() {
+		super.fillInDefaults();
+		this.setType(DamageEffect.type);
+	}
+	
 	@Override
 	public void read(Json json, JsonValue jsonData) {
 		super.read(json, jsonData);

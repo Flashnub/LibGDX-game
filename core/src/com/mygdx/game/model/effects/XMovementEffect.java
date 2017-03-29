@@ -11,7 +11,6 @@ public class XMovementEffect  extends EntityEffect{
 	float oldAccel;
 	boolean didApplyAccel;
 	XMovementEffectSettings mSettings;
-	boolean shouldBeLeft;
 	public static final String type = "XMovementEffect";
 
 	public XMovementEffect(EffectSettings settings, EffectController controller) {
@@ -20,7 +19,6 @@ public class XMovementEffect  extends EntityEffect{
 			this.mSettings = (XMovementEffectSettings) settings;
 		}
 		didApplyAccel = false;
-		shouldBeLeft = controller.getSource().isFacingLeft();
 	}
 	
 	@Override
@@ -39,7 +37,7 @@ public class XMovementEffect  extends EntityEffect{
 	@Override
 	protected void initialProcess(EntityModel target) {
 		super.initialProcess(target);
-		target.getVelocity().x = shouldBeLeft ? -this.mSettings.velocity : this.mSettings.velocity;
+		target.getVelocity().x = this.mSettings.velocity;
 //		System.out.println("Initial Process: " + target.getVelocity().x );
 
 		XMovementEffect targetMovement = target.getXMove();
@@ -53,9 +51,10 @@ public class XMovementEffect  extends EntityEffect{
 			didApplyAccel = false;
 		}
 		else {
-			target.acceleration.x = target.isFacingLeft() ? -this.mSettings.acceleration : this.mSettings.acceleration;
+			target.acceleration.x = this.mSettings.acceleration;
 			didApplyAccel = true;
 		}
+		System.out.println(target.getVelocity().x);
 	}
 
 	@Override

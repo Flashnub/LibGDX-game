@@ -119,7 +119,7 @@ public class ActionSequence implements Serializable {
 		sequence.rightInputs = new Array <Array <String>>();
 		sequence.conditionSettings = new Array <ActionConditionSettings>();
 		
-		sequence.createActionFromSettings(settings, null, null);
+		sequence.createActionFromSettings(settings, null);
 		
 		return sequence;
 	}
@@ -128,7 +128,7 @@ public class ActionSequence implements Serializable {
 	static final String aerialStaggerKey = "AerialStagger";
 	static final String tensionStaggerKey = "TensionStagger";
 	
-	public static ActionSequence createWakeupSequence(CharacterModel source, ActionListener actionListener, ActionSequence previousActionSequence) {
+	public static ActionSequence createWakeupSequence(CharacterModel source, ActionListener actionListener) {
 		ActionSequence sequence = new ActionSequence();
 		sequence.actionKey = new ActionSegmentKey(source.getNameForWakeupSeq() + "Wakeup", ActionType.Stagger);
 		sequence.isActive = true;
@@ -150,22 +150,20 @@ public class ActionSequence implements Serializable {
 		sequence.rightInputs = new Array <Array <String>>();
 		sequence.conditionSettings = new Array <ActionConditionSettings>();
 		
-		if (previousActionSequence != null) {
-			XMovementEffectSettings xMovement = previousActionSequence.getAction().getSourceXMove();
-			xMovement.getPassiveConditions().clear(); //Makes sure that the movement effect occurs only for wakeups
-			sequence.createActionFromSettings(null, xMovement, null);
-		}
-		else {
-			sequence.createActionFromSettings(null, null, null);
-		}
+		XMovementEffectSettings effect = new XMovementEffectSettings();
+		effect.fillInDefaults();
+		effect.setVelocity(source.getVelocity().x);
+		effect.setAcceleration(source.getVelocity().x * -3f);
 		
+		sequence.createActionFromSettings(null, effect);
 		
+	
 		return sequence;
 	}
 	
-	public static ActionSequence createStaggerSequence(CharacterModel source, XMovementEffectSettings xOverridingMovement, YMovementEffectSettings yOverridingMovement, ActionListener actionListener, StaggerType staggerType) {
+	public static ActionSequence createStaggerSequence(CharacterModel source, ActionListener actionListener, StaggerType staggerType) {
 		ActionSequence sequence = new ActionSequence();
-		sequence.actionKey = new ActionSegmentKey(staggerType.getKeyForStaggerType(source.getNameForStaggerSeq(staggerType, yOverridingMovement)), ActionType.Stagger);
+		sequence.actionKey = new ActionSegmentKey(staggerType.getKeyForStaggerType(source.getNameForStaggerSeq(staggerType)), ActionType.Stagger);
 		sequence.isActive = true;
 		sequence.strategy = ActionStrategy.Story;
 		if (staggerType.equals(StaggerType.Tension)) {
@@ -173,7 +171,7 @@ public class ActionSequence implements Serializable {
 			sequence.actingState = "TensionStaggerA";
 			sequence.cooldownState = "TensionStaggerC";
 		}
-		else if (source.isInAir() || (yOverridingMovement != null && yOverridingMovement.getVelocity() > 0 && !yOverridingMovement.onlyWhenInAir())){
+		else if (staggerType.equals(StaggerType.Aerial)){
 			sequence.windupState = "AerialStaggerW";
 			sequence.actingState = "AerialStaggerA";
 			sequence.cooldownState = "AerialStaggerC";
@@ -200,12 +198,7 @@ public class ActionSequence implements Serializable {
 		sequence.rightInputs = new Array <Array <String>>();
 		sequence.conditionSettings = new Array <ActionConditionSettings>();
 
-		if (staggerType.equals(StaggerType.Normal)) {
-			sequence.createActionFromSettings(null, xOverridingMovement, yOverridingMovement);
-		}
-		else {
-			sequence.createActionFromSettings(null, null, null);
-		}
+		sequence.createActionFromSettings(null, null);
 			
 		return sequence;
 	}
@@ -325,7 +318,7 @@ public class ActionSequence implements Serializable {
 		sequence.actionListener = actionListener;
 		sequence.collisionChecker = collisionChecker;
 		sequence.useLeft = source.isFacingLeft();
-		sequence.createActionFromSettings(null, null, null);
+		sequence.createActionFromSettings(null, null);
 		return sequence;
 	}
 	
@@ -426,8 +419,8 @@ public class ActionSequence implements Serializable {
 
 	}
 	
-	private void createActionFromSettings(DialogueSettings potentialDialogue, XMovementEffectSettings xReplacementMovement, YMovementEffectSettings yReplacementMovement) {
-		ActionSegment action = 	this.getActionSegmentForKey(this.actionKey, potentialDialogue, xReplacementMovement, yReplacementMovement);
+	private void createActionFromSettings(DialogueSettings potentialDialogue, XMovementEffectSettings xReplacementMovement) {
+		ActionSegment action = 	this.getActionSegmentForKey(this.actionKey, potentialDialogue, xReplacementMovement);
 		if (action != null) {
 			this.action = action;
 			action.shouldLockControls = this.isActive;
@@ -438,7 +431,7 @@ public class ActionSequence implements Serializable {
 		return action.getEffectiveRange();
 	}
 	
-	private ActionSegment getActionSegmentForKey(ActionSegmentKey segmentKey, DialogueSettings potentialDialogue,  XMovementEffectSettings xReplacementMovement, YMovementEffectSettings yReplacementMovement) {
+	private ActionSegment getActionSegmentForKey(ActionSegmentKey segmentKey, DialogueSettings potentialDialogue, XMovementEffectSettings xReplacementMovement) {
 		ActionSegment action = null;
 		switch (segmentKey.getTypeOfAction()) {
 			case Attack:
@@ -451,7 +444,7 @@ public class ActionSequence implements Serializable {
 				action = new Ability(source, JSONController.abilities.get(segmentKey.getKey()), this.actionListener);
 				break;
 			case Stagger:
-				action = new Ability(source, JSONController.abilities.get(segmentKey.getKey()), this.actionListener, xReplacementMovement, yReplacementMovement);
+				action = new Ability(source, JSONController.abilities.get(segmentKey.getKey()), this.actionListener, xReplacementMovement);
 				break;
 			case Dialogue:
 				action = new DialogueAction(potentialDialogue, this.dialogueController, this.actionListener, source, target);

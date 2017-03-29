@@ -24,8 +24,17 @@ public class YMovementEffectSettings extends EntityEffectSettings{
 	float velocity;
 	float acceleration;
 	boolean useGravity;
-	boolean startWithStagger;
 	boolean applyOnlyIfInjuredStaggered;
+	
+	public void fillInDefaults() {
+		super.fillInDefaults();
+		maxVelocity = Float.MAX_VALUE;
+		velocity = 0f;
+		acceleration = 0f;
+		setType(YMovementEffect.type);
+		applyOnlyIfInjuredStaggered = false;
+		this.useGravity = true;
+	}
 
 	@Override
 	public void write(Json json) {
@@ -58,7 +67,6 @@ public class YMovementEffectSettings extends EntityEffectSettings{
 		}
 
 		this.setType(YMovementEffect.type);
-		startWithStagger = false;
 		
 		Boolean applyOnlyIfInjuredStaggered = json.readValue("applyOnlyIfInjuredStaggered", Boolean.class, jsonData);
 		if (applyOnlyIfInjuredStaggered != null) {
@@ -84,14 +92,6 @@ public class YMovementEffectSettings extends EntityEffectSettings{
 	public float getEstimatedDistance() {
 		float xDistance = (velocity * getDuration()) + (0.5f * acceleration * getDuration() * getDuration());
 		return xDistance;
-	}
-
-	public boolean isStartWithStagger() {
-		return startWithStagger;
-	}
-
-	public void setStartWithStagger(boolean startWithStagger) {
-		this.startWithStagger = startWithStagger;
 	}
 
 	public float getVelocity() {

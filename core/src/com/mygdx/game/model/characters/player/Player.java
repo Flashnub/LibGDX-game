@@ -607,7 +607,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 
 		@Override
 		public void tensionOverload() {
-			ActionSequence staggerAction = ActionSequence.createStaggerSequence(this, null, null, this.getActionListener(), StaggerType.Tension);
+			ActionSequence staggerAction = ActionSequence.createStaggerSequence(this, this.getActionListener(), StaggerType.Tension);
     		this.addActionSequence(staggerAction);
     		this.setCurrentTension(0);
 		}

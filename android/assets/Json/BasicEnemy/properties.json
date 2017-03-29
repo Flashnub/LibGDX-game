@@ -1,11 +1,11 @@
 {
 	"class": com.mygdx.game.model.characters.CharacterProperties,
-	"maxHealth": 20,
+	"maxHealth": 2000,
 	"maxWill": 20,
 	"maxStability": 5,
 	"maxTension": 10,
 	"attack": 1,
-	"horizontalSpeed": 300,
+	"horizontalSpeed": 150,
 	"useDefaultStagger": true,
 	"useDefaultTensionStagger": false,
 	actions: {
@@ -25,7 +25,7 @@
 			"actionKey": {
 				"class": com.mygdx.game.model.actions.ActionSegmentKey,
 				"key": "Death",
-				"overridingAbilitySettingsKey": "BasicEnemyDeath",
+				"overridingAbilitySettingsKey": "Death",
 				"typeOfAction": WorldAttack
 			}
 			"windupState": "DeathW"

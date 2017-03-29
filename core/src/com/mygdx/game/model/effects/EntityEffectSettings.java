@@ -10,6 +10,12 @@ public abstract class EntityEffectSettings extends EffectSettings{
 	
 	public static final int defaultID = 1;
 	
+	public void fillInDefaults() {
+		super.fillInDefaults();
+		value = 0f;
+		specificID = defaultID;
+	}
+	
 	@Override
 	public void write(Json json) {
 		super.write(json);
@@ -20,7 +26,13 @@ public abstract class EntityEffectSettings extends EffectSettings{
 	@Override
 	public void read(Json json, JsonValue jsonData) {
 		super.read(json, jsonData);
-		value = json.readValue("value", Float.class, jsonData);
+		Float value = json.readValue("value", Float.class, jsonData);
+		if (value != null) {
+			this.value = value;
+		}
+		else {
+			this.value = 0f;
+		}
 		
 		Integer specificID = json.readValue("specificID", Integer.class, jsonData);
 		if (specificID != null) {

@@ -5,6 +5,12 @@ import com.badlogic.gdx.utils.JsonValue;
 
 public class HealingEffectSettings extends EntityEffectSettings {
 	
+	public void fillInDefaults() {
+		super.fillInDefaults();
+		this.setType(HealingEffect.type);
+	}
+	
+	
 	@Override
 	public void read(Json json, JsonValue jsonData) {
 		super.read(json, jsonData);

@@ -8,8 +8,16 @@ public class XMovementEffectSettings extends EntityEffectSettings{
 	float maxVelocity;
 	float velocity;
 	float acceleration;
-	boolean startWithStagger;
 	boolean applyOnlyIfInjuredStaggered;
+	
+	public void fillInDefaults() {
+		super.fillInDefaults();
+		maxVelocity = Float.MAX_VALUE;
+		velocity = 0f;
+		acceleration = 0f;
+		setType(XMovementEffect.type);
+		applyOnlyIfInjuredStaggered = false;
+	}
 
 	@Override
 	public void write(Json json) {
@@ -33,13 +41,12 @@ public class XMovementEffectSettings extends EntityEffectSettings{
 		}
 
 		this.setType(XMovementEffect.type);
-		startWithStagger = false;
 		Boolean applyOnlyIfInjuredStaggered = json.readValue("applyOnlyIfInjuredStaggered", Boolean.class, jsonData);
 		if (applyOnlyIfInjuredStaggered != null) {
 			this.applyOnlyIfInjuredStaggered = applyOnlyIfInjuredStaggered.booleanValue();
 		}
 		else {
-			this.applyOnlyIfInjuredStaggered = true;
+			this.applyOnlyIfInjuredStaggered = false;
 		}
 		if (this.applyOnlyIfInjuredStaggered) {
 			this.passiveConditions.add(new InjuredStaggerConditionSettings());
@@ -63,13 +70,20 @@ public class XMovementEffectSettings extends EntityEffectSettings{
 		return xDistance;
 	}
 
-	public boolean isStartWithStagger() {
-		return startWithStagger;
+	public float getVelocity() {
+		return velocity;
 	}
 
-	public void setStartWithStagger(boolean startWithStagger) {
-		this.startWithStagger = startWithStagger;
+	public void setVelocity(float velocity) {
+		this.velocity = velocity;
 	}
-	
+
+	public float getAcceleration() {
+		return acceleration;
+	}
+
+	public void setAcceleration(float acceleration) {
+		this.acceleration = acceleration;
+	}
 	
 }

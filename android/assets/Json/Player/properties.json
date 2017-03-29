@@ -10,6 +10,7 @@
 	"heightCoefficient": 0.7,
 	"useDefaultStagger": true,
 	"useDefaultTensionStagger": false,
+	"horizontalSpeed": 450,
 	"actions": {
 		"Dash": {
 			"class": com.mygdx.game.model.actions.ActionSequence,

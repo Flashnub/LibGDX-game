@@ -7,6 +7,12 @@ public class BlockEffectSettings extends EntityEffectSettings{
 
 	float perfectBlockTime;
 	
+	public void fillInDefaults() {
+		super.fillInDefaults();
+		perfectBlockTime = .2f;
+		this.setType(BlockEffect.type);
+	}
+	
 	@Override
 	public void read(Json json, JsonValue jsonData) {
 		super.read(json, jsonData);

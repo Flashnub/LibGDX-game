@@ -39,6 +39,9 @@ public class EffectInitializer {
 		case TensionAddEffect.type:
 			effect = new TensionAddEffect(settings, controller);
 			break;
+		case InjuryImmunityEffect.type:
+			effect = new InjuryImmunityEffect(settings, controller);
+			break;
 		}
 		return effect;
 	}

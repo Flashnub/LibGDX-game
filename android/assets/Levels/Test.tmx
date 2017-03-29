@@ -10,10 +10,10 @@
   <tile id="1">
    <properties>
     <property name="Impassable" type="bool" value="false"/>
+    <property name="ItemName" value="Health Potion"/>
     <property name="SpawnPoint" value="WorldItem"/>
     <property name="UIKey" value="Item"/>
     <property name="UUID" type="int" value="100"/>
-    <property name="itemName" value="HealthPotion"/>
    </properties>
   </tile>
  </tileset>
@@ -46,7 +46,7 @@
  </tileset>
  <layer name="Tile Layer 1" width="60" height="30">
   <data encoding="base64" compression="zlib">
-   eJzt0UsKACAIAFHpA93/xN0gghBkmsXbuBAHe0R04U04e9nsZbOXzV42e9nsZbOXzd6zUeDmn/7bknpf91aV/d91OaP0VvN7rySplg1nwh64
+   eJzt0csJACAMBNHgB+y/YjvwImKYzOFdQ4btEdGFN+HsZbOXzV42e9nsZbOXzV42e89Ggp8r7dse9d7ezerHvqtYb7V9M/VKknLZT3oetQ==
   </data>
  </layer>
 </map>

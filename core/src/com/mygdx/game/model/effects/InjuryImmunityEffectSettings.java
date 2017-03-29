@@ -3,16 +3,16 @@ package com.mygdx.game.model.effects;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
-public class TensionAddEffectSettings extends EntityEffectSettings{
+public class InjuryImmunityEffectSettings extends EntityEffectSettings{
 	
 	public void fillInDefaults() {
 		super.fillInDefaults();
-		this.setType(TensionAddEffect.type);
+		this.setType(InjuryImmunityEffect.type);
 	}
-
+	
 	@Override
 	public EffectSettings deepCopy() {
-		TensionAddEffectSettings copy = new TensionAddEffectSettings();
+		InjuryImmunityEffectSettings copy = new InjuryImmunityEffectSettings();
 		this.setBaseFieldsForSettings(copy);
 		return copy;
 	}
@@ -20,6 +20,6 @@ public class TensionAddEffectSettings extends EntityEffectSettings{
 	@Override
 	public void read(Json json, JsonValue jsonData) {
 		super.read(json, jsonData);
-		this.setType(TensionAddEffect.type);
+		this.setType(InjuryImmunityEffect.type);
 	}
 }

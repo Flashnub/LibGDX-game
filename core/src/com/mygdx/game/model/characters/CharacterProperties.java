@@ -122,7 +122,7 @@ public class CharacterProperties implements Serializable {
 			this.horizontalSpeed = horizontalSpeed;
 		}
 		else {
-			this.horizontalSpeed = 300f;
+			this.horizontalSpeed = 150f;
 		}
 		
 		Float sprintSpeed = json.readValue("sprintSpeed", Float.class, jsonData);
@@ -138,7 +138,7 @@ public class CharacterProperties implements Serializable {
 			this.horizontalAcceleration = horizontalAcceleration;
 		}
 		else {
-			this.horizontalAcceleration = 300f;
+			this.horizontalAcceleration = 800f;
 		}
 		
 		Float jumpSpeed = json.readValue("jumpSpeed", Float.class, jsonData);

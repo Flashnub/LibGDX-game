@@ -48,12 +48,15 @@ public class Attack extends ActionSegment {
 			}
 		}
 		boolean isIntercepted = target.checkIfIntercepted(this);
-		for (EffectSettings effectSettings : this.attackSettings.targetEffectSettings) {
+		Iterator <EffectSettings> iterator = this.attackSettings.targetEffectSettings.iterator();
+		while(iterator.hasNext()) {
+			EffectSettings effectSettings = iterator.next();
 			EntityEffect effect = EffectInitializer.initializeEntityEffect(effectSettings, this);
 			if (!isIntercepted || (isIntercepted && effect.shouldAddIfIntercepted())) {
 				if (effect.shouldReciprocateToSource(target, getActionListener())) {
 					effect.flipValues();
 					source.addEffect(effect);
+					iterator.remove();
 				}
 				else {
 					effect.flipValuesIfNecessary(target, source);
@@ -61,25 +64,14 @@ public class Attack extends ActionSegment {
 				}
 			}
 		}
-	
+
+
 		target.actionStagger(false);
 		if (!source.isActionStaggering()) {
 			source.actionStagger(false);
 		}
 		this.shouldChain = true;
-		
-		//Stop movementEffect if attack respects collision with target
-		if (this.shouldRespectEntityCollisions()) {
-			XMovementEffect xMEffect = source.getXMove();
-			if (xMEffect != null) {
-				xMEffect.setForceEnd(true);
-			}
-			YMovementEffect yMEffect = source.getYMove();
-			if (yMEffect != null) {
-				yMEffect.setForceEnd(true);
-			}
-		}
-		
+			
 		this.alreadyHitCharacters.add(new HitTracker(target));
 	} 
 	
@@ -125,6 +117,7 @@ public class Attack extends ActionSegment {
 		
 		for (EffectSettings effectSettings : attackSettings.sourceEffectSettings) {
 			EntityEffect effect = EffectInitializer.initializeEntityEffect(effectSettings, this);
+			effect.flipValuesIfNecessary(null, source);
 			source.addEffect(effect);
 			activeSourceEffects.add(effect);
 		}
@@ -133,6 +126,7 @@ public class Attack extends ActionSegment {
 	public void sourceWindupProcessWithoutSuper(CharacterModel source) {
 		for (EffectSettings effectSettings : attackSettings.windupEffectSettings) {
 			EntityEffect effect = EffectInitializer.initializeEntityEffect(effectSettings, this);
+			effect.flipValuesIfNecessary(null, source);
 			source.addEffect(effect);
 			windupSourceEffects.add(effect);
 		}

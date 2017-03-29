@@ -35,33 +35,20 @@
 	}
 	"Stagger": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
-		"sourceEffectSettings": [
-			{
-				"class": "com.mygdx.game.model.effects.XMovementEffectSettings",
-				"duration": .5,
-				"isInstantaneous": false,
-				"value": 0,
-				"velocity": 50,
-				"acceleration": -100
-			}
-		]
 	}
 	"AerialStagger": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
 		"activeTillDisruption": true
-		"sourceEffectSettings": [
-			{
-				"class": "com.mygdx.game.model.effects.XMovementEffectSettings",
-				"duration": .5,
-				"isInstantaneous": false,
-				"value": 0,
-				"velocity": 50,
-				"acceleration": -100
-			}
-		]
 	}
 	"Wakeup": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
+		"sourceEffectSettings": [
+			{
+				"class": "com.mygdx.game.model.effects.InjuryImmunityEffectSettings",
+				"duration": 1,
+				"isInstantaneous": false,
+			}
+		]
 	}
 	"PlayerTensionStagger": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",

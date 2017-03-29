@@ -7,6 +7,11 @@ public class RemovalEffectSettings extends EntityEffectSettings{
 
 	Integer idToRemove;
 	
+	public void fillInDefaults() {
+		super.fillInDefaults();
+		this.setType(RemovalEffect.type);
+	}
+	
 	@Override
 	public void read(Json json, JsonValue jsonData) {
 		super.read(json, jsonData);

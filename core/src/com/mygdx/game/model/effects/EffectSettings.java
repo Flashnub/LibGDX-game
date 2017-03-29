@@ -14,6 +14,15 @@ public abstract class EffectSettings implements Serializable {
 	private String type;
 	Array <PassiveConditionSettings> passiveConditions;
 	
+	
+	public void fillInDefaults() {
+		duration = 0.33f;
+		isInstantaneous = false;
+		delayToActivate = 0f;
+		isPermanent = false;
+		passiveConditions = new Array <PassiveConditionSettings>();
+	}
+
 	@Override
 	public void write(Json json) {
 		json.writeValue("isInstantaneous", isInstantaneous());

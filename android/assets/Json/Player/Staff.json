@@ -15,10 +15,10 @@
 				"class": com.mygdx.game.model.actions.ActionSegmentKey,
 				"key": "MedAtk1",
 				"typeOfAction": Attack
-			},
+			}
 			{
 				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": "Launch",
+				"key": "HvyAtk2",
 				"typeOfAction": Attack
 			}
 			
@@ -54,6 +54,11 @@
 				"key": "MedAtk2",
 				"typeOfAction": Attack
 			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "HvyAtk2",
+				"typeOfAction": Attack
+			}
 			
 		],
 		"inputs": [
@@ -63,6 +68,28 @@
 		"windupState": "MedAtk1W"
 		"actingState": "MedAtk1A"
 		"cooldownState": "MedAtk1C"
+	},
+		{
+		"class": com.mygdx.game.model.actions.ActionSequence,
+		"actionKey": {
+			"class": com.mygdx.game.model.actions.ActionSegmentKey,
+			"key": "HvyAtk2",
+			"typeOfAction": Attack
+		},
+		"chainableActionKeys": [
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "Rushdown",
+				"typeOfAction": Attack
+			}
+			
+		],
+		"inputs": [
+			["HEAVYATTACK"]
+		]
+		"windupState": "HvyAtk2W"
+		"actingState": "HvyAtk2A"
+		"cooldownState": "HvyAtk2C"
 	},
 	{
 		"class": com.mygdx.game.model.actions.ActionSequence,
@@ -75,11 +102,6 @@
 			{
 				"class": com.mygdx.game.model.actions.ActionSegmentKey,
 				"key": "Rushdown",
-				"typeOfAction": Attack
-			},
-			{
-				"class": com.mygdx.game.model.actions.ActionSegmentKey,
-				"key": "Launch",
 				"typeOfAction": Attack
 			}
 			

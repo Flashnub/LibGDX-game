@@ -13,6 +13,7 @@ import com.mygdx.game.constants.InputConverter.DirectionalInput;
 import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.Attack;
+import com.mygdx.game.model.actions.ActionSegment.ActionState;
 import com.mygdx.game.model.characters.CollisionCheck.CollisionType;
 import com.mygdx.game.model.characters.player.Player.PlayerModel;
 import com.mygdx.game.model.actions.ActionSequence.StaggerType;
@@ -81,7 +82,7 @@ public abstract class Character implements ModelListener {
 		public final String jumpState = "Jump";
 		public final String fallState = "Fall";
 		public final String sprintState = "Sprint";
-		final float slowingAccel = 1800;
+		final float slowingAccel = 3000;
 		
 		String state;
 		float currentHealth, maxHealth, currentWill, maxWill, attack, currentStability, maxStability, currentTension, maxTension;
@@ -98,7 +99,6 @@ public abstract class Character implements ModelListener {
 		boolean isSlowingDown;
 		boolean injuredStaggering;
 		boolean queuedJump;
-	    public float injuryImmunityTime = 0f;
 	    float actionStaggerTime;
 	    float tempVelocityX;
 	    float tempVelocityY;
@@ -172,7 +172,7 @@ public abstract class Character implements ModelListener {
 			setCurrentWill(properties.getMaxWill());
 			setAttack(properties.getAttack());
 			setMaxStability(properties.getMaxStability());
-			setCurrentStability(properties.getMaxStability(), null, null);
+			setCurrentStability(properties.getMaxStability(), null);
 			setMaxTension(properties.getMaxTension());
 			setCurrentTension(0);
 			setMaxJumpTokens(properties.getMaxJumpTokens());
@@ -214,6 +214,7 @@ public abstract class Character implements ModelListener {
 
 			//Debug
 			this.stateTime += delta;
+			this.deathCheck();
 		}
 		
 		public void setGameplaySize(float delta, TiledMapTileLayer collisionLayer) {
@@ -244,13 +245,6 @@ public abstract class Character implements ModelListener {
 			if (this.didChangeState) {
 				this.getUiModel().setAnimationTime(0f);
 				this.didChangeState = false; 
-			}
-			if (this.isImmuneToInjury()) {
-				injuryImmunityTime += delta;
-			}
-			
-			if (this.injuryImmunityTime > this.properties.getInjuryImmunityTime()) {
-				this.setImmuneToInjury(false);
 			}
 			if (!isInAir && !walking && !this.isProcessingActiveSequences()) {
 				setState(idleState);
@@ -286,7 +280,7 @@ public abstract class Character implements ModelListener {
 			ActionSequence nextActiveAction = nextActiveActionSequences.peek();
 			if (nextActiveAction != null 
 					&& (!isProcessingActiveSequences() 
-					|| (((this.getCurrentActiveActionSeq().isActionChainableWithThis(nextActiveAction) && this.actionStaggering)) 
+					|| (((this.getCurrentActiveActionSeq().isActionChainableWithThis(nextActiveAction) && (this.actionStaggering || this.getCurrentActiveActionSeq().getAction().getActionState().equals(ActionState.COOLDOWN)))) 
 					&& !this.getCurrentActiveActionSeq().cannotBeOverriden()))) {
 				if (this.isProcessingActiveSequences()) {
 					this.forceEndForActiveAction();
@@ -294,9 +288,6 @@ public abstract class Character implements ModelListener {
 				this.endActionStagger();
 				this.stopHorizontalMovement(true);
 				ActionSequence nextSequence = nextActiveActionSequences.poll();
-//				if (this.actionStaggering) {
-//					nextSequence.stagger(this.actionStaggerTime);
-//				}
 				this.processingActionSequences.add(nextSequence);
 			}
 			
@@ -390,10 +381,16 @@ public abstract class Character implements ModelListener {
 					jumpCode();
 				}
 				else if (!this.actionStaggering && this.getCurrentActiveActionSeq() != null) {
-					this.queuedJump = true;
+					if (this.getCurrentActiveActionSeq().getAction().getActionState().equals(ActionState.COOLDOWN))
+					{
+						jumpCode();
+					}
+					else {
+						this.queuedJump = true;
+					}
 				}
 				else if (this.actionStaggering){
-					this.forceActiveForActiveAction();
+//					this.forceEndForActiveAction();
 					this.queuedJump = true;
 				}
 			}
@@ -549,10 +546,12 @@ public abstract class Character implements ModelListener {
 	    	if (this.injuredStaggering && this.isInAir && this.velocity.y < 0) {
 	    		//do wakeup action.
 	    		injuredStaggering = false;
-	    		ActionSequence wakeupSeq = ActionSequence.createWakeupSequence(this, this.actionListener, this.getCurrentActiveActionSeq());
 	    		this.forceEndForActiveAction();
 	    		this.isInAir = false;
-	    		this.addActionSequence(wakeupSeq);
+	    		if (this.currentHealth != 0) {
+		    		ActionSequence wakeupSeq = ActionSequence.createWakeupSequence(this, this.actionListener);
+		    		this.addActionSequence(wakeupSeq);
+	    		}
 	    	}
 	    	else if (this.isInAir) {
 	    		if (!isFromEntityCollision)
@@ -613,18 +612,18 @@ public abstract class Character implements ModelListener {
 			}
 		}
 		
-		private void staggerAction(XMovementEffectSettings xPotentialMovementSettings, YMovementEffectSettings yPotentialMovementSettings) {
+		private void staggerAction(YMovementEffectSettings yPotentialMovementSettings) {
 			this.forceEndForActiveAction();
 			this.injuredStaggering = true;
 			StaggerType staggerType = this.isInAir() || (yPotentialMovementSettings != null && yPotentialMovementSettings.getVelocity() > 0 && !yPotentialMovementSettings.onlyWhenInAir()) ? StaggerType.Aerial : StaggerType.Normal;
-			ActionSequence staggerAction = ActionSequence.createStaggerSequence(this, xPotentialMovementSettings, yPotentialMovementSettings, this.actionListener, staggerType);
+			ActionSequence staggerAction = ActionSequence.createStaggerSequence(this, this.actionListener, staggerType);
     		this.addActionSequence(staggerAction);
     		this.actionStagger(true);
     		if (!this.isInAir && (yPotentialMovementSettings == null || (yPotentialMovementSettings.getVelocity() <= 0 && yPotentialMovementSettings.getAcceleration() <= 0))) {
-        		this.setCurrentStability(this.maxStability, null, null);
+        		this.setCurrentStability(this.maxStability, null);
     		}
     		else {
-        		this.setCurrentStability(1, null, null);
+        		this.setCurrentStability(1, null);
 
     		}
 		}
@@ -683,6 +682,7 @@ public abstract class Character implements ModelListener {
 		
 		public void deathCheck() {
 			if (this.getCurrentHealth() == 0 && !alreadyDead) {
+				this.forceEndForActiveAction();
 				this.performDeathSequence();
 				this.alreadyDead = true;
 			}
@@ -712,12 +712,12 @@ public abstract class Character implements ModelListener {
 			this.setCurrentWill(this.currentWill - value);
 		}
 		
-		public void removeFromCurrentStability(float value, XMovementEffectSettings xReplacementMovement, YMovementEffectSettings yReplacementMovement) {
-			this.setCurrentStability(this.currentStability - value, xReplacementMovement, yReplacementMovement);
+		public void removeFromCurrentStability(float value, YMovementEffectSettings yReplacementMovement) {
+			this.setCurrentStability(this.currentStability - value, yReplacementMovement);
 		}
 		
 		public void addToCurrentStability(float value) {
-			this.setCurrentStability(value + this.currentStability, null, null);
+			this.setCurrentStability(value + this.currentStability, null);
 		}
 		
 		public void addToCurrentTension(float value) {
@@ -837,17 +837,16 @@ public abstract class Character implements ModelListener {
 			return nextActiveActionSequences;
 		}
 
-		public void setCurrentStability(float currentStability, XMovementEffectSettings xPotentialMovement, YMovementEffectSettings yPotentialMovement) {
+		public void setCurrentStability(float currentStability, YMovementEffectSettings yPotentialMovement) {
 			float realStability = Math.max(0, currentStability);
 			this.currentStability = Math.min(realStability, this.maxStability);
 			if (realStability == 0 && !alreadyDead && !this.getCharacterProperties().boltedDown) {
-				staggerAction(xPotentialMovement, yPotentialMovement);
+				staggerAction(yPotentialMovement);
 			}
 			else if (!alreadyDead){
 				//only action stagger.
 	    		this.actionStagger(true);
 			}
-//			System.out.println("stability: " + this.currentStability);
 		}
 
 		public float getMaxStability() {
@@ -922,7 +921,6 @@ public abstract class Character implements ModelListener {
 
 		public void setCurrentHealth(float currentHealth) {
 			this.currentHealth = Math.min(Math.max(0, currentHealth), this.maxHealth);
-			this.deathCheck();
 		}
 
 		public float getMaxHealth() {
@@ -984,7 +982,7 @@ public abstract class Character implements ModelListener {
 			return this.properties.useDefaultWakeup ? "" : this.getName();
 		}
 		
-		public String getNameForStaggerSeq(StaggerType type, YMovementEffectSettings yOverridingMovement) {
+		public String getNameForStaggerSeq(StaggerType type) {
 			if (type.equals(StaggerType.Normal)) {
 				return this.properties.useDefaultStagger ? "" : this.getName();
 			}
@@ -1024,7 +1022,6 @@ public abstract class Character implements ModelListener {
 
 		public void setImmuneToInjury(boolean isImmuneToInjury) {
 			this.isImmuneToInjury = isImmuneToInjury;
-			injuryImmunityTime = 0f;
 		}
 		
 		public ActionListener getActionListener() {

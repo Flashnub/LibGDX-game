@@ -2,16 +2,16 @@
 	"Light1": {
 		"class": "com.mygdx.game.model.actions.AttackSettings",
 		"originX": 0,
-		"originY": 0,
-		"width": 100,
-		"height": 150,
+		"originY": 110,
+		"width": 80,
+		"height": 70,
 		"sourceEffectSettings": [
 
 		]
 		"targetEffectSettings": [
 			{
 				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
-				"value": 200
+				"value": 2
 			}
 			{
 				"class": "com.mygdx.game.model.effects.StabilityDamageEffectSettings",
@@ -19,12 +19,12 @@
 			}
 			{
 				"class": "com.mygdx.game.model.effects.XMovementEffectSettings",
-				"duration": 0.3,
+				"duration": 0.33,
 				"delayToActivate": 0,
 				"isInstantaneous": false,
 				"value": 0,
-				"velocity": 50,
-				"acceleration": -167.67
+				"velocity": 200,
+				"acceleration": -600
 			}
 			{
 				"class": "com.mygdx.game.model.effects.YMovementEffectSettings",
@@ -45,7 +45,7 @@
 	"MedAtk1": {
 		"class": "com.mygdx.game.model.actions.AttackSettings",
 		"originX": 0,
-		"originY": 0,
+		"originY": 75,
 		"width": 100,
 		"height": 150,
 		"sourceEffectSettings": [
@@ -62,12 +62,12 @@
 			}
 			{
 				"class": "com.mygdx.game.model.effects.XMovementEffectSettings",
-				"duration": 0.3,
+				"duration": 0.33,
 				"delayToActivate": 0,
 				"isInstantaneous": false,
 				"value": 0,
-				"velocity": 50,
-				"acceleration": -167.67
+				"velocity": 300,
+				"acceleration": -900
 			}
 			{
 				"class": "com.mygdx.game.model.effects.YMovementEffectSettings",
@@ -105,12 +105,12 @@
 			}
 			{
 				"class": "com.mygdx.game.model.effects.XMovementEffectSettings",
-				"duration": 0.3,
+				"duration": 0.33,
 				"delayToActivate": 0,
 				"isInstantaneous": false,
 				"value": 0,
-				"velocity": 50,
-				"acceleration": -167.67
+				"velocity": 300,
+				"acceleration": -900
 			}
 			{
 				"class": "com.mygdx.game.model.effects.YMovementEffectSettings",
@@ -131,7 +131,7 @@
 	"Launch": {
 		"class": "com.mygdx.game.model.actions.AttackSettings",
 		"originX": 0,
-		"originY": 0,
+		"originY": 50,
 		"width": 100,
 		"height": 150,
 		"sourceEffectSettings": [
@@ -157,12 +157,55 @@
 			}
 			{
 				"class": "com.mygdx.game.model.effects.XMovementEffectSettings",
-				"duration": 0.3,
+				"duration": 0.33,
 				"delayToActivate": 0,
 				"isInstantaneous": false,
 				"value": 0,
-				"velocity": 50,
-				"acceleration": -167.67
+				"velocity": 300,
+				"acceleration": -900
+			}
+		]
+	}
+	"HvyAtk2": {
+		"class": "com.mygdx.game.model.actions.AttackSettings",
+		"originX": 0,
+		"originY": 100,
+		"width": 100,
+		"height": 125,
+		"sourceEffectSettings": [
+
+		]
+		"targetEffectSettings": [
+			{
+				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
+				"value": 2
+			}
+			{
+				"class": "com.mygdx.game.model.effects.StabilityDamageEffectSettings",
+				"value": 100
+			}
+			{
+				"class": "com.mygdx.game.model.effects.XMovementEffectSettings",
+				"duration": 0.33,
+				"delayToActivate": 0,
+				"isInstantaneous": false,
+				"value": 0,
+				"velocity": 400,
+				"acceleration": -1200
+			}
+			{
+				"class": "com.mygdx.game.model.effects.YMovementEffectSettings",
+				"duration": 0.5,
+				"delayToActivate": 0,
+				"isInstantaneous": false,
+				"value": 0,
+				"velocity": 500,
+				"useGravity": true,
+				"passiveConditions": [
+					{
+						"class": "com.mygdx.game.model.conditions.AerialConditionSettings"
+					}
+				]
 			}
 		]
 	}
@@ -181,7 +224,7 @@
 		"targetEffectSettings": [
 			{
 				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
-				"value": 200
+				"value": 2
 			}
 			{
 				"class": "com.mygdx.game.model.effects.StabilityDamageEffectSettings",
@@ -203,12 +246,12 @@
 			}
 			{
 				"class": "com.mygdx.game.model.effects.XMovementEffectSettings",
-				"duration": 0.3,
+				"duration": 0.33,
 				"delayToActivate": 0,
 				"isInstantaneous": false,
 				"value": 0,
-				"velocity": 50,
-				"acceleration": -167.67
+				"velocity": 300,
+				"acceleration": -900
 			}
 		]
 	}
@@ -249,12 +292,12 @@
 			}
 			{
 				"class": "com.mygdx.game.model.effects.XMovementEffectSettings",
-				"duration": 0.3,
+				"duration": 0.33,
 				"delayToActivate": 0,
 				"isInstantaneous": false,
 				"value": 0,
-				"velocity": 50,
-				"acceleration": -167.67
+				"velocity": 200,
+				"acceleration": -600
 			}
 		]
 	}
@@ -292,12 +335,12 @@
 			}
 			{
 				"class": "com.mygdx.game.model.effects.XMovementEffectSettings",
-				"duration": 0.3,
+				"duration": 0.33,
 				"delayToActivate": 0,
 				"isInstantaneous": false,
 				"value": 0,
-				"velocity": 50,
-				"acceleration": -167.67
+				"velocity": 400,
+				"acceleration": 1200
 			}
 		]
 	}
@@ -316,7 +359,7 @@
 				"isInstantaneous": false,
 				"value": 0,
 				"velocity": 500,
-				"acceleration": 0,
+				"acceleration": -1000,
 				"applyOnlyIfInjuredStaggered": false
 			}
 		]
@@ -328,6 +371,29 @@
 			{
 				"class": "com.mygdx.game.model.effects.StabilityDamageEffectSettings",
 				"value": 10
+			}
+			{
+				"class": "com.mygdx.game.model.effects.YMovementEffectSettings",
+				"duration": 0.5,
+				"delayToActivate": 0,
+				"isInstantaneous": false,
+				"value": 0,
+				"velocity": 500,
+				"useGravity": true,
+				"passiveConditions": [
+					{
+						"class": "com.mygdx.game.model.conditions.AerialConditionSettings"
+					}
+				]
+			}
+			{
+				"class": "com.mygdx.game.model.effects.XMovementEffectSettings",
+				"duration": 0.33,
+				"delayToActivate": 0,
+				"isInstantaneous": false,
+				"value": 0,
+				"velocity": 300,
+				"acceleration": -900
 			}
 		]
 	}
@@ -352,12 +418,12 @@
 			}
 			{
 				"class": "com.mygdx.game.model.effects.XMovementEffectSettings",
-				"duration": 0.3,
+				"duration": 0.33,
 				"delayToActivate": 0,
 				"isInstantaneous": false,
 				"value": 0,
-				"velocity": 50,
-				"acceleration": -167.67
+				"velocity": 700,
+				"acceleration": -2100
 			}
 			{
 				"class": "com.mygdx.game.model.effects.YMovementEffectSettings",

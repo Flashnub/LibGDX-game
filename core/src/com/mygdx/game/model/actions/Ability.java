@@ -25,18 +25,11 @@ public class Ability extends ActionSegment{
 		this.setDurations(source);
 	}
 	
-	public Ability(CharacterModel source, AbilitySettings settings, ActionListener listener, XMovementEffectSettings xReplacementMovement, YMovementEffectSettings yReplacementMovement) {
+	public Ability(CharacterModel source, AbilitySettings settings, ActionListener listener, XMovementEffectSettings xReplacementMovement) {
 		this(source, settings, listener);
 		if (xReplacementMovement != null) {
 			this.settings.replaceXMovementIfNecessary(xReplacementMovement);
-			xReplacementMovement.setStartWithStagger(true);
 		}
-		if (yReplacementMovement != null) {
-			this.settings.replaceYMovementIfNecessary(yReplacementMovement);
-			yReplacementMovement.setStartWithStagger(true);
-		}
-		
-
 	}
 	
 	@Override
@@ -77,6 +70,7 @@ public class Ability extends ActionSegment{
 		
 		for (EffectSettings effectSettings : settings.sourceEffectSettings) {
 			EntityEffect effect = EffectInitializer.initializeEntityEffect(effectSettings, this);
+			effect.flipValuesIfNecessary(null, source);
 			source.addEffect(effect);
 			activeSourceEffects.add(effect);
 		}
@@ -85,6 +79,7 @@ public class Ability extends ActionSegment{
 	public void sourceWindupProcessWithoutSuper(CharacterModel source) {
 		for (EffectSettings effectSettings : settings.windupEffectSettings) {
 			EntityEffect effect = EffectInitializer.initializeEntityEffect(effectSettings, this);
+			effect.flipValuesIfNecessary(null, source);
 			source.addEffect(effect);
 			windupSourceEffects.add(effect);
 		}

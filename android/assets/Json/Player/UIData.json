@@ -140,7 +140,7 @@
 			"numberOfFrames": 3,
 			"playMode": NORMAL
 		}
-				{
+		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "HvyAtk2W",
 			"numberOfFrames": 3,
@@ -234,6 +234,7 @@
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "LaunchW",
 			"numberOfFrames": 5,
+			"frameRate": 16,
 			"playMode": NORMAL
 		}
 		{
@@ -246,6 +247,7 @@
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "LaunchC",
 			"numberOfFrames": 6,
+			"frameRate": 16,
 			"playMode": NORMAL
 		}
 		{
@@ -275,7 +277,7 @@
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "RushdownW",
-			"numberOfFrames": 7,
+			"numberOfFrames": 5,
 			"playMode": NORMAL
 		}
 		{

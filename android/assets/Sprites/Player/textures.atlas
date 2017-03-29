@@ -823,20 +823,6 @@ RushdownW5
   orig: 350, 267
   offset: 0, 0
   index: -1
-RushdownW6
-  rotate: false
-  xy: 1058, 2692
-  size: 350, 267
-  orig: 350, 267
-  offset: 0, 0
-  index: -1
-RushdownW7
-  rotate: false
-  xy: 1058, 2692
-  size: 350, 267
-  orig: 350, 267
-  offset: 0, 0
-  index: -1
 SpikeA1
   rotate: false
   xy: 1410, 2961

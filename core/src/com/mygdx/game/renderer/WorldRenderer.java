@@ -3,6 +3,7 @@ package com.mygdx.game.renderer;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.Controllers;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -85,6 +86,7 @@ public class WorldRenderer implements CoordinatesHelper, WorldListener{
 	        debugRenderer.setProjectionMatrix(camera.combined);
 	        debugRenderer.begin(ShapeType.Line);
 	        Polygon playerPoly = worldModel.getPlayer().getCharacterData().getGameplayHitBoxInPolygon();
+	        debugRenderer.setColor(Color.BLACK);
 	      
 //	        debugRenderer.rect(worldModel.getPlayer().getCharacterData().getGameplayHitBox().x, 
 //	        		worldModel.getPlayer().getCharacterData().getGameplayHitBox().y, 

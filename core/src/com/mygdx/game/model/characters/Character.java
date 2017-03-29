@@ -9,6 +9,8 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.Timer.Task;
 import com.mygdx.game.constants.InputConverter.DirectionalInput;
 import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.actions.ActionSequence;
@@ -211,6 +213,22 @@ public abstract class Character implements ModelListener {
 				this.movementConditionActivatedTime = 0f;
 				sprinting = false;
 			}
+			
+			if (this.timeToDisrespectOneWayCollision > 0f) {
+				this.timeToDisrespectOneWayCollision -= delta;
+				if (this.timeToDisrespectOneWayCollision <= 0f) {
+					this.timeToDisrespectOneWayCollision = 0f;
+					this.isRespectingOneWayCollision = this.shouldRespectTileCollision;
+				}
+			}
+			
+			if (this.timeToDisrespectSlopeCollision > 0f) {
+				this.timeToDisrespectSlopeCollision -= delta;
+				if (this.timeToDisrespectSlopeCollision <= 0f) {
+					this.timeToDisrespectSlopeCollision = 0f;
+					this.isRespectingSlopeCollision = this.shouldRespectTileCollision;
+				}
+			}
 
 			//Debug
 			this.stateTime += delta;
@@ -395,6 +413,15 @@ public abstract class Character implements ModelListener {
 				}
 			}
 	    }
+		
+		public void downJump() {
+			this.isRespectingOneWayCollision = false;
+			this.timeToDisrespectOneWayCollision = 0.2f;
+			
+			this.isRespectingSlopeCollision = false;
+			this.timeToDisrespectSlopeCollision = 0.5f;
+			this.slopeSide = SlopeSide.NAN;
+		}
 		
 		private void jumpCode() {
 			if (this.currentJumpTokens > 0) {

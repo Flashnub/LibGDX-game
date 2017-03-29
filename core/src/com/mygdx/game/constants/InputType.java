@@ -11,6 +11,10 @@ public class InputType {
 	public static final String MOVEMENT = "MOVEMENT";
 	public static final String USEITEM = "USEITEM";
 	public static final String JUMP = "JUMP";
+	public static final String RIGHTJUMP = "RIGHTJUMP";
+	public static final String LEFTJUMP = "LEFTJUMP";
+	public static final String UPJUMP = "UPJUMP";
+	public static final String DOWNJUMP = "DOWNJUMP";
 //	public static final String ACTION = "ACTION";
 	public static final String ACTIONCANCEL = "ACTIONCANCEL";
 	public static final String SPECIAL = "SPECIAL";
@@ -75,6 +79,12 @@ public class InputType {
 			break;
 		case RIGHTSPECIAL:
 			newType = LEFTSPECIAL;
+			break;
+		case LEFTJUMP:
+			newType = RIGHTJUMP;
+			break;
+		case RIGHTJUMP: 
+			newType = LEFTJUMP;
 			break;
 		default:
 			break;		

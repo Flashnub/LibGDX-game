@@ -70,7 +70,6 @@ public class InputConverter {
 		String test = useKeyboard ? playerSave.getKBMouseScheme().get(inputName) : playerSave.getControllerScheme().get(inputName);
 		if (test != null) {
 			switch(test) {
-			case InputType.JUMP:
 			case InputType.ACTIONCANCEL:
 			case InputType.MOVEMENTRELEASE:
 				return false;

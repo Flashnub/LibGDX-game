@@ -347,8 +347,14 @@ public class Player extends Character implements InputProcessor, ControllerListe
 					horizontalMove(false);
 					break;
 				case InputType.JUMP:
+				case InputType.RIGHTJUMP:
+				case InputType.LEFTJUMP:
+				case InputType.UPJUMP:
 					if (!actOnObject())
 						jump();
+					break;
+				case InputType.DOWNJUMP: 
+					downJump();
 					break;
 				case InputType.USEITEM:
 					this.useItem();
@@ -409,8 +415,14 @@ public class Player extends Character implements InputProcessor, ControllerListe
 				}
 				switch (inputType) {
 				case InputType.JUMP:
+				case InputType.RIGHTJUMP:
+				case InputType.LEFTJUMP:
+				case InputType.UPJUMP:
 					if (!actOnObject())
 						jump();
+					break;
+				case InputType.DOWNJUMP: 
+					downJump();
 					break;
 				case InputType.USEITEM:
 					this.useItem();

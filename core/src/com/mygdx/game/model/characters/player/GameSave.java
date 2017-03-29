@@ -126,6 +126,11 @@ public class GameSave implements Serializable{
 //		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_LB), InputType.ACTION);
 		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_LB), InputType.ACTIONCANCEL);
 		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_A), InputType.JUMP);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_A).concat(DirectionalInput.UP.toString()), InputType.UPJUMP);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_A).concat(DirectionalInput.LEFT.toString()), InputType.LEFTJUMP);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_A).concat(DirectionalInput.DOWN.toString()), InputType.DOWNJUMP);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_A).concat(DirectionalInput.RIGHT.toString()), InputType.RIGHTJUMP);
+
 		
 		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_X), InputType.LIGHTATTACK);
 		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_X).concat(DirectionalInput.UP.toString()), InputType.UPLIGHTATTACK);

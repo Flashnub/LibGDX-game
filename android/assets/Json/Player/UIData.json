@@ -277,7 +277,7 @@
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "RushdownW",
-			"numberOfFrames": 5,
+			"numberOfFrames": 4,
 			"playMode": NORMAL
 		}
 		{

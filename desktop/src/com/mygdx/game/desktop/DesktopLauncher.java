@@ -85,10 +85,10 @@ public class DesktopLauncher {
         	
             TexturePacker.process(settings, inputDir, outputDir, "textures");
         }
-    	
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.width = 1600;
-		config.height = 900;
-		new LwjglApplication(new MyGdxGame(), config);
+//    	
+//		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+//		config.width = 1600;
+//		config.height = 900;
+//		new LwjglApplication(new MyGdxGame(), config);
 	}
 }

@@ -222,13 +222,13 @@ public abstract class Character implements ModelListener {
 				}
 			}
 			
-			if (this.timeToDisrespectSlopeCollision > 0f) {
-				this.timeToDisrespectSlopeCollision -= delta;
-				if (this.timeToDisrespectSlopeCollision <= 0f) {
-					this.timeToDisrespectSlopeCollision = 0f;
-					this.isRespectingSlopeCollision = this.shouldRespectTileCollision;
-				}
-			}
+//			if (this.timeToDisrespectSlopeCollision > 0f) {
+//				this.timeToDisrespectSlopeCollision -= delta;
+//				if (this.timeToDisrespectSlopeCollision <= 0f) {
+//					this.timeToDisrespectSlopeCollision = 0f;
+//					this.isRespectingSlopeCollision = this.shouldRespectTileCollision;
+//				}
+//			}
 
 			//Debug
 			this.stateTime += delta;
@@ -298,7 +298,7 @@ public abstract class Character implements ModelListener {
 			ActionSequence nextActiveAction = nextActiveActionSequences.peek();
 			if (nextActiveAction != null 
 					&& (!isProcessingActiveSequences() 
-					|| (((this.getCurrentActiveActionSeq().isActionChainableWithThis(nextActiveAction) && (this.actionStaggering || this.getCurrentActiveActionSeq().getAction().getActionState().equals(ActionState.COOLDOWN)))) 
+					|| (((this.getCurrentActiveActionSeq().isActionChainableWithThis(nextActiveAction) && (this.actionStaggering))) 
 					&& !this.getCurrentActiveActionSeq().cannotBeOverriden()))) {
 				if (this.isProcessingActiveSequences()) {
 					this.forceEndForActiveAction();
@@ -418,9 +418,7 @@ public abstract class Character implements ModelListener {
 			this.isRespectingOneWayCollision = false;
 			this.timeToDisrespectOneWayCollision = 0.2f;
 			
-			this.isRespectingSlopeCollision = false;
-			this.timeToDisrespectSlopeCollision = 0.5f;
-			this.slopeSide = SlopeSide.NAN;
+			this.onSlope = false;
 		}
 		
 		private void jumpCode() {
@@ -537,7 +535,7 @@ public abstract class Character implements ModelListener {
 
 			CollisionCheck collisionY = this.checkForYCollision(delta, collisionLayer, this.velocity.y, true, true);
 			if (collisionY.doesCollide) {
-				if (this.getVelocity().y < 0) {
+				if (this.getVelocity().y < 0 || collisionY.collisionType.equals(CollisionType.Slope)) {
 					landed(collisionY.getCollisionType().equals(CollisionType.Entity));
 
 				}

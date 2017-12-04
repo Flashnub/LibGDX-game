@@ -34,6 +34,7 @@ public abstract class EntityModel {
 	
 	public static final String Impassable = "Impassable";
 	public static final String OneWayPlat = "OneWayPlat";
+	public static final String OneWaySlope = "OneWaySlope";
 	public static final String RightSlopeHeight = "RightSlopeHeight";
 	public static final String LeftSlopeHeight = "LeftSlopeHeight";
 	
@@ -58,16 +59,14 @@ public abstract class EntityModel {
 	boolean isRespectingOneWayCollision;
 	float timeToDisrespectOneWayCollision;
 	
-	boolean isRespectingSlopeCollision;
-	float timeToDisrespectSlopeCollision;
-	
 	//SHOULD NOT BE MODIFIED
 	boolean shouldRespectTileCollision;
 	boolean shouldRespectObjectCollision;
 	boolean shouldRespectEntityCollision;
 	int entityCollisionRepositionTokens;
-	SlopeSide slopeSide;
-	
+//	SlopeSide slopeSide;
+	boolean onSlope;
+
 
 	
 	ArrayList <EntityEffect> currentEffects;
@@ -95,7 +94,6 @@ public abstract class EntityModel {
 		this.isRespectingObjectCollision = this.shouldRespectObjectCollision;
 		this.isRespectingTileCollision = this.shouldRespectTileCollision;
 		this.isRespectingOneWayCollision = this.shouldRespectTileCollision;
-		this.isRespectingSlopeCollision = this.shouldRespectTileCollision;
 		
 		this.widthCoefficient = 1f;
 		this.heightCoefficient = 1f;
@@ -105,9 +103,9 @@ public abstract class EntityModel {
 		
 		this.currentEffects = new ArrayList <EntityEffect>();
 		this.indicesToRemove = new ArrayList<Integer>();
-		this.slopeSide = SlopeSide.NAN;
+//		this.slopeSide = SlopeSide.NAN;
+		this.onSlope = false;
 		this.timeToDisrespectOneWayCollision = 0f;
-		this.timeToDisrespectSlopeCollision = 0f;
 	}
 	
 	//Not used by projectiles.
@@ -384,107 +382,58 @@ public abstract class EntityModel {
 		
 			//If on slope then make sure that gravity moves character down or moves up.
 			//If on slope, then forgo tile collision till off of slope.
-			int rightSideXIndex = ((int) ((tempGameplayBounds.x + tempGameplayBounds.width) / collisionLayer.getTileWidth()));
-			int leftSideXIndex = ((int) ((tempGameplayBounds.x) / collisionLayer.getTileWidth()));
+			int middleSideXIndex = ((int) ((tempGameplayBounds.x + tempGameplayBounds.width / 2) / collisionLayer.getTileWidth()));
 			int yIndex = (int) ((this.gameplayHitBox.y) / collisionLayer.getTileHeight());
 			
+			SlopeInfo middleCellInfo = this.provideSlopeInfoFor(middleSideXIndex, yIndex, collisionLayer, tempGameplayBounds, tempVelocity);
+			SlopeInfo aboveMiddleCellInfo = this.provideSlopeInfoFor(middleSideXIndex, yIndex + 1, collisionLayer, tempGameplayBounds, tempVelocity);
+			SlopeInfo belowMiddleCellInfo = this.provideSlopeInfoFor(middleSideXIndex, yIndex - 1, collisionLayer, tempGameplayBounds, tempVelocity);
 
-//			Cell leftSideCell = collisionLayer.getCell(leftSideXIndex, yIndex);
-//			Cell rightSideCell = collisionLayer.getCell(rightSideXIndex, yIndex);
-			SlopeInfo leftCellInfo = this.provideSlopeInfoFor(true, leftSideXIndex, yIndex, collisionLayer, tempGameplayBounds, tempVelocity);
-			SlopeInfo rightCellInfo = this.provideSlopeInfoFor(false, rightSideXIndex, yIndex, collisionLayer, tempGameplayBounds, tempVelocity);
-
-			if (this.isFacingLeft() && this.checkSlopes()) {
-				if (leftCellInfo != null) {
-					pointOfReturn = leftCellInfo.pointOfReturn;
-					slopeSide = leftCellInfo.slopeSide;
+			if (this.checkSlopes()) {
+				if (middleCellInfo != null) {
+					pointOfReturn = middleCellInfo.pointOfReturn;
+					onSlope = middleCellInfo.onSlope;
 					collisionY = true;
 				}
-				else if (rightCellInfo != null) {
-					pointOfReturn = rightCellInfo.pointOfReturn;
-					slopeSide = rightCellInfo.slopeSide;
+				else if (aboveMiddleCellInfo != null && this.onSlope) {
+					pointOfReturn = aboveMiddleCellInfo.pointOfReturn;
+					onSlope = aboveMiddleCellInfo.onSlope;
 					collisionY = true;
 				}
-				else if (this.slopeSide.equals(SlopeSide.RIGHT)) {
-					SlopeInfo aboveRightCellInfo = this.provideSlopeInfoFor(false, rightSideXIndex, yIndex + 1, collisionLayer, tempGameplayBounds, tempVelocity);
-					SlopeInfo belowRightCellInfo = this.provideSlopeInfoFor(false, rightSideXIndex, yIndex - 1, collisionLayer, tempGameplayBounds, tempVelocity);
-
-					if (aboveRightCellInfo != null) {
-						pointOfReturn = aboveRightCellInfo.pointOfReturn;
-						slopeSide = aboveRightCellInfo.slopeSide;
-						collisionY = true;
-					}
-					else if (belowRightCellInfo != null) {
-						pointOfReturn = belowRightCellInfo.pointOfReturn;
-						slopeSide = belowRightCellInfo.slopeSide;
-						collisionY = true;
-					}
-				}
-				else if (this.slopeSide.equals(SlopeSide.LEFT)) {
-					SlopeInfo aboveLeftCellInfo = this.provideSlopeInfoFor(true, leftSideXIndex, yIndex + 1, collisionLayer, tempGameplayBounds, tempVelocity);
-					SlopeInfo belowLeftCellInfo = this.provideSlopeInfoFor(true, leftSideXIndex, yIndex - 1, collisionLayer, tempGameplayBounds, tempVelocity);
-
-					if (aboveLeftCellInfo != null) {
-						pointOfReturn = aboveLeftCellInfo.pointOfReturn;
-						slopeSide = aboveLeftCellInfo.slopeSide;
-						collisionY = true;
-					}
-					else if (belowLeftCellInfo != null) {
-						pointOfReturn = belowLeftCellInfo.pointOfReturn;
-						slopeSide = belowLeftCellInfo.slopeSide;
-						collisionY = true;
-					}
-				}
-				
-			}
-			else if (this.checkSlopes()) {
-				if (rightCellInfo != null) {
-					pointOfReturn = rightCellInfo.pointOfReturn;
-					slopeSide = rightCellInfo.slopeSide;
+				else if (belowMiddleCellInfo != null && this.onSlope) {
+					pointOfReturn = belowMiddleCellInfo.pointOfReturn;
+					onSlope = true;
 					collisionY = true;
 				}
-				else if (leftCellInfo != null) {
-					pointOfReturn = leftCellInfo.pointOfReturn;
-					slopeSide = leftCellInfo.slopeSide;
-					collisionY = true;
-				}
-				else if (this.slopeSide.equals(SlopeSide.RIGHT)) {
-					SlopeInfo aboveRightCellInfo = this.provideSlopeInfoFor(false, rightSideXIndex, yIndex + 1, collisionLayer, tempGameplayBounds, tempVelocity);
-					SlopeInfo belowRightCellInfo = this.provideSlopeInfoFor(false, rightSideXIndex, yIndex - 1, collisionLayer, tempGameplayBounds, tempVelocity);
-
-					if (aboveRightCellInfo != null) {
-						pointOfReturn = aboveRightCellInfo.pointOfReturn;
-						slopeSide = aboveRightCellInfo.slopeSide;
-						collisionY = true;
-					}
-					else if (belowRightCellInfo != null) {
-						pointOfReturn = belowRightCellInfo.pointOfReturn;
-						slopeSide = belowRightCellInfo.slopeSide;
-						collisionY = true;
-					}
-				}
-				else if (this.slopeSide.equals(SlopeSide.LEFT)) {
-					SlopeInfo aboveLeftCellInfo = this.provideSlopeInfoFor(true, leftSideXIndex, yIndex + 1, collisionLayer, tempGameplayBounds, tempVelocity);
-					SlopeInfo belowLeftCellInfo = this.provideSlopeInfoFor(true, leftSideXIndex, yIndex - 1, collisionLayer, tempGameplayBounds, tempVelocity);
-
-					if (aboveLeftCellInfo != null) {
-						pointOfReturn = aboveLeftCellInfo.pointOfReturn;
-						slopeSide = aboveLeftCellInfo.slopeSide;
-						collisionY = true;
-					}
-					else if (belowLeftCellInfo != null) {
-						pointOfReturn = belowLeftCellInfo.pointOfReturn;
-						slopeSide = belowLeftCellInfo.slopeSide;
-						collisionY = true;
-					}
+							
+				if (collisionY) {
+					collisionType = CollisionType.Slope;
 				}
 			}
+//			else if (this.checkSlopes()) {
+//				if (middleCellInfo != null) {
+//					pointOfReturn = middleCellInfo.pointOfReturn;
+//					onSlope = true;
+//					collisionY = true;
+//				}
+//				else if (this.onSlope) {
+//					if (aboveMiddleCellInfo != null) {
+//						pointOfReturn = aboveMiddleCellInfo.pointOfReturn;
+//						onSlope = aboveMiddleCellInfo.onSlope;
+//						collisionY = true;
+//					}
+//					else if (belowMiddleCellInfo != null) {
+//						pointOfReturn = belowMiddleCellInfo.pointOfReturn;
+//						onSlope = belowMiddleCellInfo.onSlope;
+//						collisionY = true;
+//					}
+//				}
+//			}
 
 			if (!collisionY) {
 				//Tile
-				if (!this.slopeSide.equals(SlopeSide.NAN)) {
-					this.slopeSide = SlopeSide.NAN;
-					System.out.println("Slope");
+				if (this.onSlope) {
+					this.onSlope = false;
 				}
 				else {
 					CollisionInfo info = this.singletonYCheckForTileCollision(collisionLayer, tempGameplayBounds, true, tempVelocity);
@@ -493,7 +442,7 @@ public abstract class EntityModel {
 				}
 			}
 
-			if (collisionY) {
+			if (collisionY && collisionType.equals(CollisionType.None)) {
 				collisionType = CollisionType.World;
 			}
 			
@@ -536,7 +485,7 @@ public abstract class EntityModel {
 			this.imageHitBox.y = tempImageBounds.y;
 			this.velocity.y = tempVelocity;
 		}
-		else if (shouldMove && collisionType.equals(CollisionType.World)) {
+		else if (shouldMove && (collisionType.equals(CollisionType.World) || collisionType.equals(CollisionType.Slope))) {
 			this.gameplayHitBox.y = pointOfReturn;
 			this.refreshImageHitBoxY();
 		}
@@ -711,16 +660,12 @@ public abstract class EntityModel {
 //			int gameplayHitBoxYIndex = ((int) ((tempGameplayBounds.y) / collisionLayer.getTileHeight()));
 //
 //			Cell gameplayHitBoxCell = collisionLayer.getCell(gameplayHitBoxXIndex, gameplayHitBoxYIndex);
-			if (this.slopeSide.equals(SlopeSide.NAN)) {
+			if (!this.onSlope) {
 				//has slope, don't check X collision
 				CollisionInfo info = this.singletonXCheckForTileCollision(collisionLayer, tempGameplayBounds, true, tempVelocity);
 				collisionX = info.didCollide;
 				pointOfReturn = info.pointOfReturn;
 			}
-
-			
-
-
 			
 			if (collisionX) {
 				collisionType = CollisionType.World;
@@ -804,31 +749,37 @@ public abstract class EntityModel {
 
 	}
 	
-	public SlopeInfo provideSlopeInfoFor(boolean isLeft, int xIndex, int yIndex, TiledMapTileLayer collisionLayer, Rectangle tempGameplayBounds, float yVelocity) {
+	public SlopeInfo provideSlopeInfoFor(int xIndex, int yIndex, TiledMapTileLayer collisionLayer, Rectangle tempGameplayBounds, float yVelocity) {
 		//figure out how far up/down
 		Cell tile = collisionLayer.getCell(xIndex, yIndex);
-		if (tile != null && tile.getTile().getProperties().containsKey(EntityModel.LeftSlopeHeight) && yVelocity <= 0) {
-			float leftSlope = (Float) tile.getTile().getProperties().get(EntityModel.LeftSlopeHeight);
-			float rightSlope = (Float) tile.getTile().getProperties().get(EntityModel.RightSlopeHeight);
-			
-			float differenceInSlope = Math.max(leftSlope, rightSlope) - Math.min(leftSlope, rightSlope);
-			float howFarEntityIsInSlopeTile = (isLeft ? tempGameplayBounds.x : (tempGameplayBounds.x + tempGameplayBounds.width)) % collisionLayer.getTileWidth();
-			float proportionOfDistance = 0f;
-			if (rightSlope > leftSlope) {
-				proportionOfDistance = howFarEntityIsInSlopeTile / collisionLayer.getTileWidth();
+		if (tile != null 
+				&& (tile.getTile().getProperties().containsKey(EntityModel.OneWaySlope) && this.isRespectingOneWayCollision) 
+				||	!(tile.getTile().getProperties().containsKey(EntityModel.OneWaySlope))) 
+		{
+			if (tile.getTile().getProperties().containsKey(EntityModel.LeftSlopeHeight) && yVelocity <= 0) {
+				float leftSlope = (Float) tile.getTile().getProperties().get(EntityModel.LeftSlopeHeight);
+				float rightSlope = (Float) tile.getTile().getProperties().get(EntityModel.RightSlopeHeight);
+				
+				float differenceInSlope = Math.max(leftSlope, rightSlope) - Math.min(leftSlope, rightSlope);
+				float howFarEntityIsInSlopeTile = ((tempGameplayBounds.x + tempGameplayBounds.width / 2) % collisionLayer.getTileWidth());
+				float proportionOfDistance = 0f;
+				if (rightSlope > leftSlope) {
+					proportionOfDistance = howFarEntityIsInSlopeTile / collisionLayer.getTileWidth();
+				}
+				else {
+					proportionOfDistance = 1f - (howFarEntityIsInSlopeTile / collisionLayer.getTileWidth());
+				}
+			    float verticalEntityDistance = differenceInSlope * proportionOfDistance + yIndex * collisionLayer.getTileHeight() + Math.min(leftSlope, rightSlope);
+			    
+				return new SlopeInfo(true, verticalEntityDistance);
 			}
-			else {
-				proportionOfDistance = 1f - (howFarEntityIsInSlopeTile / collisionLayer.getTileWidth());
-			}
-		    float verticalEntityDistance = differenceInSlope * proportionOfDistance + yIndex * collisionLayer.getTileHeight() + Math.min(leftSlope, rightSlope);
-		    
-			return new SlopeInfo(isLeft ? SlopeSide.LEFT : SlopeSide.RIGHT, verticalEntityDistance);
 		}
+
 		return null;
 	}
 	
 	public boolean checkSlopes() {
-		return this.isRespectingSlopeCollision;
+		return true;
 	}
 	
 	public void refreshImageHitBoxX() {

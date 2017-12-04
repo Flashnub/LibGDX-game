@@ -1,18 +1,16 @@
 package com.mygdx.game.model.characters;
 
-import com.mygdx.game.model.characters.EntityModel.SlopeSide;
-
 public class SlopeInfo {
-	SlopeSide slopeSide;
+	boolean onSlope;
 	float pointOfReturn;
 	
-	public SlopeInfo(SlopeSide slopeSide, float pointOfReturn) {
-		this.slopeSide = slopeSide;
+	public SlopeInfo(boolean onSlope, float pointOfReturn) {
+		this.onSlope = onSlope;
 		this.pointOfReturn = pointOfReturn;
 	}
 
-	public SlopeSide getSlopeSide() {
-		return slopeSide;
+	public boolean getSlopeSide() {
+		return onSlope;
 	}
 
 	public float getPointOfReturn() {

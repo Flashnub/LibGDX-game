@@ -3,7 +3,7 @@ package com.mygdx.game.model.characters;
 public class CollisionCheck {
 	
 	public enum CollisionType {
-		World, Object, Entity, None
+		World, Object, Entity, Slope, None
 	}
 	
 	boolean doesCollide;

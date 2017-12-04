@@ -24,6 +24,7 @@ import com.mygdx.game.model.actions.ActionSequence.StaggerType;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.nonhostile.ConditionalDialogueSettings;
 import com.mygdx.game.model.characters.Character;
+import com.mygdx.game.model.characters.CharacterConstants;
 import com.mygdx.game.model.characters.EntityCollisionData;
 import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.characters.EntityUIModel;
@@ -218,7 +219,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 			super.manageAutomaticStates(delta, collisionLayer);
 			
 			 if (dashing) {
-				setState(idleState); //Dash
+				setState(CharacterConstants.idleState); //Dash
 			}
 		}
 		
@@ -327,6 +328,9 @@ public class Player extends Character implements InputProcessor, ControllerListe
 	      
 		public boolean handleKeyDown (int keyCode)
 		{
+			if (this.currentlyHeldDirection.equals(DirectionalInput.RIGHT)) {
+				System.out.print("");
+			}
 			DirectionalInput potentialDirectionalInput = this.inputConverter.getDirectionFromKeyCodeForDown(keyCode);
 			if (!potentialDirectionalInput.equals(DirectionalInput.NONE))
 				this.currentlyHeldDirection = potentialDirectionalInput;
@@ -347,23 +351,23 @@ public class Player extends Character implements InputProcessor, ControllerListe
 					horizontalMove(false);
 					break;
 				case InputType.JUMP:
-				case InputType.RIGHTJUMP:
-				case InputType.LEFTJUMP:
-				case InputType.UPJUMP:
+				case InputType.JUMPRIGHT:
+				case InputType.JUMPLEFT:
+				case InputType.JUMPUP:
 					if (!actOnObject())
 						jump();
 					break;
-				case InputType.DOWNJUMP: 
+				case InputType.JUMPDOWN: 
 					downJump();
 					break;
 				case InputType.USEITEM:
 					this.useItem();
 					break;
-				case InputType.MOVEMENT:
-				case InputType.LEFTMOVEMENT:
-				case InputType.UPMOVEMENT:
-				case InputType.DOWNMOVEMENT:
-				case InputType.RIGHTMOVEMENT:
+				case InputType.DASH:
+				case InputType.DASHLEFT:
+				case InputType.DASHUP:
+				case InputType.DASHDOWN:
+				case InputType.DASHRIGHT:
 					this.movementConditionActivated = true;
 					break;
 				default:
@@ -388,11 +392,11 @@ public class Player extends Character implements InputProcessor, ControllerListe
 				case InputType.USEITEM:
 //					unlockDirection();
 					break;
-				case InputType.MOVEMENT:
-				case InputType.LEFTMOVEMENT:
-				case InputType.UPMOVEMENT:
-				case InputType.DOWNMOVEMENT:
-				case InputType.RIGHTMOVEMENT:
+				case InputType.DASH:
+				case InputType.DASHLEFT:
+				case InputType.DASHUP:
+				case InputType.DASHDOWN:
+				case InputType.DASHRIGHT:
 					this.movementConditionActivated = false;
 					break;
 				default:
@@ -415,13 +419,13 @@ public class Player extends Character implements InputProcessor, ControllerListe
 				}
 				switch (inputType) {
 				case InputType.JUMP:
-				case InputType.RIGHTJUMP:
-				case InputType.LEFTJUMP:
-				case InputType.UPJUMP:
+				case InputType.JUMPRIGHT:
+				case InputType.JUMPLEFT:
+				case InputType.JUMPUP:
 					if (!actOnObject())
 						jump();
 					break;
-				case InputType.DOWNJUMP: 
+				case InputType.JUMPDOWN: 
 					downJump();
 					break;
 				case InputType.USEITEM:
@@ -473,15 +477,15 @@ public class Player extends Character implements InputProcessor, ControllerListe
 					this.inputs.addFirst(inputType);
 					this.queueUpActionFromInputs();
 					switch (inputType) {
-					case InputType.MOVEMENT:
-					case InputType.LEFTMOVEMENT:
-					case InputType.UPMOVEMENT:
-					case InputType.DOWNMOVEMENT:
-					case InputType.RIGHTMOVEMENT:
+					case InputType.DASH:
+					case InputType.DASHLEFT:
+					case InputType.DASHUP:
+					case InputType.DASHDOWN:
+					case InputType.DASHRIGHT:
 						this.movementConditionActivated = true;
 //						System.out.println("Movement pressed: " + this.movementConditionActivated);
 						break;
-					case InputType.MOVEMENTRELEASE:
+					case InputType.DASHRELEASE:
 						this.movementConditionActivated = false;
 //						System.out.println("Movement pressed: " + this.movementConditionActivated);
 						break;

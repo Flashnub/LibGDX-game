@@ -4,9 +4,13 @@ public class SpriteUtils {
 	
 	public static final String left = "-Left";
 	public static final String right = "-Right";
+	//Used for animationStringWithData.
+	public static final String windupState = "W";
+	public static final String activeState = "A";
+	public static final String cooldownState = "C";
 	
-	public static String animationStringWithData(AnimationData animationData, int index) {
-		return animationData.getName() + index;
+	public static String animationStringWithData(AnimationData animationData,  String animationState, int index) {
+		return animationData.getName() + animationState + index;
 	}
 	
 	public static String animationStringWithState(String state, boolean isFacingLeft) {

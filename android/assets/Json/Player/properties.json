@@ -19,9 +19,6 @@
 				"key": "Dash",
 				"typeOfAction": Ability
 			}
-			"windUpState": "DashW"
-			"actingState": "DashA"
-			"cooldownState": "DashC"
 			"inputs": [
 				["MOVEMENTRELEASE"]
 			]
@@ -39,12 +36,9 @@
 				"key": "Block",
 				"typeOfAction": Ability
 			}
-			"windUpState": "BlockW"
-			"actingState": "BlockA"
-			"cooldownState": "BlockC"
 			"inputs": [
-				["SPECIAL"],
-				["LEFTSPECIAL"]
+				["SP"],
+				["LEFTSP"]
 			]
 		},
 		"Death": {
@@ -54,9 +48,6 @@
 				"key": "Death",
 				"typeOfAction": WorldAttack
 			}
-			"windupState": "DeathW"
-			"actingState": "DeathA"
-			"cooldownState": "DeathC"
 		}
 		
 	},

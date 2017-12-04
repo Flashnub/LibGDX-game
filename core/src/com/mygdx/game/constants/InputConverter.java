@@ -71,7 +71,7 @@ public class InputConverter {
 		if (test != null) {
 			switch(test) {
 			case InputType.ACTIONCANCEL:
-			case InputType.MOVEMENTRELEASE:
+			case InputType.DASHRELEASE:
 				return false;
 			default:
 				return true;

@@ -25,13 +25,13 @@ public abstract class ActionSegment implements EffectController {
 	Float currentTime;
 	boolean hasProcessedActiveSource;
 	boolean hasProcessedWindupSource;
-	boolean didChangeState;
 	boolean forceEnd; //Used for ending actions involuntarily (Removes from processing)
 	boolean forceActiveState; //Activate on Demand instead of fixed time.
 	boolean forceCooldownState; //Used for actions that end on demand rather than fixed time 
 	boolean hasProcessedInterruption;
 	boolean hasProcessedCompletion;
 	boolean shouldChain;
+	boolean needsToSetAnimation;
 	CharacterModel source;
 	ActionState actionState;
 	float processedWindupTime;
@@ -54,6 +54,7 @@ public abstract class ActionSegment implements EffectController {
 		hasProcessedCompletion = false;
 		shouldChain = false;
 		shouldLockControls = false;
+		needsToSetAnimation = true;
 		processedActiveTime = 0f;
 		processedWindupTime = 0f;			
 		this.currentTime = 0f;
@@ -139,7 +140,6 @@ public abstract class ActionSegment implements EffectController {
 	
 	public void setActionState(ActionState state) {
 		if (this.actionState != state) {
-			this.didChangeState = true;
 			this.actionState = state;
 		}
 	}

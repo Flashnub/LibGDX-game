@@ -18,7 +18,7 @@ public class MyGdxGame extends Game {
 	@Override
 	public void create() {
 		// TODO Auto-generated method stub
-    	tiledMap = new TmxMapLoader().load("Levels/Drafts/Level1/Draft2.tmx");
+    	tiledMap = new TmxMapLoader().load("Levels/Test3.tmx");
     	worldModel = new WorldModel((TiledMapTileLayer) tiledMap.getLayers().get(0));
 
 		GameScreen screen = new GameScreen(tiledMap, worldModel);

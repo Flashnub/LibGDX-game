@@ -38,9 +38,7 @@
   </tile>
   <tile id="5">
    <properties>
-    <property name="EntityType" value="Enemy"/>
     <property name="Impassable" type="bool" value="false"/>
-    <property name="SpawnPoint" value="BasicEnemy"/>
    </properties>
   </tile>
  </tileset>

@@ -5,12 +5,14 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Json.Serializable;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Queue;
+import com.mygdx.game.assets.SpriteUtils;
 import com.mygdx.game.constants.InputType;
 import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.actions.nonhostile.DialogueAction;
 import com.mygdx.game.model.actions.nonhostile.DialogueSettings;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.conditions.ConditionInitializer;
+import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.characters.EntityUIModel;
 import com.mygdx.game.model.effects.XMovementEffectSettings;
 import com.mygdx.game.model.effects.YMovementEffectSettings;
@@ -133,9 +135,9 @@ public class ActionSequence implements Serializable {
 		sequence.actionKey = new ActionSegmentKey(source.getNameForWakeupSeq() + "Wakeup", ActionType.Stagger);
 		sequence.isActive = true;
 		sequence.strategy = ActionStrategy.Story;
-		sequence.windupState = "WakeupWindup";
-		sequence.actingState = "WakeupActive";
-		sequence.cooldownState = "WakeupCooldown";
+		sequence.windupState = "WakeupW";
+		sequence.actingState = "WakeupA";
+		sequence.cooldownState = "WakeupC";
 		
 		sequence.leftWindupState = sequence.windupState;
 		sequence.leftActingState = sequence.actingState;
@@ -259,25 +261,33 @@ public class ActionSequence implements Serializable {
 		
 		actingState = json.readValue("actingState", String.class, jsonData);
 		
-		if (windupState != null) {
-			this.windupState = windupState;
+		if (this.actingState != null) {
+			if (windupState != null) {
+				this.windupState = windupState;
+			}
+			else {
+				this.windupState = actingState;
+			}
+					
+			if (cooldownState != null) {
+				this.cooldownState = cooldownState;
+			}
+			else {
+				this.cooldownState = actingState;
+			}
 		}
 		else {
-			this.windupState = actingState;
+			this.windupState = this.actionKey.key + SpriteUtils.windupState;
+			this.actingState = this.actionKey.key + SpriteUtils.activeState;
+			this.actingState = this.actionKey.key + SpriteUtils.activeState;
 		}
 		
+
 		if (leftWindupState != null) {
 			this.leftWindupState = leftWindupState;
 		}
 		else {
 			this.leftWindupState = this.windupState;
-		}
-		
-		if (cooldownState != null) {
-			this.cooldownState = cooldownState;
-		}
-		else {
-			this.cooldownState = actingState;
 		}
 		
 		if (leftActingState != null) {
@@ -384,19 +394,19 @@ public class ActionSequence implements Serializable {
 		return false;
 	}
 	
-	public String getCurrentActionState() {
-		this.action.didChangeState = false;
-		switch (action.getActionState()) {
-			case WINDUP:
-				return this.useLeft ? this.leftWindupState : this.windupState;
-			case ACTION:
-				return this.useLeft ? this.leftActingState : this.actingState;
-			case COOLDOWN:
-				return this.useLeft ? this.leftCooldownState : this.cooldownState;
-			default:
-				return this.useLeft ? this.leftActingState : this.actingState;
-		}
-	}
+//	public String getAnimationKey() {
+//		this.action.didChangeState = false;
+//		switch (action.getActionState()) {
+//			case WINDUP:
+//				return this.useLeft ? this.leftWindupState : this.windupState;
+//			case ACTION:
+//				return this.useLeft ? this.leftActingState : this.actingState;
+//			case COOLDOWN:
+//				return this.useLeft ? this.leftCooldownState : this.cooldownState;
+//			default:
+//				return this.useLeft ? this.leftActingState : this.actingState;
+//		}
+//	}
 	
 	public void process(float delta, ActionListener actionListener) {
 		if (this.isStaggered && !this.getAction().forceEnd) {
@@ -410,10 +420,11 @@ public class ActionSequence implements Serializable {
 			this.action.update(delta);
 			if (this.isActive) {
 				source.shouldUnlockControls(this);
-				if (action.didChangeState) {
-					source.setState(this.getCurrentActionState());
-
+				if (action.needsToSetAnimation) {
+					source.setState(this.actionKey.key);
+					action.needsToSetAnimation = false;
 				}
+
 			}
 		}
 

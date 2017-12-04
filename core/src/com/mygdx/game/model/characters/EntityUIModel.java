@@ -51,20 +51,54 @@ public class EntityUIModel {
 //				if (animationData.getName().equals("Active")) {
 //					System.out.println(animationData.getName());
 //				}
-					
-				for (int i = 0; i < animationData.getNumberOfFrames(); i++) {
-					TextureRegion rightFrame = playerAtlas.findRegion(SpriteUtils.animationStringWithData(animationData, i+1));
+				//Windup
+				for (int i = 0; i < animationData.getNumberOfWindupFrames(); i++) {
+					TextureRegion rightFrame = playerAtlas.findRegion(SpriteUtils.animationStringWithData(animationData, SpriteUtils.windupState, i+1));
 					rightAnimationFrames.add(rightFrame);
 					
 					if (rightFrame == null) {
-						System.out.println(SpriteUtils.animationStringWithData(animationData, i+1));
+						System.out.println(SpriteUtils.animationStringWithData(animationData, SpriteUtils.activeState, i+1));
 						System.out.println(entityUIData.getMasterAtlasPath());
 					}
-					TextureRegion leftFrame = new TextureRegion(rightFrame);
-
-					leftFrame.flip(true, false);
-					leftAnimationFrames.add(leftFrame);
+					else {
+						TextureRegion leftFrame = new TextureRegion(rightFrame);
+						leftFrame.flip(true, false);
+						leftAnimationFrames.add(leftFrame);
+					}
 				}
+				//Active
+				for (int i = 0; i < animationData.getNumberOfActiveFrames(); i++) {
+					TextureRegion rightFrame = playerAtlas.findRegion(SpriteUtils.animationStringWithData(animationData, SpriteUtils.activeState, i+1));
+					rightAnimationFrames.add(rightFrame);
+					
+					if (rightFrame == null) {
+						System.out.println(SpriteUtils.animationStringWithData(animationData, SpriteUtils.activeState, i+1));
+						System.out.println(entityUIData.getMasterAtlasPath());
+					}
+					else {
+						TextureRegion leftFrame = new TextureRegion(rightFrame);
+						leftFrame.flip(true, false);
+						leftAnimationFrames.add(leftFrame);
+					}
+
+				}
+				//Cooldown
+				for (int i = 0; i < animationData.getNumberOfCooldownFrames(); i++) {
+					TextureRegion rightFrame = playerAtlas.findRegion(SpriteUtils.animationStringWithData(animationData, SpriteUtils.cooldownState, i+1));
+					rightAnimationFrames.add(rightFrame);
+					
+					if (rightFrame == null) {
+						System.out.println(SpriteUtils.animationStringWithData(animationData, SpriteUtils.activeState, i+1));
+						System.out.println(entityUIData.getMasterAtlasPath());
+					}
+					else {
+						TextureRegion leftFrame = new TextureRegion(rightFrame);
+						leftFrame.flip(true, false);
+						leftAnimationFrames.add(leftFrame);
+					}
+				}
+				
+				
 				Animation leftAnimation = new Animation(animationData.getFrameRate(), leftAnimationFrames, animationData.getPlayMode());
 				Animation rightAnimation = new Animation(animationData.getFrameRate(), rightAnimationFrames, animationData.getPlayMode());
 
@@ -81,10 +115,10 @@ public class EntityUIModel {
 	}
 	
 	public boolean setCurrentFrame(EntityModel entity, float delta) {
-		String animationString = SpriteUtils.animationStringWithState(entity.getState(), entity.isFacingLeft());
+		String animationString = SpriteUtils.animationStringWithState(entity.getState(), entity.isFacingLeft()); //5PW doesn't work here. Needs 5P.
 		Animation currentAnimation = animations.get(animationString);
 		if (currentAnimation == null) {
-			animationString = SpriteUtils.animationStringWithState("Idle", entity.isFacingLeft());
+			animationString = SpriteUtils.animationStringWithState(CharacterConstants.idleState, entity.isFacingLeft());
 			currentAnimation = animations.get(animationString);
 		}
 		
@@ -142,8 +176,16 @@ public class EntityUIModel {
 	
 	public float getTimeForAnimation(String animationName, String animationType){
 		for (AnimationData data : this.entityUIData.getAnimations()) {
-			if (data.getName().equals(animationName + animationType)) {
-				return data.getNumberOfFrames() * data.getFrameRate();
+			if (data.getName().equals(animationName)) {
+				if (animationType.equals(SpriteUtils.windupState)) {
+					return data.getNumberOfWindupFrames() * data.getFrameRate();
+				}
+				else if (animationType.equals(SpriteUtils.activeState)) {
+					return data.getNumberOfActiveFrames() * data.getFrameRate();
+				}
+				else if (animationType.equals(SpriteUtils.cooldownState)) {
+					return data.getNumberOfCooldownFrames() * data.getFrameRate();
+				}
 			}
 		}
 		return 0f;

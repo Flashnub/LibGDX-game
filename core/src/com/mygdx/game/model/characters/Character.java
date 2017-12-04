@@ -78,12 +78,6 @@ public abstract class Character implements ModelListener {
 
 	public abstract class CharacterModel extends EntityModel{
 		
-		public final String idleState = "IdleDrawn";
-		public final String walkState = "Walk";
-		public final String backWalkState = "Backwalk";
-		public final String jumpState = "Jump";
-		public final String fallState = "Fall";
-		public final String sprintState = "Sprint";
 		final float slowingAccel = 3000;
 		
 		String state;
@@ -131,7 +125,7 @@ public abstract class Character implements ModelListener {
 			this.nextActiveActionSequences = new ArrayDeque<ActionSequence>();
 			this.processingActionSequences = new ArrayList <ActionSequence>();
 			this.turnAngle = TurnAngle.ZERO;
-			setState(idleState);
+			setState(CharacterConstants.idleState);
 			isImmuneToInjury = false;
 			attacking = false;
 			isInAir = true;
@@ -265,10 +259,10 @@ public abstract class Character implements ModelListener {
 				this.didChangeState = false; 
 			}
 			if (!isInAir && !walking && !this.isProcessingActiveSequences()) {
-				setState(idleState);
+				setState(CharacterConstants.idleState);
 			}
 			else if (isInAir && this.velocity.y < -3f && (this.getCurrentActiveActionSeq() == null)) {
-				setState(fallState);
+				setState(CharacterConstants.fallState);
 			}
 		}
 		
@@ -374,17 +368,17 @@ public abstract class Character implements ModelListener {
 		public void setMovementStatesIfNeeded(boolean overrideDuplicateState) {
 			if (this.isInAir) {
 				if (this.velocity.y > 0) {
-					this.setState(jumpState, overrideDuplicateState);
+					this.setState(CharacterConstants.jumpState, overrideDuplicateState);
 				}
 				else {
-					this.setState(fallState);
+					this.setState(CharacterConstants.fallState);
 				}
 			}
 			else if (this.sprinting) {
-				this.setState(sprintState);
+				this.setState(CharacterConstants.sprintState);
 			}
 			else if (this.walking) {
-				this.setState(walkState);
+				this.setState(CharacterConstants.walkState);
 			}
 			
 		}
@@ -436,8 +430,8 @@ public abstract class Character implements ModelListener {
 	    
 		public void horizontalMove(boolean left) {
 			if (!this.actionLocked) {
-				this.setFacingLeft(left);
 				if (!isInAir) {
+					this.setFacingLeft(left);
 					this.setWalking(true);
 					this.walkingTime = 0f;
 				}
@@ -477,7 +471,7 @@ public abstract class Character implements ModelListener {
 					this.velocity.x = 0;
 				}
 
-				setState(this.idleState);
+				setState(CharacterConstants.idleState);
 			}
 			else if (this.isInAir) {
 				this.acceleration.x = 0;

@@ -328,9 +328,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 	      
 		public boolean handleKeyDown (int keyCode)
 		{
-			if (this.currentlyHeldDirection.equals(DirectionalInput.RIGHT)) {
-				System.out.print("");
-			}
+
 			DirectionalInput potentialDirectionalInput = this.inputConverter.getDirectionFromKeyCodeForDown(keyCode);
 			if (!potentialDirectionalInput.equals(DirectionalInput.NONE))
 				this.currentlyHeldDirection = potentialDirectionalInput;

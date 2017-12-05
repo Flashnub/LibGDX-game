@@ -287,7 +287,6 @@ public abstract class Character implements ModelListener {
 						}
 					}
 				}
-
 			}
 			ActionSequence nextActiveAction = nextActiveActionSequences.peek();
 			if (nextActiveAction != null 
@@ -302,7 +301,6 @@ public abstract class Character implements ModelListener {
 				ActionSequence nextSequence = nextActiveActionSequences.poll();
 				this.processingActionSequences.add(nextSequence);
 			}
-			
 		}
 		
 		public boolean isProcessingActiveSequences() {

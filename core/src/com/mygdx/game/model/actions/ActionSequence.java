@@ -421,10 +421,9 @@ public class ActionSequence implements Serializable {
 			if (this.isActive) {
 				source.shouldUnlockControls(this);
 				if (action.needsToSetAnimation) {
-					source.setState(this.actionKey.key);
+					source.setState(this.actionKey.key, true);
 					action.needsToSetAnimation = false;
 				}
-
 			}
 		}
 

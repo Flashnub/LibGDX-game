@@ -1,6 +1,7 @@
 package com.mygdx.game.model.actions;
 
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.model.actions.ActionSegment.ActionState;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.EntityEffect;
 import com.mygdx.game.model.effects.EntityEffectSettings;
@@ -47,7 +48,6 @@ public class Ability extends ActionSegment{
 //		if (!this.shouldRespectEntityCollisions())
 //			source.setRespectEntityCollision(true);
 		source.unlockEntityCollisionBehavior();
-		source.updateHurtBoxProperties(settings.cooldownHurtBoxProperties);
 	}
 
 	
@@ -76,7 +76,6 @@ public class Ability extends ActionSegment{
 			activeSourceEffects.add(effect);
 		}
 
-		source.updateHurtBoxProperties(settings.activeHurtBoxProperties);
 	}
 	
 	public void sourceWindupProcessWithoutSuper(CharacterModel source) {
@@ -86,7 +85,6 @@ public class Ability extends ActionSegment{
 			source.addEffect(effect);
 			windupSourceEffects.add(effect);
 		}
-		source.updateHurtBoxProperties(settings.windupHurtBoxProperties);
 	}
 
 	@Override
@@ -208,5 +206,17 @@ public class Ability extends ActionSegment{
 		return true;
 	}
 
+	@Override
+	public void updateHurtBoxes() {
+		if (this.actionState.equals(ActionState.WINDUP)) {
+			source.updateHurtBoxProperties(this.settings.windupHurtBoxProperties);
+		}
+		else if (this.actionState.equals(ActionState.ACTIVE)) {
+			source.updateHurtBoxProperties(this.settings.activeHurtBoxProperties);
+		}
+		else if (this.actionState.equals(ActionState.COOLDOWN)) {
+			source.updateHurtBoxProperties(this.settings.cooldownHurtBoxProperties);
+		}
+	}
 
 }

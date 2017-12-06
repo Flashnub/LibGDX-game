@@ -1,5 +1,6 @@
 package com.mygdx.game.model.projectiles;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
@@ -32,6 +33,7 @@ public class ProjectileSettings extends AbilitySettings{
 	private Float collisionHeightCoefficient;
 	private Float hitRate;
 	private Boolean shouldRotate;
+	private Array<Rectangle> hurtBoxProperties;
 	Float windupTime;
 	Float cooldownTime;
 	protected Float duration;

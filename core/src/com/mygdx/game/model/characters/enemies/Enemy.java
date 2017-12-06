@@ -97,7 +97,7 @@ public class Enemy extends NPCCharacter{
 
 		
 		@Override
-		public EntityCollisionData handleEntityXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+		public EntityCollisionData handleEntityXCollisionLogic(Rectangle tempGameplayBounds, boolean alreadyCollided) {
 			if (alreadyCollided) {
 				if (this.walking) {
 					this.stopHorizontalMovement(false);
@@ -117,7 +117,7 @@ public class Enemy extends NPCCharacter{
 		}
 		
 		@Override
-		public EntityCollisionData handleEntityYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+		public EntityCollisionData handleEntityYCollisionLogic(Rectangle tempGameplayBounds, boolean alreadyCollided) {
 			if (alreadyCollided) {
 				return null;
 			}

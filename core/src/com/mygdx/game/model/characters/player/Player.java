@@ -559,7 +559,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 
 
 		@Override
-		public EntityCollisionData handleEntityXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds,  boolean alreadyCollided) {
+		public EntityCollisionData handleEntityXCollisionLogic(Rectangle tempGameplayBounds, boolean alreadyCollided) {
 			if (alreadyCollided) {
 				if (this.walking) {
 					this.stopHorizontalMovement(false);
@@ -582,7 +582,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 		}
 		
 		@Override
-		public EntityCollisionData handleEntityYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+		public EntityCollisionData handleEntityYCollisionLogic(Rectangle tempGameplayBounds, boolean alreadyCollided) {
 			if (alreadyCollided) {
 				return null;
 			}

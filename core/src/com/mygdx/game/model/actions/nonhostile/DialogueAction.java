@@ -151,4 +151,9 @@ public class DialogueAction extends ActionSegment {
 		return true;
 	}
 
+	@Override
+	public void updateHurtBoxes() {
+		
+	}
+
 }

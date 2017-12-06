@@ -45,13 +45,13 @@ public class WorldGate extends WorldObject {
 	}
 
 	@Override
-	public EntityCollisionData handleEntityXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+	public EntityCollisionData handleEntityXCollisionLogic(Rectangle tempGameplayBounds, boolean alreadyCollided) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public EntityCollisionData handleEntityYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+	public EntityCollisionData handleEntityYCollisionLogic(Rectangle tempGameplayBounds, boolean alreadyCollided) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -63,5 +63,17 @@ public class WorldGate extends WorldObject {
 				this.objListener.objectToActOn(this);
 			}
 		}
+	}
+
+	@Override
+	public void refreshHurtBoxesX() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void refreshHurtBoxesY() {
+		// TODO Auto-generated method stub
+		
 	}
 }

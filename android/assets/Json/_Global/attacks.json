@@ -1,10 +1,77 @@
 {
 	"5P": {
 		"class": "com.mygdx.game.model.actions.AttackSettings",
-		"originX": 0,
-		"originY": 110,
-		"width": 60,
-		"height": 40,
+		"hitBoxProperties": [
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":5,
+				"y":160, 
+				"width": 30
+				"height": 25
+			},
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":15,
+				"y":180, 
+				"width": 5
+				"height": 7
+			},
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":25,
+				"y":184, 
+				"width": 15
+				"height": 10
+			}
+		]
+		"windupHurtBoxProperties":  [
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":0,
+				"y":10, 
+				"width": 65
+				"height": 70
+			},
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":10,
+				"y":80, 
+				"width": 55
+				"height": 95
+			}
+		],
+		"activeHurtBoxProperties":  [
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":5,
+				"y":10, 
+				"width": 65
+				"height": 70
+			},
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":15,
+				"y":85, 
+				"width": 55
+				"height": 100
+			}
+		],
+		"cooldownHurtBoxProperties":  [
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":10,
+				"y":10, 
+				"width": 65
+				"height": 70
+			},
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":20,
+				"y":90, 
+				"width": 55
+				"height": 105
+			}
+		],
 		"sourceEffectSettings": [
 
 		]

@@ -84,13 +84,24 @@ public class WorldRenderer implements CoordinatesHelper, WorldListener{
 	        tiledMapRenderer.setView(camera);
 	        tiledMapRenderer.render();
 	        
+	        gameBatch.setProjectionMatrix(camera.combined);
+	        gameBatch.begin();
+	        drawNPCs(gameBatch);
+	        drawPlayer(gameBatch);
+	        drawEnemies(gameBatch);
+	        drawProjectiles(gameBatch);
+	        drawWorldObjects(gameBatch);
+	        drawExplosions(gameBatch);
+	        gameBatch.end();	        
+
 	        debugRenderer.setProjectionMatrix(camera.combined);
 	        debugRenderer.begin(ShapeType.Line);
+	        debugRenderer.setColor(Color.BLACK);
+
 	        //Collision
 	        Polygon playerPoly = MathUtils.rectangleToPolygon(
 	        						worldModel.getPlayer().getCharacterData().gameplayCollisionBox, 
 	        						worldModel.getPlayer().getCharacterData().getVelocityAngle());
-	        debugRenderer.setColor(Color.BLACK);
 
 	        debugRenderer.polygon(playerPoly.getTransformedVertices());
         	debugRenderer.rect(worldModel.getPlayer().getCharacterData().getImageHitBox().x, worldModel.getPlayer().getCharacterData().getImageHitBox().y, worldModel.getPlayer().getCharacterData().getImageHitBox().width, worldModel.getPlayer().getCharacterData().getImageHitBox().height);
@@ -108,12 +119,9 @@ public class WorldRenderer implements CoordinatesHelper, WorldListener{
 	        	Polygon poly = MathUtils.rectangleToPolygon(enemy.getCharacterData().gameplayCollisionBox, enemy.getCharacterData().getVelocityAngle());
 	        	debugRenderer.polygon(poly.getTransformedVertices());
 	        }
-	        for (Rectangle rectangle : worldModel.getAdditionalRectangles()) {
-	        	debugRenderer.rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
-	        }
 	        
 	        //HurtBoxes
-	        debugRenderer.setColor(Color.GREEN);
+	        debugRenderer.setColor(Color.BLUE);
 	        for (Rectangle playerHurtBox : worldModel.getPlayer().getCharacterData().gameplayHurtBoxes) {
 	        	debugRenderer.rect(playerHurtBox.x, playerHurtBox.y, playerHurtBox.width, playerHurtBox.height);
 	        }
@@ -138,18 +146,11 @@ public class WorldRenderer implements CoordinatesHelper, WorldListener{
 	        
 	        //HitBoxes
 	        debugRenderer.setColor(Color.RED);
+	        for (Rectangle rectangle : worldModel.getAdditionalRectangles()) {
+	        	debugRenderer.rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+	        }
 	        
 	        debugRenderer.end();
-	        
-	        gameBatch.setProjectionMatrix(camera.combined);
-	        gameBatch.begin();
-	        drawNPCs(gameBatch);
-	        drawPlayer(gameBatch);
-	        drawEnemies(gameBatch);
-	        drawProjectiles(gameBatch);
-	        drawWorldObjects(gameBatch);
-	        drawExplosions(gameBatch);
-	        gameBatch.end();
 	    }
 	    
 	    private void drawPlayer(SpriteBatch batch) {

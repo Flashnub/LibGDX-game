@@ -361,7 +361,7 @@ public abstract class EntityModel {
 		float pointOfReturn = 0f;
 		float time = 0f;
 		
-		Rectangle tempImageBounds = new Rectangle(this.imageBounds);
+//		Rectangle tempImageBounds = new Rectangle(this.imageBounds);
 		Rectangle tempGameplayBounds = new Rectangle(this.gameplayCollisionBox);
 //		Array <CellWrapper> tilesToCheckForWorldObjects = new Array<CellWrapper>();
 		float tempVelocity = yVelocity;
@@ -382,7 +382,7 @@ public abstract class EntityModel {
 				tempVelocity += this.acceleration.y * increment;
 			
 			tempGameplayBounds.setY(tempGameplayBounds.getY() + tempVelocity * increment);
-			tempImageBounds.y = -1f * (this.yOffsetModifier + (tempImageBounds.height * ((1f - this.heightCoefficient) / 2)) - tempGameplayBounds.y );
+//			tempImageBounds.y = -1f * (this.yOffsetModifier + (tempImageBounds.height * ((1f - this.heightCoefficient) / 2)) - tempGameplayBounds.y );
 		
 			//If on slope then make sure that gravity moves character down or moves up.
 			//If on slope, then forgo tile collision till off of slope.
@@ -460,7 +460,7 @@ public abstract class EntityModel {
 
 			//EntityCollision
 			if (!collisionY) {
-				EntityCollisionData additionalCollisionY = this.handleEntityYCollisionLogic(tempGameplayBounds, tempImageBounds, collisionY);
+				EntityCollisionData additionalCollisionY = this.handleEntityYCollisionLogic(tempGameplayBounds, collisionY);
 				if (additionalCollisionY != null) {
 					collisionY = true;
 					collisionType = CollisionType.Entity;
@@ -486,12 +486,15 @@ public abstract class EntityModel {
 		//would interfere with object/world/entity collisions. If it does, 
 		if (shouldMove && !collisionY) {
 			this.gameplayCollisionBox.y = tempGameplayBounds.y;
-			this.imageBounds.y = tempImageBounds.y;
+//			this.imageBounds.y = tempImageBounds.y;
+			this.refreshImageHitBoxY();
+			this.refreshHurtBoxesY();
 			this.velocity.y = tempVelocity;
 		}
 		else if (shouldMove && (collisionType.equals(CollisionType.World) || collisionType.equals(CollisionType.Slope))) {
 			this.gameplayCollisionBox.y = pointOfReturn;
 			this.refreshImageHitBoxY();
+			this.refreshHurtBoxesY();
 		}
 		else if (shouldMove && collisionType.equals(CollisionType.Entity))
 		{
@@ -524,7 +527,7 @@ public abstract class EntityModel {
 				if (!xCheckInfo2.didCollide && !yCheckInfo2.didCollide && !objectCheck2 && entityCollisionRepositionTokens > 0) {
 					this.gameplayCollisionBox.x = sourceHitBox.x;
 					this.refreshImageHitBoxX();
-					this.refreshHurtBoxesY();
+					this.refreshHurtBoxesX();
 					entityCollisionRepositionTokens -= 1;
 				}
 				break;
@@ -608,8 +611,8 @@ public abstract class EntityModel {
 		return interceptedAttack;
 	}
 	
-	public abstract EntityCollisionData handleEntityXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided);
-	public abstract EntityCollisionData handleEntityYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided);
+	public abstract EntityCollisionData handleEntityXCollisionLogic(Rectangle tempGameplayBounds, boolean alreadyCollided);
+	public abstract EntityCollisionData handleEntityYCollisionLogic(Rectangle tempGameplayBounds, boolean alreadyCollided);
 
 	public abstract int getAllegiance();
 	public abstract boolean isFacingLeft();
@@ -638,7 +641,7 @@ public abstract class EntityModel {
 		float pointOfReturn = 0f;
 		float time = 0f;
 		
-		Rectangle tempImageBounds = new Rectangle(this.imageBounds);
+//		Rectangle tempImageBounds = new Rectangle(this.imageBounds);
 		Rectangle tempGameplayBounds = new Rectangle(this.gameplayCollisionBox);
 		float tempVelocity = xVelocity;
 		float tempMaxTime = maxTime;
@@ -657,7 +660,7 @@ public abstract class EntityModel {
 			
 			tempVelocity += xAcceleration * increment;
 			tempGameplayBounds.setX(tempGameplayBounds.getX() + tempVelocity * increment);
-			tempImageBounds.x = -1f * (getXOffsetModifier() + (tempImageBounds.width * ((1f - this.widthCoefficient) / 2)) - tempGameplayBounds.x );
+//			tempImageBounds.x = -1f * (getXOffsetModifier() + (tempImageBounds.width * ((1f - this.widthCoefficient) / 2)) - tempGameplayBounds.x );
 //			tempImageBounds.setX(tempImageBounds.getX() + tempVelocity * increment);
 //			tempGameplayBounds.setX(this.xOffsetModifier + tempImageBounds.getX() + tempImageBounds.getWidth() * ((1f - this.widthCoefficient) / 2));
 
@@ -688,7 +691,7 @@ public abstract class EntityModel {
 
 			//Entity
 			if (!collisionX) {
-				EntityCollisionData additionalCollisionX = this.handleEntityXCollisionLogic(tempGameplayBounds, tempImageBounds, collisionX);
+				EntityCollisionData additionalCollisionX = this.handleEntityXCollisionLogic(tempGameplayBounds, collisionX);
 				if (additionalCollisionX != null) {
 					collisionX = true;
 					collisionType = CollisionType.Entity;
@@ -708,12 +711,15 @@ public abstract class EntityModel {
 		//move on x axis
 		if (shouldMove && !collisionX) {
 			this.gameplayCollisionBox.x = tempGameplayBounds.x;
-			this.imageBounds.x = tempImageBounds.x;
+//			this.imageBounds.x = tempImageBounds.x;
+			this.refreshImageHitBoxX();
+			this.refreshHurtBoxesX();
 			this.velocity.x = tempVelocity;
 		}
 		else if (shouldMove && collisionType.equals(CollisionType.World)) {
 			this.gameplayCollisionBox.x = pointOfReturn;
 			this.refreshImageHitBoxX();
+			this.refreshHurtBoxesX();
 		}
 		else if (shouldMove && collisionType.equals(CollisionType.Entity))
 		{
@@ -732,6 +738,7 @@ public abstract class EntityModel {
 				if (!xCheckInfo.didCollide && !yCheckInfo.didCollide && !objectCheck && entityCollisionRepositionTokens > 0) {
 					this.gameplayCollisionBox.x = sourceCollisionBox.x;
 					this.refreshImageHitBoxX();
+					this.refreshHurtBoxesX();
 					entityCollisionRepositionTokens -= 1;
 				}
 				break;
@@ -745,6 +752,7 @@ public abstract class EntityModel {
 				if (!xCheckInfo2.didCollide && !yCheckInfo2.didCollide && !objectCheck2 && entityCollisionRepositionTokens > 0) {
 					this.gameplayCollisionBox.x = sourceCollisionBox.x;
 					this.refreshImageHitBoxX();
+					this.refreshHurtBoxesX();
 					entityCollisionRepositionTokens -= 1;
 				}
 				break;
@@ -801,7 +809,14 @@ public abstract class EntityModel {
 	public abstract void refreshHurtBoxesY();
 	
 	public void updateHurtBoxProperties (Array <Rectangle> newHurtBoxProperties) {
+		System.out.print(newHurtBoxProperties.size);
 		this.fixedHurtBoxProperties = newHurtBoxProperties;
+		this.gameplayHurtBoxes.clear();
+		for (int i = 0; i < this.fixedHurtBoxProperties.size; i++) {
+			this.gameplayHurtBoxes.add(new Rectangle());
+		}
+		refreshHurtBoxesX();
+		refreshHurtBoxesY();
 	}
 	
 	public float getXOffsetModifier() {

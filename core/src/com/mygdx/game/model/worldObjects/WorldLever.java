@@ -57,13 +57,25 @@ public class WorldLever extends WorldObject {
 	}
 
 	@Override
-	public EntityCollisionData handleEntityXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+	public EntityCollisionData handleEntityXCollisionLogic(Rectangle tempGameplayBounds, boolean alreadyCollided) {
 		return null;
 	}
 
 	@Override
-	public EntityCollisionData handleEntityYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+	public EntityCollisionData handleEntityYCollisionLogic(Rectangle tempGameplayBounds, boolean alreadyCollided) {
 		return null;
+	}
+
+	@Override
+	public void refreshHurtBoxesX() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void refreshHurtBoxesY() {
+		// TODO Auto-generated method stub
+		
 	}
 
 

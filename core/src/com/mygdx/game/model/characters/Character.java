@@ -181,7 +181,8 @@ public abstract class Character implements ModelListener {
 			if (weapons.size > 0) {
 				currentWeapon = weapons.get(0);
 			}
-			this.fixedHurtBoxProperties = this.getCharacterProperties().defaultHurtboxProperties;
+//			this.fixedHurtBoxProperties = this.getCharacterProperties().defaultHurtboxProperties;
+			this.updateHurtBoxProperties(this.getCharacterProperties().defaultHurtboxProperties);
 					
 		}
 		
@@ -287,7 +288,8 @@ public abstract class Character implements ModelListener {
 							if (model.getCurrentlyHeldDirection().equals(DirectionalInput.LEFT) || model.getCurrentlyHeldDirection().equals(DirectionalInput.RIGHT) && !iterator.hasNext())
 								horizontalMove(model.getCurrentlyHeldDirection().equals(DirectionalInput.LEFT));
 						}
-						this.fixedHurtBoxProperties = this.getCharacterProperties().defaultHurtboxProperties;
+//						this.fixedHurtBoxProperties = this.getCharacterProperties().defaultHurtboxProperties;
+						this.updateHurtBoxProperties(this.getCharacterProperties().defaultHurtboxProperties);
 					}
 				}
 			}
@@ -837,12 +839,12 @@ public abstract class Character implements ModelListener {
 		public void refreshHurtBoxesX() {
 			for (int i = 0; i < this.gameplayHurtBoxes.size; i++) {
 				Rectangle hurtBox = gameplayHurtBoxes.get(i);
-				if (i < this.getCharacterProperties().defaultHurtboxProperties.size) {
+				if (i < this.fixedHurtBoxProperties.size) {
 					hurtBox.x = this.gameplayCollisionBox.x + this.fixedHurtBoxProperties.get(i).x;
 					hurtBox.width = this.fixedHurtBoxProperties.get(i).width;
 				}
 				else {
-					this.gameplayHurtBoxes.removeIndex(i);
+//					this.gameplayHurtBoxes.removeIndex(i);
 					break;
 				}
 			}
@@ -851,12 +853,12 @@ public abstract class Character implements ModelListener {
 		public void refreshHurtBoxesY() {
 			for (int i = 0; i < this.gameplayHurtBoxes.size; i++) {
 				Rectangle hurtBox = gameplayHurtBoxes.get(i);
-				if (i < this.getCharacterProperties().defaultHurtboxProperties.size) {
+				if (i < this.fixedHurtBoxProperties.size) {
 					hurtBox.y = this.gameplayCollisionBox.y + this.fixedHurtBoxProperties.get(i).y;
 					hurtBox.height = this.fixedHurtBoxProperties.get(i).height;
 				}
 				else {
-					this.gameplayHurtBoxes.removeIndex(i);
+//					this.gameplayHurtBoxes.removeIndex(i);
 					break;
 				}
 			}

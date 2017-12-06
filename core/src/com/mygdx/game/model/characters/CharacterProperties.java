@@ -222,7 +222,7 @@ public class CharacterProperties implements Serializable {
 			this.useDefaultTensionStagger = true;
 		}
 		
-		Float xOffsetModifier = json.readValue("xOffsetModifier", Float.class, jsonData);
+		Float xOffsetModifier = json.readValue("xCollisionOffsetModifier", Float.class, jsonData);
 		if (xOffsetModifier != null) {
 			this.xCollisionOffsetModifier = xOffsetModifier; 
 		}
@@ -230,7 +230,7 @@ public class CharacterProperties implements Serializable {
 			this.xCollisionOffsetModifier = 0f;
 		}
 		
-		Float yOffsetModifier = json.readValue("yOffsetModifier", Float.class, jsonData);
+		Float yOffsetModifier = json.readValue("yCollisionOffsetModifier", Float.class, jsonData);
 		if (yOffsetModifier != null) {
 			this.yCollisionOffsetModifier = yOffsetModifier; 
 		}
@@ -283,7 +283,7 @@ public class CharacterProperties implements Serializable {
 			this.yRotationCoefficient = 0.5f;
 		}
 		
-		defaultHurtboxProperties = json.readValue("defaultHurtboxes", Array.class, jsonData);
+		defaultHurtboxProperties = json.readValue("defaultHurtboxProperties", Array.class, jsonData);
 		if (defaultHurtboxProperties == null) {
 			defaultHurtboxProperties = new Array <Rectangle>();
 		}

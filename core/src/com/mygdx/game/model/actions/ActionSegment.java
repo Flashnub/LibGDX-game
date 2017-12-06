@@ -75,6 +75,7 @@ public abstract class ActionSegment implements EffectController {
 		for (ActionSegmentListener listener : this.segmentListeners) {
 			listener.onActive(source);
 		}
+		updateHurtBoxes();
 	}
 	
 	public void sourceWindupProcess(CharacterModel source) {
@@ -87,6 +88,7 @@ public abstract class ActionSegment implements EffectController {
 		for (ActionSegmentListener listener : this.segmentListeners) {
 			listener.onWindup(source);
 		}
+		updateHurtBoxes();
 	}
 	
 	public void completionBlock(CharacterModel source) {
@@ -98,6 +100,7 @@ public abstract class ActionSegment implements EffectController {
 		for (ActionSegmentListener listener : this.segmentListeners) {
 			listener.onCooldown(source);
 		}
+		updateHurtBoxes();
 	}
 	
 	
@@ -177,6 +180,7 @@ public abstract class ActionSegment implements EffectController {
 		this.segmentListeners.add(listener);
 	}
 	
+	public abstract void updateHurtBoxes();
 	public abstract boolean metChainConditions();
 	public abstract boolean willActionHitTarget(CharacterModel target);
 	public abstract void setDurations(CharacterModel source);

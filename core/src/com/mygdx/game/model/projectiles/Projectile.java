@@ -453,12 +453,12 @@ public class Projectile extends EntityModel implements EffectController{
 	}
 
 	@Override
-	public EntityCollisionData handleEntityXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+	public EntityCollisionData handleEntityXCollisionLogic(Rectangle tempGameplayBounds, boolean alreadyCollided) {
 		return null;
 	}
 
 	@Override
-	public EntityCollisionData handleEntityYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+	public EntityCollisionData handleEntityYCollisionLogic(Rectangle tempGameplayBounds, boolean alreadyCollided) {
 		return null;
 	}
 
@@ -503,5 +503,15 @@ public class Projectile extends EntityModel implements EffectController{
 	@Override
 	public CharacterModel getSource() {
 		return this.source;
+	}
+
+	@Override
+	public void refreshHurtBoxesX() {
+		//TBD
+	}
+
+	@Override
+	public void refreshHurtBoxesY() {
+		
 	}
 }

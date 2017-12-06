@@ -5,12 +5,42 @@
 	"maxStability": 5,
 	"maxTension": 4,
 	"attack": 1,
-	"xOffsetModifier": 80,
-	"widthCoefficient": 0.2,
-	"heightCoefficient": 0.7,
+	"xCollisionOffsetModifier": 70,
+	"collisionWidthCoefficient": 0.2,
+	"collisionHeightCoefficient": 0.7,
 	"useDefaultStagger": true,
 	"useDefaultTensionStagger": false,
 	"horizontalSpeed": 450,
+	"defaultHurtboxProperties":  [
+		{
+			"class": "com.badlogic.gdx.math.Rectangle",
+			"x":15,
+			"y":5, 
+			"width": 45
+			"height": 75
+		},
+		{
+			"class": "com.badlogic.gdx.math.Rectangle",
+			"x":15,
+			"y":80, 
+			"width": 45
+			"height": 75
+		},
+		{
+			"class": "com.badlogic.gdx.math.Rectangle",
+			"x":23,
+			"y":155, 
+			"width": 25
+			"height": 25
+		},
+		{
+			"class": "com.badlogic.gdx.math.Rectangle",
+			"x":5,
+			"y":-15, 
+			"width": 65
+			"height": 20
+		}
+	]
 	"actions": {
 		"Dash": {
 			"class": com.mygdx.game.model.actions.ActionSequence,

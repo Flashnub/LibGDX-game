@@ -91,12 +91,12 @@ public class Explosion extends EntityModel implements EffectController {
 	}
 
 	@Override
-	public EntityCollisionData handleEntityXCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+	public EntityCollisionData handleEntityXCollisionLogic(Rectangle tempGameplayBounds, boolean alreadyCollided) {
 		return null;
 	}
 
 	@Override
-	public EntityCollisionData handleEntityYCollisionLogic(Rectangle tempGameplayBounds, Rectangle tempImageBounds, boolean alreadyCollided) {
+	public EntityCollisionData handleEntityYCollisionLogic(Rectangle tempGameplayBounds, boolean alreadyCollided) {
 		return null;
 	}
 
@@ -233,5 +233,17 @@ public class Explosion extends EntityModel implements EffectController {
 	
 	public boolean checkSlopes() {
 		return false;
+	}
+
+	@Override
+	public void refreshHurtBoxesX() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void refreshHurtBoxesY() {
+		// TODO Auto-generated method stub
+		
 	}
 }

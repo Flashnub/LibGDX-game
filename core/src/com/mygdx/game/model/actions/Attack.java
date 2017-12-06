@@ -263,41 +263,6 @@ public class Attack extends ActionSegment {
 	
 	public void updateHitBoxes() {
 		for (int i = 0; i < hitBoxes.size; i++) {
-			float originXOffset = 0f;
-			float width = 0f;
-			float originYOffset = 0f;
-//			if (this.actionState.equals(ActionState.WINDUP)) {
-//				if (i < attackSettings.windupHurtBoxProperties.size) {
-//					originXOffset = attackSettings.windupHurtBoxProperties.get(i).x;
-//					originYOffset = attackSettings.windupHurtBoxProperties.get(i).y;
-//					width = attackSettings.windupHurtBoxProperties.get(i).width;
-//				}
-//				else {
-//					break;
-//				}
-//			}
-//			else if (this.actionState.equals(ActionState.ACTIVE))
-//			{
-//				if (i < attackSettings.activeHurtBoxProperties.size) {
-//					originXOffset = attackSettings.activeHurtBoxProperties.get(i).x;
-//					originYOffset = attackSettings.activeHurtBoxProperties.get(i).y;
-//					width = attackSettings.activeHurtBoxProperties.get(i).width;
-//				}
-//				else {
-//					break;
-//				}
-//			}
-//			else if (this.actionState.equals(ActionState.COOLDOWN))
-//			{
-//				if (i < attackSettings.cooldownHurtBoxProperties.size) {
-//					originXOffset = attackSettings.cooldownHurtBoxProperties.get(i).x;
-//					originYOffset = attackSettings.cooldownHurtBoxProperties.get(i).y;
-//					width = attackSettings.cooldownHurtBoxProperties.get(i).width;
-//				}
-//				else {
-//					break;
-//				}
-//			}
 			Rectangle hitBox = hitBoxes.get(i);
 			if (source.isFacingLeft()) {
 				hitBox.x = source.getGameplayCollisionBox().x - this.attackSettings.hitBoxProperties.get(i).x - this.attackSettings.hitBoxProperties.get(i).width;
@@ -305,10 +270,8 @@ public class Attack extends ActionSegment {
 			else {
 				hitBox.x = source.getGameplayCollisionBox().x + this.attackSettings.hitBoxProperties.get(i).x + source.getGameplayCollisionBox().width;
 			}
-			hitBox.y = source.getGameplayCollisionBox().y + originYOffset;
+			hitBox.y = source.getGameplayCollisionBox().y + this.attackSettings.hitBoxProperties.get(i).y ;
 		}
-
-
 	}
 
 	@Override
@@ -392,6 +355,19 @@ public class Attack extends ActionSegment {
 	@Override
 	public boolean metChainConditions() {
 		return this.hasConfirmedHit;
+	}
+
+	@Override
+	public void updateHurtBoxes() {
+		if (this.actionState.equals(ActionState.WINDUP)) {
+			source.updateHurtBoxProperties(this.attackSettings.windupHurtBoxProperties);
+		}
+		else if (this.actionState.equals(ActionState.ACTIVE)) {
+			source.updateHurtBoxProperties(this.attackSettings.activeHurtBoxProperties);
+		}
+		else if (this.actionState.equals(ActionState.COOLDOWN)) {
+			source.updateHurtBoxProperties(this.attackSettings.cooldownHurtBoxProperties);
+		}
 	}
 
 }

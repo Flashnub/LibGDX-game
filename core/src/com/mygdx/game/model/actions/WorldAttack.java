@@ -3,6 +3,7 @@ package com.mygdx.game.model.actions;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.constants.JSONController;
+import com.mygdx.game.model.actions.ActionSegment.ActionState;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.EffectInitializer;
 import com.mygdx.game.model.effects.EffectSettings;
@@ -238,5 +239,18 @@ public class WorldAttack extends ActionSegment{
 	@Override
 	public boolean willActionHitTarget(CharacterModel target) {
 		return true;
+	}
+
+	@Override
+	public void updateHurtBoxes() {
+		if (this.actionState.equals(ActionState.WINDUP)) {
+			source.updateHurtBoxProperties(this.worldAttackSettings.abilitySettings.windupHurtBoxProperties);
+		}
+		else if (this.actionState.equals(ActionState.ACTIVE)) {
+			source.updateHurtBoxProperties(this.worldAttackSettings.abilitySettings.activeHurtBoxProperties);
+		}
+		else if (this.actionState.equals(ActionState.COOLDOWN)) {
+			source.updateHurtBoxProperties(this.worldAttackSettings.abilitySettings.cooldownHurtBoxProperties);
+		}
 	}
 }

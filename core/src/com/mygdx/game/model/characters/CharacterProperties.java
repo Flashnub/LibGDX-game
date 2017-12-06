@@ -3,6 +3,7 @@ package com.mygdx.game.model.characters;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Json.Serializable;
@@ -22,8 +23,8 @@ public class CharacterProperties implements Serializable {
 	float maxStability;
 	float maxTension;
 	float staggerAllowanceTime;
-	float heightCoefficient;
-	float widthCoefficient;
+	float collisionHeightCoefficient;
+	float collisionWidthCoefficient;
 	Float gravity;
 	Float horizontalSpeed;
 	Float horizontalAcceleration;
@@ -33,6 +34,7 @@ public class CharacterProperties implements Serializable {
 	Integer allegiance;
 	CharacterModel source;
 	HashMap<String, ActionSequence> actions;
+	Array <Rectangle> defaultHurtboxProperties;
 	Array <StringWrapper> weaponKeys;
 	Array <ActionSequence> sequencesSortedByInputSize;
 	boolean useDefaultWakeup;
@@ -47,8 +49,8 @@ public class CharacterProperties implements Serializable {
 	float xRotationCoefficient;
 	float yRotationCoefficient;
 	
-	Float xOffsetModifier;
-	Float yOffsetModifier;
+	Float xCollisionOffsetModifier;
+	Float yCollisionOffsetModifier;
 	
 	public CharacterProperties() {
 		
@@ -67,12 +69,13 @@ public class CharacterProperties implements Serializable {
 		json.writeValue("gravity", gravity);
 		json.writeValue("injuryImmunityTime", injuryImmunityTime);
 		json.writeValue("allegiance", allegiance);
-		json.writeValue("widthCoefficient", widthCoefficient);
-		json.writeValue("heightCoefficient", heightCoefficient);
+		json.writeValue("collisionWidthCoefficient", collisionWidthCoefficient);
+		json.writeValue("collisionHeightCoefficient", collisionHeightCoefficient);
 		json.writeValue("weaponKeys", weaponKeys);
 		json.writeValue("shouldRespectEntityCollisions", shouldRespectEntityCollisions);
 		json.writeValue("shouldRespectTileCollisions", shouldRespectTileCollisions);
 		json.writeValue("shouldRespectObjectCollisions", shouldRespectObjectCollisions);
+		json.writeValue("defaultHurtboxes", defaultHurtboxProperties);
 
 	}
 
@@ -85,6 +88,7 @@ public class CharacterProperties implements Serializable {
 		attack = json.readValue("attack", Float.class, jsonData);
 		maxStability = json.readValue("maxStability", Float.class, jsonData);
 		actions = json.readValue("actions", HashMap.class, jsonData);
+
 		Array <StringWrapper> weaponKeys = json.readValue("weaponKeys", Array.class, jsonData);
 		if (weaponKeys == null) {
 			this.weaponKeys = new Array <StringWrapper>();
@@ -178,20 +182,20 @@ public class CharacterProperties implements Serializable {
 			this.allegiance = allegiance;
 		}
 		
-		Float widthCoefficient = json.readValue("widthCoefficient", Float.class, jsonData);
+		Float widthCoefficient = json.readValue("collisionWidthCoefficient", Float.class, jsonData);
 		if (widthCoefficient != null) {
-			this.widthCoefficient = widthCoefficient;
+			this.collisionWidthCoefficient = widthCoefficient;
 		}
 		else {
-			this.widthCoefficient = 1f;
+			this.collisionWidthCoefficient = 1f;
 		}
 		
-		Float heightCoefficient = json.readValue("heightCoefficient", Float.class, jsonData);
+		Float heightCoefficient = json.readValue("collisionHeightCoefficient", Float.class, jsonData);
 		if (heightCoefficient != null) {
-			this.heightCoefficient = heightCoefficient;
+			this.collisionHeightCoefficient = heightCoefficient;
 		}
 		else {
-			this.heightCoefficient = 1f;
+			this.collisionHeightCoefficient = 1f;
 		}
 		
 		Boolean useDefaultStagger = json.readValue("useDefaultStagger", Boolean.class, jsonData);
@@ -220,18 +224,18 @@ public class CharacterProperties implements Serializable {
 		
 		Float xOffsetModifier = json.readValue("xOffsetModifier", Float.class, jsonData);
 		if (xOffsetModifier != null) {
-			this.xOffsetModifier = xOffsetModifier; 
+			this.xCollisionOffsetModifier = xOffsetModifier; 
 		}
 		else {
-			this.xOffsetModifier = 0f;
+			this.xCollisionOffsetModifier = 0f;
 		}
 		
 		Float yOffsetModifier = json.readValue("yOffsetModifier", Float.class, jsonData);
 		if (yOffsetModifier != null) {
-			this.yOffsetModifier = yOffsetModifier; 
+			this.yCollisionOffsetModifier = yOffsetModifier; 
 		}
 		else {
-			this.yOffsetModifier = 0f;
+			this.yCollisionOffsetModifier = 0f;
 		}
 		
 		this.sequencesSortedByInputSize = new Array <ActionSequence> ();
@@ -278,6 +282,11 @@ public class CharacterProperties implements Serializable {
 		else {
 			this.yRotationCoefficient = 0.5f;
 		}
+		
+		defaultHurtboxProperties = json.readValue("defaultHurtboxes", Array.class, jsonData);
+		if (defaultHurtboxProperties == null) {
+			defaultHurtboxProperties = new Array <Rectangle>();
+		}
 	}
 
 	public CharacterProperties cloneProperties() {
@@ -291,8 +300,8 @@ public class CharacterProperties implements Serializable {
 		properties.allegiance = this.allegiance;
 		properties.gravity = this.gravity;
 		properties.injuryImmunityTime = this.injuryImmunityTime;
-		properties.widthCoefficient = this.widthCoefficient;
-		properties.heightCoefficient = this.heightCoefficient;
+		properties.collisionWidthCoefficient = this.collisionWidthCoefficient;
+		properties.collisionHeightCoefficient = this.collisionHeightCoefficient;
 		properties.horizontalAcceleration = this.horizontalAcceleration;
 		properties.weaponKeys = this.weaponKeys;
 		properties.maxTension = this.maxTension;
@@ -302,14 +311,15 @@ public class CharacterProperties implements Serializable {
 		properties.shouldRespectEntityCollisions = this.shouldRespectEntityCollisions;
 		properties.shouldRespectObjectCollisions = this.shouldRespectObjectCollisions;
 		properties.shouldRespectTileCollisions = this.shouldRespectTileCollisions;
-		properties.xOffsetModifier = this.xOffsetModifier;
-		properties.yOffsetModifier = this.yOffsetModifier;
+		properties.xCollisionOffsetModifier = this.xCollisionOffsetModifier;
+		properties.yCollisionOffsetModifier = this.yCollisionOffsetModifier;
 		properties.useDefaultAerialStagger = this.useDefaultAerialStagger;
 		properties.useDefaultWakeup = this.useDefaultWakeup;
 		properties.maxJumpTokens = this.maxJumpTokens;
 		properties.boltedDown = this.boltedDown;
 		properties.xRotationCoefficient = this.xRotationCoefficient;
 		properties.yRotationCoefficient = this.yRotationCoefficient;
+		properties.defaultHurtboxProperties = this.defaultHurtboxProperties;
 		//iterate through actions.
 		HashMap <String, ActionSequence> clonedActions = new HashMap<String, ActionSequence> ();
 		for (Map.Entry<String, ActionSequence> entry : actions.entrySet()) {
@@ -353,11 +363,11 @@ public class CharacterProperties implements Serializable {
 	}
 	
 	public float getHeightCoefficient() {
-		return heightCoefficient;
+		return collisionHeightCoefficient;
 	}
 
 	public float getWidthCoefficient() {
-		return widthCoefficient;
+		return collisionWidthCoefficient;
 	}
 
 	public Float getInjuryImmunityTime() {

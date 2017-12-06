@@ -15,8 +15,8 @@ public class EntityCollisionData {
 		this.source = source;
 		this.collidedEntity = collidedEntity;
 		
-		Rectangle oldSourceHitBox = source.getGameplayHitBox();
-		Rectangle collidedEntityHitBox = collidedEntity.getGameplayHitBox();
+		Rectangle oldSourceHitBox = source.getGameplayCollisionBox();
+		Rectangle collidedEntityHitBox = collidedEntity.getGameplayCollisionBox();
 		
 //		//Below
 //		if (oldSourceHitBox.y + oldSourceHitBox.height < collidedEntityHitBox.y) {

@@ -82,21 +82,21 @@ public abstract class EnemyAI implements PlayerObserver {
 			for (ObservationBlock observationBlock : this.observationBlocks) {
 				//find closest enemy and shoot.
 				PositionalObservation currentObservation = (PositionalObservation) observationBlock.observations.get(PositionalObservation.classKey);
-				if (currentObservation != null && currentObservation.sourceOfObservation.equals(this.currentTarget)) {
+				if (currentObservation != null && currentObservation.observationTarget.equals(this.currentTarget)) {
 					distanceObservation = currentObservation;
 					break;
 				}
 			}
 			if (distanceObservation != null) {
-				float rawDistance = distanceObservation.getHypotenuse();
+//				float rawDistance = distanceObservation.getHypotenuse();
 				//shoot if far, attack if close.
 				ActionSequence currentSequence = this.source.getCurrentActiveActionSeq();
 				for (ActionSequence actionSequence : this.source.getCharacterProperties().getActions().values()) {
 					if (!actionSequence.getActionKey().getKey().equals(ActionSequence.deathKey)) {
-						ActionSequence clonedSequence = actionSequence.cloneSequenceWithSourceAndTarget(this.source, distanceObservation.sourceOfObservation, world, world);
-						if (clonedSequence.getEffectiveRange() >= rawDistance) {
+						ActionSequence clonedSequence = actionSequence.cloneSequenceWithSourceAndTarget(this.source, distanceObservation.observationTarget, world, world);
+						if (clonedSequence.willHitTarget(distanceObservation.observationTarget)) {
 							if (currentSequence != null && currentSequence.isActionChainableWithThis(clonedSequence)) {
-								clonedSequence.increaseProbability();
+								clonedSequence.increaseActivationModifier();
 							}
 							possibleActionsToTake.add(clonedSequence);
 						}
@@ -171,14 +171,14 @@ public abstract class EnemyAI implements PlayerObserver {
 		if (isDocile()) {
 			for (ObservationBlock block : this.observationBlocks) {
 				for (Observation observation : block.observations.values()) {
-					if (observation instanceof PositionalObservation && !observation.sourceOfObservation.equals(this.source)) {
+					if (observation instanceof PositionalObservation && !observation.observationTarget.equals(this.source)) {
 						PositionalObservation positionalObservation = (PositionalObservation) observation;
 						float distance = positionalObservation.getHypotenuse();
 						if (!positionalObservation.isFacingTarget && !this.shouldTurnTowardsTarget) {
 							distance = distance * source.enemyProperties.awarenessFactor;
 						}
-						if (distance < source.enemyProperties.distanceToRecognize && this.source.getAllegiance() != positionalObservation.sourceOfObservation.getAllegiance()) {
-							currentTarget = positionalObservation.sourceOfObservation;
+						if (distance < source.enemyProperties.distanceToRecognize && this.source.getAllegiance() != positionalObservation.observationTarget.getAllegiance()) {
+							currentTarget = positionalObservation.observationTarget;
 							this.source.resetPatrolFields();
 							return;
 						}

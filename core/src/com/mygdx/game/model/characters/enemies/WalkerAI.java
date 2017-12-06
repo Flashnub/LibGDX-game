@@ -44,7 +44,7 @@ public class WalkerAI extends EnemyAI {
 			}
 			else if (!this.source.isProcessingActiveSequences()){ 
 				//walk towards or away nearest enemy
-				boolean moveLeft = source.getGameplayHitBox().x > this.getCurrentTarget().getGameplayHitBox().x;
+				boolean moveLeft = source.getGameplayCollisionBox().x > this.getCurrentTarget().getGameplayCollisionBox().x;
 				source.horizontalMove(moveLeft);
 			}
 		}		

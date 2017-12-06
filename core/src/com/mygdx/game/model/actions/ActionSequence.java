@@ -51,6 +51,7 @@ public class ActionSequence implements Serializable {
 	}
 	
 	public static final String deathKey = "Death";
+	public static final float defaultActivationModifier = 1f; 
 
 	private ActionSegmentKey actionKey;
 	private ActionStrategy strategy;
@@ -60,15 +61,15 @@ public class ActionSequence implements Serializable {
 	private String leftWindupState;
 	private String leftActingState;
 	private String leftCooldownState;
-	private boolean useLeft;
 	private boolean isActive;
+	private float activationModifier;
 
 	private boolean isSuper;
 	private Array <Array <String>> leftInputs;
 	private Array <Array <String>> rightInputs;
 	private UseType useType;
 	private Array <ActionSegmentKey> chainableActionKeys;
-	private float probabilityToActivate;
+//	private float probabilityToActivate;
 	private Array <ActionConditionSettings> conditionSettings;
 	
 	//Non json properties
@@ -89,8 +90,8 @@ public class ActionSequence implements Serializable {
 		this.highPriority = false;
 		this.shouldOverridePrevAction = false;
 		this.staggerTime = 0f;
-		this.probabilityToActivate = 0f;
 		this.isSuper = false;
+		this.activationModifier = ActionSequence.defaultActivationModifier;
 	}
 	
 	public static ActionSequence createSequenceWithDialog(DialogueSettings settings, CharacterModel source, CharacterModel target, DialogueController dialogueController, ActionListener actionListener) {
@@ -108,7 +109,6 @@ public class ActionSequence implements Serializable {
 		sequence.leftWindupState = sequence.windupState;
 		sequence.leftActingState = sequence.actingState;
 		sequence.leftCooldownState = sequence.cooldownState;
-		sequence.useLeft = source.isFacingLeft();
 		
 		sequence.source = source;
 		sequence.target = target;
@@ -120,6 +120,8 @@ public class ActionSequence implements Serializable {
 		sequence.leftInputs = new Array <Array <String>>();
 		sequence.rightInputs = new Array <Array <String>>();
 		sequence.conditionSettings = new Array <ActionConditionSettings>();
+		sequence.activationModifier = ActionSequence.defaultActivationModifier;
+
 		
 		sequence.createActionFromSettings(settings, null);
 		
@@ -142,7 +144,6 @@ public class ActionSequence implements Serializable {
 		sequence.leftWindupState = sequence.windupState;
 		sequence.leftActingState = sequence.actingState;
 		sequence.leftCooldownState = sequence.cooldownState;
-		sequence.useLeft = source.isFacingLeft();
 		sequence.highPriority = true; //Shouldn't remove action for tension
 		
 		sequence.source = source;
@@ -151,6 +152,7 @@ public class ActionSequence implements Serializable {
 		sequence.leftInputs = new Array <Array <String>>();
 		sequence.rightInputs = new Array <Array <String>>();
 		sequence.conditionSettings = new Array <ActionConditionSettings>();
+		sequence.activationModifier = ActionSequence.defaultActivationModifier;
 		
 		XMovementEffectSettings effect = new XMovementEffectSettings();
 		effect.fillInDefaults();
@@ -188,7 +190,6 @@ public class ActionSequence implements Serializable {
 		sequence.leftWindupState = sequence.windupState;
 		sequence.leftActingState = sequence.actingState;
 		sequence.leftCooldownState = sequence.cooldownState;
-		sequence.useLeft = source.isFacingLeft();
 		sequence.highPriority = true; //Shouldn't remove action for tension
 		sequence.shouldOverridePrevAction = staggerType.equals(StaggerType.Normal) || staggerType.equals(StaggerType.Aerial);
 
@@ -199,6 +200,7 @@ public class ActionSequence implements Serializable {
 		sequence.leftInputs = new Array <Array <String>>();
 		sequence.rightInputs = new Array <Array <String>>();
 		sequence.conditionSettings = new Array <ActionConditionSettings>();
+		sequence.activationModifier = ActionSequence.defaultActivationModifier;
 
 		sequence.createActionFromSettings(null, null);
 			
@@ -312,13 +314,13 @@ public class ActionSequence implements Serializable {
 			this.isActive = true;
 		}
 		
-		Float probabilityToActivate = json.readValue("probabilityToActivate", Float.class, jsonData);
-		if (probabilityToActivate != null) {
-			this.probabilityToActivate = probabilityToActivate;
-		}
-		else {
-			this.probabilityToActivate = 0.25f;
-		}
+//		Float probabilityToActivate = json.readValue("probabilityToActivate", Float.class, jsonData);
+//		if (probabilityToActivate != null) {
+//			this.probabilityToActivate = probabilityToActivate;
+//		}
+//		else {
+//			this.probabilityToActivate = 0.25f;
+//		}
 	}
 	
 	public ActionSequence cloneSequenceWithSourceAndTarget(CharacterModel source, CharacterModel target, ActionListener actionListener, CollisionChecker collisionChecker) {
@@ -327,7 +329,6 @@ public class ActionSequence implements Serializable {
 		sequence.target = target;
 		sequence.actionListener = actionListener;
 		sequence.collisionChecker = collisionChecker;
-		sequence.useLeft = source.isFacingLeft();
 		sequence.createActionFromSettings(null, null);
 		return sequence;
 	}
@@ -347,14 +348,23 @@ public class ActionSequence implements Serializable {
 		sequence.useType = this.useType;
 		sequence.leftInputs = this.leftInputs;
 		sequence.rightInputs = this.rightInputs;
-		sequence.probabilityToActivate = this.probabilityToActivate;
 		sequence.isSuper = this.isSuper;
+		sequence.activationModifier = ActionSequence.defaultActivationModifier;
 		Array <ActionConditionSettings> settingsCopy = new Array <ActionConditionSettings> ();
 		for (ActionConditionSettings settings : this.conditionSettings) {
 			settingsCopy.add(settings.deepCopy());
 		}
 		sequence.conditionSettings = settingsCopy;
 		return sequence;
+	}
+	
+
+	public float getProbabilityToActivate() {
+		return 1f / this.action.windupTime;
+	}
+	
+	public void increaseActivationModifier() {
+		this.activationModifier *= 2f;
 	}
 	
 	public void forceEnd() {
@@ -437,8 +447,8 @@ public class ActionSequence implements Serializable {
 		}
 	}
 
-	public float getEffectiveRange() {
-		return action.getEffectiveRange();
+	public boolean willHitTarget(CharacterModel target) {
+		return action.willActionHitTarget(target);
 	}
 	
 	private ActionSegment getActionSegmentForKey(ActionSegmentKey segmentKey, DialogueSettings potentialDialogue, XMovementEffectSettings xReplacementMovement) {
@@ -473,7 +483,7 @@ public class ActionSequence implements Serializable {
 			for (ActionSegmentKey key : this.chainableActionKeys) {
 				isChainable = isChainable || key.equals(nextAction.actionKey);
 			}
-			return isChainable && this.useType.equals(nextAction.useType);
+			return isChainable && this.useType.equals(nextAction.useType) && this.getAction().metChainConditions();
 		}
 		return false;
 	}
@@ -556,9 +566,9 @@ public class ActionSequence implements Serializable {
 		return this.action.shouldChain();
 	}
 	
-	public void increaseProbability() {
-		this.probabilityToActivate *= 2;
-	}
+//	public void increaseProbability() {
+//		this.probabilityToActivate *= 2;
+//	}
 
 	public ActionSegmentKey getActionKey() {
 		return actionKey;
@@ -596,9 +606,6 @@ public class ActionSequence implements Serializable {
 		return chainableActionKeys;
 	}
 
-	public float getProbabilityToActivate() {
-		return probabilityToActivate;
-	}
 
 	public UseType getUseType() {
 		return useType;

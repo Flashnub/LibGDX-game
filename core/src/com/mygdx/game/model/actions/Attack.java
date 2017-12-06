@@ -18,13 +18,14 @@ import com.mygdx.game.model.events.CollisionChecker;
 
 public class Attack extends ActionSegment {
 	 
-	Rectangle hitBox;
+	Array<Rectangle> hitBoxes;
 	int allegiance;
 	AttackSettings attackSettings;
 	Array <EntityEffect> activeSourceEffects;
 	Array <EntityEffect> windupSourceEffects;
 	Array <HitTracker> alreadyHitCharacters;
 	CollisionChecker collisionChecker;
+	boolean hasConfirmedHit;
 
 	
 	public Attack(CharacterModel source, AttackSettings settings, ActionListener listener, CollisionChecker collisionChecker) {
@@ -36,8 +37,9 @@ public class Attack extends ActionSegment {
 		this.windupSourceEffects = new Array <EntityEffect>();
 		this.alreadyHitCharacters = new Array<HitTracker>();
 		this.collisionChecker = collisionChecker;
-		this.hitBox = new Rectangle(0, 0, settings.width, settings.height);
-		this.updateHitBox();
+		this.hasConfirmedHit = false;
+		this.hitBoxes = new Array <Rectangle>();
+		this.updateHitBoxes();
 		this.setDurations(source);
 	}
 	
@@ -47,6 +49,7 @@ public class Attack extends ActionSegment {
 				return;
 			}
 		}
+		this.hasConfirmedHit = true;
 		boolean isIntercepted = target.checkIfIntercepted(this);
 		Iterator <EffectSettings> iterator = this.attackSettings.targetEffectSettings.iterator();
 		while(iterator.hasNext()) {
@@ -91,7 +94,7 @@ public class Attack extends ActionSegment {
 				iterator.remove();
 			}
 		}
-		this.updateHitBox();
+		this.updateHitBoxes();
 		actionListener.processAttack(this);
 
 		
@@ -135,32 +138,55 @@ public class Attack extends ActionSegment {
 	public void sourceCompletionWithoutSuper(CharacterModel source) {
 		source.setWidthCoefficient(source.getCharacterProperties().getWidthCoefficient());
 		source.setHeightCoefficient(source.getCharacterProperties().getHeightCoefficient());
-//		source.setxOffsetModifier(0f);
-//		source.setyOffsetModifier(0f);
-//		if (!this.shouldRespectEntityCollisions())
-//			source.setRespectEntityCollision(true);
 		source.unlockEntityCollisionBehavior();
 
 	}
 	
 	@Override
-	public float getEffectiveRange() {
-		float range = 0f;
-		float xDistance = 0f;
-		float yDistance = 0f;
-		for (EffectSettings effectSettings : this.attackSettings.sourceEffectSettings) {
-			if (effectSettings instanceof YMovementEffectSettings) {
-				YMovementEffectSettings mEffectSettings = (YMovementEffectSettings) effectSettings;
-				yDistance += mEffectSettings.getEstimatedDistance();
+	public boolean willActionHitTarget(CharacterModel target) {
+		for (Rectangle attackHitBox : this.attackSettings.hitBoxProperties) {
+			Rectangle tempAttackHitBox = new Rectangle (attackHitBox);
+			float xDistance = 0f;
+			float yDistance = 0f;
+			for (EffectSettings effectSettings : this.attackSettings.sourceEffectSettings) {
+				if (effectSettings instanceof YMovementEffectSettings) {
+					YMovementEffectSettings mEffectSettings = (YMovementEffectSettings) effectSettings;
+					yDistance += mEffectSettings.getEstimatedDistance();
+				}
+				else if (effectSettings instanceof XMovementEffectSettings) {
+					XMovementEffectSettings mEffectSettings = (XMovementEffectSettings) effectSettings;
+					xDistance += mEffectSettings.getEstimatedDistance();
+				}
 			}
-			else if (effectSettings instanceof XMovementEffectSettings) {
-				XMovementEffectSettings mEffectSettings = (XMovementEffectSettings) effectSettings;
-				xDistance += mEffectSettings.getEstimatedDistance();
+			tempAttackHitBox.x += source.gameplayCollisionBox.x + xDistance;
+			tempAttackHitBox.y += source.gameplayCollisionBox.y + yDistance;
+			for (Rectangle targetHurtBox : target.getGameplayHurtBoxes()) {
+				if (attackHitBox.overlaps(targetHurtBox)) {
+					return true;
+				}
 			}
 		}
-		range = (float) Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
-		return range + hitBox.width;
+		return false;
 	}
+	
+//	@Override
+//	public float getEffectiveRange() {
+//		float range = 0f;
+//		float xDistance = 0f;
+//		float yDistance = 0f;
+//		for (EffectSettings effectSettings : this.attackSettings.sourceEffectSettings) {
+//			if (effectSettings instanceof YMovementEffectSettings) {
+//				YMovementEffectSettings mEffectSettings = (YMovementEffectSettings) effectSettings;
+//				yDistance += mEffectSettings.getEstimatedDistance();
+//			}
+//			else if (effectSettings instanceof XMovementEffectSettings) {
+//				XMovementEffectSettings mEffectSettings = (XMovementEffectSettings) effectSettings;
+//				xDistance += mEffectSettings.getEstimatedDistance();
+//			}
+//		}
+//		range = (float) Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
+//		return range + hitBoxes.width;
+//	}
 
 //	@Override
 //	public float getWindUpTime() {
@@ -211,16 +237,12 @@ public class Attack extends ActionSegment {
 //		System.out.println("Interrupt");
 	}
 	
-	public Rectangle getHitBox() {
-		return hitBox;
+	public Array <Rectangle> getHitBoxes() {
+		return hitBoxes;
 	}
 
 	public int getAllegiance() {
 		return allegiance;
-	}
-
-	public void setHitBox(Rectangle hitBox) {
-		this.hitBox = hitBox;
 	}
 
 	public AttackSettings getAttackSettings() {
@@ -239,14 +261,53 @@ public class Attack extends ActionSegment {
 		return alreadyHitCharacters;
 	}
 	
-	public void updateHitBox() {
-		if (source.isFacingLeft()) {
-			this.hitBox.x = source.getGameplayHitBox().x - attackSettings.originX - this.attackSettings.width;
+	public void updateHitBoxes() {
+		for (int i = 0; i < hitBoxes.size; i++) {
+			float originXOffset = 0f;
+			float width = 0f;
+			float originYOffset = 0f;
+//			if (this.actionState.equals(ActionState.WINDUP)) {
+//				if (i < attackSettings.windupHurtBoxProperties.size) {
+//					originXOffset = attackSettings.windupHurtBoxProperties.get(i).x;
+//					originYOffset = attackSettings.windupHurtBoxProperties.get(i).y;
+//					width = attackSettings.windupHurtBoxProperties.get(i).width;
+//				}
+//				else {
+//					break;
+//				}
+//			}
+//			else if (this.actionState.equals(ActionState.ACTIVE))
+//			{
+//				if (i < attackSettings.activeHurtBoxProperties.size) {
+//					originXOffset = attackSettings.activeHurtBoxProperties.get(i).x;
+//					originYOffset = attackSettings.activeHurtBoxProperties.get(i).y;
+//					width = attackSettings.activeHurtBoxProperties.get(i).width;
+//				}
+//				else {
+//					break;
+//				}
+//			}
+//			else if (this.actionState.equals(ActionState.COOLDOWN))
+//			{
+//				if (i < attackSettings.cooldownHurtBoxProperties.size) {
+//					originXOffset = attackSettings.cooldownHurtBoxProperties.get(i).x;
+//					originYOffset = attackSettings.cooldownHurtBoxProperties.get(i).y;
+//					width = attackSettings.cooldownHurtBoxProperties.get(i).width;
+//				}
+//				else {
+//					break;
+//				}
+//			}
+			Rectangle hitBox = hitBoxes.get(i);
+			if (source.isFacingLeft()) {
+				hitBox.x = source.getGameplayCollisionBox().x - this.attackSettings.hitBoxProperties.get(i).x - this.attackSettings.hitBoxProperties.get(i).width;
+			}
+			else {
+				hitBox.x = source.getGameplayCollisionBox().x + this.attackSettings.hitBoxProperties.get(i).x + source.getGameplayCollisionBox().width;
+			}
+			hitBox.y = source.getGameplayCollisionBox().y + originYOffset;
 		}
-		else {
-			this.hitBox.x = source.getGameplayHitBox().x + attackSettings.originX + source.getGameplayHitBox().width;
-		}
-		this.hitBox.y = source.getGameplayHitBox().y + attackSettings.originY;
+
 
 	}
 
@@ -327,4 +388,10 @@ public class Attack extends ActionSegment {
 	public boolean isSuper() {
 		return this.attackSettings.isSuper;
 	}
+
+	@Override
+	public boolean metChainConditions() {
+		return this.hasConfirmedHit;
+	}
+
 }

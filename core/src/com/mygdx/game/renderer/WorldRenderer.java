@@ -29,6 +29,7 @@ import com.mygdx.game.model.world.WorldListener;
 import com.mygdx.game.model.world.WorldModel;
 import com.mygdx.game.model.worldObjects.Item;
 import com.mygdx.game.model.worldObjects.WorldObject;
+import com.mygdx.game.utils.MathUtils;
 import com.mygdx.game.views.ResourceBar;
 import com.mygdx.game.views.ResourceBar.ResourceBarType;
 
@@ -66,10 +67,10 @@ public class WorldRenderer implements CoordinatesHelper, WorldListener{
 	        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 	        
 			camera.position.set(
-					worldModel.getPlayer().getCharacterData().getGameplayHitBox().getX() + 
-					worldModel.getPlayer().getCharacterData().getGameplayHitBox().getWidth() / 2, 
-					worldModel.getPlayer().getCharacterData().getGameplayHitBox().getY() + 
-					worldModel.getPlayer().getCharacterData().getGameplayHitBox().getHeight() / 2, 0);
+					worldModel.getPlayer().getCharacterData().getGameplayCollisionBox().getX() + 
+					worldModel.getPlayer().getCharacterData().getGameplayCollisionBox().getWidth() / 2, 
+					worldModel.getPlayer().getCharacterData().getGameplayCollisionBox().getY() + 
+					worldModel.getPlayer().getCharacterData().getGameplayCollisionBox().getHeight() / 2, 0);
 			if (camera.position.x < camera.viewportWidth / 2)
 				camera.position.x = camera.viewportWidth / 2;
 			else if (camera.position.x > ((TiledMapTileLayer) tiledMap.getLayers().get(0)).getTileWidth() * ((TiledMapTileLayer) tiledMap.getLayers().get(0)).getWidth() - camera.viewportWidth / 2)
@@ -85,44 +86,59 @@ public class WorldRenderer implements CoordinatesHelper, WorldListener{
 	        
 	        debugRenderer.setProjectionMatrix(camera.combined);
 	        debugRenderer.begin(ShapeType.Line);
-	        Polygon playerPoly = worldModel.getPlayer().getCharacterData().getGameplayHitBoxInPolygon();
+	        //Collision
+	        Polygon playerPoly = MathUtils.rectangleToPolygon(
+	        						worldModel.getPlayer().getCharacterData().gameplayCollisionBox, 
+	        						worldModel.getPlayer().getCharacterData().getVelocityAngle());
 	        debugRenderer.setColor(Color.BLACK);
-	      
-//	        debugRenderer.rect(worldModel.getPlayer().getCharacterData().getGameplayHitBox().x, 
-//	        		worldModel.getPlayer().getCharacterData().getGameplayHitBox().y, 
-//	        		worldModel.getPlayer().getCharacterData().getGameplayHitBox().width / 2, 
-//	        		worldModel.getPlayer().getCharacterData().getGameplayHitBox().width / 2, 
-//	        		worldModel.getPlayer().getCharacterData().getGameplayHitBox().width, 
-//	        		worldModel.getPlayer().getCharacterData().getGameplayHitBox().height,
-//	        		1f, 1f,
-//	        		worldModel.getPlayer().getCharacterData().getVelocityAngle() );
+
 	        debugRenderer.polygon(playerPoly.getTransformedVertices());
         	debugRenderer.rect(worldModel.getPlayer().getCharacterData().getImageHitBox().x, worldModel.getPlayer().getCharacterData().getImageHitBox().y, worldModel.getPlayer().getCharacterData().getImageHitBox().width, worldModel.getPlayer().getCharacterData().getImageHitBox().height);
 
 	        for (Projectile projectile : worldModel.getProjectiles()) {
-	        	Polygon poly = projectile.getGameplayHitBoxInPolygon();
+	        	Polygon poly = MathUtils.rectangleToPolygon(projectile.gameplayCollisionBox, projectile.getVelocityAngle());
 		        debugRenderer.polygon(poly.getTransformedVertices());
-//	        	debugRenderer.rect(projectile.getGameplayHitBox().x,
-//	        			projectile.getGameplayHitBox().y,
-//	        			projectile.getGameplayHitBox().width / 2,
-//	        			projectile.getGameplayHitBox().height / 2, 
-//	        			projectile.getGameplayHitBox().width,
-//	        			projectile.getGameplayHitBox().height, 
-//	        			1.1f, 1.1f,
-//	        			projectile.getVelocityAngle());
 	        }
 	        
 	        for (WorldObject object : worldModel.getObjects()) {
-	        	debugRenderer.rect(object.getGameplayHitBox().x, object.getGameplayHitBox().y, object.getGameplayHitBox().width, object.getGameplayHitBox().height);
+	        	debugRenderer.rect(object.getGameplayCollisionBox().x, object.getGameplayCollisionBox().y, object.getGameplayCollisionBox().width, object.getGameplayCollisionBox().height);
 	        }
 	        
 	        for (Enemy enemy : worldModel.getEnemies()) {
-	        	Polygon poly = enemy.getCharacterData().getGameplayHitBoxInPolygon();
+	        	Polygon poly = MathUtils.rectangleToPolygon(enemy.getCharacterData().gameplayCollisionBox, enemy.getCharacterData().getVelocityAngle());
 	        	debugRenderer.polygon(poly.getTransformedVertices());
 	        }
 	        for (Rectangle rectangle : worldModel.getAdditionalRectangles()) {
 	        	debugRenderer.rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
 	        }
+	        
+	        //HurtBoxes
+	        debugRenderer.setColor(Color.GREEN);
+	        for (Rectangle playerHurtBox : worldModel.getPlayer().getCharacterData().gameplayHurtBoxes) {
+	        	debugRenderer.rect(playerHurtBox.x, playerHurtBox.y, playerHurtBox.width, playerHurtBox.height);
+	        }
+
+	        for (WorldObject object : worldModel.getObjects()) {
+	        	for (Rectangle hurtBox : object.gameplayHurtBoxes) {
+	        		debugRenderer.rect(hurtBox.x, hurtBox.y, hurtBox.width, hurtBox.height);
+	        	}
+	        }
+	        
+	        for (Enemy enemy : worldModel.getEnemies()) {
+	        	for (Rectangle hurtBox : enemy.getCharacterData().gameplayHurtBoxes) {
+	        		debugRenderer.rect(hurtBox.x, hurtBox.y, hurtBox.width, hurtBox.height);
+	        	}
+	        }
+	        
+	        for (Projectile projectile : worldModel.getProjectiles()) {
+	        	for (Rectangle hurtBox : projectile.gameplayHurtBoxes) {
+	        		debugRenderer.rect(hurtBox.x, hurtBox.y, hurtBox.width, hurtBox.height);
+	        	}
+	        }
+	        
+	        //HitBoxes
+	        debugRenderer.setColor(Color.RED);
+	        
 	        debugRenderer.end();
 	        
 	        gameBatch.setProjectionMatrix(camera.combined);

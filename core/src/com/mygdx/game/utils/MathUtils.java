@@ -1,5 +1,7 @@
 package com.mygdx.game.utils;
 
+import com.badlogic.gdx.math.Polygon;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 public class MathUtils {
@@ -26,4 +28,15 @@ public class MathUtils {
 		return solution;
 	}
 	
+	public static Polygon rectangleToPolygon(Rectangle rectangle, float velocityAngle) {
+		Polygon polygon = new Polygon(new float[] {
+				rectangle.x, rectangle.y,
+				rectangle.x, rectangle.y + rectangle.height,
+				rectangle.x + rectangle.width, rectangle.y + rectangle.height,
+				rectangle.x + rectangle.width, rectangle.y
+			});
+			polygon.setOrigin(rectangle.x + rectangle.width / 2, rectangle.y + rectangle.height / 2);
+			polygon.setRotation(velocityAngle);
+			return polygon;
+	}
 }

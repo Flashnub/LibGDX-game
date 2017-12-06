@@ -13,8 +13,8 @@ public class PositionalObservation extends Observation {
 	public PositionalObservation(CharacterModel observer, CharacterModel observedSource) {
 		super(observer, observedSource);
 		this.dataType = ObservableDataType.Distance;
-		xDelta = observer.getGameplayHitBox().x - observedSource.getGameplayHitBox().x;
-		yDelta = observer.getGameplayHitBox().y - observedSource.getGameplayHitBox().y;
+		xDelta = observer.getGameplayCollisionBox().x - observedSource.getGameplayCollisionBox().x;
+		yDelta = observer.getGameplayCollisionBox().y - observedSource.getGameplayCollisionBox().y;
 		isFacingTarget = (isTargetToLeft() && observer.isFacingLeft()) || (!isTargetToLeft() && !observer.isFacingLeft());
 	}
 	

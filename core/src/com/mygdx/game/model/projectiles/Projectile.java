@@ -57,7 +57,7 @@ public class Projectile extends EntityModel implements EffectController{
 		this.heightCoefficient = this.settings.getHeightCoefficient();
 		this.acceleration.y = -this.settings.getGravity();
 
-		this.gameplayHitBox = new Rectangle(this.imageHitBox);
+		this.gameplayCollisionBox = new Rectangle(this.imageBounds);
 		this.projectileUIModel = new EntityUIModel(name, EntityUIDataType.PROJECTILE);
 		this.actionListener = actionListener;
 		this.setCollisionChecker(collisionChecker);
@@ -88,20 +88,20 @@ public class Projectile extends EntityModel implements EffectController{
 
 	public void setStartingPosition(Vector2 originOverride, Vector2 originOffset) {
 		if (originOverride != null && originOffset != null) {
-			this.imageHitBox.x = originOverride.x + originOffset.x;
-			this.imageHitBox.y = originOverride.y + originOffset.y;
+			this.imageBounds.x = originOverride.x + originOffset.x;
+			this.imageBounds.y = originOverride.y + originOffset.y;
 		}
 		else if (originOffset != null){
-			this.imageHitBox.x = source.getImageHitBox().x + (source.getImageHitBox().width / 2f) + originOffset.x;
-			this.imageHitBox.y = source.getImageHitBox().y + (source.getImageHitBox().height / 2f) + originOffset.y;
+			this.imageBounds.x = source.getImageHitBox().x + (source.getImageHitBox().width / 2f) + originOffset.x;
+			this.imageBounds.y = source.getImageHitBox().y + (source.getImageHitBox().height / 2f) + originOffset.y;
 		}
 		else {
-			this.imageHitBox.x = source.getImageHitBox().x + (source.getImageHitBox().width / 2f);
-			this.imageHitBox.y = source.getImageHitBox().y + (source.getImageHitBox().height / 2f);
+			this.imageBounds.x = source.getImageHitBox().x + (source.getImageHitBox().width / 2f);
+			this.imageBounds.y = source.getImageHitBox().y + (source.getImageHitBox().height / 2f);
 		}
 		
-		this.gameplayHitBox.setX(this.getXOffsetModifier() + this.imageHitBox.getX() + this.imageHitBox.getWidth() * ((1f - this.widthCoefficient) / 2));
-		this.gameplayHitBox.setY(this.getyOffsetModifier() + this.imageHitBox.getY() + this.imageHitBox.getHeight() * ((1f - this.heightCoefficient) / 2));
+		this.gameplayCollisionBox.setX(this.getXOffsetModifier() + this.imageBounds.getX() + this.imageBounds.getWidth() * ((1f - this.widthCoefficient) / 2));
+		this.gameplayCollisionBox.setY(this.getyOffsetModifier() + this.imageBounds.getY() + this.imageBounds.getHeight() * ((1f - this.heightCoefficient) / 2));
 	}
 	
 	public void update(float delta, TiledMapTileLayer collisionLayer) {
@@ -116,7 +116,7 @@ public class Projectile extends EntityModel implements EffectController{
 		}
 //		this.velocity.y -= this.settings.getGravity() * delta;
 		this.handleCollisionRespectChecks();
-		this.setGameplaySize(delta);
+		this.setGameplayCollisionSize(delta);
 //		if (this.settings.isHasCollisionDetection()) {
 		this.movementWithCollisionDetection(delta, collisionLayer);
 //		}
@@ -132,11 +132,11 @@ public class Projectile extends EntityModel implements EffectController{
 	//Use this for linear traveling projectiles with a reasonably fast projectile speed. 
 	//This shouldn't be used for slow moving or pattern-based projectiles 
 	public Vector2 findInterceptPointWith(CharacterModel target, TiledMapTileLayer collisionLayer) {
-		Vector2 targetPosition = new Vector2(target.getGameplayHitBox().x + target.getGameplayHitBox().width / 2, target.getGameplayHitBox().y + target.getGameplayHitBox().height / 2); 
+		Vector2 targetPosition = new Vector2(target.getGameplayCollisionBox().x + target.getGameplayCollisionBox().width / 2, target.getGameplayCollisionBox().y + target.getGameplayCollisionBox().height / 2); 
 		Vector2 targetVelocity = new Vector2(target.getVelocity().x, target.getVelocity().y);
 		Vector2 targetAcceleration = target.getAcceleration();
 		
-		Vector2 projectilePosition = new Vector2(imageHitBox.x + (imageHitBox.width / 2), imageHitBox.y + (imageHitBox.height / 2));
+		Vector2 projectilePosition = new Vector2(imageBounds.x + (imageBounds.width / 2), imageBounds.y + (imageBounds.height / 2));
 		
 		float xPositionDifference = targetPosition.x - projectilePosition.x;
 		float yPositionDifference = targetPosition.y - projectilePosition.y;
@@ -208,9 +208,9 @@ public class Projectile extends EntityModel implements EffectController{
 				expectedPositionOfTarget = this.findInterceptPointWith(target, collisionLayer);
 			}
 			else {
-				expectedPositionOfTarget = new Vector2(target.getGameplayHitBox().x + target.getGameplayHitBox().width / 2, target.getGameplayHitBox().y + target.getGameplayHitBox().height / 2);
+				expectedPositionOfTarget = new Vector2(target.getGameplayCollisionBox().x + target.getGameplayCollisionBox().width / 2, target.getGameplayCollisionBox().y + target.getGameplayCollisionBox().height / 2);
 			}
-			Vector2 projectilePosition = new Vector2(imageHitBox.x + (imageHitBox.width / 2), imageHitBox.y + (imageHitBox.height / 2));
+			Vector2 projectilePosition = new Vector2(imageBounds.x + (imageBounds.width / 2), imageBounds.y + (imageBounds.height / 2));
 			
 			float xDelta = (expectedPositionOfTarget.x - projectilePosition.x);
 			if (xDelta >= 0) {
@@ -424,8 +424,8 @@ public class Projectile extends EntityModel implements EffectController{
 
 	public void setPosition (float x, float y)
 	{
-		this.imageHitBox.x = x;
-		this.imageHitBox.y = y;
+		this.imageBounds.x = x;
+		this.imageBounds.y = y;
 	}
 
 	public EntityUIModel getProjectileUIModel() {

@@ -2,6 +2,7 @@ package com.mygdx.game.model.actions;
 
 import java.util.Iterator;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Json.Serializable;
@@ -27,6 +28,10 @@ public class AbilitySettings implements Serializable {
 	Float xOffsetModifier;
 	Float yOffsetModifier;
 	String name;
+	Array <Rectangle> windupHurtBoxProperties;
+	Array <Rectangle> activeHurtBoxProperties;
+	Array <Rectangle> cooldownHurtBoxProperties;
+
 
 	@Override
 	public void write(Json json) {
@@ -38,6 +43,10 @@ public class AbilitySettings implements Serializable {
 		json.writeValue("sourceRespectEntityCollisions", sourceRespectEntityCollisions);
 		json.writeValue("name", name);
 		json.writeValue("isSuper", isSuper);
+		json.writeValue("windupHurtBoxProperties", windupHurtBoxProperties);
+		json.writeValue("activeHurtBoxProperties", activeHurtBoxProperties);
+		json.writeValue("cooldownHurtBoxProperties", cooldownHurtBoxProperties);
+
 	}
 	
 	@Override
@@ -125,6 +134,21 @@ public class AbilitySettings implements Serializable {
 		else {
 			this.chainsWithJump = true;
 		}	
+		
+		this.windupHurtBoxProperties = json.readValue("windupHurtBoxProperties", Array.class, jsonData);
+		if (windupHurtBoxProperties == null) {
+			this.windupHurtBoxProperties = new Array <Rectangle> ();
+		}
+		
+		this.activeHurtBoxProperties = json.readValue("activeHurtBoxProperties", Array.class, jsonData);
+		if (activeHurtBoxProperties == null) {
+			this.activeHurtBoxProperties = new Array <Rectangle> ();
+		}
+		
+		this.cooldownHurtBoxProperties = json.readValue("cooldownHurtBoxProperties", Array.class, jsonData);
+		if (cooldownHurtBoxProperties == null) {
+			this.cooldownHurtBoxProperties = new Array <Rectangle> ();
+		}
 	}
 
 	public boolean activeTillDisruption() {
@@ -194,6 +218,10 @@ public class AbilitySettings implements Serializable {
 		this.name = settings.name;
 		this.chainsWithJump = settings.chainsWithJump;
 		this.isSuper = settings.isSuper;
+		this.windupHurtBoxProperties = settings.windupHurtBoxProperties;
+		this.activeHurtBoxProperties = settings.activeHurtBoxProperties;
+		this.cooldownHurtBoxProperties = settings.cooldownHurtBoxProperties;
+
 	}
 	
 	public AbilitySettings deepCopy() {
@@ -212,6 +240,9 @@ public class AbilitySettings implements Serializable {
 		copy.isSuper = this.isSuper;
 		copy.sourceEffectSettings = this.sourceEffectSettings;
 		copy.sourceRespectEntityCollisions = this.sourceRespectEntityCollisions;
+		copy.windupHurtBoxProperties = this.windupHurtBoxProperties;
+		copy.activeHurtBoxProperties = this.activeHurtBoxProperties;
+		copy.cooldownHurtBoxProperties = this.cooldownHurtBoxProperties;
 		if (sourceEffectSettings != null) {
 			Array <EffectSettings> effectSettingsCopy = new Array <EffectSettings> ();
 			for (EffectSettings eSettings : this.sourceEffectSettings) {
@@ -229,14 +260,6 @@ public class AbilitySettings implements Serializable {
 		}
 
 		return copy;
-	}
-
-	public Float getTempWidthGameplayHitBoxModifier() {
-		return tempWidthModifier;
-	}
-
-	public Float getTempHeightGameplayHitBoxModifier() {
-		return tempHeightModifier;
 	}
 
 	public void setName(String name) {

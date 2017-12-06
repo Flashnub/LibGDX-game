@@ -284,7 +284,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 	    private void checkToDisruptCurrentAct(String inputType) {
 	    	if (this.getCurrentActiveActionSeq() != null) {
 		    	boolean needsInterruptForWindup = this.getCurrentActiveActionSeq().getAction().doesNeedDisruptionDuringWindup() && this.getCurrentActiveActionSeq().getAction().getActionState().equals(ActionState.WINDUP);
-		    	boolean needsInterruptForAction = this.getCurrentActiveActionSeq().getAction().doesNeedDisruptionDuringActive() && this.getCurrentActiveActionSeq().getAction().getActionState().equals(ActionState.ACTION);
+		    	boolean needsInterruptForAction = this.getCurrentActiveActionSeq().getAction().doesNeedDisruptionDuringActive() && this.getCurrentActiveActionSeq().getAction().getActionState().equals(ActionState.ACTIVE);
 		    	
 		    	if (needsInterruptForWindup || needsInterruptForAction) {
 		    		Queue <String> inputs = new Queue <String>();

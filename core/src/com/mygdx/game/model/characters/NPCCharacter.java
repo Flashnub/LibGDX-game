@@ -109,7 +109,7 @@ public class NPCCharacter extends Character{
 		public void handlePatrol(float delta) {
 			
 			//On start.
-			if ((!this.onPatrol && !this.onPatrolBreak) || (this.onPatrol && this.gameplayHitBox.x - 10f < this.currentEndPatrol && this.gameplayHitBox.x + 10f > this.currentEndPatrol)) {
+			if ((!this.onPatrol && !this.onPatrolBreak) || (this.onPatrol && this.gameplayCollisionBox.x - 10f < this.currentEndPatrol && this.gameplayCollisionBox.x + 10f > this.currentEndPatrol)) {
 				this.setOnBreak(true);
 			}
 			
@@ -123,18 +123,18 @@ public class NPCCharacter extends Character{
 			}
 			else if (this.onPatrol){
 				//figure out velocity.x
-				float startPatrolInWorldCoordinates = this.currentStartPatrol + this.gameplayHitBox.x;
-				float endPatrolInWorldCoordinates = this.currentEndPatrol + this.gameplayHitBox.x;
+				float startPatrolInWorldCoordinates = this.currentStartPatrol + this.gameplayCollisionBox.x;
+				float endPatrolInWorldCoordinates = this.currentEndPatrol + this.gameplayCollisionBox.x;
 				
 				if (startPatrolInWorldCoordinates == endPatrolInWorldCoordinates) {
 					this.stopHorizontalMovement(false);
 				}
-				else if (this.gameplayHitBox.x < startPatrolInWorldCoordinates && this.gameplayHitBox.x < endPatrolInWorldCoordinates) 
+				else if (this.gameplayCollisionBox.x < startPatrolInWorldCoordinates && this.gameplayCollisionBox.x < endPatrolInWorldCoordinates) 
 				{
 					//NPC is to the left of startPatrol and outside patrol routine, move back to start.
 					this.patrolWalk(false);
 				}
-				else if (this.gameplayHitBox.x > startPatrolInWorldCoordinates && this.gameplayHitBox.x > endPatrolInWorldCoordinates) 
+				else if (this.gameplayCollisionBox.x > startPatrolInWorldCoordinates && this.gameplayCollisionBox.x > endPatrolInWorldCoordinates) 
 				{
 					//NPC is to the right of startPatrol and outside patrol routine, move back to start.
 					this.patrolWalk(true);

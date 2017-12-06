@@ -60,31 +60,31 @@ public class Explosion extends EntityModel implements EffectController {
 	
 	public void setStartingPosition(Vector2 originOverride, Vector2 originOffset) {
 		if (originOverride != null && originOffset != null) {
-			this.imageHitBox.x = originOverride.x + originOffset.x;
-			this.imageHitBox.y = originOverride.y + originOffset.y;
+			this.imageBounds.x = originOverride.x + originOffset.x;
+			this.imageBounds.y = originOverride.y + originOffset.y;
 		}
 		else if (originOffset != null){
-			this.imageHitBox.x = source.getImageHitBox().x + (source.getImageHitBox().width / 2f) + originOffset.x;
-			this.imageHitBox.y = source.getImageHitBox().y + (source.getImageHitBox().height / 2f) + originOffset.y;
+			this.imageBounds.x = source.getImageHitBox().x + (source.getImageHitBox().width / 2f) + originOffset.x;
+			this.imageBounds.y = source.getImageHitBox().y + (source.getImageHitBox().height / 2f) + originOffset.y;
 		}
 		else {
-			this.imageHitBox.x = source.getImageHitBox().x + (source.getImageHitBox().width / 2f);
-			this.imageHitBox.y = source.getImageHitBox().y + (source.getImageHitBox().height / 2f);
+			this.imageBounds.x = source.getImageHitBox().x + (source.getImageHitBox().width / 2f);
+			this.imageBounds.y = source.getImageHitBox().y + (source.getImageHitBox().height / 2f);
 		}
 		
-		this.gameplayHitBox.setX(this.getXOffsetModifier() + this.imageHitBox.getX() + this.imageHitBox.getWidth() * ((1f - this.widthCoefficient) / 2));
-		this.gameplayHitBox.setY(this.getyOffsetModifier() + this.imageHitBox.getY() + this.imageHitBox.getHeight() * ((1f - this.heightCoefficient) / 2));
+		this.gameplayCollisionBox.setX(this.getXOffsetModifier() + this.imageBounds.getX() + this.imageBounds.getWidth() * ((1f - this.widthCoefficient) / 2));
+		this.gameplayCollisionBox.setY(this.getyOffsetModifier() + this.imageBounds.getY() + this.imageBounds.getHeight() * ((1f - this.heightCoefficient) / 2));
 	}
 	
 	public void update(float delta, TiledMapTileLayer collisionLayer) {
 		currentTime += delta;
 		this.changeStateCheck();
 		float oldWidth = 0f;
-		oldWidth = this.imageHitBox.width;
+		oldWidth = this.imageBounds.width;
 		explosionUIModel.setCurrentFrame(this, delta);
 		this.handleCollisionRespectChecks();
 		this.movementWithCollisionDetection(delta, collisionLayer); //should use movementWithCollision anyway?
-		this.setGameplaySize(delta);
+		this.setGameplayCollisionSize(delta);
 		this.expansionCheck(oldWidth);
 		this.actionListener.processExplosion(this);
 		this.deletionCheck();
@@ -131,10 +131,10 @@ public class Explosion extends EntityModel implements EffectController {
 	
 	public void expansionCheck(float oldWidth) {
 		//Origin needs to move backwards to account for leftward expansion.
-		float widthDifference = this.imageHitBox.width - oldWidth;
+		float widthDifference = this.imageBounds.width - oldWidth;
 		if (widthDifference > 0) {
-			this.gameplayHitBox.x = this.gameplayHitBox.x - ((widthDifference * this.widthCoefficient) / 2);
-			this.imageHitBox.x = this.imageHitBox.x - widthDifference / 2;
+			this.gameplayCollisionBox.x = this.gameplayCollisionBox.x - ((widthDifference * this.widthCoefficient) / 2);
+			this.imageBounds.x = this.imageBounds.x - widthDifference / 2;
 		}
 
 	}

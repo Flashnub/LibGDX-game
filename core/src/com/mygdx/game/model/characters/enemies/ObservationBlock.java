@@ -14,7 +14,7 @@ public class ObservationBlock {
 	}
 	
 	public void addObservation(Observation observation) {
-		if (observation.sourceOfObservation.getUuid().equals(this.sourceOfObservation.getUuid())) {
+		if (observation.observationTarget.getUuid().equals(this.sourceOfObservation.getUuid())) {
 			if (observation instanceof PositionalObservation) {
 				observations.put(PositionalObservation.classKey, observation);
 			}

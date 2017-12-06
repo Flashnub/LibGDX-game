@@ -59,10 +59,10 @@ public class DialogueAction extends ActionSegment {
 		return new DialogueAction(this.dialogue, this.dialogueController, this.getActionListener(), source, target);
 	}
 
-	@Override
-	public float getEffectiveRange() {
-		return Float.MAX_VALUE;
-	}
+//	@Override
+//	public float getEffectiveRange() {
+//		return Float.MAX_VALUE;
+//	}
 	
 	@Override 
 	public int getPriority() {
@@ -139,6 +139,16 @@ public class DialogueAction extends ActionSegment {
 	@Override
 	public boolean isSuper() {
 		return false;
+	}
+
+	@Override
+	public boolean metChainConditions() {
+		return false;
+	}
+
+	@Override
+	public boolean willActionHitTarget(CharacterModel target) {
+		return true;
 	}
 
 }

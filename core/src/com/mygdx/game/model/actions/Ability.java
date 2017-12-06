@@ -47,6 +47,7 @@ public class Ability extends ActionSegment{
 //		if (!this.shouldRespectEntityCollisions())
 //			source.setRespectEntityCollision(true);
 		source.unlockEntityCollisionBehavior();
+		source.updateHurtBoxProperties(settings.cooldownHurtBoxProperties);
 	}
 
 	
@@ -74,6 +75,8 @@ public class Ability extends ActionSegment{
 			source.addEffect(effect);
 			activeSourceEffects.add(effect);
 		}
+
+		source.updateHurtBoxProperties(settings.activeHurtBoxProperties);
 	}
 	
 	public void sourceWindupProcessWithoutSuper(CharacterModel source) {
@@ -83,6 +86,7 @@ public class Ability extends ActionSegment{
 			source.addEffect(effect);
 			windupSourceEffects.add(effect);
 		}
+		source.updateHurtBoxProperties(settings.windupHurtBoxProperties);
 	}
 
 	@Override
@@ -103,10 +107,10 @@ public class Ability extends ActionSegment{
 		return getWindUpPlusActionTime() + this.cooldownTime;
 	}
 
-	@Override
-	public float getEffectiveRange() {
-		return Float.MAX_VALUE;
-	}
+//	@Override
+//	public float getEffectiveRange() {
+//		return Float.MAX_VALUE;
+//	}
 
 	@Override
 	public ActionSegment cloneActionSegmentWithSourceAndTarget(CharacterModel source, CharacterModel target) {
@@ -192,6 +196,16 @@ public class Ability extends ActionSegment{
 	@Override
 	public boolean isSuper() {
 		return this.settings.isSuper;
+	}
+
+	@Override
+	public boolean metChainConditions() {
+		return true;
+	}
+
+	@Override
+	public boolean willActionHitTarget(CharacterModel target) {
+		return true;
 	}
 
 

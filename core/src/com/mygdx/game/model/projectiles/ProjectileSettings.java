@@ -28,8 +28,8 @@ public class ProjectileSettings extends AbilitySettings{
 	private Vector2 origin;
 	private Float angleOfVelocity; //use this to fire projectile in a direction rather than at a target.
 	private boolean inheritAngleFromSource;
-	private Float widthCoefficient;
-	private Float heightCoefficient;
+	private Float collisionWidthCoefficient;
+	private Float collisionHeightCoefficient;
 	private Float hitRate;
 	private Boolean shouldRotate;
 	Float windupTime;
@@ -57,8 +57,8 @@ public class ProjectileSettings extends AbilitySettings{
 		copy.origin = this.origin;
 		copy.angleOfVelocity = this.angleOfVelocity;
 		copy.explosionName = this.explosionName;
-		copy.widthCoefficient = this.widthCoefficient;
-		copy.heightCoefficient = this.heightCoefficient;
+		copy.collisionWidthCoefficient = this.collisionWidthCoefficient;
+		copy.collisionHeightCoefficient = this.collisionHeightCoefficient;
 		copy.shouldRotate = this.shouldRotate;
 		copy.inheritAngleFromSource = this.inheritAngleFromSource;
 		
@@ -97,8 +97,8 @@ public class ProjectileSettings extends AbilitySettings{
 		json.writeValue("possibleOrigins", origin);
 		json.writeValue("targetEffects", targetEffects);
 		json.writeValue("angleOfVelocity", angleOfVelocity);
-		json.writeValue("widthCoefficient", widthCoefficient);
-		json.writeValue("heightCoefficient", heightCoefficient);
+		json.writeValue("collisionWidthCoefficient", collisionWidthCoefficient);
+		json.writeValue("collisionHeightCoefficient", collisionHeightCoefficient);
 		json.writeValue("worldEffectSettings", worldEffectSettings);
 	}
 
@@ -140,20 +140,20 @@ public class ProjectileSettings extends AbilitySettings{
 			this.cooldownSpeed = activeSpeed;
 		}
 		
-		Float widthCoefficient = json.readValue("widthCoefficient", Float.class, jsonData);
+		Float widthCoefficient = json.readValue("collisionWidthCoefficient", Float.class, jsonData);
 		if (widthCoefficient != null) {
-			this.widthCoefficient = widthCoefficient;
+			this.collisionWidthCoefficient = widthCoefficient;
 		}
 		else {
-			this.widthCoefficient = 1f;
+			this.collisionWidthCoefficient = 1f;
 		}
 		
-		Float heightCoefficient = json.readValue("heightCoefficient", Float.class, jsonData);
+		Float heightCoefficient = json.readValue("collisionHeightCoefficient", Float.class, jsonData);
 		if (heightCoefficient != null) {
-			this.heightCoefficient = heightCoefficient;
+			this.collisionHeightCoefficient = heightCoefficient;
 		}
 		else {
-			this.heightCoefficient = 1f;
+			this.collisionHeightCoefficient = 1f;
 		}
 		
 		Float hitRate = json.readValue("hitRate", Float.class, jsonData);
@@ -293,11 +293,11 @@ public class ProjectileSettings extends AbilitySettings{
 	}
 
 	public Float getWidthCoefficient() {
-		return widthCoefficient;
+		return collisionWidthCoefficient;
 	}
 
 	public Float getHeightCoefficient() {
-		return heightCoefficient;
+		return collisionHeightCoefficient;
 	}
 
 	public Array<WorldEffectSettings> getWorldEffectSettings() {

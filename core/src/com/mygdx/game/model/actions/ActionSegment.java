@@ -11,7 +11,7 @@ import com.mygdx.game.model.events.ActionListener;
 public abstract class ActionSegment implements EffectController {
 	
 	public enum ActionState {
-		WINDUP, ACTION, COOLDOWN
+		WINDUP, ACTIVE, COOLDOWN
 	}
 	
 	public static int StoryPriority = 1;
@@ -70,7 +70,7 @@ public abstract class ActionSegment implements EffectController {
 
 	public void sourceActiveProcess(CharacterModel source) {
 		hasProcessedActiveSource = true;
-		this.setActionState(ActionState.ACTION);
+		this.setActionState(ActionState.ACTIVE);
 		sourceActiveProcessWithoutSuper(source);
 		for (ActionSegmentListener listener : this.segmentListeners) {
 			listener.onActive(source);
@@ -177,6 +177,8 @@ public abstract class ActionSegment implements EffectController {
 		this.segmentListeners.add(listener);
 	}
 	
+	public abstract boolean metChainConditions();
+	public abstract boolean willActionHitTarget(CharacterModel target);
 	public abstract void setDurations(CharacterModel source);
 	public abstract void sendActionToListener(ActionListener actionListener, float delta);
 	public abstract void sourceActiveProcessWithoutSuper(CharacterModel source);
@@ -186,7 +188,6 @@ public abstract class ActionSegment implements EffectController {
 	public abstract float getWindUpPlusActionTime();
 	public abstract float getTotalTime();
 	public abstract ActionSegment cloneActionSegmentWithSourceAndTarget(CharacterModel source, CharacterModel target);
-	public abstract float getEffectiveRange();
 	public abstract void interruptionBlock();
 	public abstract boolean shouldRespectEntityCollisions();
 	public abstract boolean doesNeedDisruptionDuringWindup();

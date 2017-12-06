@@ -57,15 +57,15 @@ public class WorldAttack extends ActionSegment{
 		this.setDurations(source);
 	}
 	
-	@Override
-	public float getEffectiveRange() {
-		float range = 0f;
-		for (WorldEffect worldEffect : worldEffects) {
-			range += worldEffect.getEffectiveRange();
-		}
-		return range;
-	}
-	
+//	@Override
+//	public float getEffectiveRange() {
+//		float range = 0f;
+//		for (WorldEffect worldEffect : worldEffects) {
+//			range += worldEffect.getEffectiveRange();
+//		}
+//		return range;
+//	}
+//	
 //	@Override 
 //	public float getWindUpPlusActionTime() {
 //		return this.worldAttackSettings.getAbilitySettings().windupTime + this.worldAttackSettings.getAbilitySettings().duration;
@@ -228,5 +228,15 @@ public class WorldAttack extends ActionSegment{
 	@Override
 	public boolean isSuper() {
 		return this.worldAttackSettings.getAbilitySettings().isSuper;
+	}
+
+	@Override
+	public boolean metChainConditions() {
+		return this.potentialAbility.metChainConditions();
+	}
+
+	@Override
+	public boolean willActionHitTarget(CharacterModel target) {
+		return true;
 	}
 }

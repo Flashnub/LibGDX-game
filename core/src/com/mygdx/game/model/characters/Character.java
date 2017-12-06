@@ -154,8 +154,8 @@ public abstract class Character implements ModelListener {
 			this.properties.setSource(this);
 			this.widthCoefficient = this.properties.getWidthCoefficient();
 			this.heightCoefficient = this.properties.getHeightCoefficient();
-			this.xOffsetModifier = this.properties.xOffsetModifier;
-			this.yOffsetModifier = this.properties.yOffsetModifier;
+			this.xOffsetModifier = this.properties.xCollisionOffsetModifier;
+			this.yOffsetModifier = this.properties.yCollisionOffsetModifier;
 			this.shouldRespectEntityCollision = this.properties.shouldRespectEntityCollisions;
 			this.shouldRespectObjectCollision = this.properties.shouldRespectObjectCollisions;
 			this.shouldRespectTileCollision = this.properties.shouldRespectTileCollisions;
@@ -181,6 +181,8 @@ public abstract class Character implements ModelListener {
 			if (weapons.size > 0) {
 				currentWeapon = weapons.get(0);
 			}
+			this.fixedHurtBoxProperties = this.getCharacterProperties().defaultHurtboxProperties;
+					
 		}
 		
 		public void update(float delta, TiledMapTileLayer collisionLayer) {
@@ -232,7 +234,7 @@ public abstract class Character implements ModelListener {
 		public void setGameplaySize(float delta, TiledMapTileLayer collisionLayer) {
 
 			
-			super.setGameplaySize(delta);
+			super.setGameplayCollisionSize(delta);
 			//clamp velocity
 			if (this.getVelocity().y > this.properties.jumpSpeed)
 				this.getVelocity().y = this.properties.jumpSpeed;
@@ -285,13 +287,14 @@ public abstract class Character implements ModelListener {
 							if (model.getCurrentlyHeldDirection().equals(DirectionalInput.LEFT) || model.getCurrentlyHeldDirection().equals(DirectionalInput.RIGHT) && !iterator.hasNext())
 								horizontalMove(model.getCurrentlyHeldDirection().equals(DirectionalInput.LEFT));
 						}
+						this.fixedHurtBoxProperties = this.getCharacterProperties().defaultHurtboxProperties;
 					}
 				}
 			}
 			ActionSequence nextActiveAction = nextActiveActionSequences.peek();
 			if (nextActiveAction != null 
 					&& (!isProcessingActiveSequences() 
-					|| (((this.getCurrentActiveActionSeq().isActionChainableWithThis(nextActiveAction) && (this.actionStaggering))) 
+					|| ((this.getCurrentActiveActionSeq().isActionChainableWithThis(nextActiveAction)) 
 					&& !this.getCurrentActiveActionSeq().cannotBeOverriden()))) {
 				if (this.isProcessingActiveSequences()) {
 					this.forceEndForActiveAction();
@@ -378,11 +381,10 @@ public abstract class Character implements ModelListener {
 			else if (this.walking) {
 				this.setState(CharacterConstants.walkState);
 			}
-			
 		}
 			
 		public boolean isTargetToLeft(CharacterModel target) {
-			return this.gameplayHitBox.x > target.gameplayHitBox.x; 
+			return this.gameplayCollisionBox.x > target.gameplayCollisionBox.x; 
 		}
 		
 		public void jump() {
@@ -746,7 +748,7 @@ public abstract class Character implements ModelListener {
 		}
 		
 		public Vector2 getCenteredPosition() {
-			Vector2 sourcePosition = new Vector2(this.gameplayHitBox.x + this.gameplayHitBox.width / 2, this.gameplayHitBox.y + this.gameplayHitBox.height / 2); 
+			Vector2 sourcePosition = new Vector2(this.gameplayCollisionBox.x + this.gameplayCollisionBox.width / 2, this.gameplayCollisionBox.y + this.gameplayCollisionBox.height / 2); 
 			return sourcePosition;
 		}
 		
@@ -829,6 +831,34 @@ public abstract class Character implements ModelListener {
 			else {
 				this.walking = false;
 				sprinting = false;
+			}
+		}
+		
+		public void refreshHurtBoxesX() {
+			for (int i = 0; i < this.gameplayHurtBoxes.size; i++) {
+				Rectangle hurtBox = gameplayHurtBoxes.get(i);
+				if (i < this.getCharacterProperties().defaultHurtboxProperties.size) {
+					hurtBox.x = this.gameplayCollisionBox.x + this.fixedHurtBoxProperties.get(i).x;
+					hurtBox.width = this.fixedHurtBoxProperties.get(i).width;
+				}
+				else {
+					this.gameplayHurtBoxes.removeIndex(i);
+					break;
+				}
+			}
+		}
+		
+		public void refreshHurtBoxesY() {
+			for (int i = 0; i < this.gameplayHurtBoxes.size; i++) {
+				Rectangle hurtBox = gameplayHurtBoxes.get(i);
+				if (i < this.getCharacterProperties().defaultHurtboxProperties.size) {
+					hurtBox.y = this.gameplayCollisionBox.y + this.fixedHurtBoxProperties.get(i).y;
+					hurtBox.height = this.fixedHurtBoxProperties.get(i).height;
+				}
+				else {
+					this.gameplayHurtBoxes.removeIndex(i);
+					break;
+				}
 			}
 		}
  		
@@ -1025,12 +1055,12 @@ public abstract class Character implements ModelListener {
 			return acceleration;
 		}
 
-		public Rectangle getGameplayHitBox() {
-			return gameplayHitBox;
+		public Rectangle getGameplayCollisionBox() {
+			return gameplayCollisionBox;
 		}
 
 		public Rectangle getImageHitBox() {
-			return imageHitBox;
+			return imageBounds;
 		}
 		
 		public boolean isImmuneToInjury() {

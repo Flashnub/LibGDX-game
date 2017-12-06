@@ -40,6 +40,7 @@ import com.mygdx.game.model.projectiles.Explosion;
 import com.mygdx.game.model.projectiles.Projectile;
 import com.mygdx.game.model.worldObjects.Item;
 import com.mygdx.game.model.worldObjects.WorldObject;
+import com.mygdx.game.utils.MathUtils;
 
 
 public class WorldModel implements ActionListener, ObjectListener, SaveListener, CollisionChecker, StatsInfoListener{
@@ -69,7 +70,8 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     SaveController saveController;
     DialogueController dialogueController;
     InputMultiplexer inputHandlers;
-    Array <Rectangle> additionalRectangles;
+    Array <Rectangle> collisionRectangles; //For debug purposes
+    Array <Rectangle> hitBoxes; //For debug purposes
     Array <WorldEffect> worldEffects;
     float stateTime;
     boolean freezeWorld;
@@ -86,7 +88,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     	npcCharacters = new Array <NPCCharacter>();
     	nearbyNPCs = new Array <NPCCharacter>();
     	explosions = new Array <Explosion> ();
-    	this.additionalRectangles = new Array <Rectangle>();
+    	this.collisionRectangles = new Array <Rectangle>();
     	this.worldEffects = new Array <WorldEffect>();
     	this.collisionLayer = collisionLayer;
     	saveController = new SaveController();
@@ -131,10 +133,10 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 			if (character != null) {
 				if (character instanceof Player) {
 					player = (Player)character; 
-					player.getCharacterData().imageHitBox.x = collisionLayer.getTileWidth() * x;
-					player.getCharacterData().gameplayHitBox.x = (collisionLayer.getTileWidth() * x);
-					player.getCharacterData().imageHitBox.y = collisionLayer.getTileHeight() * y;
-					player.getCharacterData().gameplayHitBox.y = (collisionLayer.getTileWidth() * y);
+					player.getCharacterData().imageBounds.x = collisionLayer.getTileWidth() * x;
+					player.getCharacterData().gameplayCollisionBox.x = (collisionLayer.getTileWidth() * x);
+					player.getCharacterData().imageBounds.y = collisionLayer.getTileHeight() * y;
+					player.getCharacterData().gameplayCollisionBox.y = (collisionLayer.getTileWidth() * y);
 					player.getCharacterData().setActionListener(this);
 					player.getCharacterData().setObjectListener(this);
 					player.getCharacterData().setCollisionChecker(this);
@@ -259,7 +261,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
         accumulatedTime += delta;
         stateTime += delta;
         if (stateTime % 10 < 0.2) {
-        	this.additionalRectangles.clear();
+        	this.collisionRectangles.clear();
         }
         while (accumulatedTime > 0) {
         	float timeForAction = accumulatedTime <= MAX_TIMESTEP ? accumulatedTime : MAX_TIMESTEP;
@@ -354,10 +356,10 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	}
 	
 	private void addEnemy(Enemy enemy, float xPosition, float yPosition) {
-		enemy.getCharacterData().imageHitBox.x = xPosition;
-		enemy.getCharacterData().gameplayHitBox.x = xPosition;
-		enemy.getCharacterData().imageHitBox.y = yPosition;
-		enemy.getCharacterData().gameplayHitBox.y = yPosition;
+		enemy.getCharacterData().imageBounds.x = xPosition;
+		enemy.getCharacterData().gameplayCollisionBox.x = xPosition;
+		enemy.getCharacterData().imageBounds.y = yPosition;
+		enemy.getCharacterData().gameplayCollisionBox.y = yPosition;
 		enemies.add(enemy);
 		((EnemyModel) enemy.getCharacterData()).setPlayer(player);
 		((EnemyModel) enemy.getCharacterData()).setActionListener(this);
@@ -369,10 +371,10 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	}
 	
 	private void addNPC(NPCCharacter npc, float xPosition, float yPosition) {
-		npc.getCharacterData().imageHitBox.x = xPosition;
-		npc.getCharacterData().gameplayHitBox.x = xPosition;
-		npc.getCharacterData().imageHitBox.y = yPosition;
-		npc.getCharacterData().gameplayHitBox.y = yPosition;
+		npc.getCharacterData().imageBounds.x = xPosition;
+		npc.getCharacterData().gameplayCollisionBox.x = xPosition;
+		npc.getCharacterData().imageBounds.y = yPosition;
+		npc.getCharacterData().gameplayCollisionBox.y = yPosition;
 		npcCharacters.add(npc);
 		((NPCCharacterModel) npc.getCharacterData()).setActionListener(this);
 		((NPCCharacterModel) npc.getCharacterData()).setObjectListener(this);
@@ -426,7 +428,10 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 
 	@Override
 	public void processExplosion(Explosion explosion) {
-		this.additionalRectangles.add(explosion.getGameplayHitBox());
+		this.collisionRectangles.add(explosion.getGameplayCollisionBox());
+		for (Rectangle hitBox : explosion.gameplayHurtBoxes) {
+			this.hitBoxes.add(hitBox);
+		}
 
 		if (player.getCharacterData().getAllegiance() != explosion.getAllegiance()) {
 			checkIfExplosionLands(player, explosion);
@@ -440,7 +445,11 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 
 	@Override
 	public void processAttack(Attack attack) {
-		this.additionalRectangles.add(attack.getHitBox());
+//		this.collisionRectangles.add(attack.getHitBox());
+		for (Rectangle hitBox : attack.getHitBoxes()) {
+			this.hitBoxes.add(hitBox);
+		}
+		
 		if (player.getCharacterData().getAllegiance() != attack.getAllegiance()) {
 			checkIfAttackLands(player, attack);
 		}
@@ -510,30 +519,52 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 
 	
 	private void checkIfAttackLands(Character character, Attack attack) {
-		if (attack.getHitBox().overlaps(character.getCharacterData().getGameplayHitBox())) {
-			character.getCharacterData().shouldAttackHit(attack);
+		for (Rectangle hitBox : character.getCharacterData().gameplayHurtBoxes){ 
+			for (Rectangle attackHitBox : attack.getHitBoxes()) {
+				if (attackHitBox.overlaps(hitBox)) {
+					character.getCharacterData().shouldAttackHit(attack);
+					return;
+				}
+			}
 		}
+
 	}
 	
 	private void checkIfAttackLands(WorldObject object, Attack attack) {
-		if (attack.getHitBox().overlaps(object.getGameplayHitBox())) {
-			object.shouldAttackHit(attack);
+		for (Rectangle hitBox : object.gameplayHurtBoxes){ 
+			for (Rectangle attackHitBox : attack.getHitBoxes()) {
+				if (attackHitBox.overlaps(hitBox)) {
+					object.shouldAttackHit(attack);
+					return;
+				}
+			}
+
 		}
 	}
 	
 	private void checkIfExplosionLands(Character character, Explosion explosion) {
-		Polygon explosionPolygon = explosion.getGameplayHitBoxInPolygon();
-		Polygon characterPolygon = character.getCharacterData().getGameplayHitBoxInPolygon();
-		if (Intersector.overlapConvexPolygons(explosionPolygon, characterPolygon)) {
-			character.getCharacterData().shouldExplosionHit(explosion);
+		for (Rectangle explosionHitBox : explosion.gameplayHurtBoxes) {
+			Polygon explosionPolygon = MathUtils.rectangleToPolygon(explosionHitBox, explosion.getVelocityAngle());
+			for (Rectangle characterHitBox : character.getCharacterData().gameplayHurtBoxes) {
+				Polygon characterPolygon = MathUtils.rectangleToPolygon(characterHitBox, character.getCharacterData().getVelocityAngle());
+				if (Intersector.overlapConvexPolygons(explosionPolygon, characterPolygon)) {
+					character.getCharacterData().shouldExplosionHit(explosion);
+					return;
+				}
+			}
 		}
 	}
 	
 	private void checkIfProjectileLands(Character character, Projectile projectile) {
-		Polygon projectilePolygon = projectile.getGameplayHitBoxInPolygon();
-		Polygon characterPolygon = character.getCharacterData().getGameplayHitBoxInPolygon();
-		if (Intersector.overlapConvexPolygons(projectilePolygon, characterPolygon)) {
-			character.getCharacterData().shouldProjectileHit(projectile);
+		for (Rectangle explosionHitBox : projectile.gameplayHurtBoxes) {
+			Polygon projectilePolygon = MathUtils.rectangleToPolygon(explosionHitBox, projectile.getVelocityAngle());
+			for (Rectangle characterHitBox : character.getCharacterData().gameplayHurtBoxes) {
+				Polygon characterPolygon = MathUtils.rectangleToPolygon(characterHitBox, character.getCharacterData().getVelocityAngle());
+				if (Intersector.overlapConvexPolygons(projectilePolygon, characterPolygon)) {
+					character.getCharacterData().shouldProjectileHit(projectile);
+					return;
+				}
+			}
 		}
 	}
 	
@@ -551,7 +582,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 		if (entity.getAllegiance() == Player.allegiance) {
 			for (Enemy enemy : this.enemies) {
 				if (enemy.getCharacterData().getAllegiance() != Player.allegiance 
-				&& enemy.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds)) {
+				&& enemy.getCharacterData().getGameplayCollisionBox().overlaps(tempGameplayBounds)) {
 					if ((useRespect && player.getCharacterData().isRespectingEntityCollision() 
 						&& enemy.getCharacterData().isRespectingEntityCollision()) || !useRespect) {
 						collidingEntity = new EntityCollisionData(entity, enemy.getCharacterData(), tempGameplayBounds);
@@ -559,23 +590,21 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 					}
 				}
 			}
-
 		}
 		else if (entity instanceof NPCCharacterModel){
 			for (Enemy enemy : this.enemies) {
 				if (enemy.getCharacterData().getAllegiance() != entity.getAllegiance() 
-				&& enemy.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds)) {
+				&& enemy.getCharacterData().getGameplayCollisionBox().overlaps(tempGameplayBounds)) {
 					if ((useRespect && player.getCharacterData().isRespectingEntityCollision() 
 						&& enemy.getCharacterData().isRespectingEntityCollision()) || !useRespect) {
 						collidingEntity = new EntityCollisionData(entity, enemy.getCharacterData(), tempGameplayBounds);
 						break;
 					}
-					
 				}
 			}
 			if (collidingEntity == null && entity.getAllegiance() != Player.allegiance) {
 				if (player.getCharacterData().getAllegiance() != entity.getAllegiance() 
-				&& player.getCharacterData().getGameplayHitBox().overlaps(tempGameplayBounds)) {
+				&& player.getCharacterData().getGameplayCollisionBox().overlaps(tempGameplayBounds)) {
 					if ((useRespect && player.getCharacterData().isRespectingEntityCollision() 
 						&& entity.isRespectingEntityCollision()) || !useRespect) {
 						collidingEntity = new EntityCollisionData(entity, player.getCharacterData(), tempGameplayBounds);
@@ -591,7 +620,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	public boolean checkIfEntityCollidesWithObjects(EntityModel entity, Rectangle tempGameplayBounds) {
 		boolean isColliding = false;
 		for (WorldObject object : this.objects) {
-			if (object.shouldCollideWithEntity() && object.getGameplayHitBox().overlaps(tempGameplayBounds) && !object.equals(entity)) {
+			if (object.shouldCollideWithEntity() && object.getGameplayCollisionBox().overlaps(tempGameplayBounds) && !object.equals(entity)) {
 				isColliding = true;
 				break;
 			}
@@ -603,7 +632,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	private void checkIfPlayerIsNearObjects() {
 		nearbyObjects.clear();
 		for (WorldObject object : this.objects) {
-			if (object.getGameplayHitBox().overlaps(player.getCharacterData().getGameplayHitBox()) && object.canBeActedOn()) {
+			if (object.getGameplayCollisionBox().overlaps(player.getCharacterData().getGameplayCollisionBox()) && object.canBeActedOn()) {
 				nearbyObjects.add(object);
 			}
 		}
@@ -622,7 +651,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	private void checkIfPlayerIsNearNPCs() {
 		this.nearbyNPCs.clear();
 		for (NPCCharacter character : this.npcCharacters) {
-			if (character.getCharacterData().getGameplayHitBox().overlaps(player.getCharacterData().getGameplayHitBox()) && ((NPCCharacterModel) character.getCharacterData()).canBeActedOn()) {
+			if (character.getCharacterData().getGameplayCollisionBox().overlaps(player.getCharacterData().getGameplayCollisionBox()) && ((NPCCharacterModel) character.getCharacterData()).canBeActedOn()) {
 				nearbyNPCs.add(character);
 			}
 		}
@@ -687,7 +716,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	}
 
 	public Array<Rectangle> getAdditionalRectangles() {
-		return additionalRectangles;
+		return collisionRectangles;
 	}
 
 	public Array<Enemy> getEnemies() {

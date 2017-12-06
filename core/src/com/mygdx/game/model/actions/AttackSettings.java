@@ -1,15 +1,17 @@
 package com.mygdx.game.model.actions;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.mygdx.game.model.effects.EffectSettings;
 
 public class AttackSettings extends AbilitySettings{
-	float originX;
-	float originY;
-	float width;
-	float height;
+//	float originX;
+//	float originY;
+//	float width;
+//	float height;
+	Array <Rectangle> hitBoxProperties;
 	float hitRate;
 	Array<EffectSettings> targetEffectSettings;
 	boolean shouldStagger;
@@ -21,10 +23,6 @@ public class AttackSettings extends AbilitySettings{
 		// TODO Auto-generated method stub
 		super.write(json);
 		json.writeValue("hitRate", hitRate);
-		json.writeValue("width", width);
-		json.writeValue("height", height);
-		json.writeValue("originX", originX);
-		json.writeValue("originY", originY);		
 		json.writeValue("targetEffectSettings", targetEffectSettings);
 		json.writeValue("shouldStagger", shouldStagger);
 		json.writeValue("targetRespectEntityCollisions", targetRespectEntityCollisions);
@@ -35,10 +33,10 @@ public class AttackSettings extends AbilitySettings{
 	public void read(Json json, JsonValue jsonData) {
 		// TODO Auto-generated method stub
 		super.read(json, jsonData);
-		width = json.readValue("width", Float.class, jsonData);
-		height = json.readValue("height", Float.class, jsonData);
-		originX = json.readValue("originX", Float.class, jsonData);
-		originY = json.readValue("originY", Float.class, jsonData);
+//		width = json.readValue("width", Float.class, jsonData);
+//		height = json.readValue("height", Float.class, jsonData);
+//		originX = json.readValue("originX", Float.class, jsonData);
+//		originY = json.readValue("originY", Float.class, jsonData);
 		targetEffectSettings = json.readValue("targetEffectSettings", Array.class, jsonData);
 		
 		
@@ -72,11 +70,11 @@ public class AttackSettings extends AbilitySettings{
 	public AttackSettings deepCopy() {
 		AttackSettings copy = new AttackSettings();
 		copy.setFieldsWithAbilitySettings(super.deepCopy());
-		copy.originX = this.originX;
-		copy.originY = this.originY;
+//		copy.originX = this.originX;
+//		copy.originY = this.originY;
 		copy.hitRate = this.hitRate;
-		copy.width = this.width;
-		copy.height = this.height;
+//		copy.width = this.width;
+//		copy.height = this.height;
 		copy.shouldStagger = this.shouldStagger;
 		Array<EffectSettings> newTargetSettings = new Array <EffectSettings> ();
 		for (EffectSettings eSettings : this.targetEffectSettings) {

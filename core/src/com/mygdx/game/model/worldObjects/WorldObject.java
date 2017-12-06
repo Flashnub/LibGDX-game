@@ -56,7 +56,7 @@ public abstract class WorldObject extends EntityModel implements InteractableObj
 		this.setObjListener(objListener);
 		this.saveListener = saveListener;
 		this.acceleration.y = -defaultGravity;
-		this.gameplayHitBox = this.imageHitBox;
+		this.gameplayCollisionBox = this.imageBounds;
 		state = deactivatedState;
 	}
 	
@@ -120,7 +120,7 @@ public abstract class WorldObject extends EntityModel implements InteractableObj
 	
 	public void update(float delta, TiledMapTileLayer collisionLayer) {
 		this.handleCollisionRespectChecks();
-		this.setGameplaySize(delta);
+		this.setGameplayCollisionSize(delta);
 		this.movementWithCollisionDetection(delta, collisionLayer);
 		this.handleEffects(delta);
 		if (this.didChangeState) {

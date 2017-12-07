@@ -5,71 +5,107 @@
 			{
 				"class": "com.badlogic.gdx.math.Rectangle",
 				"x":5,
-				"y":160, 
+				"y":130, 
 				"width": 30
-				"height": 25
+				"height": 30
 			},
 			{
 				"class": "com.badlogic.gdx.math.Rectangle",
-				"x":15,
-				"y":180, 
-				"width": 5
-				"height": 7
-			},
-			{
-				"class": "com.badlogic.gdx.math.Rectangle",
-				"x":25,
-				"y":184, 
-				"width": 15
-				"height": 10
+				"x":-10,
+				"y":100, 
+				"width": 55
+				"height": 30
 			}
 		]
 		"windupHurtBoxProperties":  [
 			{
 				"class": "com.badlogic.gdx.math.Rectangle",
-				"x":0,
-				"y":10, 
-				"width": 65
-				"height": 70
+				"x":15,
+				"y":5, 
+				"width": 45
+				"height": 75
 			},
 			{
 				"class": "com.badlogic.gdx.math.Rectangle",
-				"x":10,
+				"x":12,
 				"y":80, 
-				"width": 55
-				"height": 95
+				"width": 45
+				"height": 75
+			},
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":20,
+				"y":155, 
+				"width": 20
+				"height": 25
+			},
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":5,
+				"y":-15, 
+				"width": 65
+				"height": 20
 			}
+			
 		],
 		"activeHurtBoxProperties":  [
 			{
 				"class": "com.badlogic.gdx.math.Rectangle",
-				"x":5,
-				"y":10, 
-				"width": 65
-				"height": 70
+				"x":15,
+				"y":5, 
+				"width": 45
+				"height": 75
 			},
 			{
 				"class": "com.badlogic.gdx.math.Rectangle",
-				"x":15,
-				"y":85, 
-				"width": 55
-				"height": 100
+				"x":13,
+				"y":80, 
+				"width": 47
+				"height": 75
+			},
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":20,
+				"y":155, 
+				"width": 20
+				"height": 25
+			},
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":4,
+				"y":-15, 
+				"width": 66
+				"height": 21
 			}
 		],
 		"cooldownHurtBoxProperties":  [
 			{
 				"class": "com.badlogic.gdx.math.Rectangle",
-				"x":10,
-				"y":10, 
-				"width": 65
-				"height": 70
+				"x":15,
+				"y":5, 
+				"width": 45
+				"height": 75
+			},
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":12,
+				"y":80, 
+				"width": 45
+				"height": 75
 			},
 			{
 				"class": "com.badlogic.gdx.math.Rectangle",
 				"x":20,
-				"y":90, 
-				"width": 55
-				"height": 105
+				"y":155, 
+				"width": 20
+				"height": 25
+			},
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":5,
+				"y":-15, 
+				"width": 65
+				"height": 20
 			}
 		],
 		"sourceEffectSettings": [
@@ -110,7 +146,150 @@
 		]
 	}
 
+	"5K": {
+		"class": "com.mygdx.game.model.actions.AttackSettings",
+		"hitBoxProperties": [
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":5,
+				"y":130, 
+				"width": 30
+				"height": 30
+			},
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":-10,
+				"y":100, 
+				"width": 55
+				"height": 25
+			}
+		]
+		"windupHurtBoxProperties":  [
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":15,
+				"y":5, 
+				"width": 45
+				"height": 75
+			},
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":12,
+				"y":80, 
+				"width": 45
+				"height": 75
+			},
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":20,
+				"y":155, 
+				"width": 20
+				"height": 25
+			},
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":5,
+				"y":-15, 
+				"width": 65
+				"height": 20
+			}
+			
+		],
+		"activeHurtBoxProperties":  [
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":15,
+				"y":5, 
+				"width": 45
+				"height": 75
+			},
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":13,
+				"y":80, 
+				"width": 47
+				"height": 75
+			},
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":20,
+				"y":155, 
+				"width": 20
+				"height": 25
+			},
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":4,
+				"y":-15, 
+				"width": 66
+				"height": 21
+			}
+		],
+		"cooldownHurtBoxProperties":  [
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":15,
+				"y":5, 
+				"width": 45
+				"height": 75
+			},
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":12,
+				"y":80, 
+				"width": 45
+				"height": 75
+			},
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":20,
+				"y":155, 
+				"width": 20
+				"height": 25
+			},
+			{
+				"class": "com.badlogic.gdx.math.Rectangle",
+				"x":5,
+				"y":-15, 
+				"width": 65
+				"height": 20
+			}
+		],
+		"sourceEffectSettings": [
 
-
-	
+		]
+		"targetEffectSettings": [
+			{
+				"class": "com.mygdx.game.model.effects.DamageEffectSettings",
+				"value": 2
+			}
+			{
+				"class": "com.mygdx.game.model.effects.StabilityDamageEffectSettings",
+				"value": 10
+			}
+			{
+				"class": "com.mygdx.game.model.effects.XMovementEffectSettings",
+				"duration": 0.33,
+				"delayToActivate": 0,
+				"isInstantaneous": false,
+				"value": 0,
+				"velocity": 200,
+				"acceleration": -600
+			}
+			{
+				"class": "com.mygdx.game.model.effects.YMovementEffectSettings",
+				"duration": 0.5,
+				"delayToActivate": 0,
+				"isInstantaneous": false,
+				"value": 0,
+				"velocity": 250,
+				"useGravity": true,
+				"passiveConditions": [
+					{
+						"class": "com.mygdx.game.model.conditions.AerialConditionSettings"
+					}
+				]
+			}
+		]
+	}
 }

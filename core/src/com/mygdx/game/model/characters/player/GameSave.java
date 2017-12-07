@@ -124,12 +124,12 @@ public class GameSave implements Serializable{
 		gameSave.controllerScheme.put(XBox360Pad.axisCodeToString(XBox360Pad.AXIS_LEFT_X, .5f), InputType.RIGHT);
 		gameSave.controllerScheme.put(XBox360Pad.axisCodeToString(XBox360Pad.AXIS_LEFT_TRIGGER, .5f), InputType.USEITEM);
 //		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_LB), InputType.ACTION);
-		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_LB), InputType.ACTIONCANCEL);
-		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_A), InputType.JUMP);
-		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_A).concat(DirectionalInput.UP.toString()), InputType.JUMPUP);
-		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_A).concat(DirectionalInput.LEFT.toString()), InputType.JUMPLEFT);
-		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_A).concat(DirectionalInput.DOWN.toString()), InputType.JUMPDOWN);
-		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_A).concat(DirectionalInput.RIGHT.toString()), InputType.JUMPRIGHT);
+//		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_LB), InputType.ACTIONCANCEL);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_LB), InputType.JUMP);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_LB).concat(DirectionalInput.UP.toString()), InputType.JUMPUP);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_LB).concat(DirectionalInput.LEFT.toString()), InputType.JUMPLEFT);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_LB).concat(DirectionalInput.DOWN.toString()), InputType.JUMPDOWN);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_LB).concat(DirectionalInput.RIGHT.toString()), InputType.JUMPRIGHT);
 
 		
 		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_X), InputType.P);
@@ -137,6 +137,13 @@ public class GameSave implements Serializable{
 		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_X).concat(DirectionalInput.LEFT.toString()), InputType.PLEFT);
 		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_X).concat(DirectionalInput.DOWN.toString()), InputType.PDOWN);
 		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_X).concat(DirectionalInput.RIGHT.toString()), InputType.PRIGHT);
+		
+
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_A), InputType.K);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_A).concat(DirectionalInput.UP.toString()), InputType.SUP);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_A).concat(DirectionalInput.LEFT.toString()), InputType.SLEFT);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_A).concat(DirectionalInput.DOWN.toString()), InputType.SDOWN);
+		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_A).concat(DirectionalInput.RIGHT.toString()), InputType.SRIGHT);
 
 		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_Y), InputType.S);
 		gameSave.controllerScheme.put(XBox360Pad.buttonCodeToString(XBox360Pad.BUTTON_Y).concat(DirectionalInput.UP.toString()), InputType.SUP);
@@ -193,6 +200,12 @@ public class GameSave implements Serializable{
 		gameSave.KBMouseScheme.put(Keys.toString(Keys.X).concat(DirectionalInput.DOWN.toString()), InputType.SDOWN);
 		gameSave.KBMouseScheme.put(Keys.toString(Keys.X).concat(DirectionalInput.RIGHT.toString()), InputType.SRIGHT);
 		
+		gameSave.KBMouseScheme.put(Keys.toString(Keys.Q), InputType.K);
+		gameSave.KBMouseScheme.put(Keys.toString(Keys.Q).concat(DirectionalInput.UP.toString()), InputType.KUP);
+		gameSave.KBMouseScheme.put(Keys.toString(Keys.Q).concat(DirectionalInput.LEFT.toString()), InputType.KLEFT);
+		gameSave.KBMouseScheme.put(Keys.toString(Keys.Q).concat(DirectionalInput.DOWN.toString()), InputType.KDOWN);
+		gameSave.KBMouseScheme.put(Keys.toString(Keys.Q).concat(DirectionalInput.RIGHT.toString()), InputType.KRIGHT);
+		
 		gameSave.KBMouseScheme.put(Keys.toString(Keys.C), InputType.H);
 		gameSave.KBMouseScheme.put(Keys.toString(Keys.C).concat(DirectionalInput.UP.toString()), InputType.HUP);
 		gameSave.KBMouseScheme.put(Keys.toString(Keys.C).concat(DirectionalInput.LEFT.toString()), InputType.HLEFT);
@@ -205,11 +218,11 @@ public class GameSave implements Serializable{
 		gameSave.KBMouseScheme.put(Keys.toString(Keys.R).concat(DirectionalInput.DOWN.toString()), InputType.SPDOWN);
 		gameSave.KBMouseScheme.put(Keys.toString(Keys.R).concat(DirectionalInput.RIGHT.toString()), InputType.SPRIGHT);
 
-		gameSave.KBMouseScheme.put(Keys.toString(Keys.Q), InputType.DASH);
-		gameSave.KBMouseScheme.put(Keys.toString(Keys.Q).concat(DirectionalInput.UP.toString()), InputType.DASHUP);
-		gameSave.KBMouseScheme.put(Keys.toString(Keys.Q).concat(DirectionalInput.LEFT.toString()), InputType.DASHLEFT);
-		gameSave.KBMouseScheme.put(Keys.toString(Keys.Q).concat(DirectionalInput.DOWN.toString()), InputType.DASHDOWN);
-		gameSave.KBMouseScheme.put(Keys.toString(Keys.Q).concat(DirectionalInput.RIGHT.toString()), InputType.DASHRIGHT);
+		gameSave.KBMouseScheme.put(Keys.toString(Keys.T), InputType.DASH);
+		gameSave.KBMouseScheme.put(Keys.toString(Keys.T).concat(DirectionalInput.UP.toString()), InputType.DASHUP);
+		gameSave.KBMouseScheme.put(Keys.toString(Keys.T).concat(DirectionalInput.LEFT.toString()), InputType.DASHLEFT);
+		gameSave.KBMouseScheme.put(Keys.toString(Keys.T).concat(DirectionalInput.DOWN.toString()), InputType.DASHDOWN);
+		gameSave.KBMouseScheme.put(Keys.toString(Keys.T).concat(DirectionalInput.RIGHT.toString()), InputType.DASHRIGHT);
 		
 		return gameSave;
 	}

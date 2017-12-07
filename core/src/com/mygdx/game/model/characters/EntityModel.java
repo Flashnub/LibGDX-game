@@ -809,7 +809,6 @@ public abstract class EntityModel {
 	public abstract void refreshHurtBoxesY();
 	
 	public void updateHurtBoxProperties (Array <Rectangle> newHurtBoxProperties) {
-		System.out.print(newHurtBoxProperties.size);
 		this.fixedHurtBoxProperties = newHurtBoxProperties;
 		this.gameplayHurtBoxes.clear();
 		for (int i = 0; i < this.fixedHurtBoxProperties.size; i++) {

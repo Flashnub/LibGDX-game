@@ -7,10 +7,6 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.mygdx.game.model.effects.EffectSettings;
 
 public class AttackSettings extends AbilitySettings{
-//	float originX;
-//	float originY;
-//	float width;
-//	float height;
 	Array <Rectangle> hitBoxProperties;
 	float hitRate;
 	Array<EffectSettings> targetEffectSettings;
@@ -26,6 +22,8 @@ public class AttackSettings extends AbilitySettings{
 		json.writeValue("targetEffectSettings", targetEffectSettings);
 		json.writeValue("shouldStagger", shouldStagger);
 		json.writeValue("targetRespectEntityCollisions", targetRespectEntityCollisions);
+		json.writeValue("hitBoxProperties", hitBoxProperties);
+
 	}
 	
 	@Override
@@ -64,23 +62,24 @@ public class AttackSettings extends AbilitySettings{
 			this.targetRespectEntityCollisions = true;
 		}
 
+		this.hitBoxProperties = json.readValue("hitBoxProperties", Array.class, jsonData);
+		if (hitBoxProperties == null) {
+			this.hitBoxProperties = new Array <Rectangle>();
+		}
 	}
 	
 	@Override
 	public AttackSettings deepCopy() {
 		AttackSettings copy = new AttackSettings();
 		copy.setFieldsWithAbilitySettings(super.deepCopy());
-//		copy.originX = this.originX;
-//		copy.originY = this.originY;
 		copy.hitRate = this.hitRate;
-//		copy.width = this.width;
-//		copy.height = this.height;
 		copy.shouldStagger = this.shouldStagger;
 		Array<EffectSettings> newTargetSettings = new Array <EffectSettings> ();
 		for (EffectSettings eSettings : this.targetEffectSettings) {
 			newTargetSettings.add(eSettings.deepCopy());
 		}
 		copy.targetEffectSettings = newTargetSettings;
+		copy.hitBoxProperties = this.hitBoxProperties;
 		return copy;
 	}
 

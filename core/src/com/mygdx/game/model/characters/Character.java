@@ -288,7 +288,6 @@ public abstract class Character implements ModelListener {
 							if (model.getCurrentlyHeldDirection().equals(DirectionalInput.LEFT) || model.getCurrentlyHeldDirection().equals(DirectionalInput.RIGHT) && !iterator.hasNext())
 								horizontalMove(model.getCurrentlyHeldDirection().equals(DirectionalInput.LEFT));
 						}
-//						this.fixedHurtBoxProperties = this.getCharacterProperties().defaultHurtboxProperties;
 						this.updateHurtBoxProperties(this.getCharacterProperties().defaultHurtboxProperties);
 					}
 				}

@@ -88,6 +88,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     	npcCharacters = new Array <NPCCharacter>();
     	nearbyNPCs = new Array <NPCCharacter>();
     	explosions = new Array <Explosion> ();
+    	hitBoxes = new Array <Rectangle> ();
     	this.collisionRectangles = new Array <Rectangle>();
     	this.worldEffects = new Array <WorldEffect>();
     	this.collisionLayer = collisionLayer;
@@ -429,9 +430,6 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	@Override
 	public void processExplosion(Explosion explosion) {
 		this.collisionRectangles.add(explosion.getGameplayCollisionBox());
-		for (Rectangle hitBox : explosion.gameplayHurtBoxes) {
-			this.hitBoxes.add(hitBox);
-		}
 
 		if (player.getCharacterData().getAllegiance() != explosion.getAllegiance()) {
 			checkIfExplosionLands(player, explosion);
@@ -445,7 +443,6 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 
 	@Override
 	public void processAttack(Attack attack) {
-//		this.collisionRectangles.add(attack.getHitBox());
 		for (Rectangle hitBox : attack.getHitBoxes()) {
 			this.hitBoxes.add(hitBox);
 		}
@@ -711,6 +708,10 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 		this.saveController.save();
 	}
 	
+	public Array<Rectangle> getHitBoxes() {
+		return hitBoxes;
+	}
+
 	public Array<Projectile> getProjectiles() {
 		return projectiles;
 	}

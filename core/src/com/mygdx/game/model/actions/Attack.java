@@ -39,7 +39,10 @@ public class Attack extends ActionSegment {
 		this.collisionChecker = collisionChecker;
 		this.hasConfirmedHit = false;
 		this.hitBoxes = new Array <Rectangle>();
-		this.updateHitBoxes();
+		for (int i = 0; i < this.attackSettings.hitBoxProperties.size; i++) {
+			Rectangle hitBoxProperties = this.attackSettings.hitBoxProperties.get(i);
+			hitBoxes.add(new Rectangle(0, 0, hitBoxProperties.width, hitBoxProperties.height));
+		}
 		this.setDurations(source);
 	}
 	

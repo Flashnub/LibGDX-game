@@ -146,7 +146,7 @@ public class WorldRenderer implements CoordinatesHelper, WorldListener{
 	        
 	        //HitBoxes
 	        debugRenderer.setColor(Color.RED);
-	        for (Rectangle rectangle : worldModel.getAdditionalRectangles()) {
+	        for (Rectangle rectangle : worldModel.getHitBoxes()) {
 	        	debugRenderer.rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
 	        }
 	        

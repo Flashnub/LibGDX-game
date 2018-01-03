@@ -52,10 +52,10 @@
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
-			"name": "2D",
+			"name": "2S",
 			"numberOfWindupFrames": 4,
-			"numberOfActiveFrames": 2,
-			"numberOfCooldownFrames": 4,
+			"numberOfActiveFrames": 4,
+			"numberOfCooldownFrames": 2,
 			"playMode": NORMAL
 		}
 		{
@@ -108,11 +108,20 @@
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
+			"name": "5K",
+			"numberOfWindupFrames": 3,
+			"numberOfActiveFrames": 2,
+			"numberOfCooldownFrames": 4,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
 			"name": "6H",
 			"numberOfWindupFrames": 7,
 			"numberOfActiveFrames": 2,
 			"numberOfCooldownFrames": 4,
-			"playMode": NORMAL
+			"playMode": NORMAL,
+			"frameRate": 16
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
@@ -124,8 +133,16 @@
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
+			"name": "6P",
+			"numberOfWindupFrames": 5,
+			"numberOfActiveFrames": 2,
+			"numberOfCooldownFrames": 2,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
 			"name": "J5K",
-			"numberOfWindupFrames": 3,
+			"numberOfWindupFrames": 4,
 			"numberOfActiveFrames": 2,
 			"numberOfCooldownFrames": 2,
 			"playMode": NORMAL
@@ -137,6 +154,15 @@
 			"numberOfActiveFrames": 2,
 			"numberOfCooldownFrames": 4,
 			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "J5H",
+			"numberOfWindupFrames": 4,
+			"numberOfActiveFrames": 2,
+			"numberOfCooldownFrames": 3,
+			"playMode": NORMAL,
+			"frameRate": 17
 		}
 	]
 	"masterAtlasPath": "Sprites/Player/textures.atlas"

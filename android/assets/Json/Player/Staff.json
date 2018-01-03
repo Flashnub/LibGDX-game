@@ -117,6 +117,31 @@
 		"class": com.mygdx.game.model.actions.ActionSequence,
 		"actionKey": {
 			"class": com.mygdx.game.model.actions.ActionSegmentKey,
+			"key": "6S",
+			"typeOfAction": Attack
+		},
+		"chainableActionKeys": [
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "5K",
+				"typeOfAction": Attack
+			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "5H",
+				"typeOfAction": Attack
+			}
+		],
+		"inputs": [
+			["SLEFT"],
+			["SRIGHT"]
+			["SRIGHT"]
+		]
+	},
+	{
+		"class": com.mygdx.game.model.actions.ActionSequence,
+		"actionKey": {
+			"class": com.mygdx.game.model.actions.ActionSegmentKey,
 			"key": "5H",
 			"typeOfAction": Attack
 		},
@@ -147,8 +172,8 @@
 			}
 		],
 		"inputs": [
-			["RIGHTP"],
-			["LEFTP"]
+			["PRIGHT"],
+			["PLEFT"]
 		]
 	},
 	{
@@ -162,8 +187,8 @@
 
 		],
 		"inputs": [
-			["RIGHTH"],
-			["LEFTH"]
+			["HRIGHT"],
+			["HLEFT"]
 		]
 	},
 	{
@@ -206,7 +231,7 @@
 			}
 		],
 		"inputs": [
-			["DOWNP"]
+			["PDOWN"]
 		]
 	},
 	{
@@ -239,7 +264,7 @@
 			}
 		],
 		"inputs": [
-			["DOWNK"]
+			["KDOWN"]
 		]
 	},
 	{
@@ -257,7 +282,7 @@
 			}
 		],
 		"inputs": [
-			["DOWNH"]
+			["HDOWN"]
 		]
 	},
 	{
@@ -285,7 +310,7 @@
 			}
 		],
 		"inputs": [
-			["DOWNS"]
+			["SDOWN"]
 		]
 	},
 	{
@@ -309,7 +334,7 @@
 		],
 		"inputs": [
 			["S"],
-			["LEFTS"]
+			["SLEFT"]
 		],
 		"useType": Aerial
 	},
@@ -325,7 +350,7 @@
 		],
 		"inputs": [
 			["H"],
-			["LEFTH"]
+			["HLEFT"]
 		],
 		"useType": Aerial
 	},
@@ -341,7 +366,7 @@
 		],
 		"inputs": [
 			["K"],
-			["LEFTK"]
+			["KLEFT"]
 		],
 		"useType": Aerial
 	}

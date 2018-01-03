@@ -445,6 +445,9 @@ public class ActionSequence implements Serializable {
 			this.action = action;
 			action.shouldLockControls = this.isActive;
 		}
+		else {
+			System.out.println("Can't find action settings");
+		}
 	}
 
 	public boolean willHitTarget(CharacterModel target) {
@@ -453,18 +456,27 @@ public class ActionSequence implements Serializable {
 	
 	private ActionSegment getActionSegmentForKey(ActionSegmentKey segmentKey, DialogueSettings potentialDialogue, XMovementEffectSettings xReplacementMovement) {
 		ActionSegment action = null;
+		
 		switch (segmentKey.getTypeOfAction()) {
 			case Attack:
-				action = new Attack(source, JSONController.attacks.get(segmentKey.getKey()), this.actionListener, this.collisionChecker);
+				if (JSONController.attacks.get(segmentKey.getKey()) != null) {
+					action = new Attack(source, JSONController.attacks.get(segmentKey.getKey()), this.actionListener, this.collisionChecker);
+				}
 				break;
 			case WorldAttack:
-				action = new WorldAttack(source, target, actionListener, collisionChecker, JSONController.worldAttacks.get(segmentKey.getKey()), segmentKey.overridingAbilitySettingsKey);
+				if (JSONController.worldAttacks.get(segmentKey.getKey()) != null) {
+					action = new WorldAttack(source, target, actionListener, collisionChecker, JSONController.worldAttacks.get(segmentKey.getKey()), segmentKey.overridingAbilitySettingsKey);
+				}
 				break;
 			case Ability:
-				action = new Ability(source, JSONController.abilities.get(segmentKey.getKey()), this.actionListener);
+				if (JSONController.abilities.get(segmentKey.getKey()) != null) {
+					action = new Ability(source, JSONController.abilities.get(segmentKey.getKey()), this.actionListener);
+				}
 				break;
 			case Stagger:
-				action = new Ability(source, JSONController.abilities.get(segmentKey.getKey()), this.actionListener, xReplacementMovement);
+				if (JSONController.abilities.get(segmentKey.getKey()) != null) {
+					action = new Ability(source, JSONController.abilities.get(segmentKey.getKey()), this.actionListener, xReplacementMovement);
+				}
 				break;
 			case Dialogue:
 				action = new DialogueAction(potentialDialogue, this.dialogueController, this.actionListener, source, target);

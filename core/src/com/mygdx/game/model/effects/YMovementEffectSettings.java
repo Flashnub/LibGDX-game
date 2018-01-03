@@ -55,12 +55,16 @@ public class YMovementEffectSettings extends EntityEffectSettings{
 		else {
 			this.maxVelocity = Float.MAX_VALUE;
 		}
-		
+		Float acceleration = json.readValue("acceleration", Float.class, jsonData);
 		Boolean useGravity = json.readValue("useGravity", Boolean.class, jsonData);
 		if (useGravity != null) {
 			this.useGravity = useGravity.booleanValue();
 			if (!this.useGravity)
-				acceleration = json.readValue("acceleration", Float.class, jsonData);
+				this.acceleration = acceleration.floatValue();
+		}
+		else if (acceleration != null) {
+			this.useGravity = false;
+			this.acceleration = acceleration.floatValue();
 		}
 		else {
 			this.useGravity = true;

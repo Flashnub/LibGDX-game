@@ -10,7 +10,7 @@
 	"collisionHeightCoefficient": 0.7,
 	"useDefaultStagger": true,
 	"useDefaultTensionStagger": false,
-	"horizontalSpeed": 450,
+	"horizontalSpeed": 175,
 	"defaultHurtboxProperties":  [
 		{
 			"class": "com.badlogic.gdx.math.Rectangle",

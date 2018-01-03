@@ -616,7 +616,6 @@ public class Player extends Character implements InputProcessor, ControllerListe
 				return Direction.RIGHT;
 			}
 			return Direction.NaN;
-
 		}
 
 		@Override

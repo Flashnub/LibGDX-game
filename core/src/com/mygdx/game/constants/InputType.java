@@ -24,7 +24,7 @@ public class InputType {
 	public static final String PUP = "PUP";
 	public static final String PRIGHT = "PRIGHT";
 	public static final String KLEFT = "KLEFT";
-	public static final String KDOWN = "HSDOWN";
+	public static final String KDOWN = "KDOWN";
 	public static final String KUP = "KUP";
 	public static final String KRIGHT = "KRIGHT";
 	public static final String HLEFT = "HLEFT";

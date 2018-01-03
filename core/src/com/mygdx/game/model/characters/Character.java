@@ -389,7 +389,7 @@ public abstract class Character implements ModelListener {
 		}
 		
 		public void jump() {
-			if (!actionLocked || (this.getCurrentActiveActionSeq() != null && this.getCurrentActiveActionSeq().chainsWithJump())) {
+			if ((!actionLocked && this.getCurrentActiveActionSeq() == null) || (this.getCurrentActiveActionSeq() != null && this.getCurrentActiveActionSeq().chainsWithJump())) {
 				if (!this.actionStaggering && this.getCurrentActiveActionSeq() == null) {
 					jumpCode();
 				}
@@ -430,7 +430,7 @@ public abstract class Character implements ModelListener {
 		}
 	    
 		public void horizontalMove(boolean left) {
-			if (!this.actionLocked) {
+			if (!this.actionLocked && this.getCurrentActiveActionSeq() == null) {
 				if (!isInAir) {
 					this.setFacingLeft(left);
 					this.setWalking(true);
@@ -451,6 +451,7 @@ public abstract class Character implements ModelListener {
 				this.velocity.x = movingLeft ? -this.properties.getHorizontalSpeed() : this.properties.getHorizontalSpeed();
 			}
 			else if (this.isInAir) {
+				System.out.println("setting speed");
 				this.acceleration.x = movingLeft ? -this.properties.getHorizontalAcceleration() : this.properties.getHorizontalAcceleration();
 			}
 		}
@@ -522,7 +523,7 @@ public abstract class Character implements ModelListener {
 				this.getVelocity().x = 0;
 				this.getAcceleration().x = 0;
 			}
-			else if (!isTryingToMoveHorizontally().equals(Direction.NaN) && !this.actionLocked) {
+			else if (!isTryingToMoveHorizontally().equals(Direction.NaN) && (!this.actionLocked && this.getCurrentActiveActionSeq() == null)) {
 				boolean left = isTryingToMoveHorizontally().equals(Direction.LEFT);
 				this.setHorizontalSpeedForMovement(left);
 				this.setMovementStatesIfNeeded();
@@ -839,7 +840,13 @@ public abstract class Character implements ModelListener {
 			for (int i = 0; i < this.gameplayHurtBoxes.size; i++) {
 				Rectangle hurtBox = gameplayHurtBoxes.get(i);
 				if (i < this.fixedHurtBoxProperties.size) {
-					hurtBox.x = this.gameplayCollisionBox.x + this.fixedHurtBoxProperties.get(i).x;
+					if (isFacingLeft()) {
+						hurtBox.x = this.gameplayCollisionBox.x + this.gameplayCollisionBox.width - this.fixedHurtBoxProperties.get(i).x - this.fixedHurtBoxProperties.get(i).width;
+					}
+					else {
+						hurtBox.x = this.gameplayCollisionBox.x + this.fixedHurtBoxProperties.get(i).x;
+
+					}
 					hurtBox.width = this.fixedHurtBoxProperties.get(i).width;
 				}
 				else {

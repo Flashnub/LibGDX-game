@@ -55,15 +55,18 @@ public class InputConverter {
 	
 	private boolean isDirectionalInput (String inputName) {
 		String test = playerSave.getKBMouseScheme().get(inputName);
-		switch(test) {
-		case InputType.LEFT:
-		case InputType.RIGHT:
-		case InputType.UP:
-		case InputType.DOWN:
-			return true;
-		default:
-			return false;
+		if (test != null) {
+			switch(test) {
+			case InputType.LEFT:
+			case InputType.RIGHT:
+			case InputType.UP:
+			case InputType.DOWN:
+				return true;
+			default:
+				return false;
+			}
 		}
+		return false;
 	}
 	
 	private boolean doesHaveDirectionalInputs(String inputName, boolean useKeyboard) {

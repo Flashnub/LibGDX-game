@@ -323,6 +323,19 @@ public class Attack extends ActionSegment {
 		this.windupTime = this.attackSettings.windupTillDisruption ? Float.MAX_VALUE : source.getUiModel().getTimeForAnimation(this.attackSettings.name, ActionSegment.Windup);
 		this.activeTime = this.attackSettings.activeTillDisruption ? Float.MAX_VALUE : source.getUiModel().getTimeForAnimation(this.attackSettings.name, ActionSegment.Active);
 		this.cooldownTime = source.getUiModel().getTimeForAnimation(this.attackSettings.name, ActionSegment.Cooldown);
+		//Debug purposes.
+		if (windupTime == 0f)
+		{
+			System.out.println("WINDUPTIME = 0f");
+		}
+		if (activeTime == 0f)
+		{
+			System.out.println("ACTIVETIME = 0f");
+		}
+		if (cooldownTime == 0f)
+		{
+			System.out.println("COOLDOWNTIME = 0f");
+		}
 	}
 	
 	@Override

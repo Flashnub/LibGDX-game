@@ -9,7 +9,7 @@ import com.mygdx.game.assets.AnimationData;
 import com.mygdx.game.assets.EntityUIData;
 import com.mygdx.game.assets.SpriteUtils;
 import com.mygdx.game.constants.JSONController;
-import com.mygdx.game.model.characters.Character.CharacterModel;
+import com.mygdx.game.model.hitSpark.HitSpark;
 
 //=============================================================//
 //-----------------------------UI------------------------------//
@@ -17,7 +17,7 @@ import com.mygdx.game.model.characters.Character.CharacterModel;
 	
 public class EntityUIModel {
 		
-	private ObjectMap <String, Animation> animations;
+	private ObjectMap <String, Animation<TextureRegion>> animations;
 	private EntityUIData entityUIData;
 	private TextureRegion currentFrame;
 	private float animationTime;
@@ -41,7 +41,7 @@ public class EntityUIModel {
 		
 	private void loadAnimations() {
 		if (entityUIData != null) {
-			animations = new ObjectMap <String, Animation>();
+			animations = new ObjectMap <String, Animation<TextureRegion>>();
 			TextureAtlas playerAtlas = entityUIData.getMasterAtlas();
 			
 			for (AnimationData animationData : entityUIData.getAnimations()) {
@@ -99,8 +99,8 @@ public class EntityUIModel {
 				}
 				
 				
-				Animation leftAnimation = new Animation(animationData.getFrameRate(), leftAnimationFrames, animationData.getPlayMode());
-				Animation rightAnimation = new Animation(animationData.getFrameRate(), rightAnimationFrames, animationData.getPlayMode());
+				Animation <TextureRegion>  leftAnimation = new Animation<TextureRegion> (animationData.getFrameRate(), leftAnimationFrames, animationData.getPlayMode());
+				Animation <TextureRegion>  rightAnimation = new Animation<TextureRegion> (animationData.getFrameRate(), rightAnimationFrames, animationData.getPlayMode());
 
 				animations.put(animationData.getName() + SpriteUtils.left, leftAnimation);
 				animations.put(animationData.getName() + SpriteUtils.right, rightAnimation);
@@ -116,22 +116,14 @@ public class EntityUIModel {
 	
 	public boolean setCurrentFrame(EntityModel entity, float delta) {
 		String animationString = SpriteUtils.animationStringWithState(entity.getState(), entity.isFacingLeft()); //5PW doesn't work here. Needs 5P.
-		Animation currentAnimation = animations.get(animationString);
+		Animation <TextureRegion> currentAnimation = animations.get(animationString);
 		if (currentAnimation == null) {
 			animationString = SpriteUtils.animationStringWithState(CharacterConstants.idleState, entity.isFacingLeft());
 			currentAnimation = animations.get(animationString);
 		}
 		
-		if (this.shouldStagger) {
-			this.staggerTime += delta;
-			if (this.staggerTime >= EntityUIModel.standardStaggerDuration) {
-				this.shouldStagger = false;
-			}
-		}
-		else {
-			this.staggerTime = 0f;
-			this.animationTime += delta;
-		}
+		this.checkForStagger(delta);
+		
 		TextureRegion frame = currentAnimation.getKeyFrame(this.animationTime);
 		if (frame != null) {
 			currentFrame = frame;
@@ -142,9 +134,42 @@ public class EntityUIModel {
 		
 		return this.isFinishedCurrentAnimation(currentAnimation);
 	}
-		
+	
+	private void checkForStagger(float delta) {
+		if (this.shouldStagger) {
+			this.staggerTime += delta;
+			if (this.staggerTime >= EntityUIModel.standardStaggerDuration) {
+				this.shouldStagger = false;
+			}
+		}
+		else {
+			this.staggerTime = 0f;
+			this.animationTime += delta;
+		}
+	}
+	
+	public boolean setCurrentFrame(HitSpark hitSpark, float delta) {
+		String animationString = SpriteUtils.animationStringWithState(hitSpark.getSize(), false);
+		Animation <TextureRegion> currentAnimation = animations.get(animationString);
 
-	private boolean isFinishedCurrentAnimation(Animation currentAnimation) {
+		if (currentAnimation != null) {
+			this.checkForStagger(delta);
+
+			TextureRegion frame = currentAnimation.getKeyFrame(this.animationTime);
+			if (frame != null) {
+				currentFrame = frame;
+			}
+			
+			if (this.currentFrame != null) {
+				hitSpark.getImageBounds().width = this.currentFrame.getRegionWidth();
+				hitSpark.getImageBounds().height = this.currentFrame.getRegionHeight();
+			}
+		}
+		
+		return currentAnimation != null ? this.isFinishedCurrentAnimation(currentAnimation) : false;
+	}
+
+	private boolean isFinishedCurrentAnimation(Animation<TextureRegion> currentAnimation) {
 		return this.animationTime > currentAnimation.getAnimationDuration();
 	}
 

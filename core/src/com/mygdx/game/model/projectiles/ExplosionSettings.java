@@ -5,8 +5,10 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Json.Serializable;
 import com.badlogic.gdx.utils.JsonValue;
+import com.mygdx.game.assets.HitSparkUtils;
 import com.mygdx.game.model.actions.AbilitySettings;
 import com.mygdx.game.model.effects.EffectSettings;
+import com.mygdx.game.model.hitSpark.HitSparkData;
 
 public class ExplosionSettings extends AbilitySettings implements Serializable{
 	
@@ -18,6 +20,7 @@ public class ExplosionSettings extends AbilitySettings implements Serializable{
 	Float windupTime;
 	Float cooldownTime;
 	protected Float duration;
+	HitSparkData hitSparkData;
 	
 	public ExplosionSettings deepCopy() {
 		ExplosionSettings copy = new ExplosionSettings();
@@ -34,6 +37,7 @@ public class ExplosionSettings extends AbilitySettings implements Serializable{
 		copy.windupTime = this.windupTime;
 		copy.duration = this.duration;
 		copy.cooldownTime = this.cooldownTime;
+		copy.hitSparkData = this.hitSparkData;
 		return copy;
 	}
 	
@@ -102,6 +106,10 @@ public class ExplosionSettings extends AbilitySettings implements Serializable{
 		else {
 			this.cooldownTime = 0f;
 		}
+		this.hitSparkData = json.readValue("hitSparkData", HitSparkData.class, jsonData);
+		if (this.hitSparkData == null) {
+			this.hitSparkData = HitSparkUtils.defaultData();
+		}
 	}
 	
 	public Vector2 getOrigin() {
@@ -142,6 +150,10 @@ public class ExplosionSettings extends AbilitySettings implements Serializable{
 
 	public Float getTotalTime() {
 		return this.windupTime + this.duration + this.cooldownTime;
+	}
+
+	public HitSparkData getHitSparkData() {
+		return this.hitSparkData;
 	}
 
 }

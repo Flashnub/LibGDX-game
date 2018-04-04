@@ -10,8 +10,6 @@ import com.badlogic.gdx.utils.Json.Serializable;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.ActionSequence.UseType;
 import com.mygdx.game.model.characters.Character.CharacterModel;
-import com.mygdx.game.model.globalEffects.WorldEffect;
-import com.mygdx.game.model.globalEffects.WorldEffectSettings;
 import com.mygdx.game.wrappers.StringWrapper;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Queue;

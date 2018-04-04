@@ -1,6 +1,5 @@
 package com.mygdx.game.model.globalEffects;
 
-import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.EffectController;
 import com.mygdx.game.model.events.CollisionChecker;

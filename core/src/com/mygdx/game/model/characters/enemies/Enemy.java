@@ -5,7 +5,6 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Json;
 import com.mygdx.game.model.characters.EntityCollisionData;
-import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.characters.EntityUIModel;
 import com.mygdx.game.model.characters.ModelListener;
 import com.mygdx.game.model.characters.NPCCharacter;
@@ -123,7 +122,7 @@ public class Enemy extends NPCCharacter{
 			}
 			else if (this.isRespectingEntityCollision()){
 				EntityCollisionData collidedEntity = this.getCollisionChecker().checkIfEntityCollidesWithOthers(this, tempGameplayBounds);
-				boolean entityCollision = collidedEntity != null;
+//				boolean entityCollision = collidedEntity != null;
 				return collidedEntity;
 			}
 			return null;

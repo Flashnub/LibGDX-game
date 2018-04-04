@@ -4,10 +4,12 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
+import com.mygdx.game.assets.HitSparkUtils;
 import com.mygdx.game.model.actions.AbilitySettings;
 import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.effects.EffectSettings;
 import com.mygdx.game.model.globalEffects.WorldEffectSettings;
+import com.mygdx.game.model.hitSpark.HitSparkData;
 import com.badlogic.gdx.utils.JsonValue;
 
 public class ProjectileSettings extends AbilitySettings{
@@ -37,6 +39,7 @@ public class ProjectileSettings extends AbilitySettings{
 	Float windupTime;
 	Float cooldownTime;
 	protected Float duration;
+	private HitSparkData hitSparkData;
 
 	public ProjectileSettings deepCopy() {
 		ProjectileSettings copy = new ProjectileSettings();
@@ -63,6 +66,7 @@ public class ProjectileSettings extends AbilitySettings{
 		copy.collisionHeightCoefficient = this.collisionHeightCoefficient;
 		copy.shouldRotate = this.shouldRotate;
 		copy.inheritAngleFromSource = this.inheritAngleFromSource;
+		copy.hitSparkData = this.hitSparkData;
 		
 		Array <WorldEffectSettings> newWorldEffects = new Array <WorldEffectSettings>();
 		for (WorldEffectSettings wSettings : this.worldEffectSettings) {
@@ -217,6 +221,11 @@ public class ProjectileSettings extends AbilitySettings{
 		else {
 			this.inheritAngleFromSource = false;
 		}
+		
+		this.hitSparkData = json.readValue("hitSparkData", HitSparkData.class, jsonData);
+		if (this.hitSparkData == null) {
+			this.hitSparkData = HitSparkUtils.defaultData();
+		}
 	}
 	
 	
@@ -328,5 +337,9 @@ public class ProjectileSettings extends AbilitySettings{
 
 	public Float getTotalTime() {
 		return this.windupTime + this.duration + this.cooldownTime;
+	}
+
+	public HitSparkData getHitSparkData() {
+		return this.hitSparkData;
 	}
 }

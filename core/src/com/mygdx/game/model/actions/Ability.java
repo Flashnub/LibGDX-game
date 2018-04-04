@@ -1,10 +1,8 @@
 package com.mygdx.game.model.actions;
 
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.game.model.actions.ActionSegment.ActionState;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.EntityEffect;
-import com.mygdx.game.model.effects.EntityEffectSettings;
 import com.mygdx.game.model.effects.EffectSettings;
 import com.mygdx.game.model.effects.XMovementEffectSettings;
 import com.mygdx.game.model.effects.YMovementEffectSettings;

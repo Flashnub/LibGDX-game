@@ -8,9 +8,7 @@ import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.effects.EntityEffect;
 import com.mygdx.game.model.effects.EffectSettings;
-import com.mygdx.game.model.effects.XMovementEffect;
 import com.mygdx.game.model.effects.XMovementEffectSettings;
-import com.mygdx.game.model.effects.YMovementEffect;
 import com.mygdx.game.model.effects.YMovementEffectSettings;
 import com.mygdx.game.model.effects.EffectInitializer;
 import com.mygdx.game.model.events.ActionListener;
@@ -385,5 +383,6 @@ public class Attack extends ActionSegment {
 			source.updateHurtBoxProperties(this.attackSettings.cooldownHurtBoxProperties);
 		}
 	}
-
+	
+	
 }

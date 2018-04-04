@@ -5,7 +5,6 @@ import com.badlogic.gdx.utils.Json.Serializable;
 import com.badlogic.gdx.utils.JsonValue;
 import com.mygdx.game.model.actions.ActionSegmentListener;
 import com.mygdx.game.model.actions.ActionSequence;
-import com.mygdx.game.model.characters.Character;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.characters.player.Player.PlayerModel;
 

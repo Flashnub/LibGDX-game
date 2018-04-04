@@ -4,53 +4,95 @@ size: 1024,1024
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-enemy-health-bar
+Enemy_Health_bar
   rotate: false
-  xy: 2, 104
+  xy: 306, 490
   size: 118, 7
   orig: 118, 7
   offset: 0, 0
   index: -1
-enemy-health-bar-background
+Enemy_Health_bar_Background
   rotate: false
-  xy: 2, 95
+  xy: 2, 34
   size: 118, 7
   orig: 118, 7
   offset: 0, 0
   index: -1
-tension-bar-background
+Enemy_Health_bar_hurt
   rotate: false
-  xy: 2, 95
+  xy: 154, 186
   size: 118, 7
   orig: 118, 7
   offset: 0, 0
   index: -1
-enemy-health-bar-intermediate
+Health_bar_Empty
   rotate: false
-  xy: 122, 104
-  size: 118, 7
-  orig: 118, 7
+  xy: 2, 589
+  size: 483, 23
+  orig: 483, 23
   offset: 0, 0
   index: -1
-health-bar
+Health_bar_Full
   rotate: false
-  xy: 2, 177
-  size: 500, 30
-  orig: 500, 30
+  xy: 2, 564
+  size: 483, 23
+  orig: 483, 23
   offset: 0, 0
   index: -1
-health-bar-background
+Health_bar_Hurt
   rotate: false
-  xy: 2, 145
-  size: 500, 30
-  orig: 500, 30
+  xy: 2, 539
+  size: 483, 23
+  orig: 483, 23
   offset: 0, 0
   index: -1
-health-bar-intermediate
+Meter_bar_Empty
   rotate: false
-  xy: 2, 113
-  size: 500, 30
-  orig: 500, 30
+  xy: 2, 519
+  size: 453, 18
+  orig: 453, 18
+  offset: 0, 0
+  index: -1
+Meter_bar_Full
+  rotate: false
+  xy: 2, 499
+  size: 453, 18
+  orig: 453, 18
+  offset: 0, 0
+  index: -1
+Overdrive_Empty
+  rotate: false
+  xy: 2, 347
+  size: 150, 150
+  orig: 150, 150
+  offset: 0, 0
+  index: -1
+Overdrive_Face2
+  rotate: false
+  xy: 2, 195
+  size: 150, 150
+  orig: 150, 150
+  offset: 0, 0
+  index: -1
+Overdrive_Face3
+  rotate: false
+  xy: 154, 347
+  size: 150, 150
+  orig: 150, 150
+  offset: 0, 0
+  index: -1
+Overdrive_Full
+  rotate: false
+  xy: 2, 43
+  size: 150, 150
+  orig: 150, 150
+  offset: 0, 0
+  index: -1
+Overdrive_face
+  rotate: false
+  xy: 154, 195
+  size: 150, 150
+  orig: 150, 150
   offset: 0, 0
   index: -1
 item-background
@@ -60,16 +102,9 @@ item-background
   orig: 30, 30
   offset: 0, 0
   index: -1
-tension-bar
-  rotate: false
-  xy: 2, 86
-  size: 118, 7
-  orig: 118, 7
-  offset: 0, 0
-  index: -1
 text-background
   rotate: false
-  xy: 2, 34
+  xy: 306, 438
   size: 50, 50
   orig: 50, 50
   offset: 0, 0

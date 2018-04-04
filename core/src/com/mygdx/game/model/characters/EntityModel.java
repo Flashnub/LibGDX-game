@@ -5,7 +5,6 @@ import java.util.Iterator;
 
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
-import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -14,7 +13,6 @@ import com.mygdx.game.model.characters.CollisionCheck.CollisionType;
 import com.mygdx.game.model.effects.EntityEffect;
 import com.mygdx.game.model.effects.EntityEffectSettings;
 import com.mygdx.game.model.effects.XMovementEffect;
-import com.mygdx.game.model.effects.XMovementEffectSettings;
 import com.mygdx.game.model.effects.YMovementEffect;
 import com.mygdx.game.model.effects.YMovementEffectSettings;
 import com.mygdx.game.model.events.AssaultInterceptor;

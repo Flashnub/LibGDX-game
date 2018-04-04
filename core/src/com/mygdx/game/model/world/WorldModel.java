@@ -16,7 +16,6 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.constants.SaveController;
 import com.mygdx.game.model.actions.ActionSegment;
-import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.Attack;
 import com.mygdx.game.model.characters.Character;
 import com.mygdx.game.model.characters.Character.CharacterModel;
@@ -36,6 +35,8 @@ import com.mygdx.game.model.events.ObjectListener;
 import com.mygdx.game.model.events.SaveListener;
 import com.mygdx.game.model.events.StatsInfoListener;
 import com.mygdx.game.model.globalEffects.WorldEffect;
+import com.mygdx.game.model.hitSpark.HitSpark;
+import com.mygdx.game.model.hitSpark.HitSparkListener;
 import com.mygdx.game.model.projectiles.Explosion;
 import com.mygdx.game.model.projectiles.Projectile;
 import com.mygdx.game.model.worldObjects.Item;
@@ -43,7 +44,7 @@ import com.mygdx.game.model.worldObjects.WorldObject;
 import com.mygdx.game.utils.MathUtils;
 
 
-public class WorldModel implements ActionListener, ObjectListener, SaveListener, CollisionChecker, StatsInfoListener{
+public class WorldModel implements ActionListener, ObjectListener, SaveListener, CollisionChecker, StatsInfoListener, HitSparkListener{
 
     private final float MAX_TIMESTEP = 1 / 300f;
     private float accumulatedTime = 0f;
@@ -64,6 +65,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     Array <NPCCharacter> npcCharacters;
     Array <NPCCharacter> nearbyNPCs;
     Array <Explosion> explosions;
+    Array <HitSpark> hitSparks;
     Player player;
     Array <WorldListener> worldListeners;
     Array <DialogueListener> dialogueListeners;
@@ -88,6 +90,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     	npcCharacters = new Array <NPCCharacter>();
     	nearbyNPCs = new Array <NPCCharacter>();
     	explosions = new Array <Explosion> ();
+    	hitSparks = new Array <HitSpark> ();
     	hitBoxes = new Array <Rectangle> ();
     	this.collisionRectangles = new Array <Rectangle>();
     	this.worldEffects = new Array <WorldEffect>();
@@ -304,6 +307,12 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
     			if (!this.freezeWorld) 
     				effect.process(timeForAction);
     		}
+    		for (int i = 0; i < hitSparks.size; i++) {
+    			HitSpark hitSpark = hitSparks.get(i);
+    			if (!this.freezeWorld) {
+    				hitSpark.update(timeForAction);
+    			}
+    		}
     		accumulatedTime -= timeForAction;
         }
 
@@ -519,23 +528,21 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 		for (Rectangle hitBox : character.getCharacterData().gameplayHurtBoxes){ 
 			for (Rectangle attackHitBox : attack.getHitBoxes()) {
 				if (attackHitBox.overlaps(hitBox)) {
-					character.getCharacterData().shouldAttackHit(attack);
+					character.getCharacterData().shouldAttackHit(attack, this, attackHitBox);
 					return;
 				}
 			}
 		}
-
 	}
 	
 	private void checkIfAttackLands(WorldObject object, Attack attack) {
 		for (Rectangle hitBox : object.gameplayHurtBoxes){ 
 			for (Rectangle attackHitBox : attack.getHitBoxes()) {
 				if (attackHitBox.overlaps(hitBox)) {
-					object.shouldAttackHit(attack);
+					object.shouldAttackHit(attack, this, attackHitBox);
 					return;
 				}
 			}
-
 		}
 	}
 	
@@ -545,7 +552,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 			for (Rectangle characterHitBox : character.getCharacterData().gameplayHurtBoxes) {
 				Polygon characterPolygon = MathUtils.rectangleToPolygon(characterHitBox, character.getCharacterData().getVelocityAngle());
 				if (Intersector.overlapConvexPolygons(explosionPolygon, characterPolygon)) {
-					character.getCharacterData().shouldExplosionHit(explosion);
+					character.getCharacterData().shouldExplosionHit(explosion, this);
 					return;
 				}
 			}
@@ -558,7 +565,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 			for (Rectangle characterHitBox : character.getCharacterData().gameplayHurtBoxes) {
 				Polygon characterPolygon = MathUtils.rectangleToPolygon(characterHitBox, character.getCharacterData().getVelocityAngle());
 				if (Intersector.overlapConvexPolygons(projectilePolygon, characterPolygon)) {
-					character.getCharacterData().shouldProjectileHit(projectile);
+					character.getCharacterData().shouldProjectileHit(projectile, this);
 					return;
 				}
 			}
@@ -702,6 +709,12 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 			listener.handleSwitchedItem(item, numberOfItems);
 		}
 	}
+	
+
+	@Override
+	public void addHitSpark(HitSpark hitSpark) {
+		this.hitSparks.add(hitSpark);
+	}
 
 	@Override
 	public void triggerSave() {
@@ -755,6 +768,7 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	public TiledMapTileLayer getCollisionLayer() {
 		return this.collisionLayer;
 	}
+
 
 
 }

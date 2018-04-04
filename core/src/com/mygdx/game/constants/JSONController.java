@@ -100,6 +100,9 @@ public class JSONController {
             case EXPLOSION:
             	filePath = jsonFilePath + "Explosions/" + name + "/UIData.json";
             	break;
+            case HITSPARK:
+            	filePath = jsonFilePath + "HitSparks/" + name + "/UIData.json";
+            	break;
             }
         	EntityUIData uiData = json.fromJson(EntityUIData.class, Gdx.files.internal(filePath));
         	uiDatas.put(name, uiData);
@@ -135,7 +138,6 @@ public class JSONController {
 			        npcProperties.put(characterName, properties);		
 		        }
 			}
-
 		}
 		return npcProperties.get(characterName);
 	}

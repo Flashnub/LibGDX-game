@@ -30,7 +30,6 @@ public class WorldAttackSettings implements Serializable{
 		if (abilitySettingKey != null) {
 			abilitySettings = JSONController.abilities.get(abilitySettingKey).deepCopy();
 		}
-		
 	}
 
 	public AbilitySettings getAbilitySettings() {

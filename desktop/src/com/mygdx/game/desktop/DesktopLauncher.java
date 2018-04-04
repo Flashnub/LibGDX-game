@@ -60,6 +60,20 @@ public class DesktopLauncher {
     	parentInputDir = "Sprites/Items/";
         TexturePacker.process(settings, parentInputDir, parentOutputDir, "textures");
         
+        ArrayList <String> hitSparkNames = new ArrayList<String>();
+    	hitSparkNames.add("Default");
+    	hitSparkNames.add("Block");
+    	
+    	parentOutputDir = "Sprites/HitSparks/";
+    	parentInputDir = "Sprites/HitSparks/";
+    	for (String hitSparkName : hitSparkNames) {
+        	String inputDir = parentInputDir + hitSparkName;
+        	String outputDir = parentOutputDir + hitSparkName;
+        	
+            TexturePacker.process(settings, inputDir, outputDir, "textures");
+    	}
+//        TexturePacker.process(settings, parentInputDir, parentOutputDir, "textures");
+        
         parentOutputDir = "Sprites/WorldObjects/";
         parentInputDir = "Sprites/WorldObjects/";
     	ArrayList <String> objectNames = new ArrayList<String>();

@@ -1,9 +1,7 @@
 package com.mygdx.game.model.actions;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.constants.JSONController;
-import com.mygdx.game.model.actions.ActionSegment.ActionState;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.effects.EffectInitializer;
 import com.mygdx.game.model.effects.EffectSettings;
@@ -12,7 +10,6 @@ import com.mygdx.game.model.effects.XMovementEffectSettings;
 import com.mygdx.game.model.effects.YMovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.CollisionChecker;
-import com.mygdx.game.model.globalEffects.DeleteCharacterEffect;
 import com.mygdx.game.model.globalEffects.WorldEffect;
 import com.mygdx.game.model.globalEffects.WorldEffectSettings;
 

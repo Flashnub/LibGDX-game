@@ -1,13 +1,8 @@
 package com.mygdx.game.views;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.mygdx.game.assets.HUDUtils;
-import com.mygdx.game.model.events.StatsInfoListener;
 import com.mygdx.game.model.worldObjects.Item;
 import com.mygdx.game.views.ResourceBar.ResourceBarType;
 

@@ -1,6 +1,5 @@
 package com.mygdx.game.model.weapons;
 
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Queue;
 import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.actions.ActionSequence;

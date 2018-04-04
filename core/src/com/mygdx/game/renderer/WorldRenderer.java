@@ -1,8 +1,6 @@
 package com.mygdx.game.renderer;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.controllers.Controller;
-import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -14,8 +12,6 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Polygon;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.actions.ActionSegment;
@@ -29,8 +25,6 @@ import com.mygdx.game.model.world.WorldListener;
 import com.mygdx.game.model.world.WorldModel;
 import com.mygdx.game.model.worldObjects.Item;
 import com.mygdx.game.model.worldObjects.WorldObject;
-import com.mygdx.game.utils.MathUtils;
-import com.mygdx.game.views.ResourceBar;
 import com.mygdx.game.views.ResourceBar.ResourceBarType;
 
 public class WorldRenderer implements CoordinatesHelper, WorldListener{
@@ -99,57 +93,57 @@ public class WorldRenderer implements CoordinatesHelper, WorldListener{
 	        debugRenderer.setColor(Color.BLACK);
 
 	        //Collision
-	        Polygon playerPoly = MathUtils.rectangleToPolygon(
-	        						worldModel.getPlayer().getCharacterData().gameplayCollisionBox, 
-	        						worldModel.getPlayer().getCharacterData().getVelocityAngle());
-
-	        debugRenderer.polygon(playerPoly.getTransformedVertices());
-        	debugRenderer.rect(worldModel.getPlayer().getCharacterData().getImageHitBox().x, worldModel.getPlayer().getCharacterData().getImageHitBox().y, worldModel.getPlayer().getCharacterData().getImageHitBox().width, worldModel.getPlayer().getCharacterData().getImageHitBox().height);
-
-	        for (Projectile projectile : worldModel.getProjectiles()) {
-	        	Polygon poly = MathUtils.rectangleToPolygon(projectile.gameplayCollisionBox, projectile.getVelocityAngle());
-		        debugRenderer.polygon(poly.getTransformedVertices());
-	        }
-	        
-	        for (WorldObject object : worldModel.getObjects()) {
-	        	debugRenderer.rect(object.getGameplayCollisionBox().x, object.getGameplayCollisionBox().y, object.getGameplayCollisionBox().width, object.getGameplayCollisionBox().height);
-	        }
-	        
-	        for (Enemy enemy : worldModel.getEnemies()) {
-	        	Polygon poly = MathUtils.rectangleToPolygon(enemy.getCharacterData().gameplayCollisionBox, enemy.getCharacterData().getVelocityAngle());
-	        	debugRenderer.polygon(poly.getTransformedVertices());
-	        }
-	        
-	        //HurtBoxes
-	        debugRenderer.setColor(Color.BLUE);
-	        for (Rectangle playerHurtBox : worldModel.getPlayer().getCharacterData().gameplayHurtBoxes) {
-	        	debugRenderer.rect(playerHurtBox.x, playerHurtBox.y, playerHurtBox.width, playerHurtBox.height);
-	        }
-
-	        for (WorldObject object : worldModel.getObjects()) {
-	        	for (Rectangle hurtBox : object.gameplayHurtBoxes) {
-	        		debugRenderer.rect(hurtBox.x, hurtBox.y, hurtBox.width, hurtBox.height);
-	        	}
-	        }
-	        
-	        for (Enemy enemy : worldModel.getEnemies()) {
-	        	for (Rectangle hurtBox : enemy.getCharacterData().gameplayHurtBoxes) {
-	        		debugRenderer.rect(hurtBox.x, hurtBox.y, hurtBox.width, hurtBox.height);
-	        	}
-	        }
-	        
-	        for (Projectile projectile : worldModel.getProjectiles()) {
-	        	for (Rectangle hurtBox : projectile.gameplayHurtBoxes) {
-	        		debugRenderer.rect(hurtBox.x, hurtBox.y, hurtBox.width, hurtBox.height);
-	        	}
-	        }
-	        
-	        //HitBoxes
-	        debugRenderer.setColor(Color.RED);
-	        for (Rectangle rectangle : worldModel.getHitBoxes()) {
-	        	debugRenderer.rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
-	        }
-	        
+//	        Polygon playerPoly = MathUtils.rectangleToPolygon(
+//	        						worldModel.getPlayer().getCharacterData().gameplayCollisionBox, 
+//	        						worldModel.getPlayer().getCharacterData().getVelocityAngle());
+//
+//	        debugRenderer.polygon(playerPoly.getTransformedVertices());
+//        	debugRenderer.rect(worldModel.getPlayer().getCharacterData().getImageHitBox().x, worldModel.getPlayer().getCharacterData().getImageHitBox().y, worldModel.getPlayer().getCharacterData().getImageHitBox().width, worldModel.getPlayer().getCharacterData().getImageHitBox().height);
+//
+//	        for (Projectile projectile : worldModel.getProjectiles()) {
+//	        	Polygon poly = MathUtils.rectangleToPolygon(projectile.gameplayCollisionBox, projectile.getVelocityAngle());
+//		        debugRenderer.polygon(poly.getTransformedVertices());
+//	        }
+//	        
+//	        for (WorldObject object : worldModel.getObjects()) {
+//	        	debugRenderer.rect(object.getGameplayCollisionBox().x, object.getGameplayCollisionBox().y, object.getGameplayCollisionBox().width, object.getGameplayCollisionBox().height);
+//	        }
+//	        
+//	        for (Enemy enemy : worldModel.getEnemies()) {
+//	        	Polygon poly = MathUtils.rectangleToPolygon(enemy.getCharacterData().gameplayCollisionBox, enemy.getCharacterData().getVelocityAngle());
+//	        	debugRenderer.polygon(poly.getTransformedVertices());
+//	        }
+//	        
+//	        //HurtBoxes
+//	        debugRenderer.setColor(Color.BLUE);
+//	        for (Rectangle playerHurtBox : worldModel.getPlayer().getCharacterData().gameplayHurtBoxes) {
+//	        	debugRenderer.rect(playerHurtBox.x, playerHurtBox.y, playerHurtBox.width, playerHurtBox.height);
+//	        }
+//
+//	        for (WorldObject object : worldModel.getObjects()) {
+//	        	for (Rectangle hurtBox : object.gameplayHurtBoxes) {
+//	        		debugRenderer.rect(hurtBox.x, hurtBox.y, hurtBox.width, hurtBox.height);
+//	        	}
+//	        }
+//	        
+//	        for (Enemy enemy : worldModel.getEnemies()) {
+//	        	for (Rectangle hurtBox : enemy.getCharacterData().gameplayHurtBoxes) {
+//	        		debugRenderer.rect(hurtBox.x, hurtBox.y, hurtBox.width, hurtBox.height);
+//	        	}
+//	        }
+//	        
+//	        for (Projectile projectile : worldModel.getProjectiles()) {
+//	        	for (Rectangle hurtBox : projectile.gameplayHurtBoxes) {
+//	        		debugRenderer.rect(hurtBox.x, hurtBox.y, hurtBox.width, hurtBox.height);
+//	        	}
+//	        }
+//	        
+//	        //HitBoxes
+//	        debugRenderer.setColor(Color.RED);
+//	        for (Rectangle rectangle : worldModel.getHitBoxes()) {
+//	        	debugRenderer.rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+//	        }
+//	        
 	        debugRenderer.end();
 	    }
 	    

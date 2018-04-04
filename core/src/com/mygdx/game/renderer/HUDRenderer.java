@@ -5,7 +5,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.model.actions.ActionSegment;
-import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.characters.NPCCharacter;
 import com.mygdx.game.model.characters.enemies.Enemy;
 import com.mygdx.game.model.characters.player.Player.PlayerModel;

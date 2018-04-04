@@ -9,8 +9,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Timer;
-import com.badlogic.gdx.utils.Timer.Task;
+import com.mygdx.game.assets.HitSparkUtils;
 import com.mygdx.game.constants.InputConverter.DirectionalInput;
 import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.actions.ActionSequence;
@@ -21,12 +20,14 @@ import com.mygdx.game.model.characters.player.Player.PlayerModel;
 import com.mygdx.game.model.actions.ActionSequence.StaggerType;
 import com.mygdx.game.model.effects.EntityEffect;
 import com.mygdx.game.model.effects.XMovementEffect;
-import com.mygdx.game.model.effects.XMovementEffectSettings;
 import com.mygdx.game.model.effects.YMovementEffect;
 import com.mygdx.game.model.effects.YMovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.AssaultInterceptor;
 import com.mygdx.game.model.events.ObjectListener;
+import com.mygdx.game.model.hitSpark.HitSpark;
+import com.mygdx.game.model.hitSpark.HitSparkData;
+import com.mygdx.game.model.hitSpark.HitSparkListener;
 import com.mygdx.game.model.projectiles.Explosion;
 import com.mygdx.game.model.projectiles.Projectile;
 import com.mygdx.game.model.weapons.Weapon;
@@ -649,47 +650,82 @@ public abstract class Character implements ModelListener {
     		}
 		}
 		
-		public void shouldProjectileHit(Projectile projectile) {
+		public void shouldProjectileHit(Projectile projectile, HitSparkListener hitSparkListener) {
+			HitSpark hitSpark = null;
 			if (!isImmuneToInjury()) {
 				boolean didInterceptAttack = false;
 				for (EntityEffect effect : this.currentEffects) {
 					if (effect instanceof AssaultInterceptor) {
 						didInterceptAttack = ((AssaultInterceptor) effect).didInterceptProjectile(this, projectile);
+						HitSparkData hitSparkData = HitSparkUtils.blockData(projectile.getSettings().getHitSparkData().getSize());
+						hitSpark = new HitSpark(hitSparkData, 
+								projectile.getGameplayCollisionBox().x + (projectile.isFacingLeft() ? 0f : projectile.getGameplayCollisionBox().width),
+								projectile.getGameplayCollisionBox().y + projectile.getGameplayCollisionBox().height / 2);
 						break;
 					}
 				}
 				if (!didInterceptAttack) {
 					projectile.processHit(this);
+					hitSpark = new HitSpark(projectile.getSettings().getHitSparkData(), 
+							projectile.getGameplayCollisionBox().x + (projectile.isFacingLeft() ? 0f : projectile.getGameplayCollisionBox().width),
+							projectile.getGameplayCollisionBox().y + projectile.getGameplayCollisionBox().height / 2);
 				}
+			}
+			if (hitSpark != null) {
+				hitSparkListener.addHitSpark(hitSpark);
 			}
 		}
 		
-		public void shouldExplosionHit(Explosion explosion) {
+		public void shouldExplosionHit(Explosion explosion, HitSparkListener hitSparkListener) {
+			HitSpark hitSpark = null;
 			if (!isImmuneToInjury) {
 				boolean didInterceptAttack = false;
 				for (EntityEffect effect : this.currentEffects) {
 					if (effect instanceof AssaultInterceptor) {
 						didInterceptAttack = ((AssaultInterceptor) effect).didInterceptExplosion(this, explosion);
+						HitSparkData hitSparkData = HitSparkUtils.blockData(explosion.getExplosionSettings().getHitSparkData().getSize());
+						hitSpark = new HitSpark(hitSparkData, 
+								explosion.getGameplayCollisionBox().x + explosion.getGameplayCollisionBox().width / 2,
+								explosion.getGameplayCollisionBox().y + explosion.getGameplayCollisionBox().height / 2);
 						break;
 					}
 				}
 				if (!didInterceptAttack) {
 					explosion.processExplosionHit(this);
+					HitSparkData hitSparkData = explosion.getExplosionSettings().getHitSparkData();
+					hitSpark = new HitSpark(hitSparkData, 
+							explosion.getGameplayCollisionBox().x + explosion.getGameplayCollisionBox().width / 2,
+							explosion.getGameplayCollisionBox().y + explosion.getGameplayCollisionBox().height / 2);
 				}
+			}
+			if (hitSpark != null) {
+				hitSparkListener.addHitSpark(hitSpark);
 			}
 		}
 		
-		public void shouldAttackHit(Attack attack) {
+		public void shouldAttackHit(Attack attack, HitSparkListener hitSparkListener, Rectangle collidingHitBox) {
+			HitSpark hitSpark = null;
 			if (!isImmuneToInjury()) {
 				boolean didInterceptAttack = false;
 				for (EntityEffect effect : this.currentEffects) {
 					if (effect instanceof AssaultInterceptor) {
 						didInterceptAttack = ((AssaultInterceptor) effect).didInterceptAttack(this, attack);
+						HitSparkData hitSparkData = HitSparkUtils.blockData(attack.getAttackSettings().getHitSparkData().getSize());
+						hitSpark = new HitSpark(hitSparkData, 
+								collidingHitBox.x + collidingHitBox.width / 2,
+								collidingHitBox.y + collidingHitBox.height / 2);
 					}
 				}
 				if (!didInterceptAttack) {
 					attack.processAttackOnEntity(this);
+					HitSparkData hitSparkData = attack.getAttackSettings().getHitSparkData();
+					hitSpark = new HitSpark(hitSparkData, 
+							collidingHitBox.x + collidingHitBox.width / 2,
+							collidingHitBox.y + collidingHitBox.height / 2);
 				}
+			}
+			if (hitSpark != null) {
+				hitSparkListener.addHitSpark(hitSpark);
 			}
 		}
 		

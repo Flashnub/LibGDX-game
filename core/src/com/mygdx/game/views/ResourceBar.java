@@ -20,7 +20,7 @@ public class ResourceBar extends Actor{
 			public TextureRegion getForegroundSprite() {
 				TextureAtlas atlas = HUDUtils.masterAtlas;
 				if (atlas != null) {
-					return atlas.findRegion("health-bar");
+					return atlas.findRegion("Health_bar_Full");
 				}
 				return null;
 			}
@@ -29,7 +29,7 @@ public class ResourceBar extends Actor{
 			public TextureRegion getIntermediateForegroundSprite() {
 				TextureAtlas atlas = HUDUtils.masterAtlas;
 				if (atlas != null) {
-					return atlas.findRegion("health-bar-intermediate");
+					return atlas.findRegion("Health_bar_Hurt");
 				}
 				return null;
 			}
@@ -38,7 +38,7 @@ public class ResourceBar extends Actor{
 			public TextureRegion getBackgroundSprite() {
 				TextureAtlas atlas = HUDUtils.masterAtlas;
 				if (atlas != null) {
-					return atlas.findRegion("health-bar-background");
+					return atlas.findRegion("Health_bar_Empty");
 				}
 				return null;
 			}
@@ -57,8 +57,12 @@ public class ResourceBar extends Actor{
 				return 30f;
 			}
 			
-			public Float proportionalWidth() {
-				return 0.25f;
+//			public Float proportionalWidth() {
+//				return 0.25f;
+//			}
+			
+			public Float fixedWidth() {
+				return 483f;
 			}
 			
 		}, PlayerTension {
@@ -66,7 +70,7 @@ public class ResourceBar extends Actor{
 			public TextureRegion getForegroundSprite() {
 				TextureAtlas atlas = HUDUtils.masterAtlas;
 				if (atlas != null) {
-					return atlas.findRegion("tension-bar");
+					return atlas.findRegion("Meter_bar_Full");
 				}
 				return null;
 			}
@@ -75,7 +79,7 @@ public class ResourceBar extends Actor{
 			public TextureRegion getIntermediateForegroundSprite() {
 				TextureAtlas atlas = HUDUtils.masterAtlas;
 				if (atlas != null) {
-					return atlas.findRegion("tension-bar");
+					return atlas.findRegion("Meter_bar_Empty");
 				}
 				return null;
 			}
@@ -84,7 +88,7 @@ public class ResourceBar extends Actor{
 			public TextureRegion getBackgroundSprite() {
 				TextureAtlas atlas = HUDUtils.masterAtlas;
 				if (atlas != null) {
-					return atlas.findRegion("tension-bar-background");
+					return atlas.findRegion("Meter_bar_Empty");
 				}
 				return null;
 			}
@@ -116,7 +120,7 @@ public class ResourceBar extends Actor{
 			public TextureRegion getForegroundSprite() {
 				TextureAtlas atlas = HUDUtils.masterAtlas;
 				if (atlas != null) {
-					return atlas.findRegion("enemy-health-bar");
+					return atlas.findRegion("Enemy_health_bar");
 				}
 				return null;
 			}
@@ -125,7 +129,7 @@ public class ResourceBar extends Actor{
 			public TextureRegion getIntermediateForegroundSprite() {
 				TextureAtlas atlas = HUDUtils.masterAtlas;
 				if (atlas != null) {
-					return atlas.findRegion("enemy-health-bar-intermediate");
+					return atlas.findRegion("Enemy_health_bar_hurt");
 				}
 				return null;
 			}
@@ -134,7 +138,7 @@ public class ResourceBar extends Actor{
 			public TextureRegion getBackgroundSprite() {
 				TextureAtlas atlas = HUDUtils.masterAtlas;
 				if (atlas != null) {
-					return atlas.findRegion("enemy-health-bar-background");
+					return atlas.findRegion("Enemy_health_bar_background");
 				}
 				return null;
 			}
@@ -169,7 +173,7 @@ public class ResourceBar extends Actor{
 		public TextureRegion getForegroundSprite() {
 			TextureAtlas atlas = HUDUtils.masterAtlas;
 			if (atlas != null) {
-				return atlas.findRegion("health-bar-background");
+				return atlas.findRegion("Health_bar_Full");
 			}
 			return null;
 		}
@@ -177,7 +181,7 @@ public class ResourceBar extends Actor{
 		public TextureRegion getIntermediateForegroundSprite() {
 			TextureAtlas atlas = HUDUtils.masterAtlas;
 			if (atlas != null) {
-				return atlas.findRegion("health-bar-intermediate");
+				return atlas.findRegion("Health_bar_Hurt");
 			}
 			return null;
 		}
@@ -185,7 +189,7 @@ public class ResourceBar extends Actor{
 		public TextureRegion getBackgroundSprite() {
 			TextureAtlas atlas = HUDUtils.masterAtlas;
 			if (atlas != null) {
-				return atlas.findRegion("health-bar-background");
+				return atlas.findRegion("Health_bar_Empty");
 			}
 			return null;
 		}
@@ -203,19 +207,19 @@ public class ResourceBar extends Actor{
 		}
 		
 		public Float fixedHeight() {
-			return null;
+			return 0f;
 		}
 		
 		public Float fixedWidth() {
-			return null;
+			return 0f;
 		}
 		
 		public Float proportionalWidth() {
-			return null;
+			return 0.0f;
 		}
 		
 		public Float proportionalHeight() {
-			return null;
+			return 0.0f;
 		}
 	}
 	

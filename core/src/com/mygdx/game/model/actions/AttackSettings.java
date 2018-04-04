@@ -4,7 +4,9 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.mygdx.game.assets.HitSparkUtils;
 import com.mygdx.game.model.effects.EffectSettings;
+import com.mygdx.game.model.hitSpark.HitSparkData;
 
 public class AttackSettings extends AbilitySettings{
 	Array <Rectangle> hitBoxProperties;
@@ -12,7 +14,7 @@ public class AttackSettings extends AbilitySettings{
 	Array<EffectSettings> targetEffectSettings;
 	boolean shouldStagger;
 	boolean targetRespectEntityCollisions; //if this is false, the action ignores all entity collisions.
-
+	HitSparkData hitSparkData;
 	
 	@Override
 	public void write(Json json) {
@@ -23,6 +25,7 @@ public class AttackSettings extends AbilitySettings{
 		json.writeValue("shouldStagger", shouldStagger);
 		json.writeValue("targetRespectEntityCollisions", targetRespectEntityCollisions);
 		json.writeValue("hitBoxProperties", hitBoxProperties);
+		json.writeValue("hitSparkData", hitSparkData);
 
 	}
 	
@@ -66,6 +69,11 @@ public class AttackSettings extends AbilitySettings{
 		if (hitBoxProperties == null) {
 			this.hitBoxProperties = new Array <Rectangle>();
 		}
+		
+		this.hitSparkData = json.readValue("hitSparkData", HitSparkData.class, jsonData);
+		if (this.hitSparkData == null) {
+			this.hitSparkData = HitSparkUtils.defaultData();
+		}
 	}
 	
 	@Override
@@ -80,6 +88,7 @@ public class AttackSettings extends AbilitySettings{
 		}
 		copy.targetEffectSettings = newTargetSettings;
 		copy.hitBoxProperties = this.hitBoxProperties;
+		copy.hitSparkData = this.hitSparkData;
 		return copy;
 	}
 
@@ -89,5 +98,9 @@ public class AttackSettings extends AbilitySettings{
 
 	public boolean isShouldStagger() {
 		return shouldStagger;
+	}
+
+	public HitSparkData getHitSparkData() {
+		return hitSparkData;
 	}
 }

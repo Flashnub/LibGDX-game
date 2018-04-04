@@ -2,6 +2,8 @@ package com.mygdx.game.model.worldObjects;
 
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.math.Rectangle;
+import com.mygdx.game.assets.HitSparkUtils;
 import com.mygdx.game.model.actions.Attack;
 import com.mygdx.game.model.characters.CollisionCheck;
 import com.mygdx.game.model.characters.EntityModel;
@@ -12,6 +14,9 @@ import com.mygdx.game.model.characters.player.Player.PlayerModel;
 import com.mygdx.game.model.events.InteractableObject;
 import com.mygdx.game.model.events.ObjectListener;
 import com.mygdx.game.model.events.SaveListener;
+import com.mygdx.game.model.hitSpark.HitSpark;
+import com.mygdx.game.model.hitSpark.HitSparkData;
+import com.mygdx.game.model.hitSpark.HitSparkListener;
 import com.mygdx.game.model.world.WorldModel;
 
 public abstract class WorldObject extends EntityModel implements InteractableObject{
@@ -75,9 +80,16 @@ public abstract class WorldObject extends EntityModel implements InteractableObj
 	public abstract boolean shouldCollideWithEntity();
 	public abstract UUIDType getUUIDType();
 	
-	public void shouldAttackHit(Attack attack) {
+	public void shouldAttackHit(Attack attack, HitSparkListener listener, Rectangle collidingHitBox) {
 		if (this.isStrikeable && !this.isActivated) {
 			attack.processAttackOnEntity(this);
+			HitSparkData hitSparkData = HitSparkUtils.blockData(attack.getAttackSettings().getHitSparkData().getSize());
+			HitSpark hitSpark = new HitSpark(hitSparkData, 
+					collidingHitBox.x + collidingHitBox.width / 2,
+					collidingHitBox.y + collidingHitBox.height / 2);
+			if (hitSpark != null) {
+				listener.addHitSpark(hitSpark);
+			}
 		}
 	}
 	

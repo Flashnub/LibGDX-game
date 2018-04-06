@@ -4,7 +4,6 @@ import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.characters.CollisionCheck;
 import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.events.ActionListener;
-import com.mygdx.game.model.worldObjects.WorldObject;
 
 public class XMovementEffect  extends EntityEffect{
 

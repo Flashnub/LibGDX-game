@@ -1,6 +1,5 @@
 package com.mygdx.game.model.conditions;
 
-import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.characters.EntityModel;
 
 public abstract class PassiveCondition {

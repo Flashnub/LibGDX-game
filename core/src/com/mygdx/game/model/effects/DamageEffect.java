@@ -1,6 +1,5 @@
 package com.mygdx.game.model.effects;
 
-import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.characters.enemies.Enemy.EnemyModel;
 import com.mygdx.game.model.events.ActionListener;

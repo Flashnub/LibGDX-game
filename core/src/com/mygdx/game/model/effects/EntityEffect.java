@@ -2,7 +2,6 @@ package com.mygdx.game.model.effects;
 
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.characters.EntityUIModel;
-import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.conditions.PassiveCondition;
 import com.mygdx.game.model.conditions.PassiveConditionSettings;

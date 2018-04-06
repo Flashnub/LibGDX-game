@@ -1,0 +1,30 @@
+{
+	"class": com.mygdx.game.assets.EntityUIData,
+	"animations": [
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "DefaultLight",
+			"numberOfWindupFrames": 7,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "DefaultMedium",
+			"numberOfWindupFrames": 7,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "DefaultHeavy",
+			"numberOfWindupFrames": 7,
+			"playMode": NORMAL
+		}
+				{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "DefaultSpecial",
+			"numberOfWindupFrames": 9,
+			"playMode": NORMAL
+		}
+	]
+	"masterAtlasPath": "Sprites/HitSparks/Default/textures.atlas"
+}

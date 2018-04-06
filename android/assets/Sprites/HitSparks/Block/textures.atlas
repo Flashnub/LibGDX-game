@@ -1,167 +1,188 @@
 
 textures.png
-size: 2048,1024
+size: 1024,1024
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-HSBlockLightW1
+BlockLightW1
   rotate: false
-  xy: 1616, 888
-  size: 120, 120
-  orig: 120, 120
+  xy: 362, 950
+  size: 73, 66
+  orig: 73, 66
   offset: 0, 0
   index: -1
-HSBlockLightW2
+BlockLightW2
   rotate: false
-  xy: 1738, 888
-  size: 120, 120
-  orig: 120, 120
+  xy: 437, 950
+  size: 73, 66
+  orig: 73, 66
   offset: 0, 0
   index: -1
-HSBlockLightW3
+BlockLightW3
   rotate: false
-  xy: 1860, 888
-  size: 120, 120
-  orig: 120, 120
+  xy: 2, 70
+  size: 73, 66
+  orig: 73, 66
   offset: 0, 0
   index: -1
-HSBlockLightW4
+BlockLightW4
   rotate: false
-  xy: 1616, 766
-  size: 120, 120
-  orig: 120, 120
+  xy: 242, 838
+  size: 73, 66
+  orig: 73, 66
   offset: 0, 0
   index: -1
-HSBlockLightW5
+BlockLightW5
   rotate: false
-  xy: 1738, 766
-  size: 120, 120
-  orig: 120, 120
+  xy: 122, 582
+  size: 73, 66
+  orig: 73, 66
   offset: 0, 0
   index: -1
-HSBlockLightW6
-  rotate: false
-  xy: 1860, 766
-  size: 120, 120
-  orig: 120, 120
-  offset: 0, 0
-  index: -1
-HSBlockMediumW1
-  rotate: false
-  xy: 506, 304
-  size: 200, 200
-  orig: 200, 200
-  offset: 0, 0
-  index: -1
-HSBlockMediumW2
-  rotate: false
-  xy: 758, 556
-  size: 200, 200
-  orig: 200, 200
-  offset: 0, 0
-  index: -1
-HSBlockMediumW3
-  rotate: false
-  xy: 1010, 808
-  size: 200, 200
-  orig: 200, 200
-  offset: 0, 0
-  index: -1
-HSBlockMediumW4
-  rotate: false
-  xy: 506, 102
-  size: 200, 200
-  orig: 200, 200
-  offset: 0, 0
-  index: -1
-HSBlockMediumW5
-  rotate: false
-  xy: 1212, 808
-  size: 200, 200
-  orig: 200, 200
-  offset: 0, 0
-  index: -1
-HSBlockMediumW6
-  rotate: false
-  xy: 1414, 808
-  size: 200, 200
-  orig: 200, 200
-  offset: 0, 0
-  index: -1
-HSBlockSpecialW1
-  rotate: false
-  xy: 2, 758
-  size: 250, 250
-  orig: 250, 250
-  offset: 0, 0
-  index: -1
-HSBlockSpecialW10
-  rotate: false
-  xy: 758, 758
-  size: 250, 250
-  orig: 250, 250
-  offset: 0, 0
-  index: -1
-HSBlockSpecialW11
-  rotate: false
-  xy: 254, 2
-  size: 250, 250
-  orig: 250, 250
-  offset: 0, 0
-  index: -1
-HSBlockSpecialW2
-  rotate: false
-  xy: 2, 506
-  size: 250, 250
-  orig: 250, 250
-  offset: 0, 0
-  index: -1
-HSBlockSpecialW3
-  rotate: false
-  xy: 254, 758
-  size: 250, 250
-  orig: 250, 250
-  offset: 0, 0
-  index: -1
-HSBlockSpecialW4
-  rotate: false
-  xy: 2, 254
-  size: 250, 250
-  orig: 250, 250
-  offset: 0, 0
-  index: -1
-HSBlockSpecialW5
-  rotate: false
-  xy: 254, 506
-  size: 250, 250
-  orig: 250, 250
-  offset: 0, 0
-  index: -1
-HSBlockSpecialW6
-  rotate: false
-  xy: 506, 758
-  size: 250, 250
-  orig: 250, 250
-  offset: 0, 0
-  index: -1
-HSBlockSpecialW7
+BlockLightW6
   rotate: false
   xy: 2, 2
-  size: 250, 250
-  orig: 250, 250
+  size: 73, 66
+  orig: 73, 66
   offset: 0, 0
   index: -1
-HSBlockSpecialW8
+BlockLightW7
   rotate: false
-  xy: 254, 254
-  size: 250, 250
-  orig: 250, 250
+  xy: 77, 70
+  size: 73, 66
+  orig: 73, 66
   offset: 0, 0
   index: -1
-HSBlockSpecialW9
+BlockMediumW1
   rotate: false
-  xy: 506, 506
-  size: 250, 250
-  orig: 250, 250
+  xy: 2, 906
+  size: 118, 110
+  orig: 118, 110
+  offset: 0, 0
+  index: -1
+BlockMediumW2
+  rotate: false
+  xy: 2, 794
+  size: 118, 110
+  orig: 118, 110
+  offset: 0, 0
+  index: -1
+BlockMediumW3
+  rotate: false
+  xy: 122, 906
+  size: 118, 110
+  orig: 118, 110
+  offset: 0, 0
+  index: -1
+BlockMediumW4
+  rotate: false
+  xy: 2, 682
+  size: 118, 110
+  orig: 118, 110
+  offset: 0, 0
+  index: -1
+BlockMediumW5
+  rotate: false
+  xy: 122, 794
+  size: 118, 110
+  orig: 118, 110
+  offset: 0, 0
+  index: -1
+BlockMediumW6
+  rotate: false
+  xy: 242, 906
+  size: 118, 110
+  orig: 118, 110
+  offset: 0, 0
+  index: -1
+BlockMediumW7
+  rotate: false
+  xy: 2, 570
+  size: 118, 110
+  orig: 118, 110
+  offset: 0, 0
+  index: -1
+BlockSpecialW1
+  rotate: false
+  xy: 122, 650
+  size: 46, 142
+  orig: 46, 142
+  offset: 0, 0
+  index: -1
+BlockSpecialW10
+  rotate: false
+  xy: 98, 426
+  size: 46, 142
+  orig: 46, 142
+  offset: 0, 0
+  index: -1
+BlockSpecialW11
+  rotate: false
+  xy: 98, 282
+  size: 46, 142
+  orig: 46, 142
+  offset: 0, 0
+  index: -1
+BlockSpecialW12
+  rotate: false
+  xy: 98, 138
+  size: 46, 142
+  orig: 46, 142
+  offset: 0, 0
+  index: -1
+BlockSpecialW2
+  rotate: false
+  xy: 2, 426
+  size: 46, 142
+  orig: 46, 142
+  offset: 0, 0
+  index: -1
+BlockSpecialW3
+  rotate: false
+  xy: 170, 650
+  size: 46, 142
+  orig: 46, 142
+  offset: 0, 0
+  index: -1
+BlockSpecialW4
+  rotate: false
+  xy: 2, 282
+  size: 46, 142
+  orig: 46, 142
+  offset: 0, 0
+  index: -1
+BlockSpecialW5
+  rotate: false
+  xy: 50, 426
+  size: 46, 142
+  orig: 46, 142
+  offset: 0, 0
+  index: -1
+BlockSpecialW6
+  rotate: false
+  xy: 2, 138
+  size: 46, 142
+  orig: 46, 142
+  offset: 0, 0
+  index: -1
+BlockSpecialW7
+  rotate: false
+  xy: 50, 282
+  size: 46, 142
+  orig: 46, 142
+  offset: 0, 0
+  index: -1
+BlockSpecialW8
+  rotate: false
+  xy: 50, 138
+  size: 46, 142
+  orig: 46, 142
+  offset: 0, 0
+  index: -1
+BlockSpecialW9
+  rotate: false
+  xy: 218, 650
+  size: 46, 142
+  orig: 46, 142
   offset: 0, 0
   index: -1

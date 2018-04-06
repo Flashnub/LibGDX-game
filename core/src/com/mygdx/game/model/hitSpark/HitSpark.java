@@ -9,18 +9,29 @@ public class HitSpark {
 	EntityUIModel uiModel;
 	float currentTime;
 	HitSparkData data;
+	boolean isFinished;
+	HitSparkListener listener;
 
-	public HitSpark (HitSparkData data, float x, float y) {
+	public HitSpark (HitSparkData data, float x, float y, HitSparkListener listener) {
 		this.data = data;
-		this.imageBounds = new Rectangle(x, y, 0, 0);
-		this.uiModel = new EntityUIModel(data.getType(), EntityUIDataType.HITSPARK);
 		currentTime = 0f;
+		isFinished = false;
+		this.listener = listener;
+		this.imageBounds = new Rectangle();
+		this.uiModel = new EntityUIModel(data.getType(), EntityUIDataType.HITSPARK);
+		this.uiModel.setCurrentFrame(this, currentTime);
+		this.imageBounds.x = x;
+		this.imageBounds.y = y - (this.uiModel.getCurrentFrame().getRegionHeight() / 2);
 	}
 	
 	
 	public void update(float delta) {
-		this.uiModel.setCurrentFrame(this, delta);
-		
+		this.isFinished = this.uiModel.setCurrentFrame(this, delta);
+		currentTime += delta;
+		if (this.isFinished){
+			listener.deleteHitSpark(this);
+		}
+
 //		if (this.uiModel.getCurrentFrame() != null) {
 //			this.imageBounds.width = this.uiModel.getCurrentFrame().getRegionWidth();
 //			this.imageBounds.height = this.uiModel.getCurrentFrame().getRegionHeight();
@@ -31,7 +42,15 @@ public class HitSpark {
 		return data.getSize();
 	}
 	
-	public Rectangle getImageBounds() {
+	public Rectangle getImageHitBox() {
 		return imageBounds;
+	}
+
+	public EntityUIModel getUiModel() {
+		return uiModel;
+	}
+	
+	public String getType() {
+		return data.getType();
 	}
 }

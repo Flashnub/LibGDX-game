@@ -4,21 +4,21 @@ size: 1024,1024
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-Enemy_Health_bar
+Enemy_health_bar
   rotate: false
   xy: 306, 490
   size: 118, 7
   orig: 118, 7
   offset: 0, 0
   index: -1
-Enemy_Health_bar_Background
+Enemy_health_bar_background
   rotate: false
   xy: 2, 34
   size: 118, 7
   orig: 118, 7
   offset: 0, 0
   index: -1
-Enemy_Health_bar_hurt
+Enemy_health_bar_hurt
   rotate: false
   xy: 154, 186
   size: 118, 7

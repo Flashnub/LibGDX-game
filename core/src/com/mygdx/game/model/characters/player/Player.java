@@ -26,7 +26,6 @@ import com.mygdx.game.model.actions.nonhostile.ConditionalDialogueSettings;
 import com.mygdx.game.model.characters.Character;
 import com.mygdx.game.model.characters.CharacterConstants;
 import com.mygdx.game.model.characters.EntityCollisionData;
-import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.characters.EntityUIModel;
 import com.mygdx.game.model.characters.ModelListener;
 import com.mygdx.game.model.characters.player.GameSave.UUIDType;
@@ -496,6 +495,10 @@ public class Player extends Character implements InputProcessor, ControllerListe
 		private void setHeldDirectionForAxis(int axisCode, DirectionalInput potentialDirectionalInput) {
 			if ((axisCode == XBox360Pad.AXIS_LEFT_Y && !(this.currentlyHeldDirection.equals(DirectionalInput.LEFT) || this.currentlyHeldDirection.equals(DirectionalInput.RIGHT))) 
 			  || axisCode == XBox360Pad.AXIS_LEFT_X && !(this.currentlyHeldDirection.equals(DirectionalInput.UP) || this.currentlyHeldDirection.equals(DirectionalInput.DOWN))) {
+				
+				if (this.currentlyHeldDirection.equals(DirectionalInput.LEFT)) {
+					
+				}
 				this.currentlyHeldDirection = potentialDirectionalInput;
 			}
 

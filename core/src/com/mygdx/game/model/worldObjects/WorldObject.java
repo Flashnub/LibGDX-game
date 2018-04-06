@@ -85,8 +85,9 @@ public abstract class WorldObject extends EntityModel implements InteractableObj
 			attack.processAttackOnEntity(this);
 			HitSparkData hitSparkData = HitSparkUtils.blockData(attack.getAttackSettings().getHitSparkData().getSize());
 			HitSpark hitSpark = new HitSpark(hitSparkData, 
-					collidingHitBox.x + collidingHitBox.width / 2,
-					collidingHitBox.y + collidingHitBox.height / 2);
+					collidingHitBox.x,
+					collidingHitBox.y,
+					listener);
 			if (hitSpark != null) {
 				listener.addHitSpark(hitSpark);
 			}

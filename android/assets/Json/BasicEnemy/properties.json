@@ -8,6 +8,15 @@
 	"horizontalSpeed": 150,
 	"useDefaultStagger": true,
 	"useDefaultTensionStagger": false,
+		"defaultHurtboxProperties":  [
+		{
+			"class": "com.badlogic.gdx.math.Rectangle",
+			"x":0,
+			"y":0, 
+			"width": 200
+			"height": 200
+		}
+	]
 	actions: {
 		"BasicAttack": {
 			"class": com.mygdx.game.model.actions.ActionSequence,

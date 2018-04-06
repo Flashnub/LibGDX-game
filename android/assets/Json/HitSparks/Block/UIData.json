@@ -1,0 +1,24 @@
+{
+	"class": com.mygdx.game.assets.EntityUIData,
+	"animations": [
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "BlockLight",
+			"numberOfWindupFrames": 7,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "BlockMedium",
+			"numberOfWindupFrames": 7,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "BlockSpecial",
+			"numberOfWindupFrames": 12,
+			"playMode": NORMAL
+		}
+	]
+	"masterAtlasPath": "Sprites/HitSparks/Block/textures.atlas"
+}

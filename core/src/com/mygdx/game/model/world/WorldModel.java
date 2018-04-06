@@ -715,7 +715,12 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 	public void addHitSpark(HitSpark hitSpark) {
 		this.hitSparks.add(hitSpark);
 	}
-
+	
+	@Override
+	public void deleteHitSpark(HitSpark hitSpark) {
+		this.hitSparks.removeValue(hitSpark, true);		
+	}
+	
 	@Override
 	public void triggerSave() {
 		this.saveController.save();
@@ -767,6 +772,10 @@ public class WorldModel implements ActionListener, ObjectListener, SaveListener,
 
 	public TiledMapTileLayer getCollisionLayer() {
 		return this.collisionLayer;
+	}
+
+	public Array<HitSpark> getHitSparks() {
+		return hitSparks;
 	}
 
 

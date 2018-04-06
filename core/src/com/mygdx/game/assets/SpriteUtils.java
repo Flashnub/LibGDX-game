@@ -16,4 +16,8 @@ public class SpriteUtils {
 	public static String animationStringWithState(String state, boolean isFacingLeft) {
 		return state + (isFacingLeft ? SpriteUtils.left : SpriteUtils.right);
 	}
+	
+	public static String animationStringWithSizeType(String size, String type, boolean isFacingLeft) {
+		return type + size + (isFacingLeft ? SpriteUtils.left : SpriteUtils.right);
+	}
 }

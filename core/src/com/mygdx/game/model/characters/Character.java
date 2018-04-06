@@ -96,6 +96,7 @@ public abstract class Character implements ModelListener {
 		boolean isSlowingDown;
 		boolean injuredStaggering;
 		boolean queuedJump;
+		boolean isCrouching;
 	    float actionStaggerTime;
 	    float tempVelocityX;
 	    float tempVelocityY;
@@ -137,6 +138,7 @@ public abstract class Character implements ModelListener {
 			isSlowingDown = false;
 			sprinting = false;
 			injuredStaggering = false;
+			isCrouching = false;
 			queuedJump = false;
 			this.movementConditionActivated = false;
 			this.movementConditionActivatedTime = 0f;
@@ -263,7 +265,12 @@ public abstract class Character implements ModelListener {
 				this.didChangeState = false; 
 			}
 			if (!isInAir && !walking && !this.isProcessingActiveSequences()) {
-				setState(CharacterConstants.idleState);
+				if (this.isCrouching) {
+					setState(CharacterConstants.crouchState);
+				}
+				else {
+					setState(CharacterConstants.idleState);
+				}
 			}
 			else if (isInAir && this.velocity.y < -3f && (this.getCurrentActiveActionSeq() == null)) {
 				setState(CharacterConstants.fallState);
@@ -427,7 +434,15 @@ public abstract class Character implements ModelListener {
 		    	this.setMovementStatesIfNeeded(true);
 		    	this.currentJumpTokens -= 1;
 			}
-
+		}
+		
+		public void crouch() {
+			this.isCrouching = true;
+			
+		}
+		
+		public void unCrouch() {
+			this.isCrouching = false;
 		}
 	    
 		public void horizontalMove(boolean left) {
@@ -473,8 +488,12 @@ public abstract class Character implements ModelListener {
 				else {
 					this.velocity.x = 0;
 				}
-
-				setState(CharacterConstants.idleState);
+				if (this.isCrouching) {
+					setState(CharacterConstants.crouchState);
+				}
+				else {
+					setState(CharacterConstants.idleState);
+				}
 			}
 			else if (this.isInAir) {
 				this.acceleration.x = 0;
@@ -660,7 +679,8 @@ public abstract class Character implements ModelListener {
 						HitSparkData hitSparkData = HitSparkUtils.blockData(projectile.getSettings().getHitSparkData().getSize());
 						hitSpark = new HitSpark(hitSparkData, 
 								projectile.getGameplayCollisionBox().x + (projectile.isFacingLeft() ? 0f : projectile.getGameplayCollisionBox().width),
-								projectile.getGameplayCollisionBox().y + projectile.getGameplayCollisionBox().height / 2);
+								projectile.getGameplayCollisionBox().y + projectile.getGameplayCollisionBox().height / 2,
+								hitSparkListener);
 						break;
 					}
 				}
@@ -668,7 +688,8 @@ public abstract class Character implements ModelListener {
 					projectile.processHit(this);
 					hitSpark = new HitSpark(projectile.getSettings().getHitSparkData(), 
 							projectile.getGameplayCollisionBox().x + (projectile.isFacingLeft() ? 0f : projectile.getGameplayCollisionBox().width),
-							projectile.getGameplayCollisionBox().y + projectile.getGameplayCollisionBox().height / 2);
+							projectile.getGameplayCollisionBox().y + projectile.getGameplayCollisionBox().height / 2,
+							hitSparkListener);
 				}
 			}
 			if (hitSpark != null) {
@@ -686,7 +707,8 @@ public abstract class Character implements ModelListener {
 						HitSparkData hitSparkData = HitSparkUtils.blockData(explosion.getExplosionSettings().getHitSparkData().getSize());
 						hitSpark = new HitSpark(hitSparkData, 
 								explosion.getGameplayCollisionBox().x + explosion.getGameplayCollisionBox().width / 2,
-								explosion.getGameplayCollisionBox().y + explosion.getGameplayCollisionBox().height / 2);
+								explosion.getGameplayCollisionBox().y + explosion.getGameplayCollisionBox().height / 2,
+								hitSparkListener);
 						break;
 					}
 				}
@@ -695,7 +717,8 @@ public abstract class Character implements ModelListener {
 					HitSparkData hitSparkData = explosion.getExplosionSettings().getHitSparkData();
 					hitSpark = new HitSpark(hitSparkData, 
 							explosion.getGameplayCollisionBox().x + explosion.getGameplayCollisionBox().width / 2,
-							explosion.getGameplayCollisionBox().y + explosion.getGameplayCollisionBox().height / 2);
+							explosion.getGameplayCollisionBox().y + explosion.getGameplayCollisionBox().height / 2,
+							hitSparkListener);
 				}
 			}
 			if (hitSpark != null) {
@@ -712,8 +735,9 @@ public abstract class Character implements ModelListener {
 						didInterceptAttack = ((AssaultInterceptor) effect).didInterceptAttack(this, attack);
 						HitSparkData hitSparkData = HitSparkUtils.blockData(attack.getAttackSettings().getHitSparkData().getSize());
 						hitSpark = new HitSpark(hitSparkData, 
-								collidingHitBox.x + collidingHitBox.width / 2,
-								collidingHitBox.y + collidingHitBox.height / 2);
+								collidingHitBox.x,
+								collidingHitBox.y,
+								hitSparkListener);
 					}
 				}
 				if (!didInterceptAttack) {
@@ -721,7 +745,8 @@ public abstract class Character implements ModelListener {
 					HitSparkData hitSparkData = attack.getAttackSettings().getHitSparkData();
 					hitSpark = new HitSpark(hitSparkData, 
 							collidingHitBox.x + collidingHitBox.width / 2,
-							collidingHitBox.y + collidingHitBox.height / 2);
+							collidingHitBox.y,
+							hitSparkListener);
 				}
 			}
 			if (hitSpark != null) {

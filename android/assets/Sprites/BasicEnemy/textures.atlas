@@ -88,7 +88,7 @@ WakeupC4
   orig: 100, 200
   offset: 0, 0
   index: -1
-Backwalk1
+BackwalkW1
   rotate: false
   xy: 104, 406
   size: 100, 200
@@ -109,14 +109,14 @@ DeathA1
   orig: 100, 200
   offset: 0, 0
   index: -1
-Idle1
+IdleDrawnW1
   rotate: false
   xy: 104, 406
   size: 100, 200
   orig: 100, 200
   offset: 0, 0
   index: -1
-IdleDrawn1
+IdleW1
   rotate: false
   xy: 104, 406
   size: 100, 200
@@ -151,7 +151,7 @@ WakeupA4
   orig: 100, 200
   offset: 0, 0
   index: -1
-Walk1
+WalkW1
   rotate: false
   xy: 104, 406
   size: 100, 200

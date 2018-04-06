@@ -2,7 +2,6 @@ package com.mygdx.game.model.events;
 
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.mygdx.game.model.actions.ActionSegment;
-import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.Attack;
 import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.globalEffects.WorldEffect;

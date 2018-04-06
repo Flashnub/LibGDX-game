@@ -149,7 +149,7 @@ public class EntityUIModel {
 	}
 	
 	public boolean setCurrentFrame(HitSpark hitSpark, float delta) {
-		String animationString = SpriteUtils.animationStringWithState(hitSpark.getSize(), false);
+		String animationString = SpriteUtils.animationStringWithSizeType(hitSpark.getSize(), hitSpark.getType(), false);
 		Animation <TextureRegion> currentAnimation = animations.get(animationString);
 
 		if (currentAnimation != null) {
@@ -161,8 +161,8 @@ public class EntityUIModel {
 			}
 			
 			if (this.currentFrame != null) {
-				hitSpark.getImageBounds().width = this.currentFrame.getRegionWidth();
-				hitSpark.getImageBounds().height = this.currentFrame.getRegionHeight();
+				hitSpark.getImageHitBox().width = this.currentFrame.getRegionWidth();
+				hitSpark.getImageHitBox().height = this.currentFrame.getRegionHeight();
 			}
 		}
 		

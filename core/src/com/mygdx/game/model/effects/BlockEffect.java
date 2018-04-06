@@ -3,7 +3,6 @@ package com.mygdx.game.model.effects;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.model.actions.Attack;
 import com.mygdx.game.model.actions.HitTracker;
-import com.mygdx.game.model.characters.Character.CharacterModel;
 import com.mygdx.game.model.characters.EntityModel;
 import com.mygdx.game.model.events.ActionListener;
 import com.mygdx.game.model.events.AssaultInterceptor;

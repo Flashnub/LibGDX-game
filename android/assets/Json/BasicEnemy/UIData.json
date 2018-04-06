@@ -4,123 +4,67 @@
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "Idle",
-			"numberOfFrames": 1,
+			"numberOfWindupFrames": 1,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "IdleDrawn",
-			"numberOfFrames": 1,
+			"numberOfWindupFrames": 1,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
-			"name": "DeathW",
-			"numberOfFrames": 1,
+			"name": "Death",
+			"numberOfWindupFrames": 1,
+			"numberOfActiveFrames": 1,
+			"numberOfCooldownFrames": 1,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
-			"name": "DeathA",
-			"numberOfFrames": 1,
-			"playMode": NORMAL
-		}		
-		{
-			"class": com.mygdx.game.assets.AnimationData,
-			"name": "DeathC",
-			"numberOfFrames": 1,
-			"playMode": NORMAL
-		}	
-		{
-			"class": com.mygdx.game.assets.AnimationData,
-			"name": "BasicAttackW",
-			"numberOfFrames": 1,
+			"name": "BasicAttack",
+			"numberOfWindupFrames": 1,
+			"numberOfActiveFrames": 1,
+			"numberOfCooldownFrames": 1,
 			"frameRate": 5,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
-			"name": "BasicAttackA",
-			"numberOfFrames": 1,
-			"frameRate": 5,
+			"name": "Stagger",
+			"numberOfWindupFrames": 1,
+			"numberOfActiveFrames": 1,
+			"numberOfCooldownFrames": 1,
 			"playMode": NORMAL
 		}		
 		{
 			"class": com.mygdx.game.assets.AnimationData,
-			"name": "BasicAttackC",
-			"numberOfFrames": 1,
-			"frameRate": 5,
-			"playMode": NORMAL
-		}	
-		{
-			"class": com.mygdx.game.assets.AnimationData,
-			"name": "StaggerW",
-			"numberOfFrames": 1,
+			"name": "AerialStagger",
+			"numberOfWindupFrames": 1,
+			"numberOfActiveFrames": 1,
+			"numberOfCooldownFrames": 1,
 			"playMode": NORMAL
 		}		
-		{
-			"class": com.mygdx.game.assets.AnimationData,
-			"name": "StaggerA",
-			"numberOfFrames": 1,
-			"playMode": NORMAL
-		}
-		{
-			"class": com.mygdx.game.assets.AnimationData,
-			"name": "StaggerC",
-			"numberOfFrames": 1,
-			"playMode": NORMAL
-		}
-		{
-			"class": com.mygdx.game.assets.AnimationData,
-			"name": "AerialStaggerW",
-			"numberOfFrames": 1,
-			"playMode": NORMAL
-		}		
-		{
-			"class": com.mygdx.game.assets.AnimationData,
-			"name": "AerialStaggerA",
-			"numberOfFrames": 1,
-			"playMode": NORMAL
-		}
-		{
-			"class": com.mygdx.game.assets.AnimationData,
-			"name": "AerialStaggerC",
-			"numberOfFrames": 1,
-			"playMode": NORMAL
-		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "Walk",
-			"numberOfFrames": 1,
+			"numberOfWindupFrames": 1,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "Backwalk",
-			"numberOfFrames": 1,
+			"numberOfWindupFrames": 1,
 			"playMode": NORMAL
 		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
-			"name": "WakeupW",
+			"name": "Wakeup",
 			"frameRate": 24,
 			"numberOfFrames": 4,
 			"playMode": NORMAL
 		}		
-		{
-			"class": com.mygdx.game.assets.AnimationData,
-			"name": "WakeupA",
-			"frameRate": 4,
-			"numberOfFrames": 4,
-			"playMode": NORMAL
-		}
-		{
-			"class": com.mygdx.game.assets.AnimationData,
-			"name": "WakeupC",
-			"frameRate": 4,
-			"numberOfFrames": 4,
-			"playMode": NORMAL
-		}
 	]
 	"masterAtlasPath": "Sprites/BasicEnemy/textures.atlas"
 }

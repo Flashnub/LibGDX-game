@@ -17,6 +17,8 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.Queue;
 import com.mygdx.game.constants.InputConverter;
 import com.mygdx.game.constants.InputConverter.DirectionalInput;
+import com.mygdx.game.constants.InputConverter.XDirectionalInput;
+import com.mygdx.game.constants.InputConverter.YDirectionalInput;
 import com.mygdx.game.constants.InputType;
 import com.mygdx.game.constants.XBox360Pad;
 import com.mygdx.game.model.actions.ActionSegment.ActionState;
@@ -162,7 +164,8 @@ public class Player extends Character implements InputProcessor, ControllerListe
 	
 		final String blockState = "Block";		
 		boolean dashing, canControl, isJumpPressed;
-		DirectionalInput currentlyHeldDirection;
+		XDirectionalInput currentlyHeldXDirection;
+		YDirectionalInput currentlyHeldYDirection;
 	    Array <String> processedCondtionalDialogueUUIDs;
 	    SpawnPoint spawnPoint;
 	    InteractableObject nearbyObject;
@@ -199,7 +202,9 @@ public class Player extends Character implements InputProcessor, ControllerListe
 			this.processedCondtionalDialogueUUIDs = new Array <String>();
 			dashing = false;
 			canControl = false;
-			this.currentlyHeldDirection = DirectionalInput.NONE;
+			this.currentlyHeldXDirection = XDirectionalInput.NONE;
+			this.currentlyHeldYDirection = YDirectionalInput.NONE;
+
 			isJumpPressed = false;
 //			this.widthCoefficient = 0.19f;
 //			this.heightCoefficient = 0.6f;
@@ -261,7 +266,6 @@ public class Player extends Character implements InputProcessor, ControllerListe
 					}
 				}
 			}
-	
 		}
 		
 		public void dialogueAction(String uuid) {
@@ -325,14 +329,40 @@ public class Player extends Character implements InputProcessor, ControllerListe
 	    	this.selectedItemType.use(this);
 	    }
 	      
+		private void setDirectionFromDirectionalInput(DirectionalInput input) {
+			switch (input) {
+			case LEFT:
+				this.currentlyHeldXDirection = XDirectionalInput.LEFT;
+				break;
+			case RIGHT:
+				this.currentlyHeldXDirection = XDirectionalInput.LEFT;
+				break;
+			case UP:
+				this.currentlyHeldYDirection = YDirectionalInput.UP;
+				break;
+			case DOWN:
+				this.currentlyHeldYDirection = YDirectionalInput.DOWN;
+				break;
+			case NONE:
+				this.currentlyHeldXDirection = XDirectionalInput.NONE;
+				this.currentlyHeldYDirection = YDirectionalInput.NONE;
+				break;
+			default:
+				break;
+			}
+		}
+		    
 		public boolean handleKeyDown (int keyCode)
 		{
 
 			DirectionalInput potentialDirectionalInput = this.inputConverter.getDirectionFromKeyCodeForDown(keyCode);
-			if (!potentialDirectionalInput.equals(DirectionalInput.NONE))
-				this.currentlyHeldDirection = potentialDirectionalInput;
 			
-			String inputType = this.inputConverter.convertKeyCodeToInputType(keyCode, this.currentlyHeldDirection);
+			if (!potentialDirectionalInput.equals(DirectionalInput.NONE))
+				setDirectionFromDirectionalInput(potentialDirectionalInput);
+			
+			DirectionalInput actualDirectionalInput = DirectionalInput.getDirectionFromXAndY(this.currentlyHeldXDirection, this.currentlyHeldYDirection);
+			
+			String inputType = this.inputConverter.convertKeyCodeToInputType(keyCode, actualDirectionalInput);
 			if (!inputType.equals("")) {
 				System.out.println(inputType);
 				this.inputs.addFirst(inputType);
@@ -377,9 +407,13 @@ public class Player extends Character implements InputProcessor, ControllerListe
 		}
 		
 		public boolean handleKeyUp (int keyCode) {
-			DirectionalInput directionHeld = this.inputConverter.getDirectionFromKeyCodeForUp(keyCode, this.currentlyHeldDirection);
+			DirectionalInput directionHeld = this.inputConverter.getDirectionFromKeyCodeForUp(keyCode, this.currentlyHeldXDirection);
 			if (directionHeld != null) {
-				this.currentlyHeldDirection = directionHeld;
+				XDirectionalInput input = directionHeld.getXDirectionalInputFromThis();
+				if (input.equals(XDirectionalInput.LEFT) || input.equals(XDirectionalInput.RIGHT)) {
+					
+				}
+				this.currentlyHeldXDirection = directionHeld;
 				checkIfNeedToStopWalk();
 			}
 			String inputType = this.inputConverter.convertKeyCodeToInputType(keyCode, this.currentlyHeldDirection);

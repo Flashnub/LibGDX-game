@@ -7,8 +7,73 @@ public class InputConverter {
 	
 	GameSave playerSave;
 	
+	public enum XDirectionalInput {
+		LEFT, RIGHT, NONE
+	}
+	
+	public enum YDirectionalInput {
+		UP, DOWN, NONE
+	}
+	
 	public enum DirectionalInput {
-		LEFT, RIGHT, UP, DOWN, NONE
+		NONE, UP, UPLEFT, UPRIGHT, LEFT, RIGHT, DOWNLEFT, DOWNRIGHT, DOWN;
+		
+		public XDirectionalInput getXDirectionalInputFromThis() {
+			if (this.equals(LEFT)) {
+				return XDirectionalInput.LEFT;
+			}
+			else if (this.equals(RIGHT)) {
+				return XDirectionalInput.RIGHT;
+			}
+			return XDirectionalInput.NONE;
+		}
+		
+//		public YDirectionalInput getYDirectionalInputFromThis() {
+//			if (this.equals(UP)) {
+//				return YDirectionalInput.UP;
+//			}
+//			else if (this.equals(DOWN)) {
+//				return YDirectionalInput.DOWN;
+//			}
+//			return YDirectionalInput.NONE;
+//		}
+		
+		public static DirectionalInput getDirectionFromXAndY(XDirectionalInput xDirection, YDirectionalInput yDirection) {
+			if (xDirection.equals(LEFT)) {
+				if (yDirection.equals(UP)) {
+					return DirectionalInput.UPLEFT;
+				}
+				else if (yDirection.equals(DOWN)) {
+					return DirectionalInput.DOWNLEFT;
+				}
+				else if (yDirection.equals(NONE)) {
+					return DirectionalInput.LEFT;
+				}
+			}
+			else if (xDirection.equals(RIGHT)) {
+				if (yDirection.equals(UP)) {
+					return DirectionalInput.UPRIGHT;
+				}
+				else if (yDirection.equals(DOWN)) {
+					return DirectionalInput.DOWNRIGHT;
+				}
+				else if (yDirection.equals(NONE)) {
+					return DirectionalInput.RIGHT;
+				}
+			}
+			else if (xDirection.equals(NONE)) {
+				if (yDirection.equals(UP)) {
+					return DirectionalInput.UP;
+				}
+				else if (yDirection.equals(DOWN)) {
+					return DirectionalInput.DOWN;
+				}
+				else if (yDirection.equals(NONE)) {
+					return DirectionalInput.NONE;
+				}
+			}
+			return DirectionalInput.NONE;
+		}
 	}
 	
 	public InputConverter (GameSave save) {
@@ -104,7 +169,7 @@ public class InputConverter {
 		}
 	}
  	
-	public DirectionalInput getDirectionFromKeyCodeForUp(int keyCode, DirectionalInput currentDirectionHeld) {
+	public DirectionalInput getDirectionFromKeyCodeForUp(int keyCode, XDirectionalInput currentDirectionHeld) {
 		String inputName = Keys.toString(keyCode);
 		String inputType = playerSave.getKBMouseScheme().get(inputName);
 		if (inputType == null) 
@@ -115,14 +180,14 @@ public class InputConverter {
 		case InputType.UP:
 			return DirectionalInput.NONE;
 		case InputType.RIGHT:
-			if (currentDirectionHeld.equals(DirectionalInput.LEFT)) {
+			if (currentDirectionHeld.equals(XDirectionalInput.LEFT)) {
 				return null;
 			}
 			else {
 				return DirectionalInput.NONE;
 			}
 		case InputType.LEFT:
-			if (currentDirectionHeld.equals(DirectionalInput.RIGHT)) {
+			if (currentDirectionHeld.equals(XDirectionalInput.RIGHT)) {
 				return null;
 			}
 			else {

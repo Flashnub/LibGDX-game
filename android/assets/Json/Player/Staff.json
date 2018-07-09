@@ -63,7 +63,8 @@
 			}
 		],
 		"inputs": [
-			["P"]
+			["P"],
+			["PUP"]
 		]
 	},
 	{
@@ -86,7 +87,8 @@
 			}
 		],
 		"inputs": [
-			["K"]
+			["K"],
+			["KUP"]
 		],
 		"chainsWithJump": false
 	},
@@ -110,7 +112,8 @@
 			}
 		],
 		"inputs": [
-			["S"]
+			["S"],
+			["SUP"]
 		]
 	},
 	{
@@ -134,8 +137,9 @@
 		],
 		"inputs": [
 			["SLEFT"],
-			["SRIGHT"]
-			["SRIGHT"]
+			["SRIGHT"],
+			["SUPLEFT"],
+			["SUPRIGHT"]
 		]
 	},
 	{
@@ -149,7 +153,8 @@
 
 		],
 		"inputs": [
-			["H"]
+			["H"],
+			["HUP"],
 		]
 	},
 	{
@@ -172,8 +177,10 @@
 			}
 		],
 		"inputs": [
+			["PLEFT"],
 			["PRIGHT"],
-			["PLEFT"]
+			["PUPLEFT"],
+			["PUPRIGHT"]
 		]
 	},
 	{
@@ -187,8 +194,10 @@
 
 		],
 		"inputs": [
-			["HRIGHT"],
-			["HLEFT"]
+			["SLEFT"],
+			["SRIGHT"],
+			["SUPLEFT"],
+			["SUPRIGHT"]
 		]
 	},
 	{
@@ -231,7 +240,10 @@
 			}
 		],
 		"inputs": [
-			["PDOWN"]
+			["PDOWN"],
+			["PDOWNRIGHT"],
+			["PDOWNLEFT"]
+
 		]
 	},
 	{
@@ -264,7 +276,9 @@
 			}
 		],
 		"inputs": [
-			["KDOWN"]
+			["KDOWN"],
+			["KDOWNRIGHT"],
+			["KDOWNLEFT"]
 		]
 	},
 	{
@@ -282,7 +296,9 @@
 			}
 		],
 		"inputs": [
-			["HDOWN"]
+			["HDOWN"],
+			["HDOWNRIGHT"],
+			["HDOWNLEFT"]
 		]
 	},
 	{
@@ -310,7 +326,9 @@
 			}
 		],
 		"inputs": [
-			["SDOWN"]
+			["SDOWN"],
+			["SDOWNRIGHT"],
+			["SDOWNLEFT"]
 		]
 	},
 	{
@@ -334,7 +352,14 @@
 		],
 		"inputs": [
 			["S"],
-			["SLEFT"]
+			["SUP"],
+			["SLEFT"],
+			["SDOWN"],
+			["SDOWNRIGHT"],
+			["SDOWNLEFT"],
+			["SRIGHT"],
+			["SUPLEFT"],
+			["SUPRIGHT"]
 		],
 		"useType": Aerial
 	},
@@ -350,7 +375,14 @@
 		],
 		"inputs": [
 			["H"],
-			["HLEFT"]
+			["HUP"],
+			["HLEFT"],
+			["HDOWN"],
+			["HDOWNRIGHT"],
+			["HDOWNLEFT"],
+			["HRIGHT"],
+			["HUPLEFT"],
+			["HUPRIGHT"]
 		],
 		"useType": Aerial
 	},
@@ -366,7 +398,14 @@
 		],
 		"inputs": [
 			["K"],
-			["KLEFT"]
+			["KUP"],
+			["KLEFT"],
+			["KDOWN"],
+			["KDOWNRIGHT"],
+			["KDOWNLEFT"],
+			["KRIGHT"],
+			["KUPLEFT"],
+			["KUPRIGHT"]
 		],
 		"useType": Aerial
 	}

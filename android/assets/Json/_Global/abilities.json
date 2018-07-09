@@ -27,6 +27,12 @@
 			}
 		]
 	}
+	"CrouchToIdle": {
+		"class": "com.mygdx.game.model.actions.AbilitySettings"
+	}
+	"IdleToCrouch": {
+		"class": "com.mygdx.game.model.actions.AbilitySettings"
+	}
 	"BasicProjectileAttack": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
 		"sourceEffectSettings": [

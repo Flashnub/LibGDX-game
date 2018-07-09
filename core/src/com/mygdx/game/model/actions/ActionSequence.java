@@ -22,12 +22,12 @@ import com.mygdx.game.model.world.DialogueController;
 
 public class ActionSequence implements Serializable {
 	
-	enum ActionStrategy {
-		RangedOffensive, RangedHeal, MeleeOffensive, Story
-	}
+//	enum ActionStrategy {
+//		RangedOffensive, RangedHeal, MeleeOffensive, Story, Defense
+//	}
 	
 	public enum ActionType {
-		Attack, WorldAttack, Ability, Dialogue, Gesture, ItemGift, Stagger
+		Attack, WorldAttack, Ability, Dialogue, Gesture, ItemGift, Stagger, StanceChange
 	}
 	
 	public enum UseType {
@@ -54,7 +54,7 @@ public class ActionSequence implements Serializable {
 	public static final float defaultActivationModifier = 1f; 
 
 	private ActionSegmentKey actionKey;
-	private ActionStrategy strategy;
+//	private ActionStrategy strategy;
 	private String windupState;
 	private String actingState;
 	private String cooldownState;
@@ -101,7 +101,7 @@ public class ActionSequence implements Serializable {
 				hasState ? DialogueSettings.defaultState : DialogueSettings.stateless,
 				ActionType.Dialogue);
 		sequence.isActive = hasState;
-		sequence.strategy = ActionStrategy.Story;
+//		sequence.strategy = ActionStrategy.Story;
 
 		sequence.windupState = settings.getWindupState();
 		sequence.actingState = settings.getActingState();
@@ -136,7 +136,7 @@ public class ActionSequence implements Serializable {
 		ActionSequence sequence = new ActionSequence();
 		sequence.actionKey = new ActionSegmentKey(source.getNameForWakeupSeq() + "Wakeup", ActionType.Stagger);
 		sequence.isActive = true;
-		sequence.strategy = ActionStrategy.Story;
+//		sequence.strategy = ActionStrategy.Story;
 		sequence.windupState = "WakeupW";
 		sequence.actingState = "WakeupA";
 		sequence.cooldownState = "WakeupC";
@@ -165,11 +165,67 @@ public class ActionSequence implements Serializable {
 		return sequence;
 	}
 	
+	public static ActionSequence createCrouchToIdleSeq(CharacterModel source, ActionListener actionListener) {
+		ActionSequence sequence = new ActionSequence();
+		sequence.actionKey = new ActionSegmentKey("CrouchToIdle", ActionType.StanceChange);
+		sequence.isActive = true;
+//		sequence.strategy = ActionStrategy.Story;
+		sequence.windupState = "CrouchToIdleW";
+		sequence.actingState = "CrouchToIdleA";
+		sequence.cooldownState = "CrouchToIdleC";
+		
+		sequence.leftWindupState = sequence.windupState;
+		sequence.leftActingState = sequence.actingState;
+		sequence.leftCooldownState = sequence.cooldownState;
+		sequence.highPriority = false; 
+		
+		sequence.source = source;
+		sequence.actionListener = actionListener;
+		sequence.useType = UseType.Ground;
+		sequence.leftInputs = new Array <Array <String>>();
+		sequence.rightInputs = new Array <Array <String>>();
+		sequence.conditionSettings = new Array <ActionConditionSettings>();
+		sequence.activationModifier = ActionSequence.defaultActivationModifier;
+		
+		sequence.createActionFromSettings(null, null);
+
+		
+		return sequence;
+	}
+	
+	public static ActionSequence createIdleToCrouchSeq(CharacterModel source, ActionListener actionListener) {
+		ActionSequence sequence = new ActionSequence();
+		sequence.actionKey = new ActionSegmentKey("IdleToCrouch", ActionType.StanceChange);
+		sequence.isActive = true;
+//		sequence.strategy = ActionStrategy.Story;
+		sequence.windupState = "IdleToCrouchW";
+		sequence.actingState = "IdleToCrouchA";
+		sequence.cooldownState = "IdleToCrouchC";
+		
+		sequence.leftWindupState = sequence.windupState;
+		sequence.leftActingState = sequence.actingState;
+		sequence.leftCooldownState = sequence.cooldownState;
+		sequence.highPriority = false; 
+		
+		sequence.source = source;
+		sequence.actionListener = actionListener;
+		sequence.useType = UseType.Ground;
+		sequence.leftInputs = new Array <Array <String>>();
+		sequence.rightInputs = new Array <Array <String>>();
+		sequence.conditionSettings = new Array <ActionConditionSettings>();
+		sequence.activationModifier = ActionSequence.defaultActivationModifier;
+		
+		sequence.createActionFromSettings(null, null);
+
+		
+		return sequence;
+	}
+	
 	public static ActionSequence createStaggerSequence(CharacterModel source, ActionListener actionListener, StaggerType staggerType) {
 		ActionSequence sequence = new ActionSequence();
 		sequence.actionKey = new ActionSegmentKey(staggerType.getKeyForStaggerType(source.getNameForStaggerSeq(staggerType)), ActionType.Stagger);
 		sequence.isActive = true;
-		sequence.strategy = ActionStrategy.Story;
+//		sequence.strategy = ActionStrategy.Story;
 		if (staggerType.equals(StaggerType.Tension)) {
 			sequence.windupState = "TensionStaggerW";
 			sequence.actingState = "TensionStaggerA";
@@ -210,7 +266,7 @@ public class ActionSequence implements Serializable {
 	@Override
 	public void write(Json json) {
 		json.writeValue("actionKey", actionKey);
-		json.writeValue("strategy", strategy);
+//		json.writeValue("strategy", strategy);
 		json.writeValue("windupState", windupState);
 		json.writeValue("actingState", windupState);
 		json.writeValue("cooldownState", windupState);
@@ -221,7 +277,7 @@ public class ActionSequence implements Serializable {
 	@Override
 	public void read(Json json, JsonValue jsonData) {
 		actionKey = json.readValue("actionKey", ActionSegmentKey.class, jsonData);
-		strategy = json.readValue("strategy", ActionStrategy.class, jsonData);
+//		strategy = json.readValue("strategy", ActionStrategy.class, jsonData);
 		chainableActionKeys = json.readValue("chainableActionKeys", Array.class, jsonData);
 		
 		Boolean	isSuper = json.readValue("isSuper", Boolean.class, jsonData);
@@ -336,7 +392,7 @@ public class ActionSequence implements Serializable {
 	public ActionSequence cloneBareSequence() {
 		ActionSequence sequence = new ActionSequence();
 		sequence.actionKey = this.actionKey;
-		sequence.strategy = this.strategy;
+//		sequence.strategy = this.strategy;
 		sequence.windupState = this.windupState;
 		sequence.actingState = this.actingState;
 		sequence.cooldownState = this.cooldownState;
@@ -396,6 +452,7 @@ public class ActionSequence implements Serializable {
 			case Gesture:
 			case ItemGift:
 			case Stagger:
+			case StanceChange:
 				return false;
 			case Attack:
 			case WorldAttack:
@@ -480,6 +537,11 @@ public class ActionSequence implements Serializable {
 				break;
 			case Dialogue:
 				action = new DialogueAction(potentialDialogue, this.dialogueController, this.actionListener, source, target);
+				break;
+			case StanceChange:
+				if (JSONController.abilities.get(segmentKey.getKey()) != null) {
+					action = new Ability(source, JSONController.abilities.get(segmentKey.getKey()), this.actionListener);
+				}
 				break;
 			case Gesture:
 				break;

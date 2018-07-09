@@ -335,7 +335,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 				this.currentlyHeldXDirection = XDirectionalInput.LEFT;
 				break;
 			case RIGHT:
-				this.currentlyHeldXDirection = XDirectionalInput.LEFT;
+				this.currentlyHeldXDirection = XDirectionalInput.RIGHT;
 				break;
 			case UP:
 				this.currentlyHeldYDirection = YDirectionalInput.UP;
@@ -354,7 +354,6 @@ public class Player extends Character implements InputProcessor, ControllerListe
 		    
 		public boolean handleKeyDown (int keyCode)
 		{
-
 			DirectionalInput potentialDirectionalInput = this.inputConverter.getDirectionFromKeyCodeForDown(keyCode);
 			
 			if (!potentialDirectionalInput.equals(DirectionalInput.NONE))
@@ -364,7 +363,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 			
 			String inputType = this.inputConverter.convertKeyCodeToInputType(keyCode, actualDirectionalInput);
 			if (!inputType.equals("")) {
-				System.out.println(inputType);
+				System.out.println("Key DOWN: " + inputType);
 				this.inputs.addFirst(inputType);
 				if (this.queueUpActionFromInputs())
 				{
@@ -372,19 +371,30 @@ public class Player extends Character implements InputProcessor, ControllerListe
 				}
 				switch (inputType) {
 				case InputType.LEFT:
+				case InputType.UPLEFT:
 					horizontalMove(true);
 					break;
 				case InputType.RIGHT:
+				case InputType.UPRIGHT:
 					horizontalMove(false);
+					break;
+				case InputType.DOWNRIGHT:
+				case InputType.DOWNLEFT:
+				case InputType.DOWN:
+					this.crouch();
 					break;
 				case InputType.JUMP:
 				case InputType.JUMPRIGHT:
 				case InputType.JUMPLEFT:
 				case InputType.JUMPUP:
+				case InputType.JUMPUPRIGHT:
+				case InputType.JUMPUPLEFT:
 					if (!actOnObject())
 						jump();
 					break;
 				case InputType.JUMPDOWN: 
+				case InputType.JUMPDOWNLEFT:
+				case InputType.JUMPDOWNRIGHT: 
 					downJump();
 					break;
 				case InputType.USEITEM:
@@ -392,7 +402,11 @@ public class Player extends Character implements InputProcessor, ControllerListe
 					break;
 				case InputType.DASH:
 				case InputType.DASHLEFT:
+				case InputType.DASHUPLEFT:
+				case InputType.DASHUPRIGHT:
 				case InputType.DASHUP:
+				case InputType.DASHDOWNRIGHT:
+				case InputType.DASHDOWNLEFT:
 				case InputType.DASHDOWN:
 				case InputType.DASHRIGHT:
 					this.movementConditionActivated = true;
@@ -407,16 +421,18 @@ public class Player extends Character implements InputProcessor, ControllerListe
 		}
 		
 		public boolean handleKeyUp (int keyCode) {
-			DirectionalInput directionHeld = this.inputConverter.getDirectionFromKeyCodeForUp(keyCode, this.currentlyHeldXDirection);
+			//This is used to see what direction the character should be facing after key up.
+			//we need to reset currentlyHeldX and Y directions, right now x is being set.
+			String inputType = this.inputConverter.convertKeyCodeToInputType(keyCode, this.getCurrentlyHeldDirection());
+			DirectionalInput directionHeld = this.inputConverter.getDirectionFromKeyCodeForUp(keyCode, this.currentlyHeldXDirection, this.currentlyHeldYDirection);
 			if (directionHeld != null) {
-				XDirectionalInput input = directionHeld.getXDirectionalInputFromThis();
-				if (input.equals(XDirectionalInput.LEFT) || input.equals(XDirectionalInput.RIGHT)) {
-					
-				}
-				this.currentlyHeldXDirection = directionHeld;
+				this.currentlyHeldXDirection = directionHeld.getXDirectionalInputKey();
+				this.currentlyHeldYDirection = directionHeld.getYDirectionalInput();
 				checkIfNeedToStopWalk();
 			}
-			String inputType = this.inputConverter.convertKeyCodeToInputType(keyCode, this.currentlyHeldDirection);
+//			String inputType = this.inputConverter.convertKeyCodeToInputType(keyCode, this.getCurrentlyHeldDirection());
+			System.out.println("Key UP: " + inputType);
+			System.out.println("Key UP direction: " + directionHeld);
 			if (!inputType.equals("")) {
 				this.checkToDisruptCurrentAct(inputType);
 				switch (inputType) {
@@ -425,10 +441,20 @@ public class Player extends Character implements InputProcessor, ControllerListe
 					break;
 				case InputType.DASH:
 				case InputType.DASHLEFT:
+				case InputType.DASHUPLEFT:
+				case InputType.DASHUPRIGHT:
 				case InputType.DASHUP:
+				case InputType.DASHDOWNRIGHT:
+				case InputType.DASHDOWNLEFT:
 				case InputType.DASHDOWN:
 				case InputType.DASHRIGHT:
 					this.movementConditionActivated = false;
+					break;
+				case InputType.DOWNLEFT:
+				case InputType.DOWNRIGHT:
+				case InputType.DOWN:
+					if (!this.currentlyHeldYDirection.equals(YDirectionalInput.DOWN))
+						this.unCrouch(); //this doesn't work, keyUp right triggers DownRight
 					break;
 				default:
 					break;
@@ -440,7 +466,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 		}
 		
 		public boolean handleButtonDown(Controller controller, int buttonCode) {
-			String inputType = this.inputConverter.convertButtonCodeToInputType(buttonCode, currentlyHeldDirection);
+			String inputType = this.inputConverter.convertButtonCodeToInputType(buttonCode, this.getCurrentlyHeldDirection());
 			if (!inputType.equals("")) {
 				System.out.println(inputType);
 				this.inputs.addFirst(inputType);
@@ -453,10 +479,14 @@ public class Player extends Character implements InputProcessor, ControllerListe
 				case InputType.JUMPRIGHT:
 				case InputType.JUMPLEFT:
 				case InputType.JUMPUP:
+				case InputType.JUMPUPRIGHT:
+				case InputType.JUMPUPLEFT:
 					if (!actOnObject())
 						jump();
 					break;
 				case InputType.JUMPDOWN: 
+				case InputType.JUMPDOWNLEFT:
+				case InputType.JUMPDOWNRIGHT: 
 					downJump();
 					break;
 				case InputType.USEITEM:
@@ -472,7 +502,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 		}
 		
 		public boolean handleButtonUp(Controller controller, int buttonCode) {
-			String inputType = this.inputConverter.convertButtonCodeToInputType(buttonCode, this.currentlyHeldDirection);
+			String inputType = this.inputConverter.convertButtonCodeToInputType(buttonCode, this.getCurrentlyHeldDirection());
 			if (!inputType.equals("")) {
 				this.checkToDisruptCurrentAct(inputType);
 			}
@@ -485,14 +515,21 @@ public class Player extends Character implements InputProcessor, ControllerListe
 				DirectionalInput potentialDirectionalInput = this.inputConverter.getDirectionFromAxisCode(axisCode, value);
 //				System.out.println(axisCode == XBox360Pad.AXIS_LEFT_X ? "X "  + potentialDirectionalInput.toString() : "Y " + potentialDirectionalInput.toString());
 				this.setHeldDirectionForAxis(axisCode, potentialDirectionalInput);
-				switch (potentialDirectionalInput) {
+				switch (this.getCurrentlyHeldDirection()) {
 					case LEFT:
+					case UPLEFT:
 						if (axisCode == XBox360Pad.AXIS_LEFT_X)
 							horizontalMove(true);
 						break;
 					case RIGHT:
+					case UPRIGHT:
 						if (axisCode == XBox360Pad.AXIS_LEFT_X)
 							horizontalMove(false);
+						break;
+					case DOWNRIGHT:
+					case DOWNLEFT:
+					case DOWN:
+						this.crouch();
 						break;
 					case NONE:
 						if (axisCode == XBox360Pad.AXIS_LEFT_X)
@@ -502,7 +539,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 					}
 			}
 			else if (axisCode == XBox360Pad.AXIS_LEFT_TRIGGER) {
-				String inputType = this.inputConverter.convertAxisTriggerToInputType(axisCode, value, currentlyHeldDirection);
+				String inputType = this.inputConverter.convertAxisTriggerToInputType(axisCode, value, this.getCurrentlyHeldDirection());
 				if (inputType != null) {
 					System.out.println(inputType);
 					this.inputs.addFirst(inputType);
@@ -510,7 +547,11 @@ public class Player extends Character implements InputProcessor, ControllerListe
 					switch (inputType) {
 					case InputType.DASH:
 					case InputType.DASHLEFT:
+					case InputType.DASHUPLEFT:
+					case InputType.DASHUPRIGHT:
 					case InputType.DASHUP:
+					case InputType.DASHDOWNRIGHT:
+					case InputType.DASHDOWNLEFT:
 					case InputType.DASHDOWN:
 					case InputType.DASHRIGHT:
 						this.movementConditionActivated = true;
@@ -527,15 +568,26 @@ public class Player extends Character implements InputProcessor, ControllerListe
 		}
 		
 		private void setHeldDirectionForAxis(int axisCode, DirectionalInput potentialDirectionalInput) {
-			if ((axisCode == XBox360Pad.AXIS_LEFT_Y && !(this.currentlyHeldDirection.equals(DirectionalInput.LEFT) || this.currentlyHeldDirection.equals(DirectionalInput.RIGHT))) 
-			  || axisCode == XBox360Pad.AXIS_LEFT_X && !(this.currentlyHeldDirection.equals(DirectionalInput.UP) || this.currentlyHeldDirection.equals(DirectionalInput.DOWN))) {
-				
-				if (this.currentlyHeldDirection.equals(DirectionalInput.LEFT)) {
-					
+//			if ((axisCode == XBox360Pad.AXIS_LEFT_Y && !(this.getCurrentlyHeldDirection().equals(DirectionalInput.LEFT) || this.getCurrentlyHeldDirection().equals(DirectionalInput.RIGHT))) 
+//			  || axisCode == XBox360Pad.AXIS_LEFT_X && !(this.getCurrentlyHeldDirection().equals(DirectionalInput.UP) || this.currentlyHeldDirection().equals(DirectionalInput.DOWN))) {
+//				
+//				if (this.currentlyHeldDirection.equals(DirectionalInput.LEFT)) {
+//					
+//				}
+//				this.currentlyHeldDirection = potentialDirectionalInput;
+//			}
+			if (axisCode == XBox360Pad.AXIS_LEFT_X) {
+				XDirectionalInput xInput = potentialDirectionalInput.getXDirectionalInputAxis();
+				if (xInput != null) {
+					this.currentlyHeldXDirection = xInput;
 				}
-				this.currentlyHeldDirection = potentialDirectionalInput;
 			}
-
+			else if (axisCode == XBox360Pad.AXIS_LEFT_Y) {
+				YDirectionalInput yInput = potentialDirectionalInput.getYDirectionalInput();
+				if (yInput != null) {
+					this.currentlyHeldYDirection = yInput;
+				}
+			}
 		}
 		
 		public boolean handlePovMoved(Controller controller, int povCode, PovDirection value) {
@@ -544,7 +596,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 		}
 		
 		private void checkIfNeedToStopWalk() {
-			if (!this.currentlyHeldDirection.equals(DirectionalInput.LEFT) && !this.currentlyHeldDirection.equals(DirectionalInput.RIGHT)) {
+			if (!this.currentlyHeldXDirection.equals(XDirectionalInput.LEFT) && !this.currentlyHeldXDirection.equals(XDirectionalInput.RIGHT)) {
 				this.stopHorizontalMovement(true);
 			}
 		}
@@ -646,10 +698,10 @@ public class Player extends Character implements InputProcessor, ControllerListe
 
 		@Override
 		public Direction isTryingToMoveHorizontally() {
-			if (this.currentlyHeldDirection.equals(DirectionalInput.LEFT)) {
+			if (this.currentlyHeldXDirection.equals(XDirectionalInput.LEFT)) {
 				return Direction.LEFT;
 			}
-			else if (this.currentlyHeldDirection.equals(DirectionalInput.RIGHT)) {
+			else if (this.currentlyHeldXDirection.equals(XDirectionalInput.RIGHT)) {
 				return Direction.RIGHT;
 			}
 			return Direction.NaN;
@@ -691,11 +743,7 @@ public class Player extends Character implements InputProcessor, ControllerListe
 		}
 
 		public DirectionalInput getCurrentlyHeldDirection() {
-			return currentlyHeldDirection;
+			return DirectionalInput.getDirectionFromXAndY(this.currentlyHeldXDirection, this.currentlyHeldYDirection);
 		}
-
-		
 	}
-
-	
 }

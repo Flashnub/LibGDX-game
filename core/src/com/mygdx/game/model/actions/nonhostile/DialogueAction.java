@@ -29,7 +29,7 @@ public class DialogueAction extends ActionSegment {
 	}
 
 	@Override
-	public void sourceActiveProcessWithoutSuper(CharacterModel source) {
+	public void sourceActiveProcessAdditionalBehavior(CharacterModel source) {
 		if (dialogue.targetEffects != null) {
 			for (EffectSettings effectSettings : dialogue.targetEffects) {
 				EntityEffect effect = EffectInitializer.initializeEntityEffect(effectSettings, this);
@@ -85,7 +85,7 @@ public class DialogueAction extends ActionSegment {
 	}
 
 	@Override
-	public void sourceWindupProcessWithoutSuper(CharacterModel source) {
+	public void sourceWindupProcessAdditonalBehavior(CharacterModel source) {
 		
 	}
 
@@ -100,7 +100,7 @@ public class DialogueAction extends ActionSegment {
 	}
 
 	@Override
-	public void sourceCompletionWithoutSuper(CharacterModel source) {
+	public void sourceCompletionAdditionalBehavior(CharacterModel source) {
 		
 	}
 

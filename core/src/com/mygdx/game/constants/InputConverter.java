@@ -18,7 +18,7 @@ public class InputConverter {
 	public enum DirectionalInput {
 		NONE, UP, UPLEFT, UPRIGHT, LEFT, RIGHT, DOWNLEFT, DOWNRIGHT, DOWN;
 		
-		public XDirectionalInput getXDirectionalInputFromThis() {
+		public XDirectionalInput getXDirectionalInputKey() {
 			if (this.equals(LEFT)) {
 				return XDirectionalInput.LEFT;
 			}
@@ -38,37 +38,64 @@ public class InputConverter {
 //			return YDirectionalInput.NONE;
 //		}
 		
+		//Only used for Axis codes.
+		public XDirectionalInput getXDirectionalInputAxis() {
+			if (this.equals(DirectionalInput.LEFT)) {
+				return XDirectionalInput.LEFT;
+			}
+			else if (this.equals(DirectionalInput.RIGHT)) {
+				return XDirectionalInput.RIGHT;
+			}
+//			else if (this.equals(DirectionalInput.NONE)) {
+//				return XDirectionalInput.NONE;
+//			}
+			return XDirectionalInput.NONE;
+		}
+		
+		public YDirectionalInput getYDirectionalInput() {
+			if (this.equals(DirectionalInput.UP)) {
+				return YDirectionalInput.UP;
+			}
+			else if (this.equals(DirectionalInput.DOWN)) {
+				return YDirectionalInput.DOWN;
+			}
+//			else if (this.equals(DirectionalInput.NONE)) {
+//				return YDirectionalInput.NONE;
+//			}
+			return YDirectionalInput.NONE;
+		}
+		
 		public static DirectionalInput getDirectionFromXAndY(XDirectionalInput xDirection, YDirectionalInput yDirection) {
-			if (xDirection.equals(LEFT)) {
-				if (yDirection.equals(UP)) {
+			if (xDirection.equals(XDirectionalInput.LEFT)) {
+				if (yDirection.equals(YDirectionalInput.UP)) {
 					return DirectionalInput.UPLEFT;
 				}
-				else if (yDirection.equals(DOWN)) {
+				else if (yDirection.equals(YDirectionalInput.DOWN)) {
 					return DirectionalInput.DOWNLEFT;
 				}
-				else if (yDirection.equals(NONE)) {
+				else if (yDirection.equals(YDirectionalInput.NONE)) {
 					return DirectionalInput.LEFT;
 				}
 			}
-			else if (xDirection.equals(RIGHT)) {
-				if (yDirection.equals(UP)) {
+			else if (xDirection.equals(XDirectionalInput.RIGHT)) {
+				if (yDirection.equals(YDirectionalInput.UP)) {
 					return DirectionalInput.UPRIGHT;
 				}
-				else if (yDirection.equals(DOWN)) {
+				else if (yDirection.equals(YDirectionalInput.DOWN)) {
 					return DirectionalInput.DOWNRIGHT;
 				}
-				else if (yDirection.equals(NONE)) {
+				else if (yDirection.equals(YDirectionalInput.NONE)) {
 					return DirectionalInput.RIGHT;
 				}
 			}
-			else if (xDirection.equals(NONE)) {
-				if (yDirection.equals(UP)) {
+			else if (xDirection.equals(XDirectionalInput.NONE)) {
+				if (yDirection.equals(YDirectionalInput.UP)) {
 					return DirectionalInput.UP;
 				}
-				else if (yDirection.equals(DOWN)) {
+				else if (yDirection.equals(YDirectionalInput.DOWN)) {
 					return DirectionalInput.DOWN;
 				}
-				else if (yDirection.equals(NONE)) {
+				else if (yDirection.equals(YDirectionalInput.NONE)) {
 					return DirectionalInput.NONE;
 				}
 			}
@@ -87,7 +114,13 @@ public class InputConverter {
 			inputName = inputName.concat(directionHeld.toString());
 		}
 		if (inputName != null) {
-			result = playerSave.getKBMouseScheme().get(inputName);
+			//Is the keyCode a direction?
+			if (!this.getDirectionFromKeyCodeForDown(keyCode).equals(DirectionalInput.NONE)) {
+				result = InputType.getFromDirection(directionHeld);
+			}
+			else {
+				result = playerSave.getKBMouseScheme().get(inputName); //this won't work for upleft/downleft/etc.
+			}
 		}
 		
 		return result != null ? result : "";
@@ -125,7 +158,11 @@ public class InputConverter {
 			case InputType.LEFT:
 			case InputType.RIGHT:
 			case InputType.UP:
+			case InputType.UPLEFT:
+			case InputType.UPRIGHT:
 			case InputType.DOWN:
+			case InputType.DOWNLEFT:
+			case InputType.DOWNRIGHT:
 				return true;
 			default:
 				return false;
@@ -169,7 +206,7 @@ public class InputConverter {
 		}
 	}
  	
-	public DirectionalInput getDirectionFromKeyCodeForUp(int keyCode, XDirectionalInput currentDirectionHeld) {
+	public DirectionalInput getDirectionFromKeyCodeForUp(int keyCode, XDirectionalInput currentXDirectionHeld, YDirectionalInput currentYDirectionHeld) {
 		String inputName = Keys.toString(keyCode);
 		String inputType = playerSave.getKBMouseScheme().get(inputName);
 		if (inputType == null) 
@@ -178,17 +215,37 @@ public class InputConverter {
 		switch (inputType) {
 		case InputType.DOWN:
 		case InputType.UP:
-			return DirectionalInput.NONE;
+			if (currentXDirectionHeld.equals(XDirectionalInput.LEFT)) {
+				return DirectionalInput.LEFT;
+			}
+			else if (currentXDirectionHeld.equals(XDirectionalInput.RIGHT)) {
+				return DirectionalInput.RIGHT;
+			}
+			else {
+				return DirectionalInput.NONE;
+			}
 		case InputType.RIGHT:
-			if (currentDirectionHeld.equals(XDirectionalInput.LEFT)) {
+			if (currentXDirectionHeld.equals(XDirectionalInput.LEFT)) {
 				return null;
+			}
+			else if (currentYDirectionHeld.equals(YDirectionalInput.UP)){
+				return DirectionalInput.UP;
+			}
+			else if (currentYDirectionHeld.equals(YDirectionalInput.DOWN)) {
+				return DirectionalInput.DOWN;
 			}
 			else {
 				return DirectionalInput.NONE;
 			}
 		case InputType.LEFT:
-			if (currentDirectionHeld.equals(XDirectionalInput.RIGHT)) {
+			if (currentXDirectionHeld.equals(XDirectionalInput.RIGHT)) {
 				return null;
+			}
+			else if (currentYDirectionHeld.equals(YDirectionalInput.UP)){
+				return DirectionalInput.UP;
+			}
+			else if (currentYDirectionHeld.equals(YDirectionalInput.DOWN)) {
+				return DirectionalInput.DOWN;
 			}
 			else {
 				return DirectionalInput.NONE;
@@ -218,30 +275,4 @@ public class InputConverter {
  		}
  	}
  	
-
-// 	public DirectionalInput getDirectionFromAxisCodeForUp(int axisCode, float value, DirectionalInput currentDirectionHeld) {
-//		String inputName = XBox360Pad.axisCodeToString(axisCode, value);
-//		String inputType = playerSave.getControllerScheme().get(inputName);
-//		switch (inputType) {
-//		case InputType.DOWN:
-//		case InputType.UP:
-//			return DirectionalInput.NONE;
-//		case InputType.RIGHT:
-//			if (currentDirectionHeld.equals(DirectionalInput.LEFT)) {
-//				return null;
-//			}
-//			else {
-//				return DirectionalInput.NONE;
-//			}
-//		case InputType.LEFT:
-//			if (currentDirectionHeld.equals(DirectionalInput.RIGHT)) {
-//				return null;
-//			}
-//			else {
-//				return DirectionalInput.NONE;
-//			}
-//		default:
-//			return null;
-//		}
-// 	}
 }

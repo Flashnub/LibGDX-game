@@ -33,6 +33,7 @@ public class CharacterProperties implements Serializable {
 	CharacterModel source;
 	HashMap<String, ActionSequence> actions;
 	Array <Rectangle> defaultHurtboxProperties;
+	Array <Rectangle> crouchingHurtboxProperties;
 	Array <StringWrapper> weaponKeys;
 	Array <ActionSequence> sequencesSortedByInputSize;
 	boolean useDefaultWakeup;
@@ -73,7 +74,8 @@ public class CharacterProperties implements Serializable {
 		json.writeValue("shouldRespectEntityCollisions", shouldRespectEntityCollisions);
 		json.writeValue("shouldRespectTileCollisions", shouldRespectTileCollisions);
 		json.writeValue("shouldRespectObjectCollisions", shouldRespectObjectCollisions);
-		json.writeValue("defaultHurtboxes", defaultHurtboxProperties);
+		json.writeValue("defaultHurtboxProperties", defaultHurtboxProperties);
+		json.writeValue("crouchingHurtboxProperties", crouchingHurtboxProperties);
 
 	}
 
@@ -285,6 +287,11 @@ public class CharacterProperties implements Serializable {
 		if (defaultHurtboxProperties == null) {
 			defaultHurtboxProperties = new Array <Rectangle>();
 		}
+		
+		crouchingHurtboxProperties = json.readValue("crouchingHurtBoxProperties", Array.class, jsonData);
+		if (crouchingHurtboxProperties == null) {
+			crouchingHurtboxProperties = defaultHurtboxProperties;
+		}
 	}
 
 	public CharacterProperties cloneProperties() {
@@ -318,6 +325,7 @@ public class CharacterProperties implements Serializable {
 		properties.xRotationCoefficient = this.xRotationCoefficient;
 		properties.yRotationCoefficient = this.yRotationCoefficient;
 		properties.defaultHurtboxProperties = this.defaultHurtboxProperties;
+		properties.crouchingHurtboxProperties = this.crouchingHurtboxProperties;
 		//iterate through actions.
 		HashMap <String, ActionSequence> clonedActions = new HashMap<String, ActionSequence> ();
 		for (Map.Entry<String, ActionSequence> entry : actions.entrySet()) {

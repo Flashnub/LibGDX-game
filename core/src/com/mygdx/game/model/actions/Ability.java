@@ -38,7 +38,7 @@ public class Ability extends ActionSegment{
 	}
 	
 	@Override
-	public void sourceCompletionWithoutSuper(CharacterModel source) {
+	public void sourceCompletionAdditionalBehavior(CharacterModel source) {
 		source.setWidthCoefficient(source.getCharacterProperties().getWidthCoefficient());
 		source.setHeightCoefficient(source.getCharacterProperties().getHeightCoefficient());
 //		source.setxOffsetModifier(0f);
@@ -49,7 +49,7 @@ public class Ability extends ActionSegment{
 	}
 
 	
-	public void sourceActiveProcessWithoutSuper(CharacterModel source) {
+	public void sourceActiveProcessAdditionalBehavior(CharacterModel source) {
 		if (this.settings.tempWidthModifier != null) {
 			source.setWidthCoefficient(this.settings.tempWidthModifier.floatValue());
 		}
@@ -76,7 +76,7 @@ public class Ability extends ActionSegment{
 
 	}
 	
-	public void sourceWindupProcessWithoutSuper(CharacterModel source) {
+	public void sourceWindupProcessAdditonalBehavior(CharacterModel source) {
 		for (EffectSettings effectSettings : settings.windupEffectSettings) {
 			EntityEffect effect = EffectInitializer.initializeEntityEffect(effectSettings, this);
 			effect.flipValuesIfNecessary(null, source);

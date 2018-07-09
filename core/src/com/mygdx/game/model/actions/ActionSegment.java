@@ -71,7 +71,7 @@ public abstract class ActionSegment implements EffectController {
 	public void sourceActiveProcess(CharacterModel source) {
 		hasProcessedActiveSource = true;
 		this.setActionState(ActionState.ACTIVE);
-		sourceActiveProcessWithoutSuper(source);
+		sourceActiveProcessAdditionalBehavior(source);
 		for (ActionSegmentListener listener : this.segmentListeners) {
 			listener.onActive(source);
 		}
@@ -81,7 +81,7 @@ public abstract class ActionSegment implements EffectController {
 	public void sourceWindupProcess(CharacterModel source) {
 		hasProcessedWindupSource = true;
 		this.setActionState(ActionState.WINDUP);
-		sourceWindupProcessWithoutSuper(source);
+		sourceWindupProcessAdditonalBehavior(source);
 		if (!source.isActionLock() && this.shouldLockControls) {
 			source.lockControls();
 		}
@@ -96,7 +96,7 @@ public abstract class ActionSegment implements EffectController {
 			this.setActionState(ActionState.COOLDOWN);
 		
 		this.hasProcessedCompletion = true;
-		this.sourceCompletionWithoutSuper(source);
+		this.sourceCompletionAdditionalBehavior(source);
 		for (ActionSegmentListener listener : this.segmentListeners) {
 			listener.onCooldown(source);
 		}
@@ -185,9 +185,9 @@ public abstract class ActionSegment implements EffectController {
 	public abstract boolean willActionHitTarget(CharacterModel target);
 	public abstract void setDurations(CharacterModel source);
 	public abstract void sendActionToListener(ActionListener actionListener, float delta);
-	public abstract void sourceActiveProcessWithoutSuper(CharacterModel source);
-	public abstract void sourceWindupProcessWithoutSuper(CharacterModel source);
-	public abstract void sourceCompletionWithoutSuper(CharacterModel source);
+	public abstract void sourceActiveProcessAdditionalBehavior(CharacterModel source);
+	public abstract void sourceWindupProcessAdditonalBehavior(CharacterModel source);
+	public abstract void sourceCompletionAdditionalBehavior(CharacterModel source);
 	public abstract float getWindUpTime();
 	public abstract float getWindUpPlusActionTime();
 	public abstract float getTotalTime();

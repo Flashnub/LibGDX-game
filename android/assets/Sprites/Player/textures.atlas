@@ -221,7 +221,7 @@ repeat: none
   orig: 350, 267
   offset: 0, 0
   index: -1
-CrouchToIdle1
+CrouchToIdleW1
   rotate: false
   xy: 1410, 7265
   size: 350, 267
@@ -235,7 +235,7 @@ CrouchW1
   orig: 350, 267
   offset: 0, 0
   index: -1
-StandToCrouchW3
+IdleToCrouchW3
   rotate: false
   xy: 1410, 7265
   size: 350, 267
@@ -795,28 +795,28 @@ StandToCrouchW3
   orig: 350, 267
   offset: 0, 0
   index: -1
-CrouchToIdle2
+CrouchToIdleW2
   rotate: false
   xy: 2, 1885
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
-StandToCrouchW2
+IdleToCrouchW2
   rotate: false
   xy: 2, 1885
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
-CrouchToIdle3
+CrouchToIdleW3
   rotate: false
   xy: 354, 2154
   size: 350, 267
   orig: 350, 267
   offset: 0, 0
   index: -1
-StandToCrouchW1
+IdleToCrouchW1
   rotate: false
   xy: 354, 2154
   size: 350, 267

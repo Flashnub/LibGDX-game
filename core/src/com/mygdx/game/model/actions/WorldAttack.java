@@ -107,9 +107,9 @@ public class WorldAttack extends ActionSegment{
 		}
 	}
 	
-	public void sourceActiveProcessWithoutSuper(CharacterModel source) {
+	public void sourceActiveProcessAdditionalBehavior(CharacterModel source) {
 		if (this.potentialAbility != null) {
-			this.potentialAbility.sourceActiveProcessWithoutSuper(source);
+			this.potentialAbility.sourceActiveProcessAdditionalBehavior(source);
 		}
 		for (WorldEffect worldEffect : worldEffects) {
 			this.actionListener.addWorldEffect(worldEffect);
@@ -117,16 +117,16 @@ public class WorldAttack extends ActionSegment{
 	}
 	
 	@Override
-	public void sourceWindupProcessWithoutSuper(CharacterModel source) {
+	public void sourceWindupProcessAdditonalBehavior(CharacterModel source) {
 		if (this.potentialAbility != null) {
-			this.potentialAbility.sourceWindupProcessWithoutSuper(source);
+			this.potentialAbility.sourceWindupProcessAdditonalBehavior(source);
 		}		
 	}
 	
 	@Override
-	public void sourceCompletionWithoutSuper(CharacterModel source) {
+	public void sourceCompletionAdditionalBehavior(CharacterModel source) {
 		if (this.potentialAbility != null) {
-			this.potentialAbility.sourceCompletionWithoutSuper(source);
+			this.potentialAbility.sourceCompletionAdditionalBehavior(source);
 		}				
 	}
 

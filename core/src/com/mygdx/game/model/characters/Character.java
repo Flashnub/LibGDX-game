@@ -96,7 +96,7 @@ public abstract class Character implements ModelListener {
 		boolean isSlowingDown;
 		boolean injuredStaggering;
 		boolean queuedJump;
-		boolean isCrouching;
+		private boolean isCrouching;
 	    float actionStaggerTime;
 	    float tempVelocityX;
 	    float tempVelocityY;
@@ -138,7 +138,7 @@ public abstract class Character implements ModelListener {
 			isSlowingDown = false;
 			sprinting = false;
 			injuredStaggering = false;
-			isCrouching = false;
+			setCrouching(false);
 			queuedJump = false;
 			this.movementConditionActivated = false;
 			this.movementConditionActivatedTime = 0f;
@@ -265,7 +265,7 @@ public abstract class Character implements ModelListener {
 				this.didChangeState = false; 
 			}
 			if (!isInAir && !walking && !this.isProcessingActiveSequences()) {
-				if (this.isCrouching) {
+				if (this.isCrouching()) {
 					setState(CharacterConstants.crouchState);
 				}
 				else {
@@ -427,6 +427,7 @@ public abstract class Character implements ModelListener {
 		private void jumpCode() {
 			if (this.currentJumpTokens > 0) {
 				this.forceEndForActiveAction();
+				this.unCrouchWithoutSeq();
 				if (!isInAir)
 					isInAir = true;
 	            this.setWalking(false);
@@ -437,14 +438,26 @@ public abstract class Character implements ModelListener {
 		}
 		
 		public void crouch() {
-			this.isCrouching = true;
-			
+			if (!actionLocked && this.getCurrentActiveActionSeq() == null && !this.isInAir && !this.isCrouching) {
+				this.setCrouching(true); // this might have to happen after the action seq.
+				this.updateHurtBoxProperties(this.getCharacterProperties().crouchingHurtboxProperties);
+				
+				this.addActionSequence(ActionSequence.createIdleToCrouchSeq(this, actionListener));
+			}
 		}
 		
 		public void unCrouch() {
-			this.isCrouching = false;
+			if (!actionLocked && this.getCurrentActiveActionSeq() == null && !this.isInAir && this.isCrouching) {
+				this.unCrouchWithoutSeq();
+				this.addActionSequence(ActionSequence.createCrouchToIdleSeq(this, actionListener));
+			}
 		}
 	    
+		private void unCrouchWithoutSeq() {
+			this.setCrouching(false);
+			this.updateHurtBoxProperties(this.getCharacterProperties().defaultHurtboxProperties);
+		}
+		
 		public void horizontalMove(boolean left) {
 			if (!this.actionLocked && this.getCurrentActiveActionSeq() == null) {
 				if (!isInAir) {
@@ -488,7 +501,7 @@ public abstract class Character implements ModelListener {
 				else {
 					this.velocity.x = 0;
 				}
-				if (this.isCrouching) {
+				if (this.isCrouching()) {
 					setState(CharacterConstants.crouchState);
 				}
 				else {
@@ -665,7 +678,6 @@ public abstract class Character implements ModelListener {
     		}
     		else {
         		this.setCurrentStability(1, null);
-
     		}
 		}
 		
@@ -1218,6 +1230,14 @@ public abstract class Character implements ModelListener {
 		
 		public float getYRotationCoefficient() {
 			return this.getCharacterProperties().yRotationCoefficient;
+		}
+
+		public boolean isCrouching() {
+			return isCrouching;
+		}
+
+		public void setCrouching(boolean isCrouching) {
+			this.isCrouching = isCrouching;
 		}
 	}
 	

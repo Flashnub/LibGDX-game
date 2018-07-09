@@ -101,7 +101,7 @@ public class Attack extends ActionSegment {
 		
 	}
 	
-	public void sourceActiveProcessWithoutSuper(CharacterModel source) {
+	public void sourceActiveProcessAdditionalBehavior(CharacterModel source) {
 		if (this.attackSettings.tempWidthModifier != null) {
 			source.setWidthCoefficient(this.attackSettings.tempWidthModifier.floatValue());
 		}
@@ -127,7 +127,7 @@ public class Attack extends ActionSegment {
 		}
 	}
 	
-	public void sourceWindupProcessWithoutSuper(CharacterModel source) {
+	public void sourceWindupProcessAdditonalBehavior(CharacterModel source) {
 		for (EffectSettings effectSettings : attackSettings.windupEffectSettings) {
 			EntityEffect effect = EffectInitializer.initializeEntityEffect(effectSettings, this);
 			effect.flipValuesIfNecessary(null, source);
@@ -136,7 +136,7 @@ public class Attack extends ActionSegment {
 		}
 	}
 	
-	public void sourceCompletionWithoutSuper(CharacterModel source) {
+	public void sourceCompletionAdditionalBehavior(CharacterModel source) {
 		source.setWidthCoefficient(source.getCharacterProperties().getWidthCoefficient());
 		source.setHeightCoefficient(source.getCharacterProperties().getHeightCoefficient());
 		source.unlockEntityCollisionBehavior();

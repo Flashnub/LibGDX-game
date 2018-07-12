@@ -1,6 +1,6 @@
 package com.mygdx.game.model.characters.player;
 
-import com.mygdx.game.model.items.Item;
+import com.mygdx.game.model.worldObjects.Item;
 
 public interface PlayerListener {
 	public void handleAcquiredItem(Item item, Player player);

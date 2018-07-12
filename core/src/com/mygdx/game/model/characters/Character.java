@@ -5,28 +5,49 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.UUID;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.assets.HitSparkUtils;
+import com.mygdx.game.constants.InputConverter.DirectionalInput;
+import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.actions.ActionSequence;
 import com.mygdx.game.model.actions.Attack;
-import com.mygdx.game.model.effects.Effect;
-import com.mygdx.game.model.effects.MovementEffect;
+import com.mygdx.game.model.actions.ActionSegment.ActionState;
+import com.mygdx.game.model.characters.CollisionCheck.CollisionType;
+import com.mygdx.game.model.characters.player.Player.PlayerModel;
+import com.mygdx.game.model.actions.ActionSequence.StaggerType;
+import com.mygdx.game.model.effects.EntityEffect;
+import com.mygdx.game.model.effects.XMovementEffect;
+import com.mygdx.game.model.effects.YMovementEffect;
+import com.mygdx.game.model.effects.YMovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
+import com.mygdx.game.model.events.AssaultInterceptor;
 import com.mygdx.game.model.events.ObjectListener;
+import com.mygdx.game.model.hitSpark.HitSpark;
+import com.mygdx.game.model.hitSpark.HitSparkData;
+import com.mygdx.game.model.hitSpark.HitSparkListener;
+import com.mygdx.game.model.projectiles.Explosion;
 import com.mygdx.game.model.projectiles.Projectile;
+import com.mygdx.game.model.weapons.Weapon;
+import com.mygdx.game.wrappers.StringWrapper;
 
-public abstract class Character {
+public abstract class Character implements ModelListener {
 	
 	private EntityUIModel characterUIData;
 	private CharacterModel characterData;
 	
+	public enum Direction {
+		LEFT, RIGHT, NaN;
+	}
+	
+	public enum TurnAngle {
+	   ZERO, FOURTYFIVE, NEGFOURTYFIVE, NINETY, NEGNINETY;
+	}
 	
 	public Character(String characterName) {
-		setCharacterUIData(new EntityUIModel(characterName));
+		setCharacterUIData(new EntityUIModel(characterName, EntityUIDataType.CHARACTER));
 	}
 	
 
@@ -40,455 +61,724 @@ public abstract class Character {
 		}
 	}
 	
+	public void setPatrolInfo(Array <Float> patrolWaypoints, float patrolDuration, float breakDuration) {
+		this.getCharacterData().setPatrolInfo(patrolWaypoints, patrolDuration, breakDuration);
+	}
+	
+	public void actionStagger() {
+		this.characterUIData.stagger();
+	}
+	
+	public void endActionStagger() {
+		this.characterUIData.endStagger();
+	}
+	
 	//=============================================================//
 	//----------------------------MODEL----------------------------//
 	//=============================================================//
 
-	public abstract class CharacterModel {
+	public abstract class CharacterModel extends EntityModel{
 		
-		private final String idleState = "Idle";
+		final float slowingAccel = 3000;
 		
 		String state;
-		int currentHealth, maxHealth, currentWill, maxWill, attack;
+		float currentHealth, maxHealth, currentWill, maxWill, attack, currentStability, maxStability, currentTension, maxTension;
 		boolean isImmuneToInjury, attacking;
-		protected boolean jumping;
-		boolean staggering;
+		protected boolean isInAir;
+		protected boolean walking;
+		float walkingTime;
+		boolean sprinting;
+		boolean didChangeState;
+		boolean actionStaggering;
 		boolean facingLeft;
+		boolean actionLocked;
+		boolean alreadyDead;
+		boolean isSlowingDown;
+		boolean injuredStaggering;
+		boolean queuedJump;
+		private boolean isCrouching;
+	    float actionStaggerTime;
+	    float tempVelocityX;
+	    float tempVelocityY;
 		String name, uuid; 
+	    protected boolean movementConditionActivated;
+	    float movementConditionActivatedTime;
+	    int currentJumpTokens, maxJumpTokens;
+	    TurnAngle turnAngle;
 		
-		float gravity = 120f; 
-		float jumpSpeed = 120f; 
-		public float gameplayHitBoxWidthModifier;
-		public float gameplayHitBoxHeightModifier;
+		
 		ActionListener actionListener;
 		ObjectListener objectListener;
+		ModelListener modelListener;
 		
-		public Vector2 velocity, acceleration;
-		public Rectangle gameplayHitBox;
-		public Rectangle imageHitBox;
-//		boolean isProcessingMovementEffect;
 		EntityUIModel uiModel;
 		CharacterProperties properties;
-		ArrayList <Effect> currentEffects;
-		ActionSequence currentActionSequence;
-		ArrayDeque <ActionSequence> actionSequences;
+		ArrayList <ActionSequence> processingActionSequences;
+		ArrayDeque <ActionSequence> nextActiveActionSequences;
+		Array <Weapon> weapons;
+		Weapon currentWeapon;
 		
-		public CharacterModel(String characterName, EntityUIModel uiModel) {
-			velocity = new Vector2();
-			acceleration = new Vector2();
-			gameplayHitBox = new Rectangle();
-			imageHitBox = new Rectangle();
-			
-			setState(idleState);
+
+		
+		//Debug
+		float stateTime;
+		
+		public CharacterModel(String characterName, EntityUIModel uiModel, ModelListener modelListener) {
+			this.nextActiveActionSequences = new ArrayDeque<ActionSequence>();
+			this.processingActionSequences = new ArrayList <ActionSequence>();
+			this.turnAngle = TurnAngle.ZERO;
+			setState(CharacterConstants.idleState);
 			isImmuneToInjury = false;
 			attacking = false;
-			staggering = false;
-			jumping = true;
+			isInAir = true;
 			facingLeft = false;
-//			isProcessingMovementEffect = false;
-			setMaxHealth(maxHealth);
-			setMaxWill(maxWill);
-			setAttack(attack);
+			actionLocked = false;
+			walking = false;
+			alreadyDead = false;
+			isSlowingDown = false;
+			sprinting = false;
+			injuredStaggering = false;
+			setCrouching(false);
+			queuedJump = false;
+			this.movementConditionActivated = false;
+			this.movementConditionActivatedTime = 0f;
+			stateTime = 0f;
+			actionStaggerTime = 0f;
+			tempVelocityX = 0f;
+			tempVelocityY = 0f;
+			walkingTime = 0f;
+			this.modelListener = modelListener;
+
 			UUID id = UUID.randomUUID();
 			this.uuid = id.toString();
-			this.gameplayHitBoxWidthModifier = 0.19f;
-			this.gameplayHitBoxHeightModifier = 0.6f;
+			this.name = characterName;
 			this.uiModel = uiModel;
-			Json json = new Json();
-			this.properties = json.fromJson(CharacterProperties.class, Gdx.files.internal("Json/" + characterName + "/properties.json"));
-			this.currentEffects = new ArrayList <Effect>();
-			this.actionSequences = new ArrayDeque<ActionSequence>();
+			this.properties = JSONController.loadCharacterProperties(characterName);
+			this.properties.setSource(this);
+			this.widthCoefficient = this.properties.getWidthCoefficient();
+			this.heightCoefficient = this.properties.getHeightCoefficient();
+			this.xOffsetModifier = this.properties.xCollisionOffsetModifier;
+			this.yOffsetModifier = this.properties.yCollisionOffsetModifier;
+			this.shouldRespectEntityCollision = this.properties.shouldRespectEntityCollisions;
+			this.shouldRespectObjectCollision = this.properties.shouldRespectObjectCollisions;
+			this.shouldRespectTileCollision = this.properties.shouldRespectTileCollisions;
+			this.isRespectingEntityCollision = this.shouldRespectEntityCollision;
+			this.isRespectingObjectCollision = this.shouldRespectObjectCollision;
+			this.isRespectingTileCollision = this.shouldRespectTileCollision;
+			setMaxHealth(properties.getMaxHealth());
+			setCurrentHealth(properties.getMaxHealth());
+			setMaxWill(properties.getMaxWill());
+			setCurrentWill(properties.getMaxWill());
+			setAttack(properties.getAttack());
+			setMaxStability(properties.getMaxStability());
+			setCurrentStability(properties.getMaxStability(), null);
+			setMaxTension(properties.getMaxTension());
+			setCurrentTension(0);
+			setMaxJumpTokens(properties.getMaxJumpTokens());
+			setCurrentJumpTokens(properties.getMaxJumpTokens());
+			acceleration.y = -properties.getGravity();
+			weapons = new Array <Weapon> ();
+			for (StringWrapper key : this.getCharacterProperties().getWeaponKeys()) {
+				weapons.add(new Weapon(key.value, characterName));
+			}
+			if (weapons.size > 0) {
+				currentWeapon = weapons.get(0);
+			}
+//			this.fixedHurtBoxProperties = this.getCharacterProperties().defaultHurtboxProperties;
+			this.updateHurtBoxProperties(this.getCharacterProperties().defaultHurtboxProperties);
+					
 		}
 		
 		public void update(float delta, TiledMapTileLayer collisionLayer) {
-			this.move(delta, collisionLayer);
+			this.handleCollisionRespectChecks();
+			this.setGameplaySize(delta, collisionLayer);
 			this.movementWithCollisionDetection(delta, collisionLayer);
 			this.manageAutomaticStates(delta, collisionLayer);
 			this.handleEffects(delta);
 			this.handleActionSequences(delta);
-//			System.out.println(imageHitBox.x + " " + imageHitBox.y + " " + imageHitBox.width + " " + imageHitBox.height);
-		}
-		
-		public void move(float delta, TiledMapTileLayer collisionLayer) {
-			this.getVelocity().y += this.getAcceleration().y * delta;
-			this.getVelocity().x += this.getAcceleration().x * delta;
-			
-			this.gameplayHitBox.width = this.getImageHitBox().width * gameplayHitBoxWidthModifier;
-			this.gameplayHitBox.height = this.getImageHitBox().height * gameplayHitBoxHeightModifier;
-
-			if (currentActionSequence != null) {
-				System.out.println(velocity);
+			if (this.actionStaggering) {
+				this.actionStaggerTime += delta;
+				if (this.actionStaggerTime > EntityUIModel.standardStaggerDuration) {
+					this.endActionStagger();
+				}
 			}
-			//clamp velocity
-			if (this.getVelocity().y > this.jumpSpeed)
-				this.getVelocity().y = this.jumpSpeed;
-			else if (this.getVelocity().y < -this.jumpSpeed)
-				this.getVelocity().y = -this.jumpSpeed;
-				
+			
+			if (this.movementConditionActivated) {
+				this.movementConditionActivatedTime += delta;
+				if (movementConditionActivatedTime > .5f && this.walkingTime > .5f && !this.sprinting) {
+					sprinting = true;
+				}
+			}
+			else {
+				this.movementConditionActivatedTime = 0f;
+				sprinting = false;
+			}
+			
+			if (this.timeToDisrespectOneWayCollision > 0f) {
+				this.timeToDisrespectOneWayCollision -= delta;
+				if (this.timeToDisrespectOneWayCollision <= 0f) {
+					this.timeToDisrespectOneWayCollision = 0f;
+					this.isRespectingOneWayCollision = this.shouldRespectTileCollision;
+				}
+			}
+			
+//			if (this.timeToDisrespectSlopeCollision > 0f) {
+//				this.timeToDisrespectSlopeCollision -= delta;
+//				if (this.timeToDisrespectSlopeCollision <= 0f) {
+//					this.timeToDisrespectSlopeCollision = 0f;
+//					this.isRespectingSlopeCollision = this.shouldRespectTileCollision;
+//				}
 //			}
 
+			//Debug
+			this.stateTime += delta;
+			this.deathCheck();
+		}
+		
+		public void setGameplaySize(float delta, TiledMapTileLayer collisionLayer) {
+
+			
+			super.setGameplayCollisionSize(delta);
+			//clamp velocity
+			if (this.getVelocity().y > this.properties.jumpSpeed)
+				this.getVelocity().y = this.properties.jumpSpeed;
+			else if (this.getVelocity().y < -this.properties.jumpSpeed) {
+				this.getVelocity().y = -this.properties.jumpSpeed; 
+			}
+
+			if (this.getXMove() != null)
+			{
+				float xVelocityMax = this.getXMove().getMaxVelocity();
+				if (this.velocity.x > xVelocityMax) {
+					this.velocity.x = xVelocityMax;
+				}
+				else if (this.velocity.x < -xVelocityMax) {
+					this.velocity.x = -xVelocityMax;
+				}
+			}
+				 
+		}
+		
+		protected void manageAutomaticStates(float delta, TiledMapTileLayer collisionLayer) {
+			if (this.didChangeState) {
+				this.getUiModel().setAnimationTime(0f);
+				this.didChangeState = false; 
+			}
+			if (!isInAir && !walking && !this.isProcessingActiveSequences()) {
+				if (this.isCrouching()) {
+					setState(CharacterConstants.crouchState);
+				}
+				else {
+					setState(CharacterConstants.idleState);
+				}
+			}
+			else if (isInAir && this.velocity.y < -3f && (this.getCurrentActiveActionSeq() == null)) {
+				setState(CharacterConstants.fallState);
+			}
 		}
 		
 		private void handleActionSequences(float delta) {
-			if (this.currentActionSequence != null) {
-				currentActionSequence.process(delta, actionListener);
-				if (this.currentActionSequence.isFinished()) {
-					currentActionSequence = null;
-				}
-			}
-			else if (actionSequences.peek() != null) {
-				this.currentActionSequence = actionSequences.poll();
-			}
-			
-		}
-		
-		
-		public void addActionSequence (ActionSequence sequence) {
-			sequence.setSource(this);
-			actionSequences.add(sequence);
-		}
-		
-		private void handleEffects(float delta) {
-			boolean movementEffect = false;
-			for(Iterator<Effect> iterator = this.currentEffects.iterator(); iterator.hasNext();) {
-				Effect effect = iterator.next();
-				boolean isFinished = effect.process(this, delta);
-				movementEffect = (effect instanceof MovementEffect && !isFinished) || movementEffect;
-				if (isFinished) {
-					effect.completion(this);
-					iterator.remove();
-				}
-			}
-//			this.isProcessingMovementEffect = movementEffect;
-		}
-		
-		public void addEffect(Effect effect) {
-			effect.initialProcess(this);
-			if (effect instanceof MovementEffect) {
-				MovementEffect mEffect = ((MovementEffect) effect);
-				for (Effect currentEffect : currentEffects) {
-					if (currentEffect instanceof MovementEffect) {
-						mEffect.setOldAccel(((MovementEffect) currentEffect).getOldAccel());
-						currentEffects.remove(currentEffect);
-						break;
+			if (this.processingActionSequences != null) {
+				Iterator <ActionSequence> iterator = processingActionSequences.iterator();
+				while (iterator.hasNext()) {
+					ActionSequence actionSequence = iterator.next();
+					actionSequence.process(delta, actionListener);
+					if (actionSequence.isFinished()) {
+						if (actionSequence.isStaggered()) {
+							this.modelListener.endActionStagger();
+						}
+						else {
+							this.queuedJump = false; //Attack missed, so end the queued jump
+						}
+						iterator.remove();
+						if (this instanceof PlayerModel){
+							PlayerModel model = (PlayerModel) this;
+							if (model.getCurrentlyHeldDirection().equals(DirectionalInput.LEFT) || model.getCurrentlyHeldDirection().equals(DirectionalInput.RIGHT) && !iterator.hasNext())
+								horizontalMove(model.getCurrentlyHeldDirection().equals(DirectionalInput.LEFT));
+						}
+						this.updateHurtBoxProperties(this.getCharacterProperties().defaultHurtboxProperties);
 					}
 				}
 			}
-			currentEffects.add(effect);
+			ActionSequence nextActiveAction = nextActiveActionSequences.peek();
+			if (nextActiveAction != null 
+					&& (!isProcessingActiveSequences() 
+					|| ((this.getCurrentActiveActionSeq().isActionChainableWithThis(nextActiveAction)) 
+					&& !this.getCurrentActiveActionSeq().cannotBeOverriden()))) {
+				if (this.isProcessingActiveSequences()) {
+					this.forceEndForActiveAction();
+				}
+				this.endActionStagger();
+				this.stopHorizontalMovement(true);
+				ActionSequence nextSequence = nextActiveActionSequences.poll();
+				this.processingActionSequences.add(nextSequence);
+			}
 		}
 		
-		public MovementEffect getCurrentMovement() {
-			for (Effect effect : this.currentEffects) {
-				if (effect instanceof MovementEffect) {
-					return (MovementEffect) effect;
+		public boolean isProcessingActiveSequences() {
+			return this.getCurrentActiveActionSeq() != null;
+		}
+		
+		public ActionSequence getCurrentActiveActionSeq() {
+			for (ActionSequence actionSequence : this.processingActionSequences) {
+				if (actionSequence.isActive()) {
+					return actionSequence;
 				}
 			}
 			return null;
 		}
-
 		
-		public void clearActionSequencesWithNewSequence(ActionSequence sequence) {
-			actionSequences.clear();
-			this.currentActionSequence = sequence;
+		public void addActionSequence (ActionSequence sequence) {
+			if (sequence.cannotBeOverriden()) {
+				if (sequence.shouldOverridePrevAction()) {
+					forceEndForActiveAction(); 
+					processingActionSequences.add(sequence);
+				}
+				else {
+					nextActiveActionSequences.pollFirst();
+					nextActiveActionSequences.addFirst(sequence);
+				}
+			}
+			else if (sequence.isActive() && (!actionLocked || isAbleToEnqueueAction())) {
+				ActionSequence nextAction = nextActiveActionSequences.peek();
+				if (nextAction == null || !nextAction.cannotBeOverriden()) {
+					nextActiveActionSequences.pollFirst();
+					nextActiveActionSequences.addFirst(sequence);
+				}
+			}
+			else if (!sequence.isActive()){
+				processingActionSequences.add(sequence);
+			}
 		}
 		
+		public boolean isAbleToEnqueueAction() {
+	    	return this.isProcessingActiveSequences();
+	    }
+		
+
+		
+		public void lockControls() {
+			this.actionLocked = true;
+		}
+		
+		public void shouldUnlockControls(ActionSequence action) {
+	    	if (action.getAction().isFinished())
+	    	{
+	    		this.setActionLock(false);
+	    	}
+		}
+		
+
+
+		
+		public void setMovementStatesIfNeeded() {
+			this.setMovementStatesIfNeeded(false);
+		}
+		
+		public void setMovementStatesIfNeeded(boolean overrideDuplicateState) {
+			if (this.isInAir) {
+				if (this.velocity.y > 0) {
+					this.setState(CharacterConstants.jumpState, overrideDuplicateState);
+				}
+				else {
+					this.setState(CharacterConstants.fallState);
+				}
+			}
+			else if (this.sprinting) {
+				this.setState(CharacterConstants.sprintState);
+			}
+			else if (this.walking) {
+				this.setState(CharacterConstants.walkState);
+			}
+		}
+			
+		public boolean isTargetToLeft(CharacterModel target) {
+			return this.gameplayCollisionBox.x > target.gameplayCollisionBox.x; 
+		}
+		
+		public void jump() {
+			if ((!actionLocked && this.getCurrentActiveActionSeq() == null) || (this.getCurrentActiveActionSeq() != null && this.getCurrentActiveActionSeq().chainsWithJump())) {
+				if (!this.actionStaggering && this.getCurrentActiveActionSeq() == null) {
+					jumpCode();
+				}
+				else if (!this.actionStaggering && this.getCurrentActiveActionSeq() != null) {
+					if (this.getCurrentActiveActionSeq().getAction().getActionState().equals(ActionState.COOLDOWN))
+					{
+						jumpCode();
+					}
+					else {
+						this.queuedJump = true;
+					}
+				}
+				else if (this.actionStaggering){
+//					this.forceEndForActiveAction();
+					this.queuedJump = true;
+				}
+			}
+	    }
+		
+		public void downJump() {
+			this.isRespectingOneWayCollision = false;
+			this.timeToDisrespectOneWayCollision = 0.2f;
+			
+			this.onSlope = false;
+		}
+		
+		private void jumpCode() {
+			if (this.currentJumpTokens > 0) {
+				this.forceEndForActiveAction();
+				this.unCrouchWithoutSeq();
+				if (!isInAir)
+					isInAir = true;
+	            this.setWalking(false);
+	            this.getVelocity().y = getJumpSpeed();
+		    	this.setMovementStatesIfNeeded(true);
+		    	this.currentJumpTokens -= 1;
+			}
+		}
+		
+		public void crouch() {
+			if (!actionLocked && this.getCurrentActiveActionSeq() == null && !this.isInAir && !this.isCrouching) {
+				this.setCrouching(true); // this might have to happen after the action seq.
+				this.updateHurtBoxProperties(this.getCharacterProperties().crouchingHurtboxProperties);
+				
+				this.addActionSequence(ActionSequence.createIdleToCrouchSeq(this, actionListener));
+			}
+		}
+		
+		public void unCrouch() {
+			if (!actionLocked && this.getCurrentActiveActionSeq() == null && !this.isInAir && this.isCrouching) {
+				this.unCrouchWithoutSeq();
+				this.addActionSequence(ActionSequence.createCrouchToIdleSeq(this, actionListener));
+			}
+		}
+	    
+		private void unCrouchWithoutSeq() {
+			this.setCrouching(false);
+			this.updateHurtBoxProperties(this.getCharacterProperties().defaultHurtboxProperties);
+		}
+		
+		public void horizontalMove(boolean left) {
+			if (!this.actionLocked && this.getCurrentActiveActionSeq() == null) {
+				if (!isInAir) {
+					this.setFacingLeft(left);
+					this.setWalking(true);
+					this.walkingTime = 0f;
+				}
+
+				setHorizontalSpeedForMovement(left);
+				this.setMovementStatesIfNeeded();
+				
+			}
+		}
+		
+		private void setHorizontalSpeedForMovement(boolean movingLeft) {
+			if (this.sprinting) {
+				this.velocity.x = movingLeft ? -this.properties.getSprintSpeed() : this.properties.getSprintSpeed();
+			}
+			else if (this.walking) {
+				this.velocity.x = movingLeft ? -this.properties.getHorizontalSpeed() : this.properties.getHorizontalSpeed();
+			}
+			else if (this.isInAir) {
+				System.out.println("setting speed");
+				this.acceleration.x = movingLeft ? -this.properties.getHorizontalAcceleration() : this.properties.getHorizontalAcceleration();
+			}
+		}
+		
+		public abstract void patrolWalk(boolean left);
+		
+		public void stopHorizontalMovement(boolean shouldSlow) {
+			if (this.walking) {
+				if (shouldSlow) {
+					this.isSlowingDown = true;
+					if (this.velocity.x > 0) {
+						this.acceleration.x = -this.slowingAccel;
+					}
+					else {
+						this.acceleration.x = this.slowingAccel;
+					}
+				}
+				else {
+					this.velocity.x = 0;
+				}
+				if (this.isCrouching()) {
+					setState(CharacterConstants.crouchState);
+				}
+				else {
+					setState(CharacterConstants.idleState);
+				}
+			}
+			else if (this.isInAir) {
+				this.acceleration.x = 0;
+			}
+			this.setWalking(false);
+		}
+		
+		public float getJumpSpeed() {
+			return this.properties.jumpSpeed;
+		}
+		
+		public float getWalkSpeed() {
+			return this.properties.horizontalSpeed;
+		}
+		
+		public abstract Direction isTryingToMoveHorizontally();
+
 		protected void movementWithCollisionDetection(float delta, TiledMapTileLayer collisionLayer) {
 		//logic for collision detection
-			
-			//save old position
-			float oldX = this.getImageHitBox().getX(), oldY = this.getImageHitBox().getY(), tileWidth = collisionLayer.getTileWidth(), tileHeight = collisionLayer.getTileHeight();
-			boolean collisionX = false, collisionY = false;
-			
-			//move on x axis
-			this.getImageHitBox().setX(this.getImageHitBox().getX() + this.getVelocity().x * delta);
-			this.getGameplayHitBox().setX(this.getImageHitBox().getX() + (this.getImageHitBox().getWidth() * .4f));
-			
-			
-			
-			
-			if (this.getVelocity().x < 0) {
-				//left blocks
-				Cell topLeftBlock = collisionLayer.getCell
-						((int) (this.gameplayHitBox.x / tileWidth), 
-						(int) ((this.gameplayHitBox.y + this.gameplayHitBox.height) / tileHeight));
-				Cell middleLeftBlock = collisionLayer.getCell
-						((int) (this.gameplayHitBox.x / tileWidth), 
-						(int) ((this.gameplayHitBox.y + this.gameplayHitBox.height / 2) / tileHeight));
-				Cell lowerLeftBlock = collisionLayer.getCell
-						((int) (this.gameplayHitBox.x / tileWidth), 
-						(int) ((this.gameplayHitBox.y) / tileHeight));
-				
-				if (topLeftBlock != null)
-					collisionX = ((String)topLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
-					
-				
-				//middle left block
-				if(!collisionX && middleLeftBlock != null)
-					collisionX = ((String)middleLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
-				
-				//lower left block
-				if(!collisionX && lowerLeftBlock != null )
-					collisionX = ((String)lowerLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
-				
-//				this.leftcollisionX = collisionX;
-				
+			if (this.actionStaggering) {
+				return;
 			}
-			else if (this.getVelocity().x > 0) {
-				//right blocks
-				Cell topRightBlock = collisionLayer.getCell
-						((int) ((this.gameplayHitBox.x + this.gameplayHitBox.width) / tileWidth),
-						(int) ((this.gameplayHitBox.y + this.gameplayHitBox.height) / tileHeight));
-				Cell middleRightBlock = collisionLayer.getCell
-						((int) ((this.gameplayHitBox.x + this.gameplayHitBox.width) / tileWidth),
-						(int) ((this.gameplayHitBox.y + this.gameplayHitBox.height / 2) / tileHeight));
-				Cell lowerRightBlock = collisionLayer.getCell
-						((int) ((this.gameplayHitBox.x + this.gameplayHitBox.width) / tileWidth), 
-						(int) ((this.gameplayHitBox.y) / tileHeight));
-				
-				// top right block
-				if (topRightBlock != null)
-					collisionX = ((String)topRightBlock.getTile().getProperties().get("Impassable")).equals("true");
-				
-				//middle right block
-				if(!collisionX && middleRightBlock != null)
-					collisionX = ((String)middleRightBlock.getTile().getProperties().get("Impassable")).equals("true");
-				
-				//lower right block
-				if(!collisionX && lowerRightBlock != null)
-					collisionX = ((String)lowerRightBlock.getTile().getProperties().get("Impassable")).equals("true");
-				
-//				this.rightCollisionX = collisionX;
+			if (this.properties.boltedDown) {
+				this.velocity.x = 0f;
+				this.velocity.y = 0f;
+				this.acceleration.x = 0f;
+				this.acceleration.y = 0f;
+				return;
 			}
 			
-			//react to X collision
-			if (collisionX) {
-				this.getImageHitBox().setX(oldX);
-				this.gameplayHitBox.setX(oldX + this.getImageHitBox().width * .4f);
+			if (this.walking) {
+				this.walkingTime += delta;
+			}
+			else {
+				this.walkingTime = 0f;
+			}
+			
+			if (this.isSlowingDown && this.getXMove() == null) {
+				if ((this.velocity.x > 0 && this.acceleration.x > 0) || (this.velocity.x < 0 && this.acceleration.x < 0)) {
+					this.velocity.x = 0;
+					this.acceleration.x = 0;
+					this.isSlowingDown = false;
+				}
+			}
+			CollisionCheck collisionX = this.checkForXCollision(delta, collisionLayer, this.velocity.x, this.acceleration.x, true);
+			if (collisionX.doesCollide) {
 				this.getVelocity().x = 0;
 				this.getAcceleration().x = 0;
 			}
-
-			
-		
-			//move on y axis
-			this.getImageHitBox().setY(this.getImageHitBox().getY() + this.getVelocity().y * delta);
-			this.gameplayHitBox.setY(this.getImageHitBox().getY() + this.getImageHitBox().getHeight() * .2f);
-			
-			//Collision detection: Y axis
-			
-			if (this.getVelocity().y < 0) {
-				Cell bottomLeftBlock = collisionLayer.getCell((int) (this.gameplayHitBox.x / tileWidth), (int) ((this.gameplayHitBox.y) / tileHeight));
-				Cell bottomMiddleBlock = collisionLayer.getCell((int) ((this.gameplayHitBox.x + this.gameplayHitBox.width / 2) / tileWidth), (int) ((this.gameplayHitBox.y) / tileHeight));
-				Cell bottomRightBlock = collisionLayer.getCell((int) ((this.gameplayHitBox.x + this.gameplayHitBox.width) / tileWidth), (int) ((this.gameplayHitBox.y) / tileHeight));
-				//bottom left block
-				if (bottomLeftBlock != null)
-					collisionY = ((String)bottomLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
-					
-				//bottom middle block
-				if(!collisionY && bottomMiddleBlock != null)
-					collisionY = ((String)bottomMiddleBlock.getTile().getProperties().get("Impassable")).equals("true");
-				
-				//bottom right block
-				if(!collisionY && bottomRightBlock != null)
-					collisionY = ((String)bottomRightBlock.getTile().getProperties().get("Impassable")).equals("true");
-				
-		
-			} 
-			else if (this.getVelocity().y > 0) {
-				Cell topLeftBlock = collisionLayer.getCell((int) (this.gameplayHitBox.x / tileWidth), (int) ((this.gameplayHitBox.y + this.gameplayHitBox.height) / tileHeight));			
-				Cell topMiddleBlock = collisionLayer.getCell((int) ((this.gameplayHitBox.x + this.gameplayHitBox.width / 2) / tileWidth), (int) ((this.gameplayHitBox.y + this.gameplayHitBox.height) / tileHeight));
-				Cell topRightBlock = collisionLayer.getCell((int) ((this.gameplayHitBox.x + this.gameplayHitBox.width) / tileWidth), (int) ((this.gameplayHitBox.y + this.gameplayHitBox.height) / tileHeight));
-				
-				//top left block
-				if (topLeftBlock != null)
-					collisionY = ((String)topLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
-				
-				//top middle block
-				if(!collisionY && topMiddleBlock != null)
-					collisionY = ((String)topMiddleBlock.getTile().getProperties().get("Impassable")).equals("true");
-				
-				//top right block
-				if(!collisionY && topRightBlock != null)
-					collisionY = ((String)topRightBlock.getTile().getProperties().get("Impassable")).equals("true");
+			else if (!isTryingToMoveHorizontally().equals(Direction.NaN) && (!this.actionLocked && this.getCurrentActiveActionSeq() == null)) {
+				boolean left = isTryingToMoveHorizontally().equals(Direction.LEFT);
+				this.setHorizontalSpeedForMovement(left);
+				this.setMovementStatesIfNeeded();
 			}
-			
-			//react to Ycollision
-			if (collisionY) {
-				this.getImageHitBox().setY(oldY);
-				this.gameplayHitBox.setY(oldY + this.getImageHitBox().height * .2f);
-				if (this.getVelocity().y < 0) {
-					landed();
+
+			CollisionCheck collisionY = this.checkForYCollision(delta, collisionLayer, this.velocity.y, true, true);
+			if (collisionY.doesCollide) {
+				if (this.getVelocity().y < 0 || collisionY.collisionType.equals(CollisionType.Slope)) {
+					landed(collisionY.getCollisionType().equals(CollisionType.Entity));
+
 				}
-				this.getVelocity().y = 0;
+				if (!collisionY.getCollisionType().equals(CollisionType.Entity)) {
+					if (collisionY.isVelocityPositive) {
+						this.getVelocity().y = -5f;
 
-					
+					}
+					else {
+						this.getVelocity().y = 0;
+					}
+				}
 			}
-			return;
+			else if (!isInAir && this.getVelocity().y < -100f) {
+				this.falling();
+			}
+
 		}
 		
 		public float howLongTillYCollision(float maxTime, TiledMapTileLayer collisionLayer) {
-			float time = 0f;
-			Rectangle tempImageBounds = new Rectangle(this.imageHitBox);
-			Rectangle tempGameplayBounds = new Rectangle(this.gameplayHitBox);
-			float tempVelocity = this.velocity.y;
-			while (time <= maxTime) {
-				float delta =  1 / 300f;
-				tempVelocity += this.acceleration.y * delta;
-				float tileWidth = collisionLayer.getTileWidth(), tileHeight = collisionLayer.getTileHeight();
-				
-				tempImageBounds.setY(tempImageBounds.getY() + tempVelocity * delta);
-				tempGameplayBounds.setY(tempImageBounds.getY() + tempImageBounds.getHeight() * .2f);
-				boolean collisionY = false;
-				
-				//Collision detection: Y axis
-				
-				if (tempVelocity < 0) {
-					Cell bottomLeftBlock = collisionLayer.getCell((int) (tempGameplayBounds.x / tileWidth), (int) ((tempGameplayBounds.y) / tileHeight));
-					Cell bottomMiddleBlock = collisionLayer.getCell((int) ((tempGameplayBounds.x + tempGameplayBounds.width / 2) / tileWidth), (int) ((tempGameplayBounds.y) / tileHeight));
-					Cell bottomRightBlock = collisionLayer.getCell((int) ((tempGameplayBounds.x + tempGameplayBounds.width) / tileWidth), (int) ((tempGameplayBounds.y) / tileHeight));
-					//bottom left block
-					if (bottomLeftBlock != null)
-						collisionY = ((String)bottomLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
-						
-					//bottom middle block
-					if(!collisionY && bottomMiddleBlock != null)
-						collisionY = ((String)bottomMiddleBlock.getTile().getProperties().get("Impassable")).equals("true");
-					
-					//bottom right block
-					if(!collisionY && bottomRightBlock != null)
-						collisionY = ((String)bottomRightBlock.getTile().getProperties().get("Impassable")).equals("true");
-					
-			
-				} 
-				else if (tempVelocity > 0) {
-					Cell topLeftBlock = collisionLayer.getCell((int) (tempGameplayBounds.x / tileWidth), (int) ((tempGameplayBounds.y + tempGameplayBounds.height) / tileHeight));			
-					Cell topMiddleBlock = collisionLayer.getCell((int) ((tempGameplayBounds.x + tempGameplayBounds.width / 2) / tileWidth), (int) ((tempGameplayBounds.y + tempGameplayBounds.height) / tileHeight));
-					Cell topRightBlock = collisionLayer.getCell((int) ((tempGameplayBounds.x + tempGameplayBounds.width) / tileWidth), (int) ((tempGameplayBounds.y + tempGameplayBounds.height) / tileHeight));
-					
-					//top left block
-					if (topLeftBlock != null)
-						collisionY = ((String)topLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
-					
-					//top middle block
-					if(!collisionY && topMiddleBlock != null)
-						collisionY = ((String)topMiddleBlock.getTile().getProperties().get("Impassable")).equals("true");
-					
-					//top right block
-					if(!collisionY && topRightBlock != null)
-						collisionY = ((String)topRightBlock.getTile().getProperties().get("Impassable")).equals("true");
-				}
-				
-				if (collisionY) {
-					break;
-				}
-				
-				time += delta;
-			}
-			if (time >= maxTime) {
-				return maxTime;
-			}
-			return time;
+			CollisionCheck collisionY = this.checkForYCollision(maxTime, collisionLayer, this.velocity.y, false, true);
+			return collisionY.timeUntilCollision;
 		}
+		
+
 		
 		public float howLongTillXCollision(float maxTime, TiledMapTileLayer collisionLayer) {
-			float time = 0f;
-			Rectangle tempImageBounds = new Rectangle(this.imageHitBox);
-			Rectangle tempGameplayBounds = new Rectangle(this.gameplayHitBox);
-			float tempVelocity = this.velocity.x;
-			while (time < maxTime) {
-				float delta =  1 / 300f;
-				tempVelocity += this.acceleration.x * delta;
-				float tileWidth = collisionLayer.getTileWidth(), tileHeight = collisionLayer.getTileHeight();
-				
-				tempImageBounds.setX(tempImageBounds.getX() + tempVelocity * delta);
-				tempGameplayBounds.setX(tempImageBounds.getX() + tempImageBounds.getWidth() * .4f);
-				boolean collisionX = false;
-				
-				if (tempVelocity < 0) {
-					//left blocks
-					Cell topLeftBlock = collisionLayer.getCell
-							((int) (tempGameplayBounds.x / tileWidth), 
-							(int) ((tempGameplayBounds.y + tempGameplayBounds.height) / tileHeight));
-					Cell middleLeftBlock = collisionLayer.getCell
-							((int) (tempGameplayBounds.x / tileWidth), 
-							(int) ((tempGameplayBounds.y + tempGameplayBounds.height / 2) / tileHeight));
-					Cell lowerLeftBlock = collisionLayer.getCell
-							((int) (tempGameplayBounds.x / tileWidth), 
-							(int) ((tempGameplayBounds.y) / tileHeight));
-					
-					if (topLeftBlock != null)
-						collisionX = ((String)topLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
-						
-					
-					//middle left block
-					if(!collisionX && middleLeftBlock != null)
-						collisionX = ((String)middleLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
-					
-					//lower left block
-					if(!collisionX && lowerLeftBlock != null )
-						collisionX = ((String)lowerLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
-					
-//					this.leftcollisionX = collisionX;
-					
+			CollisionCheck collisionX = this.checkForXCollision(maxTime, collisionLayer, this.velocity.x, this.acceleration.x, false);
+			return collisionX.timeUntilCollision;
+		}
+		
+	    public void landed(boolean isFromEntityCollision) {
+	    	if (this.injuredStaggering && this.isInAir && this.velocity.y < 0) {
+	    		//do wakeup action.
+	    		injuredStaggering = false;
+	    		this.forceEndForActiveAction();
+	    		this.isInAir = false;
+	    		if (this.currentHealth != 0) {
+		    		ActionSequence wakeupSeq = ActionSequence.createWakeupSequence(this, this.actionListener);
+		    		this.addActionSequence(wakeupSeq);
+	    		}
+	    	}
+	    	else if (this.isInAir) {
+	    		if (!isFromEntityCollision)
+	    		{
+	    			this.forceEndForActiveAction();
+	    			this.isInAir = false;
+					this.acceleration.x = 0;
+					this.velocity.x = 0;
+	    		}
+
+				if (!this.isTryingToMoveHorizontally().equals(Direction.NaN)) {
+					boolean left = this.isTryingToMoveHorizontally().equals(Direction.LEFT);
+					this.horizontalMove(left);
 				}
-				else if (tempVelocity > 0) {
-					//right blocks
-					Cell topRightBlock = collisionLayer.getCell
-							((int) ((tempGameplayBounds.x + tempGameplayBounds.width) / tileWidth),
-							(int) ((tempGameplayBounds.y + tempGameplayBounds.height) / tileHeight));
-					Cell middleRightBlock = collisionLayer.getCell
-							((int) ((tempGameplayBounds.x + tempGameplayBounds.width) / tileWidth),
-							(int) ((tempGameplayBounds.y + tempGameplayBounds.height / 2) / tileHeight));
-					Cell lowerRightBlock = collisionLayer.getCell
-							((int) ((tempGameplayBounds.x + tempGameplayBounds.width) / tileWidth), 
-							(int) ((tempGameplayBounds.y) / tileHeight));
-					
-					// top right block
-					if (topRightBlock != null)
-						collisionX = ((String)topRightBlock.getTile().getProperties().get("Impassable")).equals("true");
-					
-					//middle right block
-					if(!collisionX && middleRightBlock != null)
-						collisionX = ((String)middleRightBlock.getTile().getProperties().get("Impassable")).equals("true");
-					
-					//lower right block
-					if(!collisionX && lowerRightBlock != null)
-						collisionX = ((String)lowerRightBlock.getTile().getProperties().get("Impassable")).equals("true");
-					
-//					this.rightCollisionX = collisionX;
+				else {
+					this.setMovementStatesIfNeeded();
 				}
-				
-				if (collisionX) {
+	    	}
+    		if (!isFromEntityCollision) {
+    			this.setCurrentJumpTokens(maxJumpTokens);
+    			this.entityCollisionRepositionTokens = 1;
+
+    		}
+	    }
+		
+	    public void falling() {
+	    	this.isInAir = true;
+//	    	this.setMovementStatesIfNeeded();
+	    }
+		
+		public void forceEndForActiveAction() {
+			for (int i = 0; i < this.processingActionSequences.size(); i++) {
+				ActionSequence sequence = this.processingActionSequences.get(i);
+				if (sequence.isActive()) {
+					sequence.forceEnd();
 					break;
 				}
-				
-				time += delta;
 			}
-			if (time >= maxTime) {
-				return maxTime;
-			}
-			return time;
 		}
 		
-		protected abstract void manageAutomaticStates(float delta, TiledMapTileLayer collisionLayer);
-		
-		protected abstract void landed(); 
-		
-		public abstract int getAllegiance();
-		
-		public void onDeath() {
-			
+		public void forceCooldownForActiveAction() {
+			for (int i = 0; i < this.processingActionSequences.size(); i++) {
+				ActionSequence sequence = this.processingActionSequences.get(i);
+				if (sequence.isActive()) {
+					sequence.forceCooldownState();
+					break;
+				}
+			}
 		}
 		
-		public void shouldProjectileHit(Projectile projectile) {
+		public void forceActiveForActiveAction() {
+			for (int i = 0; i < this.processingActionSequences.size(); i++) {
+				ActionSequence sequence = this.processingActionSequences.get(i);
+				if (sequence.isActive()) {
+					sequence.forceActiveState();
+					break;
+				}
+			}
+		}
+		
+		private void staggerAction(YMovementEffectSettings yPotentialMovementSettings) {
+			this.forceEndForActiveAction();
+			this.injuredStaggering = true;
+			StaggerType staggerType = this.isInAir() || (yPotentialMovementSettings != null && yPotentialMovementSettings.getVelocity() > 0 && !yPotentialMovementSettings.onlyWhenInAir()) ? StaggerType.Aerial : StaggerType.Normal;
+			ActionSequence staggerAction = ActionSequence.createStaggerSequence(this, this.actionListener, staggerType);
+    		this.addActionSequence(staggerAction);
+    		this.actionStagger(true);
+    		if (!this.isInAir && (yPotentialMovementSettings == null || (yPotentialMovementSettings.getVelocity() <= 0 && yPotentialMovementSettings.getAcceleration() <= 0))) {
+        		this.setCurrentStability(this.maxStability, null);
+    		}
+    		else {
+        		this.setCurrentStability(1, null);
+    		}
+		}
+		
+		public void shouldProjectileHit(Projectile projectile, HitSparkListener hitSparkListener) {
+			HitSpark hitSpark = null;
 			if (!isImmuneToInjury()) {
-				projectile.processExpirationOrHit(this);
+				boolean didInterceptAttack = false;
+				for (EntityEffect effect : this.currentEffects) {
+					if (effect instanceof AssaultInterceptor) {
+						didInterceptAttack = ((AssaultInterceptor) effect).didInterceptProjectile(this, projectile);
+						HitSparkData hitSparkData = HitSparkUtils.blockData(projectile.getSettings().getHitSparkData().getSize());
+						hitSpark = new HitSpark(hitSparkData, 
+								projectile.getGameplayCollisionBox().x + (projectile.isFacingLeft() ? 0f : projectile.getGameplayCollisionBox().width),
+								projectile.getGameplayCollisionBox().y + projectile.getGameplayCollisionBox().height / 2,
+								hitSparkListener);
+						break;
+					}
+				}
+				if (!didInterceptAttack) {
+					projectile.processHit(this);
+					hitSpark = new HitSpark(projectile.getSettings().getHitSparkData(), 
+							projectile.getGameplayCollisionBox().x + (projectile.isFacingLeft() ? 0f : projectile.getGameplayCollisionBox().width),
+							projectile.getGameplayCollisionBox().y + projectile.getGameplayCollisionBox().height / 2,
+							hitSparkListener);
+				}
+			}
+			if (hitSpark != null) {
+				hitSparkListener.addHitSpark(hitSpark);
 			}
 		}
 		
-		public void shouldAttackHit(Attack attack) {
+		public void shouldExplosionHit(Explosion explosion, HitSparkListener hitSparkListener) {
+			HitSpark hitSpark = null;
+			if (!isImmuneToInjury) {
+				boolean didInterceptAttack = false;
+				for (EntityEffect effect : this.currentEffects) {
+					if (effect instanceof AssaultInterceptor) {
+						didInterceptAttack = ((AssaultInterceptor) effect).didInterceptExplosion(this, explosion);
+						HitSparkData hitSparkData = HitSparkUtils.blockData(explosion.getExplosionSettings().getHitSparkData().getSize());
+						hitSpark = new HitSpark(hitSparkData, 
+								explosion.getGameplayCollisionBox().x + explosion.getGameplayCollisionBox().width / 2,
+								explosion.getGameplayCollisionBox().y + explosion.getGameplayCollisionBox().height / 2,
+								hitSparkListener);
+						break;
+					}
+				}
+				if (!didInterceptAttack) {
+					explosion.processExplosionHit(this);
+					HitSparkData hitSparkData = explosion.getExplosionSettings().getHitSparkData();
+					hitSpark = new HitSpark(hitSparkData, 
+							explosion.getGameplayCollisionBox().x + explosion.getGameplayCollisionBox().width / 2,
+							explosion.getGameplayCollisionBox().y + explosion.getGameplayCollisionBox().height / 2,
+							hitSparkListener);
+				}
+			}
+			if (hitSpark != null) {
+				hitSparkListener.addHitSpark(hitSpark);
+			}
+		}
+		
+		public void shouldAttackHit(Attack attack, HitSparkListener hitSparkListener, Rectangle collidingHitBox) {
+			HitSpark hitSpark = null;
 			if (!isImmuneToInjury()) {
-				attack.processAttackOnCharacter(this);
+				boolean didInterceptAttack = false;
+				for (EntityEffect effect : this.currentEffects) {
+					if (effect instanceof AssaultInterceptor) {
+						didInterceptAttack = ((AssaultInterceptor) effect).didInterceptAttack(this, attack);
+						HitSparkData hitSparkData = HitSparkUtils.blockData(attack.getAttackSettings().getHitSparkData().getSize());
+						hitSpark = new HitSpark(hitSparkData, 
+								collidingHitBox.x,
+								collidingHitBox.y,
+								hitSparkListener);
+					}
+				}
+				if (!didInterceptAttack) {
+					attack.processAttackOnEntity(this);
+					HitSparkData hitSparkData = attack.getAttackSettings().getHitSparkData();
+					hitSpark = new HitSpark(hitSparkData, 
+							collidingHitBox.x + collidingHitBox.width / 2,
+							collidingHitBox.y,
+							hitSparkListener);
+				}
+			}
+			if (hitSpark != null) {
+				hitSparkListener.addHitSpark(hitSpark);
+			}
+		}
+		
+		public void performDeathSequence() {
+			ActionSequence deathSequence = this.getCharacterProperties().getActions().get(ActionSequence.deathKey).cloneSequenceWithSourceAndTarget(this, null, actionListener, collisionChecker);
+			if (deathSequence != null) {
+				this.addActionSequence(deathSequence);
+			}
+
+		}
+		
+		public void deathCheck() {
+			if (this.getCurrentHealth() == 0 && !alreadyDead) {
+				this.forceEndForActiveAction();
+				this.performDeathSequence();
+				this.alreadyDead = true;
 			}
 		}
 		
@@ -496,63 +786,236 @@ public abstract class Character {
 			return ((float)this.getCurrentHealth()) / ((float)this.getMaxHealth());
 		}
 		
-//		public void interruptMovementAction(Movement newMovement) {
-//			if (newMovement != null) {
-//				this.completeMovementAction();
-//			}
-//			this.currentMovementAction = newMovement;
-//
-//		}
-//		
-//		private void completeMovementAction() {
-//			if (this.currentMovementAction != null && this.isProcessingMovementEffect) {
-//				this.currentMovementAction.completion(this);
-//				this.isProcessingMovementEffect = false;
-//				this.currentMovementAction = this.tempMovementActions.poll();
-//			}
-//		}
-		
-		public void addToCurrentHealth(int value) {
+		public float getTensionRatio() {
+			return ((float)this.getCurrentTension()) / ((float)this.getMaxTension());
+		}
+	
+		public void addToCurrentHealth(float value) {
 			this.setCurrentHealth(value + this.currentHealth);
 		}
 		
-		public void removeFromCurrentHealth(int value) {
+		public void removeFromCurrentHealth(float value) {
 			this.setCurrentHealth(this.currentHealth - value);
 		}
+		
+		public void addToCurrentWill(float value) {
+			this.setCurrentWill(value + this.currentWill);
+		}
+		
+		public void removeFromCurrentWill(float value) {
+			this.setCurrentWill(this.currentWill - value);
+		}
+		
+		public void removeFromCurrentStability(float value, YMovementEffectSettings yReplacementMovement) {
+			this.setCurrentStability(this.currentStability - value, yReplacementMovement);
+		}
+		
+		public void addToCurrentStability(float value) {
+			this.setCurrentStability(value + this.currentStability, null);
+		}
+		
+		public void addToCurrentTension(float value) {
+			this.setCurrentTension(this.currentTension + value);
+		}
+		
+		public void removeFromCurrentTension(float value) {
+			this.setCurrentTension(this.currentTension - value);
+		}
+		
+		public Vector2 getCenteredPosition() {
+			Vector2 sourcePosition = new Vector2(this.gameplayCollisionBox.x + this.gameplayCollisionBox.width / 2, this.gameplayCollisionBox.y + this.gameplayCollisionBox.height / 2); 
+			return sourcePosition;
+		}
+		
+		public void setTurnAngle(float turnAngle) {
+			if (turnAngle <= -80f) {
+				this.turnAngle = TurnAngle.NEGNINETY;
+			}
+			else if (turnAngle > -80f && turnAngle <= -30f) {
+				this.turnAngle = TurnAngle.NEGFOURTYFIVE;
+			}
+			else if (turnAngle > -30f && turnAngle <= 30f) {
+				this.turnAngle = TurnAngle.ZERO;
+			}
+			else if (turnAngle > 30f && turnAngle <= 80f) {
+				this.turnAngle = TurnAngle.FOURTYFIVE;
+			}
+			else if (turnAngle > 80f){
+				this.turnAngle = TurnAngle.NINETY;
+			}
+		}
+		
+		public float convertTurnAngleToFloat() {
+			switch (this.turnAngle) {
+			case NEGNINETY:
+				return -90f;
+			case NEGFOURTYFIVE:
+				return -45f;
+			case ZERO:
+				return 0f;
+			case FOURTYFIVE: 
+				return 45f;
+			case NINETY: 
+				return 90f;
+			}
+			return 0f;
+		}
+		
+		public void endActionStagger() {
+			if (actionStaggering) {
+//				if (this.getCurrentMovement() == null) {
+					this.velocity.x = tempVelocityX;
+					this.velocity.y = tempVelocityY;
+//				}
+				this.actionStaggering = false;
+				this.actionStaggerTime = 0f;
+				if (this.queuedJump) {
+					this.jumpCode();
+					this.queuedJump = false;
+				}
+			}
 
+		}
+		
+		public abstract void setPatrolInfo(Array<Float> wayPoints, float patrolDuration, float breakDuration);
+		
+		public void actionStagger(boolean stabilityStaggering) {
+			this.actionStaggering = true;
+			this.tempVelocityX = this.velocity.x;
+			this.tempVelocityY = this.velocity.y;
+			this.velocity.x = 0f;
+			this.velocity.y = 0f;
+			ActionSequence currentSeq = this.getCurrentActiveActionSeq();
+			if (currentSeq != null) {
+				currentSeq.stagger();
+			}
+				
+			for (EntityEffect effect : this.currentEffects) {
+				if (effect instanceof XMovementEffect || effect instanceof YMovementEffect)
+					effect.stagger();
+			}
+				
+			this.modelListener.actionStagger();
+		}
 
+		
+		public void setWalking(boolean walking) {
+			if (walking) {
+				this.walking = true;
+			}
+			else {
+				this.walking = false;
+				sprinting = false;
+			}
+		}
+		
+		public void refreshHurtBoxesX() {
+			for (int i = 0; i < this.gameplayHurtBoxes.size; i++) {
+				Rectangle hurtBox = gameplayHurtBoxes.get(i);
+				if (i < this.fixedHurtBoxProperties.size) {
+					if (isFacingLeft()) {
+						hurtBox.x = this.gameplayCollisionBox.x + this.gameplayCollisionBox.width - this.fixedHurtBoxProperties.get(i).x - this.fixedHurtBoxProperties.get(i).width;
+					}
+					else {
+						hurtBox.x = this.gameplayCollisionBox.x + this.fixedHurtBoxProperties.get(i).x;
+
+					}
+					hurtBox.width = this.fixedHurtBoxProperties.get(i).width;
+				}
+				else {
+//					this.gameplayHurtBoxes.removeIndex(i);
+					break;
+				}
+			}
+		}
+		
+		public void refreshHurtBoxesY() {
+			for (int i = 0; i < this.gameplayHurtBoxes.size; i++) {
+				Rectangle hurtBox = gameplayHurtBoxes.get(i);
+				if (i < this.fixedHurtBoxProperties.size) {
+					hurtBox.y = this.gameplayCollisionBox.y + this.fixedHurtBoxProperties.get(i).y;
+					hurtBox.height = this.fixedHurtBoxProperties.get(i).height;
+				}
+				else {
+//					this.gameplayHurtBoxes.removeIndex(i);
+					break;
+				}
+			}
+		}
+ 		
 		//-------------GETTERS/SETTERS------------//
 		
 		public String getState() {
 			return state;
 		}
 
+		public boolean isAlreadyDead() {
+			return alreadyDead;
+		}
+
+		public boolean isActionStaggering() {
+			return actionStaggering;
+		}
+
+		public float getCurrentStability() {
+			return currentStability;
+		}
+
+		public ArrayDeque<ActionSequence> getNextActiveActionSequences() {
+			return nextActiveActionSequences;
+		}
+
+		public void setCurrentStability(float currentStability, YMovementEffectSettings yPotentialMovement) {
+			float realStability = Math.max(0, currentStability);
+			this.currentStability = Math.min(realStability, this.maxStability);
+			if (realStability == 0 && !alreadyDead && !this.getCharacterProperties().boltedDown) {
+				staggerAction(yPotentialMovement);
+			}
+			else if (!alreadyDead){
+				//only action stagger.
+	    		this.actionStagger(true);
+			}
+		}
+
+		public float getMaxStability() {
+			return maxStability;
+		}
+
+		public void setMaxStability(float maxStability) {
+			this.maxStability = maxStability;
+		}
+
+		public ArrayList<ActionSequence> getProcessingActionSequences() {
+			return processingActionSequences;
+		}
+
+		public boolean isActionLock() {
+			return actionLocked;
+		}
+
+		public void setActionLock(boolean actionLock) {
+			this.actionLocked = actionLock;
+		}
+
+		public float getGameplayHitBoxWidthModifier() {
+			return widthCoefficient;
+		}
+
+		public float getGameplayHitBoxHeightModifier() {
+			return heightCoefficient;
+		}
+		
+
+		public String getUuid() {
+			return uuid;
+		}
+
 		public ObjectListener getObjectListener() {
 			return objectListener;
 		}
 
-		public void setItemListener(ObjectListener itemListener) {
-			this.objectListener = itemListener;
-		}
-
-		public float getGameplayHitBoxWidthModifier() {
-			return gameplayHitBoxWidthModifier;
-		}
-
-		public float getGameplayHitBoxHeightModifier() {
-			return gameplayHitBoxHeightModifier;
-		}
-
-//		public boolean isProcessingMovementAction() {
-//			return isProcessingMovementEffect;
-//		}
-//
-//		public void setProcessingMovementAction(boolean isProcessingMovementAction) {
-//			this.isProcessingMovementEffect = isProcessingMovementAction;
-//		}
-
-		public String getUuid() {
-			return uuid;
+		public void setObjectListener(ObjectListener objectListener) {
+			this.objectListener = objectListener;
 		}
 
 		public ActionListener getAttackListener() {
@@ -562,55 +1025,103 @@ public abstract class Character {
 		public void setActionListener(ActionListener attackListener) {
 			this.actionListener = attackListener;
 		}
-
+		
 		public void setState(String state) {
-			this.state = state;
+			this.setState(state, false);
 		}
 
-		public int getCurrentHealth() {
+		public void setState(String state, boolean overrideDuplicate) {
+			if (this.state == null || (!this.state.equals(state))) {
+				this.state = state;
+				this.didChangeState = true;
+				this.stateTime = 0f;
+			}
+			else if (overrideDuplicate) {
+				this.state = state;
+				this.didChangeState = true;
+				this.stateTime = 0f;
+			}
+		}
+
+		public float getCurrentHealth() {
 			return currentHealth;
 		}
 
-		public void setCurrentHealth(int currentHealth) {
+		public void setCurrentHealth(float currentHealth) {
 			this.currentHealth = Math.min(Math.max(0, currentHealth), this.maxHealth);
 		}
 
-		public int getMaxHealth() {
+		public float getMaxHealth() {
 			return maxHealth;
 		}
 
-		public void setMaxHealth(int maxHealth) {
+		public void setMaxHealth(float maxHealth) {
 			this.maxHealth = maxHealth;
 			this.currentHealth = maxHealth;
 		}
 
-		public int getCurrentWill() {
+		public float getCurrentWill() {
 			return currentWill;
 		}
 
-		public void setCurrentWill(int currentWill) {
-			this.currentWill = currentWill;
+		public void setCurrentWill(float currentWill) {
+			this.currentWill = Math.min(Math.max(0, currentWill), this.maxWill);
 		}
 
-		public int getMaxWill() {
+		public float getMaxWill() {
 			return maxWill;
 		}
 
-		public void setMaxWill(int maxWill) {
+		public void setMaxWill(float maxWill) {
 			this.maxWill = maxWill;
 			this.currentWill = maxWill;
 		}
 
-		public int getAttack() {
+		public int getCurrentJumpTokens() {
+			return currentJumpTokens;
+		}
+
+		public void setCurrentJumpTokens(int currentJumpTokens) {
+			this.currentJumpTokens = Math.min(Math.max(0, currentJumpTokens), this.maxJumpTokens);
+		}
+
+		public int getMaxJumpTokens() {
+			return maxJumpTokens;
+		}
+
+		public void setMaxJumpTokens(int maxJumpTokens) {
+			this.maxJumpTokens = maxJumpTokens;
+			this.currentJumpTokens = maxJumpTokens;
+		}
+
+		public float getAttack() {
 			return attack;
 		}
 
-		public void setAttack(int attack) {
+		public void setAttack(float attack) {
 			this.attack = attack;
 		}
 
 		public String getName() {
 			return name;
+		}
+		
+		public String getNameForWakeupSeq() {
+			return this.properties.useDefaultWakeup ? "" : this.getName();
+		}
+		
+		public String getNameForStaggerSeq(StaggerType type) {
+			if (type.equals(StaggerType.Normal)) {
+				return this.properties.useDefaultStagger ? "" : this.getName();
+			}
+			else if (type.equals(StaggerType.Aerial)) {
+				return this.properties.useDefaultAerialStagger ? "" : this.getName();
+			}
+			else if (type.equals(StaggerType.Tension)) {
+				return this.properties.useDefaultTensionStagger ? "" : this.getName();
+
+			}
+			return "";
 		}
 
 		public void setName(String name) {
@@ -625,12 +1136,12 @@ public abstract class Character {
 			return acceleration;
 		}
 
-		public Rectangle getGameplayHitBox() {
-			return gameplayHitBox;
+		public Rectangle getGameplayCollisionBox() {
+			return gameplayCollisionBox;
 		}
 
 		public Rectangle getImageHitBox() {
-			return imageHitBox;
+			return imageBounds;
 		}
 		
 		public boolean isImmuneToInjury() {
@@ -639,6 +1150,10 @@ public abstract class Character {
 
 		public void setImmuneToInjury(boolean isImmuneToInjury) {
 			this.isImmuneToInjury = isImmuneToInjury;
+		}
+		
+		public ActionListener getActionListener() {
+			return actionListener;
 		}
 
 		public boolean isAttacking() {
@@ -649,20 +1164,12 @@ public abstract class Character {
 			this.attacking = attacking;
 		}
 
-		public boolean isJumping() {
-			return jumping;
+		public boolean isInAir() {
+			return isInAir;
 		}
 
-		public void setJumping(boolean jumping) {
-			this.jumping = jumping;
-		}
-
-		public boolean isStaggering() {
-			return staggering;
-		}
-
-		public void setStaggering(boolean staggering) {
-			this.staggering = staggering;
+		public void setIsInAir(boolean isInAir) {
+			this.isInAir = isInAir;
 		}
 
 		public boolean isFacingLeft() {
@@ -673,22 +1180,6 @@ public abstract class Character {
 			this.facingLeft = facingLeft;
 		}
 
-		public float getJumpSpeed() {
-			return jumpSpeed;
-		}
-
-		public void setJumpSpeed(float jumpSpeed) {
-			this.jumpSpeed = jumpSpeed;
-		}
-
-		public float getGravity() {
-			return gravity;
-		}
-
-		public void setGravity(float gravity) {
-			this.gravity = gravity;
-		}
-
 		public EntityUIModel getUiModel() {
 			return uiModel;
 		}
@@ -696,8 +1187,58 @@ public abstract class Character {
 		public CharacterProperties getCharacterProperties() {
 			return properties;
 		}
-		
 
+		public Weapon getCurrentWeapon() {
+			return currentWeapon;
+		}
+
+		public float getCurrentTension() {
+			return currentTension;
+		}
+
+		public void setCurrentTension(float currentTension) {
+			this.currentTension = Math.min(Math.max(0, currentTension), this.maxTension);
+			if (this.currentTension == this.maxTension) {
+				this.tensionOverload();
+			}
+		}
+		
+		public abstract void tensionOverload();
+
+		public float getMaxTension() {
+			return maxTension;
+		}
+
+		public void setMaxTension(float maxTension) {
+			this.maxTension = maxTension;
+			this.currentTension = 0;
+		}
+
+
+
+		public boolean isSprinting() {
+			return sprinting;
+		}
+
+		public boolean isInjuredStaggering() {
+			return injuredStaggering;
+		}
+		
+		public float getXRotationCoefficient() {
+			return this.getCharacterProperties().xRotationCoefficient;
+		}
+		
+		public float getYRotationCoefficient() {
+			return this.getCharacterProperties().yRotationCoefficient;
+		}
+
+		public boolean isCrouching() {
+			return isCrouching;
+		}
+
+		public void setCrouching(boolean isCrouching) {
+			this.isCrouching = isCrouching;
+		}
 	}
 	
 	@Override 

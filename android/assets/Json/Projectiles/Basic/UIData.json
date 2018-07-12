@@ -1,0 +1,24 @@
+{
+	"class": com.mygdx.game.assets.EntityUIData,
+	"animations": [
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Windup",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Active",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Cooldown",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+	]
+	"masterAtlasPath": "Sprites/Projectiles/Basic/textures.atlas"
+}

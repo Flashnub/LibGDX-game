@@ -1,0 +1,16 @@
+{
+	"BasicExplosion": {
+		"class": com.mygdx.game.model.projectiles.ExplosionSettings,
+		"heightCoefficient": 0.4,
+		"widthCoefficient": 0.4,
+		"duration": 2,
+		"windupTime": 1,
+		"cooldownTime": 1,
+		"targetEffects": [
+			{
+				"class": com.mygdx.game.model.effects.DamageEffectSettings,
+				"value": 10
+			}
+		]
+	}
+}

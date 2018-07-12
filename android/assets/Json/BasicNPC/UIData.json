@@ -1,0 +1,24 @@
+{
+	"class": com.mygdx.game.assets.EntityUIData,
+	"animations": [
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Idle",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Circle",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Triangle",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+	]
+	"masterAtlasPath": "Sprites/BasicNPC/textures.atlas"
+}

@@ -1,90 +1,117 @@
 package com.mygdx.game.model.effects;
 
-import com.mygdx.game.model.characters.Character.CharacterModel;
+import java.util.UUID;
 
 public abstract class Effect {
-	EffectSettings settings;
 	Boolean isActive;
-	float currentTime;
+	private boolean hasProcessedInitial;
+	private boolean hasProcessedCompletion;
+	protected boolean forceEnd;
+	private float currentTime;
+	private EffectController retriever;
+	EffectSettings settings;
+	String uuid;
+	
+	public Effect() {
+		setCurrentTime(0f);
+		this.isActive = false;
+		this.setHasProcessedInitial(false);
+		this.setHasProcessedCompletion(false);
+		this.setForceEnd(false);
+		UUID id = UUID.randomUUID();
+		this.uuid = id.toString();
+	}
 	
 	public Effect(EffectSettings settings) {
-		currentTime = 0f;
-		this.isActive = false;
+		this();
 		this.settings = settings;
+
 	}
 	
-	public enum EffectType {
-		MOVEMENT, DAMAGE, HEALING
+
+	public EffectController getController() {
+		return getRetriever();
+	}
+
+	public void setController(EffectController retriever) {
+		this.setRetriever(retriever);
+	}
+
+	
+	protected void initialProcess() {
+		this.isActive = true;
+		this.setHasProcessedInitial(true);
 	}
 	
-	
-	
-	public void initialProcess(CharacterModel target) {
+	protected void processDuringActive(float delta) {
 		
 	}
-	public void completion(CharacterModel target) {
-		
-	}
 	
-	public boolean process(CharacterModel target, float delta) {
-		boolean isFinished = false;
-		if (currentTime >= settings.delayToActivate || settings.isInstantaneous) {
-			isActive = true;
-		}
-		if (currentTime >= (settings.duration + settings.delayToActivate) || settings.isInstantaneous) {
-			isFinished = true;
-		}
-		currentTime += delta;
-		return isFinished;
+	protected void completion() {
+		this.setHasProcessedCompletion(true);
 	}
 	
 	public float remainingDuration() {
-		if (currentTime <= this.settings.delayToActivate) {
-			return this.settings.duration;
+		if (getCurrentTime() <= this.settings.getDelayToActivate()) {
+			return this.settings.getDuration();
 		}
 		else {
-			return this.settings.duration - (this.currentTime - this.settings.delayToActivate);
+			return this.settings.getDuration() - (this.getCurrentTime() - this.settings.getDelayToActivate());
 		}
 	}
-
 	
+	public abstract String getType();
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Effect) {
+			return ((Effect) obj).uuid.equals(this.uuid); 
+		}
+		return super.equals(obj);
+	}
+
+
 	public float getCurrentTime() {
 		return currentTime;
 	}
 
-//	@Override
-//	public void write(Json json) {
-//		json.writeValue("isInstantaneous", isInstantaneous);
-//		json.writeValue("duration", duration);
-//		json.writeValue("delayToActivate", delayToActivate);
-//		json.writeValue("value", value);
-//	}
-//	
-//	
-//	@Override
-//	public void read(Json json, JsonValue jsonData) {
-//		isInstantaneous = json.readValue("isInstantaneous", Boolean.class, jsonData);
-//		if (isInstantaneous == null || isInstantaneous == true) {
-//			isInstantaneous = true;
-//			duration = 0f;
-//			delayToActivate = 0f;
-//		}
-//		else {
-//			isInstantaneous = false;
-//			duration = json.readValue("duration", Float.class, jsonData);
-//			Float delayToActivate = json.readValue("delayToActivate", Float.class, jsonData);
-//			if (delayToActivate != null) {
-//				this.delayToActivate = delayToActivate;
-//			}
-//			else 
-//			{
-//				this.delayToActivate = 0f;
-//			}
-//		}
-//		value = json.readValue("value", Integer.class, jsonData);
-//		
-//		currentTime = 0f;
-//		this.isActive = false;
-//	}
-//	
+	public void setCurrentTime(float currentTime) {
+		this.currentTime = currentTime;
+	}
+
+	public boolean hasProcessedInitial() {
+		return hasProcessedInitial;
+	}
+
+	public void setHasProcessedInitial(boolean hasProcessedInitial) {
+		this.hasProcessedInitial = hasProcessedInitial;
+	}
+
+	public boolean isForceEnd() {
+		return forceEnd;
+	}
+
+	public void setForceEnd(boolean forceEnd) {
+		this.forceEnd = forceEnd;
+	}
+
+	public boolean hasProcessedCompletion() {
+		return hasProcessedCompletion;
+	}
+
+	public void setHasProcessedCompletion(boolean hasProcessedCompletion) {
+		this.hasProcessedCompletion = hasProcessedCompletion;
+	}
+
+	public EffectController getRetriever() {
+		return retriever;
+	}
+
+	public void setRetriever(EffectController retriever) {
+		this.retriever = retriever;
+	}
+	
+	public boolean isActive() {
+		return this.isActive;
+	}
 }

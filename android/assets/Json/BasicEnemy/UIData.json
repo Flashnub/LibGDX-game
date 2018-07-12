@@ -4,10 +4,67 @@
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "Idle",
-			"numberOfFrames": 1,
-			"duration": 0.05,
+			"numberOfWindupFrames": 1,
 			"playMode": NORMAL
 		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "IdleDrawn",
+			"numberOfWindupFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Death",
+			"numberOfWindupFrames": 1,
+			"numberOfActiveFrames": 1,
+			"numberOfCooldownFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "BasicAttack",
+			"numberOfWindupFrames": 1,
+			"numberOfActiveFrames": 1,
+			"numberOfCooldownFrames": 1,
+			"frameRate": 5,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Stagger",
+			"numberOfWindupFrames": 1,
+			"numberOfActiveFrames": 1,
+			"numberOfCooldownFrames": 1,
+			"playMode": NORMAL
+		}		
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "AerialStagger",
+			"numberOfWindupFrames": 1,
+			"numberOfActiveFrames": 1,
+			"numberOfCooldownFrames": 1,
+			"playMode": NORMAL
+		}		
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Walk",
+			"numberOfWindupFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Backwalk",
+			"numberOfWindupFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Wakeup",
+			"frameRate": 24,
+			"numberOfFrames": 4,
+			"playMode": NORMAL
+		}		
 	]
 	"masterAtlasPath": "Sprites/BasicEnemy/textures.atlas"
 }

@@ -1,0 +1,25 @@
+{
+	"class": com.mygdx.game.model.characters.NPCProperties,
+	"UUID": "BasicNPC",
+	"storyDialogues": {
+		"0-0": {
+			"class": com.mygdx.game.model.actions.nonhostile.NormalDialogueSettings,
+			"writtenDialogue": "Hello (NPC)",
+			"UUIDForNextDialogue": "Test1",
+			"UUIDForNextCharacterToTalk": "Player"
+		}
+		
+	},
+	"conditionalDialogues": [
+		{
+			"class": com.mygdx.game.model.actions.nonhostile.InjuryDialogueSettings,
+			"writtenDialogue": "Ouch (Enemy)",
+			"minimumRatio": 0.5,
+			"maximumRatio": 0.6
+		}
+	],
+	"externalConditionalDialogues": {
+	
+	}
+	
+}

@@ -1,23 +1,17 @@
 {
-	"PlayerDash": {
+	"Dash": {
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
+		"sourceRespectEntityCollisions": false,
 		"sourceEffectSettings": [
 			{
-				"class": "com.mygdx.game.model.effects.MovementEffectSettings",
+				"class": "com.mygdx.game.model.effects.XMovementEffectSettings",
 				"duration": 0.5,
-				"delayToActivate": 0,
+				"delayToActivate": 0.0,
 				"isInstantaneous": false,
+				"applyOnlyIfInjuredStaggered": false,
 				"value": 0,
-				"velocity": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": 100,
-					"y": 0
-				}
-				"acceleration": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": -200,
-					"y": 0
-				}
+				"velocity": 400,
+				"acceleration": -800
 			}
 		]
 	}
@@ -25,21 +19,58 @@
 		"class": "com.mygdx.game.model.actions.AbilitySettings",
 		"sourceEffectSettings": [
 			{
-				"class": "com.mygdx.game.model.effects.MovementEffectSettings",
-				"duration": 0.5,
-				"delayToActivate": 0,
-				"isInstantaneous": false,
+				"class": "com.mygdx.game.model.effects.BlockEffectSettings",
 				"value": 0,
-				"velocity": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": 100,
-					"y": 0
-				}
-				"acceleration": {
-					"class": "com.badlogic.gdx.math.Vector2",
-					"x": -200,
-					"y": 0
-				}
+				"isInstantaneous": false,
+				"perfectBlockTime": 0.3,
+				"duration": 1
+			}
+		]
+	}
+	"CrouchToIdle": {
+		"class": "com.mygdx.game.model.actions.AbilitySettings"
+	}
+	"IdleToCrouch": {
+		"class": "com.mygdx.game.model.actions.AbilitySettings"
+	}
+	"BasicProjectileAttack": {
+		"class": "com.mygdx.game.model.actions.AbilitySettings",
+		"sourceEffectSettings": [
+	
+		]
+	}
+	"Stagger": {
+		"class": "com.mygdx.game.model.actions.AbilitySettings",
+	}
+	"AerialStagger": {
+		"class": "com.mygdx.game.model.actions.AbilitySettings",
+		"activeTillDisruption": true
+	}
+	"Wakeup": {
+		"class": "com.mygdx.game.model.actions.AbilitySettings",
+		"sourceEffectSettings": [
+			{
+				"class": "com.mygdx.game.model.effects.InjuryImmunityEffectSettings",
+				"duration": 1,
+				"isInstantaneous": false,
+			}
+		]
+	}
+	"PlayerTensionStagger": {
+		"class": "com.mygdx.game.model.actions.AbilitySettings",
+	}
+	"Death": {
+		"class": "com.mygdx.game.model.actions.AbilitySettings",
+	}
+	"BasicEnemyTensionStagger": {
+		"class": "com.mygdx.game.model.actions.AbilitySettings",
+	}
+	"Health Potion": {
+		"class": "com.mygdx.game.model.actions.AbilitySettings",
+		"sourceEffectSettings": [
+			{
+				"class": com.mygdx.game.model.effects.HealingEffectSettings,
+				"value": 10
 			}
 		]
 	}

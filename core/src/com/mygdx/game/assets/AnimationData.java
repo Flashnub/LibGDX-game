@@ -7,8 +7,10 @@ import com.badlogic.gdx.utils.JsonValue;
 
 public class AnimationData implements Serializable {
 	String name;
-	int numberOfFrames;
-	float duration;
+	int numberOfWindupFrames;
+	int numberOfActiveFrames;
+	int numberOfCooldownFrames;
+	float frameRate;
 	PlayMode playMode;
 	
 	public AnimationData() {
@@ -19,12 +21,20 @@ public class AnimationData implements Serializable {
 		return name;
 	}
 
-	public int getNumberOfFrames() {
-		return numberOfFrames;
+	public int getNumberOfWindupFrames() {
+		return numberOfWindupFrames;
 	}
 	
-	public float getDuration() {
-		return duration;
+	public int getNumberOfActiveFrames() {
+		return numberOfActiveFrames;
+	}
+
+	public int getNumberOfCooldownFrames() {
+		return numberOfCooldownFrames;
+	}
+
+	public float getFrameRate() {
+		return frameRate;
 	}
 	
 	public static String animationString(String name, AnimationData animationData) {
@@ -39,8 +49,10 @@ public class AnimationData implements Serializable {
 	public void write(Json json) {
 		// TODO Auto-generated method stub
 		json.writeValue("name", name);
-		json.writeValue("numberOfFrames", numberOfFrames);
-		json.writeValue("duration", duration);
+		json.writeValue("numberOfWindupFrames", numberOfWindupFrames);
+		json.writeValue("numberOfActiveFrames", numberOfActiveFrames);
+		json.writeValue("numberOfCooldownFrames", numberOfCooldownFrames);
+		json.writeValue("frameRate", frameRate);
 		json.writeValue("playMode", playMode);
 	}
 
@@ -48,8 +60,22 @@ public class AnimationData implements Serializable {
 	public void read(Json json, JsonValue jsonData) {
 		// TODO Auto-generated method stub
 		name = json.readValue("name", String.class, jsonData);
-		numberOfFrames = json.readValue("numberOfFrames", Integer.class, jsonData);
-		duration = json.readValue("duration", Float.class, jsonData);
+		
+		Integer numberOfWindupFrames = json.readValue("numberOfWindupFrames", Integer.class, jsonData);
+		Integer numberOfActiveFrames = json.readValue("numberOfActiveFrames", Integer.class, jsonData);
+		Integer numberOfCooldownFrames = json.readValue("numberOfCooldownFrames", Integer.class, jsonData);
+
+		this.numberOfWindupFrames = numberOfWindupFrames != null ? numberOfWindupFrames.intValue() : 0;
+		this.numberOfActiveFrames = numberOfActiveFrames != null ? numberOfActiveFrames.intValue() : 0;
+		this.numberOfCooldownFrames = numberOfCooldownFrames != null ? numberOfCooldownFrames.intValue() : 0;
+
+		Float frameRate = json.readValue("frameRate", Float.class, jsonData);
+		if (frameRate != null) {
+			this.frameRate = 1f / frameRate;
+		}
+		else {
+			this.frameRate = 1f / 24f;
+		}
 		playMode = json.readValue("playMode", PlayMode.class, jsonData);
 	}
 	

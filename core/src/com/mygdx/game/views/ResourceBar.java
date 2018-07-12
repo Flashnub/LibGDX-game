@@ -1,5 +1,6 @@
 package com.mygdx.game.views;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -19,7 +20,7 @@ public class ResourceBar extends Actor{
 			public TextureRegion getForegroundSprite() {
 				TextureAtlas atlas = HUDUtils.masterAtlas;
 				if (atlas != null) {
-					return atlas.findRegion("health-bar");
+					return atlas.findRegion("Health_bar_Full");
 				}
 				return null;
 			}
@@ -28,7 +29,7 @@ public class ResourceBar extends Actor{
 			public TextureRegion getIntermediateForegroundSprite() {
 				TextureAtlas atlas = HUDUtils.masterAtlas;
 				if (atlas != null) {
-					return atlas.findRegion("health-bar-intermediate");
+					return atlas.findRegion("Health_bar_Hurt");
 				}
 				return null;
 			}
@@ -37,20 +38,89 @@ public class ResourceBar extends Actor{
 			public TextureRegion getBackgroundSprite() {
 				TextureAtlas atlas = HUDUtils.masterAtlas;
 				if (atlas != null) {
-					return atlas.findRegion("health-bar-background");
+					return atlas.findRegion("Health_bar_Empty");
 				}
 				return null;
 			}
-		}, PlayerWill {
-
-		}, PlayerEnergy {
-
+			
+			@Override 
+			public Color getTintColor(float ratio) {
+				return ratio > 0.6f ? Color.WHITE : new Color(1, Math.max((1 - ratio), 0.1f), Math.max((1 - ratio), 0.1f), 1);
+			}
+			
+			@Override
+			public Vector2 originCoefficients() {
+				return new Vector2(0.1f, 0.8f);
+			}			
+			
+			public Float fixedHeight() {
+				return 30f;
+			}
+			
+//			public Float proportionalWidth() {
+//				return 0.25f;
+//			}
+			
+			public Float fixedWidth() {
+				return 483f;
+			}
+			
+		}, PlayerTension {
+			@Override
+			public TextureRegion getForegroundSprite() {
+				TextureAtlas atlas = HUDUtils.masterAtlas;
+				if (atlas != null) {
+					return atlas.findRegion("Meter_bar_Full");
+				}
+				return null;
+			}
+			
+			@Override
+			public TextureRegion getIntermediateForegroundSprite() {
+				TextureAtlas atlas = HUDUtils.masterAtlas;
+				if (atlas != null) {
+					return atlas.findRegion("Meter_bar_Empty");
+				}
+				return null;
+			}
+			
+			@Override
+			public TextureRegion getBackgroundSprite() {
+				TextureAtlas atlas = HUDUtils.masterAtlas;
+				if (atlas != null) {
+					return atlas.findRegion("Meter_bar_Empty");
+				}
+				return null;
+			}
+						
+			@Override 
+			public Color getTintColor(float ratio) {
+				return new Color(1, Math.max((1 - ratio), 0.1f), Math.max((1 - ratio), 0.1f), 1);
+			}
+			
+			@Override
+			public Vector2 originCoefficients() {
+				return new Vector2(0.1f, 0.8f);
+			}
+			
+			public Float fixedHeight() {
+				return 20f;
+			}
+			
+			public Float proportionalWidth() {
+				return 0.3f;
+			}
+			
+			public Vector2 originOffset() {
+				return new Vector2(0, -35f);
+			}
+			
 		}, EnemyHealth {
 			@Override
 			public TextureRegion getForegroundSprite() {
 				TextureAtlas atlas = HUDUtils.masterAtlas;
 				if (atlas != null) {
-					return atlas.findRegion("enemy-health-bar");
+					return atlas.findRegion("Enemy_health_bar");
 				}
 				return null;
 			}
@@ -59,7 +129,7 @@ public class ResourceBar extends Actor{
 			public TextureRegion getIntermediateForegroundSprite() {
 				TextureAtlas atlas = HUDUtils.masterAtlas;
 				if (atlas != null) {
-					return atlas.findRegion("enemy-health-bar-intermediate");
+					return atlas.findRegion("Enemy_health_bar_hurt");
 				}
 				return null;
 			}
@@ -68,13 +138,33 @@ public class ResourceBar extends Actor{
 			public TextureRegion getBackgroundSprite() {
 				TextureAtlas atlas = HUDUtils.masterAtlas;
 				if (atlas != null) {
-					return atlas.findRegion("enemy-health-bar-background");
+					return atlas.findRegion("Enemy_health_bar_background");
 				}
 				return null;
 			}
 			
+			@Override 
+			public Color getTintColor(float ratio) {
+				return ratio > 0.6f ? Color.WHITE : new Color(1, Math.max((1 - ratio), 0.1f), Math.max((1 - ratio), 0.1f), 1);
+			}
 			
+			public Float fixedHeight() {
+				return 5f;
+			}
+			
+			public Float fixedWidth() {
+				return 30f;
+			}
+			
+			public boolean shouldUseHelper() {
+				return true;
+			}
+
 		};
+		
+		public boolean shouldUseHelper() {
+			return false;
+		}
 		
 		public String getAffiliation() {
 			return this.toString();
@@ -83,7 +173,7 @@ public class ResourceBar extends Actor{
 		public TextureRegion getForegroundSprite() {
 			TextureAtlas atlas = HUDUtils.masterAtlas;
 			if (atlas != null) {
-				return atlas.findRegion("health-bar-background");
+				return atlas.findRegion("Health_bar_Full");
 			}
 			return null;
 		}
@@ -91,7 +181,7 @@ public class ResourceBar extends Actor{
 		public TextureRegion getIntermediateForegroundSprite() {
 			TextureAtlas atlas = HUDUtils.masterAtlas;
 			if (atlas != null) {
-				return atlas.findRegion("health-bar-intermediate");
+				return atlas.findRegion("Health_bar_Hurt");
 			}
 			return null;
 		}
@@ -99,9 +189,37 @@ public class ResourceBar extends Actor{
 		public TextureRegion getBackgroundSprite() {
 			TextureAtlas atlas = HUDUtils.masterAtlas;
 			if (atlas != null) {
-				return atlas.findRegion("health-bar-background");
+				return atlas.findRegion("Health_bar_Empty");
 			}
 			return null;
+		}
+		
+		public Color getTintColor(float ratio) {
+			return Color.WHITE;
+		}
+		
+		public Vector2 originCoefficients() {
+			return new Vector2();
+		}
+		
+		public Vector2 originOffset() {
+			return new Vector2();
+		}
+		
+		public Float fixedHeight() {
+			return 0f;
+		}
+		
+		public Float fixedWidth() {
+			return 0f;
+		}
+		
+		public Float proportionalWidth() {
+			return 0.0f;
+		}
+		
+		public Float proportionalHeight() {
+			return 0.0f;
 		}
 	}
 	
@@ -120,45 +238,87 @@ public class ResourceBar extends Actor{
 	boolean isAnimating = false;
 	boolean isShowingIntermediate = false;
 	
-	public static final float enemyHealthBarWidth = 30f;
-	
+
 	public ResourceBar(ResourceBarType type, Character character, CoordinatesHelper helper) {
 		this.owner = character;
 		this.type = type;
 		this.foreground = type.getForegroundSprite();
 		this.intermediateForeground = type.getIntermediateForegroundSprite();
 		this.background = type.getBackgroundSprite();
-		this.expectedRatio = this.owner.getCharacterData().getHealthRatio();
+		this.expectedRatio = this.getRatio();
 		this.differenceInRatio = 0f;
 		this.helper = helper;
 	}
 	
 	public void layoutWithViewPort(Viewport viewPort, Batch batch) {
-		if (type.getAffiliation().equals(ResourceBarType.PlayerHealth.getAffiliation())) {
-			this.setX(viewPort.getScreenWidth() * 0.1f);
-			this.setY(viewPort.getScreenHeight() * 0.8f);
-			this.setWidth(viewPort.getScreenWidth() * 0.3f);
-			this.setHeight(30);
+		if (this.type.shouldUseHelper()) {
+			Vector2 screenOffset = helper.getScreenCoordinatesForCharacter(owner);
+			this.setX(screenOffset.x);
+			this.setY(screenOffset.y);
 		}
-		else if (type.getAffiliation().equals(ResourceBarType.PlayerWill.getAffiliation())) {
-			
+		else 
+		{
+			this.setX(viewPort.getScreenWidth() * type.originCoefficients().x + type.originOffset().x);
+			this.setY(viewPort.getScreenHeight() * type.originCoefficients().y + type.originOffset().y);
 		}
-		else if (type.getAffiliation().equals(ResourceBarType.PlayerWill.getAffiliation())) {
-			
+
+		
+		//Width.
+		if (type.fixedWidth() != null && type.proportionalWidth() != null) {
+			this.setWidth(viewPort.getScreenWidth() * type.proportionalWidth() + type.fixedWidth());
 		}
-		else if (type.getAffiliation().equals(ResourceBarType.EnemyHealth.getAffiliation())) {
-			Vector2 enemyCoordinates = this.helper.getScreenCoordinatesForCharacter(owner);
-			this.setX(enemyCoordinates.x);
-			this.setY(enemyCoordinates.y);
-			this.setWidth(ResourceBar.enemyHealthBarWidth);
-			this.setHeight(5);
+		else if (type.fixedWidth() != null){
+			this.setWidth(type.fixedWidth());
 		}
-	
+		else {
+			this.setWidth(viewPort.getScreenWidth() * type.proportionalWidth());
+		}
+		
+		//Height.
+		if (type.fixedHeight() != null && type.proportionalHeight() != null) {
+			this.setHeight(viewPort.getScreenHeight() * type.proportionalHeight() + type.fixedHeight());
+		}
+		else if (type.fixedHeight() != null) {
+			this.setHeight(type.fixedHeight());
+		}
+		else {
+			this.setHeight(viewPort.getScreenHeight() * type.proportionalHeight() + type.fixedHeight());
+		}
+		
+//		if (type.getAffiliation().equals(ResourceBarType.PlayerHealth.getAffiliation())) {
+//
+//		}
+//		else if (type.getAffiliation().equals(ResourceBarType.PlayerTension.getAffiliation())) {
+//			this.setX(viewPort.getScreenWidth() * type.originCoefficients().x);
+//			this.setY(viewPort.getScreenHeight() * type.originCoefficients().y - 35);
+//			this.setWidth(viewPort.getScreenWidth() * 0.25f);
+//			this.setHeight(20);
+//		}
+//		else if (type.getAffiliation().equals(ResourceBarType.EnemyHealth.getAffiliation())) {
+//			Vector2 enemyCoordinates = this.helper.getScreenCoordinatesForCharacter(owner);
+//			this.setX(enemyCoordinates.x);
+//			this.setY(enemyCoordinates.y);
+//			this.setWidth(ResourceBar.enemyHealthBarWidth);
+//			this.setHeight(5);
+//		}
+
+		float intermediateRatio = 0f;
+		float solidRatio = 0f;
+		if (differenceInRatio < 0) {
+			intermediateRatio = (this.expectedRatio);
+			solidRatio = (this.expectedRatio + this.differenceInRatio);
+		}
+		else {
+			intermediateRatio = (this.expectedRatio + this.differenceInRatio);
+			solidRatio = (this.expectedRatio);
+		}
 		batch.draw(background, this.getX(), this.getY(), this.getWidth(), this.getHeight());
 		if (this.isShowingIntermediate) {
-			batch.draw(intermediateForeground, this.getX(), this.getY(), this.getWidth() * (this.expectedRatio + differenceInRatio), this.getHeight());
+			batch.draw(intermediateForeground, this.getX(), this.getY(), this.getWidth() * intermediateRatio, this.getHeight());
 		}
-		batch.draw(foreground, this.getX(), this.getY(), this.getWidth() * this.expectedRatio, this.getHeight());
+		batch.setColor(type.getTintColor(this.getRatio()));
+		batch.draw(foreground, this.getX(), this.getY(), this.getWidth() * solidRatio, this.getHeight());
+		batch.setColor(Color.WHITE);
 	}
 	
 	@Override
@@ -170,14 +330,14 @@ public class ResourceBar extends Actor{
 	@Override
 	public void act(float delta) {
 		super.act(delta);
-		if (this.owner.getCharacterData().getHealthRatio() != expectedRatio) {
-			this.differenceInRatio += expectedRatio - this.owner.getCharacterData().getHealthRatio();
-			this.expectedRatio = this.owner.getCharacterData().getHealthRatio();
+		if (this.getRatio() != expectedRatio) {
+			this.differenceInRatio += expectedRatio - this.getRatio();
+			this.expectedRatio = this.getRatio();
 			this.animationTime = 0f;
 			this.isAnimating = false;
 			this.isShowingIntermediate = true;
 		}
-		else if (this.differenceInRatio > 0f) {
+		else if (this.differenceInRatio != 0f) {
 			animationTime += delta;
 			if (animationTime > delayToAnimate) {
 				this.isAnimating = true;
@@ -199,5 +359,13 @@ public class ResourceBar extends Actor{
 		return super.equals(object);
 	}
 	
+	private float getRatio() {
+		if (this.type.equals(ResourceBarType.PlayerTension)) {
+			return this.owner.getCharacterData().getTensionRatio();
+		}
+		else {
+			return this.owner.getCharacterData().getHealthRatio();
+		}
+	}
 	
 }

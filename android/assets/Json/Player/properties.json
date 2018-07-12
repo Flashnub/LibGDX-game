@@ -3,43 +3,118 @@
 	"maxHealth": 20,
 	"maxWill": 20,
 	"maxStability": 5,
+	"maxTension": 4,
 	"attack": 1,
-	actions: {
-		"PlayerDash": {
-			"class": com.mygdx.game.model.actions.ActionSequence,
-			"actionKeys": [
-				{
-					"class": com.mygdx.game.model.actions.ActionSegmentKey,
-					"keys": [
-						{
-							"class": com.mygdx.game.wrappers.StringWrapper,
-							"value": "PlayerDash"
-						}
-					],
-					"typeOfAction": Ability
-				}
-			]
-			"windUpState": "Idle"
-			"actingState": "Idle"
-			"cooldownState": "Idle"
+	"xCollisionOffsetModifier": 70,
+	"collisionWidthCoefficient": 0.2,
+	"collisionHeightCoefficient": 0.7,
+	"useDefaultStagger": true,
+	"useDefaultTensionStagger": false,
+	"horizontalSpeed": 175,
+	"defaultHurtboxProperties":  [
+		{
+			"class": "com.badlogic.gdx.math.Rectangle",
+			"x":15,
+			"y":5, 
+			"width": 45
+			"height": 75
 		},
-		"PlayerAttack": {
+		{
+			"class": "com.badlogic.gdx.math.Rectangle",
+			"x":15,
+			"y":80, 
+			"width": 45
+			"height": 75
+		},
+		{
+			"class": "com.badlogic.gdx.math.Rectangle",
+			"x":23,
+			"y":155, 
+			"width": 25
+			"height": 25
+		},
+		{
+			"class": "com.badlogic.gdx.math.Rectangle",
+			"x":5,
+			"y":-15, 
+			"width": 65
+			"height": 20
+		}
+	]
+	"actions": {
+		"CrouchToIdle": {
 			"class": com.mygdx.game.model.actions.ActionSequence,
-			"actionKeys": [
+			"actionKey": {
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "CrouchToIdle",
+				"typeOfAction": Ability
+			}
+			"inputs": [
+				["N/A"]
+			]
+		},
+		"IdleToCrouch": {
+			"class": com.mygdx.game.model.actions.ActionSequence,
+			"actionKey": {
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "IdleToCrouch",
+				"typeOfAction": Ability
+			}
+			"inputs": [
+				["N/A"]
+			]
+		},
+		"Dash": {
+			"class": com.mygdx.game.model.actions.ActionSequence,
+			"actionKey": {
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "Dash",
+				"typeOfAction": Ability
+			}
+			"inputs": [
+				["MOVEMENTRELEASE"]
+			]
+			"conditionSettings": [
 				{
-					"class": com.mygdx.game.model.actions.ActionSegmentKey,
-					"keys": [
-						{
-							"class": com.mygdx.game.wrappers.StringWrapper,
-							"value": "PlayerAttack"
-						}
-					],
-					"typeOfAction": Attack
+					"class": com.mygdx.game.model.actions.SprintActionConditionSettings,
+					"onlyIfSprinting": false
 				}
 			]
-			"windUpState": "Idle"
-			"actingState": "Idle"
-			"cooldownState": "Idle"
+		},
+		"Block": {
+			"class": com.mygdx.game.model.actions.ActionSequence,
+			"actionKey": {
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "Block",
+				"typeOfAction": Ability
+			}
+			"inputs": [
+				["SP"],
+				["SPUP"],
+				["SPLEFT"],
+				["SPDOWN"],
+				["SPDOWNRIGHT"],
+				["SPDOWNLEFT"],
+				["SPRIGHT"],
+				["SPUPLEFT"],
+				["SPUPRIGHT"]
+				
+			]
+		},
+		"Death": {
+			"class": com.mygdx.game.model.actions.ActionSequence,
+			"actionKey": {
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "Death",
+				"typeOfAction": WorldAttack
+			}
 		}
-	}
+		
+	},
+	"weaponKeys": [
+		{
+			"class": com.mygdx.game.wrappers.StringWrapper,
+			"value": "Staff"
+		}
+	]
 }

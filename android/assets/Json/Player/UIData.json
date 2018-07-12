@@ -4,30 +4,165 @@
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "Idle",
-			"numberOfFrames": 1,
-			"duration": 0.05,
+			"numberOfWindupFrames": 1,
+			"playMode": LOOP
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Crouch",
+			"numberOfWindupFrames": 1,
 			"playMode": NORMAL
-		},
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "CrouchToIdle",
+			"numberOfWindupFrames": 3,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "IdleToCrouch",
+			"numberOfWindupFrames": 3,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Fall",
+			"numberOfWindupFrames": 3,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Jump",
+			"numberOfWindupFrames": 5,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Run",
+			"numberOfWindupFrames": 10,
+			"playMode": LOOP
+		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
 			"name": "Walk",
-			"numberOfFrames": 7,
-			"duration": 0.06667,
-			"playMode": LOOP
-		},
+			"numberOfWindupFrames": 10,
+			"playMode": LOOP,
+			"frameRate": 12.5
+		}
 		{
 			"class": com.mygdx.game.assets.AnimationData,
-			"name": "Backwalk",
-			"numberOfFrames": 11,
-			"duration": 0.07692,
-			"playMode": LOOP
-		},
-		{
-			"class": com.mygdx.game.assets.AnimationData,
-			"name": "Block",
-			"numberOfFrames": 4,
-			"duration": 0.05,
+			"name": "2S",
+			"numberOfWindupFrames": 4,
+			"numberOfActiveFrames": 4,
+			"numberOfCooldownFrames": 2,
 			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "2H",
+			"numberOfWindupFrames": 10,
+			"numberOfActiveFrames": 3,
+			"numberOfCooldownFrames": 4,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "2K",
+			"numberOfWindupFrames": 4,
+			"numberOfActiveFrames": 1,
+			"numberOfCooldownFrames": 4,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "2P",
+			"numberOfWindupFrames": 2,
+			"numberOfActiveFrames": 1,
+			"numberOfCooldownFrames": 2,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "5H",
+			"numberOfWindupFrames": 5,
+			"numberOfActiveFrames": 3,
+			"numberOfCooldownFrames": 4,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "5S",
+			"numberOfWindupFrames": 6,
+			"numberOfActiveFrames": 1,
+			"numberOfCooldownFrames": 2,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "5P",
+			"numberOfWindupFrames": 4,
+			"numberOfActiveFrames": 1,
+			"numberOfCooldownFrames": 2,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "5K",
+			"numberOfWindupFrames": 3,
+			"numberOfActiveFrames": 2,
+			"numberOfCooldownFrames": 4,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "6H",
+			"numberOfWindupFrames": 7,
+			"numberOfActiveFrames": 2,
+			"numberOfCooldownFrames": 4,
+			"playMode": NORMAL,
+			"frameRate": 16
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "6S",
+			"numberOfWindupFrames": 6,
+			"numberOfActiveFrames": 2,
+			"numberOfCooldownFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "6P",
+			"numberOfWindupFrames": 5,
+			"numberOfActiveFrames": 2,
+			"numberOfCooldownFrames": 2,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "J5K",
+			"numberOfWindupFrames": 4,
+			"numberOfActiveFrames": 2,
+			"numberOfCooldownFrames": 2,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "J5S",
+			"numberOfWindupFrames": 5,
+			"numberOfActiveFrames": 2,
+			"numberOfCooldownFrames": 4,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "J5H",
+			"numberOfWindupFrames": 4,
+			"numberOfActiveFrames": 2,
+			"numberOfCooldownFrames": 3,
+			"playMode": NORMAL,
+			"frameRate": 17
 		}
 	]
 	"masterAtlasPath": "Sprites/Player/textures.atlas"

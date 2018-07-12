@@ -2,13 +2,26 @@ package com.mygdx.game.model.effects;
 
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.mygdx.game.model.effects.Effect.EffectType;
 
-public class HealingEffectSettings extends EffectSettings {
+public class HealingEffectSettings extends EntityEffectSettings {
+	
+	public void fillInDefaults() {
+		super.fillInDefaults();
+		this.setType(HealingEffect.type);
+	}
+	
 	
 	@Override
 	public void read(Json json, JsonValue jsonData) {
 		super.read(json, jsonData);
-		this.type = EffectType.HEALING;
+		this.setType(HealingEffect.type);
 	}
+	
+	@Override
+	public HealingEffectSettings deepCopy() {
+		HealingEffectSettings copy = new HealingEffectSettings();
+		this.setBaseFieldsForSettings(copy);
+		return copy;
+	}
+	
 }

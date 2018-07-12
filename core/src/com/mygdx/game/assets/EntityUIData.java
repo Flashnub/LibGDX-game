@@ -38,4 +38,8 @@ public class EntityUIData implements Serializable {
 	public ArrayList<AnimationData> getAnimations() {
 		return animations;
 	}
+
+	public String getMasterAtlasPath() {
+		return masterAtlasPath;
+	}
 }

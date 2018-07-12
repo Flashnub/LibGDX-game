@@ -1,0 +1,49 @@
+{
+	"class": com.mygdx.game.assets.EntityUIData,
+	"animations": [
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "Idle",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "DeathW",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}		
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "DeathA",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "DeathC",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "BasicProjectileAttackW",
+			"numberOfFrames": 3,
+			"playMode": NORMAL
+		}
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "BasicProjectileAttackA",
+			"numberOfFrames": 1,
+			"playMode": NORMAL
+		}		
+		{
+			"class": com.mygdx.game.assets.AnimationData,
+			"name": "BasicProjectileAttackC",
+			"numberOfFrames": 2,
+			"playMode": NORMAL
+		}	
+	]
+	"masterAtlasPath": "Sprites/BasicGun/textures.atlas"
+
+}

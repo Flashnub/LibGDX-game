@@ -3,88 +3,140 @@ package com.mygdx.game.model.projectiles;
 import java.util.UUID;
 
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.constants.JSONController;
 import com.mygdx.game.model.characters.EntityUIModel;
+import com.mygdx.game.model.actions.HitTracker;
 import com.mygdx.game.model.characters.Character.CharacterModel;
-import com.mygdx.game.model.effects.Effect;
+import com.mygdx.game.model.characters.CollisionCheck;
+import com.mygdx.game.model.characters.EntityCollisionData;
+import com.mygdx.game.model.characters.EntityModel;
+import com.mygdx.game.model.characters.EntityUIDataType;
+import com.mygdx.game.model.effects.EntityEffect;
+import com.mygdx.game.model.effects.EffectController;
+import com.mygdx.game.model.effects.EffectInitializer;
+import com.mygdx.game.model.effects.EffectSettings;
+import com.mygdx.game.model.effects.XMovementEffectSettings;
+import com.mygdx.game.model.effects.YMovementEffectSettings;
 import com.mygdx.game.model.events.ActionListener;
+import com.mygdx.game.model.events.CollisionChecker;
+import com.mygdx.game.model.globalEffects.WorldEffect;
+import com.mygdx.game.model.globalEffects.WorldEffectSettings;
 import com.mygdx.game.utils.MathUtils;
 
-public class Projectile {
-//	
-//	public enum ProjectileState implements State {
-//		Active, Preactive;
-//		
-//		@Override
-//		public String getState() {
-//			return toString();
-//		}
-//	}
-
-	private final String activeState = "Active";
-	private final String preActiveState = "Preactive";
+public class Projectile extends EntityModel implements EffectController{
 	
-	private Rectangle bounds = new Rectangle();
-	private Vector2 velocity = new Vector2();
-	private int allegiance = 0;
-	private float stateTime = 0f;
-	private boolean firstTimeSetup = true;
+	private float currentTime;
+	private float activeTime;
 	private EntityUIModel projectileUIModel;
-	private String projectileState;
 	private String uuid;
 	private ActionListener actionListener;
+	private CharacterModel source;
 	private CharacterModel target;
 	private ProjectileSettings settings;
+	private String state;
+	private boolean didChangeState;
+	private boolean forceCooldown;
+	private boolean forceEnd;
+	private Array <HitTracker> charactersHit;
+
 	
-	public Projectile(String name, CharacterModel target, CharacterModel source, ActionListener actionListener)
+	public Projectile(String name, CharacterModel source, CharacterModel target, ActionListener actionListener, CollisionChecker collisionChecker)
 	{
-		this.settings = JSONController.projectiles.get(name);
-		this.bounds.x = source.getImageHitBox().x + settings.getPossibleOrigins().get(0).x;
-		this.bounds.y = source.getImageHitBox().y + settings.getPossibleOrigins().get(0).x;
-		this.projectileUIModel = new EntityUIModel(name);
-		this.projectileState = this.activeState;
+		super();
+		this.state = EntityModel.windupState;
+		this.forceCooldown = false;
+		this.forceEnd = false;
+		this.didChangeState = true;
+		this.currentTime = 0f;
+		this.activeTime = 0f;
+		this.settings = JSONController.projectiles.get(name).deepCopy();
+		this.widthCoefficient = this.settings.getWidthCoefficient();
+		this.heightCoefficient = this.settings.getHeightCoefficient();
+		this.acceleration.y = -this.settings.getGravity();
+
+		this.gameplayCollisionBox = new Rectangle(this.imageBounds);
+		this.projectileUIModel = new EntityUIModel(name, EntityUIDataType.PROJECTILE);
 		this.actionListener = actionListener;
+		this.setCollisionChecker(collisionChecker);
+		this.source = source;
 		this.target = target;
+		this.charactersHit = new Array <HitTracker>();
 		UUID id = UUID.randomUUID();
 		this.uuid = id.toString();
-	}
-	
-	public Projectile() {
-		this.projectileState = this.activeState;
-	}
-
-	public void update(float delta, TiledMapTileLayer collisionLayer) {
-		if (this.firstTimeSetup || this.settings.isTracks()) {
-			if (this.firstTimeSetup) {
-				this.firstTimeSetup = false;
-			}
-			this.determineAndSetVelocity(target, collisionLayer);
-		}
-		this.velocity.y -= this.settings.getGravity() * delta;
-		if (this.settings.isBounces()) {
-			this.movementWithCollisionDetection(delta, collisionLayer);
+		this.allegiance = source.getAllegiance();
+		
+		if (this.settings.isHasCollisionDetection()) {
+			this.setShouldRespectEntityCollision(true);
+			this.setShouldRespectObjectCollision(true);
+			this.setShouldRespectTileCollision(true);
+			this.setRespectingEntityCollision(true);
+			this.setRespectingObjectCollision(true);
+			this.setRespectingTileCollision(true);
 		}
 		else {
-			this.bounds.x = this.bounds.x + this.velocity.x * delta;
-			this.bounds.y = this.bounds.y + this.velocity.y * delta;
+			this.setShouldRespectEntityCollision(false);
+			this.setShouldRespectObjectCollision(false);
+			this.setShouldRespectTileCollision(false);
+			this.setRespectingEntityCollision(false);
+			this.setRespectingObjectCollision(false);
+			this.setRespectingTileCollision(false);
 		}
-		stateTime += delta;
-		projectileUIModel.setCurrentFrame(this, delta);
+	}
+
+	public void setStartingPosition(Vector2 originOverride, Vector2 originOffset) {
+		if (originOverride != null && originOffset != null) {
+			this.imageBounds.x = originOverride.x + originOffset.x;
+			this.imageBounds.y = originOverride.y + originOffset.y;
+		}
+		else if (originOffset != null){
+			this.imageBounds.x = source.getImageHitBox().x + (source.getImageHitBox().width / 2f) + originOffset.x;
+			this.imageBounds.y = source.getImageHitBox().y + (source.getImageHitBox().height / 2f) + originOffset.y;
+		}
+		else {
+			this.imageBounds.x = source.getImageHitBox().x + (source.getImageHitBox().width / 2f);
+			this.imageBounds.y = source.getImageHitBox().y + (source.getImageHitBox().height / 2f);
+		}
+		
+		this.gameplayCollisionBox.setX(this.getXOffsetModifier() + this.imageBounds.getX() + this.imageBounds.getWidth() * ((1f - this.widthCoefficient) / 2));
+		this.gameplayCollisionBox.setY(this.getyOffsetModifier() + this.imageBounds.getY() + this.imageBounds.getHeight() * ((1f - this.heightCoefficient) / 2));
+	}
+	
+	public void update(float delta, TiledMapTileLayer collisionLayer) {
+		currentTime += delta;
+		this.changeStateCheck();
+		if (this.state.equals(EntityModel.activeState)) {
+			activeTime += delta;
+		}
+		if (this.didChangeState || this.settings.isTracks()) {
+			this.didChangeState = false;
+			this.determineAndSetVelocity(target, collisionLayer);
+		}
+//		this.velocity.y -= this.settings.getGravity() * delta;
+		this.handleCollisionRespectChecks();
+		this.setGameplayCollisionSize(delta);
+//		if (this.settings.isHasCollisionDetection()) {
+		this.movementWithCollisionDetection(delta, collisionLayer);
+//		}
+//		else {
+//			moveWithoutCollisionDetection(delta);
+//		}
+		projectileUIModel.setCurrentFrame(this, delta, this.getVelocityAngle());
 		actionListener.processProjectile(this);
+		this.deletionCheck();
 	}
 
 	//Taken from http://stackoverflow.com/questions/2248876/2d-game-fire-at-a-moving-target-by-predicting-intersection-of-projectile-and-u
 	//Use this for linear traveling projectiles with a reasonably fast projectile speed. 
 	//This shouldn't be used for slow moving or pattern-based projectiles 
-	public Vector2 findInterceptPointWith(CharacterModel character, TiledMapTileLayer collisionLayer) {
-		Vector2 targetPosition = new Vector2(character.getGameplayHitBox().x + character.getGameplayHitBox().width / 2, character.getGameplayHitBox().y + character.getGameplayHitBox().height / 2); 
-		Vector2 targetVelocity = new Vector2(character.getVelocity().x, character.getVelocity().y);
-		Vector2 targetAcceleration = character.getAcceleration();
+	public Vector2 findInterceptPointWith(CharacterModel target, TiledMapTileLayer collisionLayer) {
+		Vector2 targetPosition = new Vector2(target.getGameplayCollisionBox().x + target.getGameplayCollisionBox().width / 2, target.getGameplayCollisionBox().y + target.getGameplayCollisionBox().height / 2); 
+		Vector2 targetVelocity = new Vector2(target.getVelocity().x, target.getVelocity().y);
+		Vector2 targetAcceleration = target.getAcceleration();
 		
-		Vector2 projectilePosition = new Vector2(bounds.x + (bounds.width / 2), bounds.y + (bounds.height / 2));
+		Vector2 projectilePosition = new Vector2(imageBounds.x + (imageBounds.width / 2), imageBounds.y + (imageBounds.height / 2));
 		
 		float xPositionDifference = targetPosition.x - projectilePosition.x;
 		float yPositionDifference = targetPosition.y - projectilePosition.y;
@@ -108,13 +160,15 @@ public class Projectile {
 			}
 			if (t > 0) {
 				//YPosition should never be negative.
-				float xTimeTillCollision = character.howLongTillXCollision(t, collisionLayer);
+				float xTimeTillCollision = target.howLongTillXCollision(t, collisionLayer);
 				float xTimeTillAccelStops = Float.MAX_VALUE;
-				if (character.getCurrentMovement() != null) {
-					xTimeTillAccelStops = character.getCurrentMovement().remainingDuration();
+				if (target.getXMove() != null) {
+					xTimeTillAccelStops = target.getXMove().remainingDuration();
 				}
 				float xTime = Math.min(xTimeTillCollision, xTimeTillAccelStops);
-				float yTimeTillCollision = character.howLongTillYCollision(t, collisionLayer);
+				float yTimeTillCollision = target.howLongTillYCollision(t, collisionLayer);
+//				System.out.println(xTime);
+//				System.out.println(yTimeTillCollision);
 				solution = new Vector2((targetPosition.x) +  ((targetVelocityX * xTime) + (.5f * targetAcceleration.x * xTime * xTime)),
 										(targetPosition.y) + ((targetVelocityY * yTimeTillCollision) + (.5f * targetAcceleration.y * yTimeTillCollision * yTimeTillCollision)));
 			}
@@ -126,166 +180,215 @@ public class Projectile {
 		return solution;
 	}
 	
-	public void determineAndSetVelocity(CharacterModel character, TiledMapTileLayer collisionLayer) {
-		Vector2 expectedPositionOfTarget;
-		if (this.settings.isUseSmartAim() && !this.settings.isTracks()) {
-			expectedPositionOfTarget = this.findInterceptPointWith(character, collisionLayer);
+	public void determineAndSetVelocity(CharacterModel target, TiledMapTileLayer collisionLayer) {
+		if (this.settings.getAngleOfVelocity() != null) {
+			boolean isTargetToLeft = source.isTargetToLeft(target);
+			float angleOfVelocity = isTargetToLeft ? 180f - this.settings.getAngleOfVelocity() : this.settings.getAngleOfVelocity();
+			float angleInRadians = (float) Math.toRadians(angleOfVelocity);
+			float xVelocity = (float) (this.projectileSpeed() * Math.cos(angleInRadians));
+			float yVelocity = (float) (this.projectileSpeed() * Math.sin(angleInRadians));
+			
+			this.velocity.x = xVelocity;
+			this.velocity.y = yVelocity;
+		}
+		else if (this.settings.inheritAngleFromSource()) {
+			boolean isTargetToLeft = source.isTargetToLeft(target);
+			float angleOfVelocity = isTargetToLeft ? 180f - this.source.convertTurnAngleToFloat() : this.source.convertTurnAngleToFloat();
+			float angleInRadians = (float) Math.toRadians(angleOfVelocity);
+			float xVelocity = (float) (this.projectileSpeed() * Math.cos(angleInRadians));
+			float yVelocity = (float) (this.projectileSpeed() * Math.sin(angleInRadians));
+			
+			this.velocity.x = xVelocity;
+			this.velocity.y = yVelocity;
 		}
 		else {
-			expectedPositionOfTarget = new Vector2(character.getGameplayHitBox().x + character.getGameplayHitBox().width / 2, character.getGameplayHitBox().y + character.getGameplayHitBox().height / 2);
+			Vector2 expectedPositionOfTarget;
+
+			if (this.settings.isUseSmartAim() && !this.settings.isTracks()) {
+				expectedPositionOfTarget = this.findInterceptPointWith(target, collisionLayer);
+			}
+			else {
+				expectedPositionOfTarget = new Vector2(target.getGameplayCollisionBox().x + target.getGameplayCollisionBox().width / 2, target.getGameplayCollisionBox().y + target.getGameplayCollisionBox().height / 2);
+			}
+			Vector2 projectilePosition = new Vector2(imageBounds.x + (imageBounds.width / 2), imageBounds.y + (imageBounds.height / 2));
+			
+			float xDelta = (expectedPositionOfTarget.x - projectilePosition.x);
+			if (xDelta >= 0) {
+				xDelta = Math.max(0.01f, xDelta);
+			}
+			else {
+				xDelta = Math.min(-0.01f, xDelta);
+			}
+			
+			float yDelta = expectedPositionOfTarget.y - projectilePosition.y;
+			if (yDelta >= 0) {
+				yDelta = Math.max(0.01f, yDelta);
+			}
+			else {
+				yDelta = Math.min(-0.01f, yDelta);
+			}
+			
+			float fullDelta = (float) Math.sqrt((xDelta * xDelta) + (yDelta * yDelta));
+			
+			float time = yDelta / ((yDelta / fullDelta) * this.projectileSpeed());
+			this.velocity.x = (xDelta / fullDelta) * this.projectileSpeed();
+			if (this.projectileSpeed() == 0) {
+				this.velocity.y = 0;
+			}
+			else {
+				this.velocity.y = ((yDelta / fullDelta) * this.projectileSpeed()) + (.5f * this.settings.getGravity() * time);
+
+			}
 		}
-		Vector2 projectilePosition = new Vector2(bounds.x + (bounds.width / 2), bounds.y + (bounds.height / 2));
-		float xDelta = (expectedPositionOfTarget.x - projectilePosition.x);
-		float yDelta = (expectedPositionOfTarget.y - projectilePosition.y);
-		float fullDelta = (float) Math.sqrt((xDelta * xDelta) + (yDelta * yDelta));
-		
-		float time = yDelta / ((yDelta / fullDelta) * this.projectileSpeed());
-		this.velocity.x = (xDelta / fullDelta) * this.projectileSpeed();
-		this.velocity.y = ((yDelta / fullDelta) * this.projectileSpeed()) + (.5f * this.settings.getGravity() * time);
 	}
 	
 	protected void movementWithCollisionDetection(float delta, TiledMapTileLayer collisionLayer) {
 		//logic for collision detection
-		
-		//save old position
-		float oldX = this.getImageHitBox().getX(), oldY = this.getImageHitBox().getY(), tileWidth = collisionLayer.getTileWidth(), tileHeight = collisionLayer.getTileHeight();
-		boolean collisionX = false, collisionY = false;
-		
-		//move on x axis
-		this.getImageHitBox().setX(this.getImageHitBox().getX() + this.getVelocity().x * delta);
-		
-		if (this.getVelocity().x < 0) {
-			//left blocks
-			Cell topLeftBlock = collisionLayer.getCell
-					((int) (this.bounds.x / tileWidth), 
-					(int) ((this.bounds.y + this.bounds.height) / tileHeight));
-			Cell middleLeftBlock = collisionLayer.getCell
-					((int) (this.bounds.x / tileWidth), 
-					(int) ((this.bounds.y + this.bounds.height / 2) / tileHeight));
-			Cell lowerLeftBlock = collisionLayer.getCell
-					((int) (this.bounds.x / tileWidth), 
-					(int) ((this.bounds.y) / tileHeight));
-			
-			if (topLeftBlock != null)
-				collisionX = ((String)topLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
-				
-			
-			//middle left block
-			if(!collisionX && middleLeftBlock != null)
-				collisionX = ((String)middleLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
-			
-			//lower left block
-			if(!collisionX && lowerLeftBlock != null )
-				collisionX = ((String)lowerLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
-			
-//			this.leftcollisionX = collisionX;
-			
+		CollisionCheck collisionX = this.checkForXCollision(delta, collisionLayer, this.velocity.x, this.acceleration.x, true);
+		if (collisionX.doesCollide()) {
+			if (this.settings.isBounces()) {
+				this.getVelocity().x = -this.getVelocity().x;
+			}
+//			else if (this.settings.isDisappearOnImpact()){
+//				forceCooldown = true;
+//				this.actionListener.deleteProjectile(this);
+//			}
+			this.collisionCheck();
 		}
-		else if (this.getVelocity().x > 0) {
-			//right blocks
-			Cell topRightBlock = collisionLayer.getCell
-					((int) ((this.bounds.x + this.bounds.width) / tileWidth),
-					(int) ((this.bounds.y + this.bounds.height) / tileHeight));
-			Cell middleRightBlock = collisionLayer.getCell
-					((int) ((this.bounds.x + this.bounds.width) / tileWidth),
-					(int) ((this.bounds.y + this.bounds.height / 2) / tileHeight));
-			Cell lowerRightBlock = collisionLayer.getCell
-					((int) ((this.bounds.x + this.bounds.width) / tileWidth), 
-					(int) ((this.bounds.y) / tileHeight));
-			
-			// top right block
-			if (topRightBlock != null)
-				collisionX = ((String)topRightBlock.getTile().getProperties().get("Impassable")).equals("true");
-			
-			//middle right block
-			if(!collisionX && middleRightBlock != null)
-				collisionX = ((String)middleRightBlock.getTile().getProperties().get("Impassable")).equals("true");
-			
-			//lower right block
-			if(!collisionX && lowerRightBlock != null)
-				collisionX = ((String)lowerRightBlock.getTile().getProperties().get("Impassable")).equals("true");
-			
-//			this.rightCollisionX = collisionX;
+		CollisionCheck collisionY = this.checkForYCollision(delta, collisionLayer, this.velocity.y, true, !this.state.equals(EntityModel.cooldownState));
+		if (collisionY.doesCollide()) {
+			if (this.settings.isBounces()) {
+				this.getVelocity().y = -this.getVelocity().y;
+			}
+//			else if (this.settings.isDisappearOnImpact()){
+//				forceCooldown = true;
+//				this.actionListener.deleteProjectile(this);
+//			}
+			this.collisionCheck();
 		}
-		
-		//react to X collision
-		if (collisionX) {
-			this.getImageHitBox().setX(oldX);;
-			this.getVelocity().x = -this.getVelocity().x;
-		}
-
-		
+	}
 	
-		//move on y axis
-		this.getImageHitBox().setY(this.getImageHitBox().getY() + this.getVelocity().y * delta);
-		
-		//Collision detection: Y axis
-		
-		if (this.getVelocity().y < 0) {
-			Cell bottomLeftBlock = collisionLayer.getCell((int) (this.bounds.x / tileWidth), (int) ((this.bounds.y) / tileHeight));
-			Cell bottomMiddleBlock = collisionLayer.getCell((int) ((this.bounds.x + this.bounds.width / 2) / tileWidth), (int) ((this.bounds.y) / tileHeight));
-			Cell bottomRightBlock = collisionLayer.getCell((int) ((this.bounds.x + this.bounds.width) / tileWidth), (int) ((this.bounds.y) / tileHeight));
-			//bottom left block
-			if (bottomLeftBlock != null)
-				collisionY = ((String)bottomLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
-				
-			//bottom middle block
-			if(!collisionY && bottomMiddleBlock != null)
-				collisionY = ((String)bottomMiddleBlock.getTile().getProperties().get("Impassable")).equals("true");
-			
-			//bottom right block
-			if(!collisionY && bottomRightBlock != null)
-				collisionY = ((String)bottomRightBlock.getTile().getProperties().get("Impassable")).equals("true");
-			
-	
-		} 
-		else if (this.getVelocity().y > 0) {
-			Cell topLeftBlock = collisionLayer.getCell((int) (this.bounds.x / tileWidth), (int) ((this.bounds.y + this.bounds.height) / tileHeight));			
-			Cell topMiddleBlock = collisionLayer.getCell((int) ((this.bounds.x + this.bounds.width / 2) / tileWidth), (int) ((this.bounds.y + this.bounds.height) / tileHeight));
-			Cell topRightBlock = collisionLayer.getCell((int) ((this.bounds.x + this.bounds.width) / tileWidth), (int) ((this.bounds.y + this.bounds.height) / tileHeight));
-			
-			//top left block
-			if (topLeftBlock != null)
-				collisionY = ((String)topLeftBlock.getTile().getProperties().get("Impassable")).equals("true");
-			
-			//top middle block
-			if(!collisionY && topMiddleBlock != null)
-				collisionY = ((String)topMiddleBlock.getTile().getProperties().get("Impassable")).equals("true");
-			
-			//top right block
-			if(!collisionY && topRightBlock != null)
-				collisionY = ((String)topRightBlock.getTile().getProperties().get("Impassable")).equals("true");
+	public float getEffectiveRange() {
+		if (this.settings.getDuration() == null) {
+			return 10f;
 		}
-		
-		//react to Ycollision
-		if (collisionY) {
-			this.getImageHitBox().setY(oldY);
-			this.getVelocity().y = -this.getVelocity().y;
-		}
-		return;
+		return this.settings.getDuration() * this.projectileSpeed();
 	}
 	
 	protected float projectileSpeed() {
-		return this.settings.getSpeed();
+		return this.settings.getSpeed(this.state);
 	}
 	
 	//If characterModel is null, projectile expires.
-	public void processExpirationOrHit(CharacterModel characterModel){
-		if (characterModel != null) {
-			for (Effect effect : settings.getTargetEffects()) {
-				characterModel.addEffect(effect);
-			}
-			characterModel.setImmuneToInjury(true);
-			if (this.settings.isExplodeOnImpact()) {
-				this.actionListener.deleteProjectile(this);
-			}
-		}
-		else {
-			this.actionListener.deleteProjectile(this);
-		}
+//	public void processExpirationOrHit(CharacterModel characterModel){
 
+//			if (this.settings.isDisappearOnImpact()) {
+//				this.actionListener.deleteProjectile(this);
+//				forceCooldown = true;
+//			}
+		
+//		else {
+////			this.actionListener.deleteProjectile(this);
+////			forceCooldown = true;
+//			this.collisionCheck(true);
+//		}
+
+//	}
+	
+	public void processHit(CharacterModel target) {
+		if (target != null) {
+			for (HitTracker tracker : this.charactersHit) {
+				if (tracker.equals(target)){
+					return;
+				}
+			}
+			for (EffectSettings effectSettings : settings.getTargetEffects()) {
+				EntityEffect effect = EffectInitializer.initializeEntityEffect(effectSettings, this);
+				target.addEffect(effect);
+			}
+			target.setImmuneToInjury(true);
+			this.charactersHit.add(new HitTracker(target));
+			if (this.getSettings().isDisappearOnImpact()) {
+				this.collisionCheck();
+			}
+		}
 	}
 	
+	public boolean isActive() {
+		return this.state.equals(EntityModel.windupState) || this.state.equals(EntityModel.activeState);
+	}
+	
+	public void collisionCheck() {
+		if (this.settings.isDisappearOnImpact()) {
+			forceCooldown = true;
+		}
+		if (this.settings.getWorldEffectSettings().size > 0) {
+			Vector2 effectOrigin = new Vector2(getImageHitBox().x + (getImageHitBox().width / 2f), getImageHitBox().y);
+			for (WorldEffectSettings wEffectSettings : this.settings.getWorldEffectSettings()) {
+				WorldEffect wEffect = EffectInitializer.initializeWorldEffect(wEffectSettings, this, this.getCollisionChecker(), this.source, this.target, effectOrigin);
+				this.actionListener.addWorldEffect(wEffect);
+			}
+		}
+	}
+	
+	public boolean checkSlopes() {
+		return false;
+	}
+		
+	private void deletionCheck() {
+		if (this.currentTime > this.getTotalTime() || forceEnd) {
+			this.collisionCheck();
+			this.actionListener.deleteProjectile(this);
+		}
+		
+	}
+	
+	private void changeStateCheck() {
+		if ((this.currentTime <= this.getTotalTime() && this.currentTime > this.getWindUpPlusDuration()) || this.forceCooldown) {
+			this.setState(EntityModel.cooldownState);
+		}
+		else if (this.currentTime > this.settings.getWindUpTime() && this.currentTime <= this.getWindUpPlusDuration()) {
+			this.setState(EntityModel.activeState);
+		}
+		else if (this.currentTime <= this.settings.getWindUpTime()) {
+			this.setState(EntityModel.windupState);
+		}		
+	}
+	
+	public float getTotalTime() {
+		if (this.forceCooldown) {
+			return this.settings.getWindUpTime() + this.activeTime + this.settings.getCooldownTime();
+		}
+		return this.settings.getWindUpTime() + this.settings.getDuration() + this.settings.getCooldownTime(); 
+	}
+	
+	private float getWindUpPlusDuration() {
+		if (this.forceCooldown) {
+			return this.settings.getWindUpTime() + this.activeTime;
+		}
+		return this.settings.getWindUpTime() + this.settings.getDuration();
+	}
+	
+	public void setState(String state) {
+		if (!this.state.equals(state))
+		{
+			this.didChangeState = true;
+		}
+		if (state.equals(EntityModel.cooldownState)) {
+			this.settings.disableGravity();
+		}
+		this.state = state;
+	}
+	
+	@Override
+	public float getVelocityAngle() {
+		if (!this.settings.getShouldRotate()) {
+			return 0f;
+		}
+		double angleInRads = Math.atan2(velocity.y, velocity.x);
+		return (float) Math.toDegrees(angleInRads);
+	}
+
 	public CharacterModel getTarget() {
 		return target;
 	}
@@ -305,13 +408,9 @@ public class Projectile {
 	public boolean isFacingLeft() {
 		return this.velocity.x < 0;
 	}
-	
-	public String getProjectileState() {
-		return projectileState;
-	}
 
-	public void setProjectileState(String projectileState) {
-		this.projectileState = projectileState;
+	public void setProjectileState(String state) {
+		this.state = state;
 		this.projectileUIModel.setAnimationTime(0f);
 	}
 	
@@ -323,18 +422,10 @@ public class Projectile {
 		this.allegiance = allegiance;
 	}
 
-	public Rectangle getImageHitBox() {
-		return bounds;
-	}
-
-	public void setBounds(Rectangle position) {
-		this.bounds = position;
-	}
-
 	public void setPosition (float x, float y)
 	{
-		this.bounds.x = x;
-		this.bounds.y = y;
+		this.imageBounds.x = x;
+		this.imageBounds.y = y;
 	}
 
 	public EntityUIModel getProjectileUIModel() {
@@ -350,7 +441,7 @@ public class Projectile {
 	}
 	
 	public float getStateTime() {
-		return stateTime;
+		return currentTime;
 	}
 
 	@Override
@@ -359,5 +450,68 @@ public class Projectile {
 			return ((Projectile) obj).uuid.equals(this.uuid); 
 		}
 		return super.equals(obj);
+	}
+
+	@Override
+	public EntityCollisionData handleEntityXCollisionLogic(Rectangle tempGameplayBounds, boolean alreadyCollided) {
+		return null;
+	}
+
+	@Override
+	public EntityCollisionData handleEntityYCollisionLogic(Rectangle tempGameplayBounds, boolean alreadyCollided) {
+		return null;
+	}
+
+
+	@Override
+	public XMovementEffectSettings getXReplacementMovementForStagger() {
+		XMovementEffectSettings mSettings = null;
+		for (EffectSettings settings : this.settings.getTargetEffects()) {
+			if (settings instanceof XMovementEffectSettings) {
+				mSettings = (XMovementEffectSettings) settings;
+			}
+		}
+		return mSettings;
+	}
+	
+	@Override
+	public YMovementEffectSettings getYReplacementMovementForStagger() {
+		YMovementEffectSettings mSettings = null;
+		for (EffectSettings settings : this.settings.getTargetEffects()) {
+			if (settings instanceof YMovementEffectSettings) {
+				mSettings = (YMovementEffectSettings) settings;
+			}
+		}
+		return mSettings;
+	}
+
+	@Override
+	public String getState() {
+		return this.state;
+	}
+	
+	@Override
+	public ActionListener getActionListener() {
+		return this.actionListener;
+	}
+	
+	@Override
+	public Vector2 spawnOriginForChar() {
+		return new Vector2(this.getImageHitBox().x, this.getImageHitBox().y);
+	}
+
+	@Override
+	public CharacterModel getSource() {
+		return this.source;
+	}
+
+	@Override
+	public void refreshHurtBoxesX() {
+		//TBD
+	}
+
+	@Override
+	public void refreshHurtBoxesY() {
+		
 	}
 }

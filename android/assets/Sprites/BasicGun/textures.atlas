@@ -1,0 +1,76 @@
+
+textures.png
+size: 1024,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+BasicProjectileAttackA1
+  rotate: false
+  xy: 2, 246
+  size: 90, 120
+  orig: 90, 120
+  offset: 0, 0
+  index: -1
+BasicProjectileAttackC1
+  rotate: false
+  xy: 2, 124
+  size: 90, 120
+  orig: 90, 120
+  offset: 0, 0
+  index: -1
+BasicProjectileAttackC2
+  rotate: false
+  xy: 94, 246
+  size: 90, 120
+  orig: 90, 120
+  offset: 0, 0
+  index: -1
+DeathA1
+  rotate: false
+  xy: 94, 246
+  size: 90, 120
+  orig: 90, 120
+  offset: 0, 0
+  index: -1
+DeathC1
+  rotate: false
+  xy: 94, 246
+  size: 90, 120
+  orig: 90, 120
+  offset: 0, 0
+  index: -1
+DeathW1
+  rotate: false
+  xy: 94, 246
+  size: 90, 120
+  orig: 90, 120
+  offset: 0, 0
+  index: -1
+Idle1
+  rotate: false
+  xy: 94, 246
+  size: 90, 120
+  orig: 90, 120
+  offset: 0, 0
+  index: -1
+BasicProjectileAttackW1
+  rotate: false
+  xy: 2, 2
+  size: 90, 120
+  orig: 90, 120
+  offset: 0, 0
+  index: -1
+BasicProjectileAttackW2
+  rotate: false
+  xy: 94, 124
+  size: 90, 120
+  orig: 90, 120
+  offset: 0, 0
+  index: -1
+BasicProjectileAttackW3
+  rotate: false
+  xy: 186, 246
+  size: 90, 120
+  orig: 90, 120
+  offset: 0, 0
+  index: -1

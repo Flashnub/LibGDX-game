@@ -4,7 +4,196 @@ size: 1024,1024
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-BasicEnemy-Idle1
+AerialStaggerA1
+  rotate: false
+  xy: 2, 406
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+StaggerA1
+  rotate: false
+  xy: 2, 406
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+AerialStaggerC1
+  rotate: false
+  xy: 2, 204
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+AerialStaggerW1
+  rotate: false
+  xy: 2, 204
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+BasicAttackA1
+  rotate: false
+  xy: 2, 204
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+DeathW1
+  rotate: false
+  xy: 2, 204
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+StaggerC1
+  rotate: false
+  xy: 2, 204
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+StaggerW1
+  rotate: false
+  xy: 2, 204
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+WakeupC1
+  rotate: false
+  xy: 2, 204
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+WakeupC2
+  rotate: false
+  xy: 2, 204
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+WakeupC3
+  rotate: false
+  xy: 2, 204
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+WakeupC4
+  rotate: false
+  xy: 2, 204
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+BackwalkW1
+  rotate: false
+  xy: 104, 406
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+BasicAttackW1
+  rotate: false
+  xy: 104, 406
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+DeathA1
+  rotate: false
+  xy: 104, 406
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+IdleDrawnW1
+  rotate: false
+  xy: 104, 406
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+IdleW1
+  rotate: false
+  xy: 104, 406
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+WakeupA1
+  rotate: false
+  xy: 104, 406
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+WakeupA2
+  rotate: false
+  xy: 104, 406
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+WakeupA3
+  rotate: false
+  xy: 104, 406
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+WakeupA4
+  rotate: false
+  xy: 104, 406
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+WalkW1
+  rotate: false
+  xy: 104, 406
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+BasicAttackC1
+  rotate: false
+  xy: 2, 2
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+DeathC1
+  rotate: false
+  xy: 2, 2
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+WakeupW1
+  rotate: false
+  xy: 2, 2
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+WakeupW2
+  rotate: false
+  xy: 2, 2
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+WakeupW3
+  rotate: false
+  xy: 2, 2
+  size: 100, 200
+  orig: 100, 200
+  offset: 0, 0
+  index: -1
+WakeupW4
   rotate: false
   xy: 2, 2
   size: 100, 200

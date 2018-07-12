@@ -1,0 +1,23 @@
+1. Attack preemptively
+2. Rush in close and attack
+3. Dodge and react.
+
+1>2
+2>3
+3>1
+
+Strat to beat should include all 3 options.
+
+
+
+Basic Enemy has f.S + 5P
+Option 1 works against rush in + 5P, rush in + f.S, whiffs against preemptive f.S
+Option 2 works against rush in + 5P/f.S provided you attack with a longer range normal, loses to preemptive f.S
+Option 3 works against preemptive f.S, loses to rush in + 5P
+
+Static enemy (Meaning it doesn't read the player and behavior is determined by static conditions)
+Behavior is determined as follows:
+If HP > 50%
+	Rush + 5P
+else
+	Preemptive f.S

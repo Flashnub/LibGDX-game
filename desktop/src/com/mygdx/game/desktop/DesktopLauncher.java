@@ -5,12 +5,8 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.mygdx.game.MyGdxGame;
 
 import java.util.ArrayList;
-
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 import com.badlogic.gdx.tools.texturepacker.TexturePacker.Settings;
-import com.mygdx.game.MyGdxGame;
 
 public class DesktopLauncher {
 	
@@ -30,6 +26,8 @@ public class DesktopLauncher {
         ArrayList <String> characterNames = new ArrayList<String>();
         characterNames.add("Player");
         characterNames.add("BasicEnemy");
+        characterNames.add("BasicGun");
+        characterNames.add("BasicNPC");
     	
     	for (String characterName : characterNames) {
         	String inputDir = parentInputDir + characterName;
@@ -45,6 +43,7 @@ public class DesktopLauncher {
 //        ArrayList<StringWrapper> projectileNames = arrayWrapper2.array;
         ArrayList <String> projectileNames = new ArrayList<String>();
         projectileNames.add("Basic");
+        projectileNames.add("Basic2");
 
     	for (String projectileName : projectileNames) {
         	String inputDir = parentInputDir + projectileName;
@@ -57,13 +56,53 @@ public class DesktopLauncher {
     	parentInputDir = "Sprites/UI/";
         TexturePacker.process(settings, parentInputDir, parentOutputDir, "textures");
         
+    	parentOutputDir = "Sprites/Items/";
+    	parentInputDir = "Sprites/Items/";
+        TexturePacker.process(settings, parentInputDir, parentOutputDir, "textures");
+        
+        ArrayList <String> hitSparkNames = new ArrayList<String>();
+    	hitSparkNames.add("Default");
+    	hitSparkNames.add("Block");
+    	
+    	parentOutputDir = "Sprites/HitSparks/";
+    	parentInputDir = "Sprites/HitSparks/";
+    	for (String hitSparkName : hitSparkNames) {
+        	String inputDir = parentInputDir + hitSparkName;
+        	String outputDir = parentOutputDir + hitSparkName;
+        	
+            TexturePacker.process(settings, inputDir, outputDir, "textures");
+    	}
+//        TexturePacker.process(settings, parentInputDir, parentOutputDir, "textures");
+        
         parentOutputDir = "Sprites/WorldObjects/";
         parentInputDir = "Sprites/WorldObjects/";
-        TexturePacker.process(settings, parentInputDir, parentOutputDir, "textures");
+    	ArrayList <String> objectNames = new ArrayList<String>();
+    	objectNames.add("Item");
+    	objectNames.add("Lever");
+    	objectNames.add("Gate");
+    	objectNames.add("BreakableRunway");
 
+    	for (String objectName : objectNames) {
+        	String inputDir = parentInputDir + objectName;
+        	String outputDir = parentOutputDir + objectName;
+        	
+            TexturePacker.process(settings, inputDir, outputDir, "textures");
+    	}
+    	
+        parentOutputDir = "Sprites/Explosions/";
+        parentInputDir = "Sprites/Explosions/";
+        ArrayList<String> explosionNames = new ArrayList<String>();
+        explosionNames.add("BasicExplosion");
+        for(String explosionName : explosionNames) {
+        	String inputDir = parentInputDir + explosionName;
+        	String outputDir = parentOutputDir + explosionName;
+        	
+            TexturePacker.process(settings, inputDir, outputDir, "textures");
+        }
+//    	
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.width = 800;
-		config.height = 600;
+		config.width = 1600;
+		config.height = 900;
 		new LwjglApplication(new MyGdxGame(), config);
 	}
 }

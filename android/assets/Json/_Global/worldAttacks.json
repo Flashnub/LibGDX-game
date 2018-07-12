@@ -1,0 +1,34 @@
+{
+	"BasicProjectileAttack": {
+		"class": com.mygdx.game.model.actions.WorldAttackSettings,
+		"abilitySettingKey": "BasicProjectileAttack",
+		"worldEffectSettings": [
+			{
+				"class": com.mygdx.game.model.globalEffects.ProjectileCreateEffectSettings,
+				"projectileSettingKey": "Basic"
+			}
+		]
+	}
+	"BasicProjectileAttack2": {
+		"class": com.mygdx.game.model.actions.WorldAttackSettings,
+		"abilitySettingKey": "BasicProjectileAttack",
+		"worldEffectSettings": [
+			{
+				"class": com.mygdx.game.model.globalEffects.ProjectileCreateEffectSettings,
+				"projectileSettingKey": "Basic2"
+			}
+		]
+	}
+	"Death": {
+		"class": com.mygdx.game.model.actions.WorldAttackSettings,
+		"abilitySettingKey": "Death",
+		"worldEffectSettings": [
+			{
+				"class": com.mygdx.game.model.globalEffects.DeleteCharacterEffectSettings,
+				"delayToActivate": 4,
+				"duration": 0.01,
+				"isInstantaneous": false
+			}
+		]
+	}
+}

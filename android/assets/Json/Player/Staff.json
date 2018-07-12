@@ -1,0 +1,413 @@
+{
+	"class": com.mygdx.game.model.weapons.WeaponProperties,
+	"name": "Staff",
+	"description": "PlayerStaff",
+	"weaponActions": [
+	{
+		"class": com.mygdx.game.model.actions.ActionSequence,
+		"actionKey": {
+			"class": com.mygdx.game.model.actions.ActionSegmentKey,
+			"key": "5P",
+			"typeOfAction": Attack
+		},
+		"chainableActionKeys": [
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "5S",
+				"typeOfAction": Attack
+			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "5H",
+				"typeOfAction": Attack
+			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "5K",
+				"typeOfAction": Attack
+			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "5P",
+				"typeOfAction": Attack
+			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "2P",
+				"typeOfAction": Attack
+			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "2K",
+				"typeOfAction": Attack
+			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "2H",
+				"typeOfAction": Attack
+			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "2S",
+				"typeOfAction": Attack
+			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "6H",
+				"typeOfAction": Attack
+			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "6S",
+				"typeOfAction": Attack
+			}
+		],
+		"inputs": [
+			["P"],
+			["PUP"]
+		]
+	},
+	{
+		"class": com.mygdx.game.model.actions.ActionSequence,
+		"actionKey": {
+			"class": com.mygdx.game.model.actions.ActionSegmentKey,
+			"key": "5K",
+			"typeOfAction": Attack
+		},
+		"chainableActionKeys": [
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "5P",
+				"typeOfAction": Attack
+			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "5S",
+				"typeOfAction": Attack
+			}
+		],
+		"inputs": [
+			["K"],
+			["KUP"]
+		],
+		"chainsWithJump": false
+	},
+	{
+		"class": com.mygdx.game.model.actions.ActionSequence,
+		"actionKey": {
+			"class": com.mygdx.game.model.actions.ActionSegmentKey,
+			"key": "5S",
+			"typeOfAction": Attack
+		},
+		"chainableActionKeys": [
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "6S",
+				"typeOfAction": Attack
+			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "5H",
+				"typeOfAction": Attack
+			}
+		],
+		"inputs": [
+			["S"],
+			["SUP"]
+		]
+	},
+	{
+		"class": com.mygdx.game.model.actions.ActionSequence,
+		"actionKey": {
+			"class": com.mygdx.game.model.actions.ActionSegmentKey,
+			"key": "6S",
+			"typeOfAction": Attack
+		},
+		"chainableActionKeys": [
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "5K",
+				"typeOfAction": Attack
+			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "5H",
+				"typeOfAction": Attack
+			}
+		],
+		"inputs": [
+			["SLEFT"],
+			["SRIGHT"],
+			["SUPLEFT"],
+			["SUPRIGHT"]
+		]
+	},
+	{
+		"class": com.mygdx.game.model.actions.ActionSequence,
+		"actionKey": {
+			"class": com.mygdx.game.model.actions.ActionSegmentKey,
+			"key": "5H",
+			"typeOfAction": Attack
+		},
+		"chainableActionKeys": [
+
+		],
+		"inputs": [
+			["H"],
+			["HUP"],
+		]
+	},
+	{
+		"class": com.mygdx.game.model.actions.ActionSequence,
+		"actionKey": {
+			"class": com.mygdx.game.model.actions.ActionSegmentKey,
+			"key": "6P",
+			"typeOfAction": Attack
+		},
+		"chainableActionKeys": [
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "5S",
+				"typeOfAction": Attack
+			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "6S",
+				"typeOfAction": Attack
+			}
+		],
+		"inputs": [
+			["PLEFT"],
+			["PRIGHT"],
+			["PUPLEFT"],
+			["PUPRIGHT"]
+		]
+	},
+	{
+		"class": com.mygdx.game.model.actions.ActionSequence,
+		"actionKey": {
+			"class": com.mygdx.game.model.actions.ActionSegmentKey,
+			"key": "6H",
+			"typeOfAction": Attack
+		},
+		"chainableActionKeys": [
+
+		],
+		"inputs": [
+			["SLEFT"],
+			["SRIGHT"],
+			["SUPLEFT"],
+			["SUPRIGHT"]
+		]
+	},
+	{
+		"class": com.mygdx.game.model.actions.ActionSequence,
+		"actionKey": {
+			"class": com.mygdx.game.model.actions.ActionSegmentKey,
+			"key": "2P",
+			"typeOfAction": Attack
+		},
+		"chainableActionKeys": [
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "2P",
+				"typeOfAction": Attack
+			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "2K",
+				"typeOfAction": Attack
+			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "2S",
+				"typeOfAction": Attack
+			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "5K",
+				"typeOfAction": Attack
+			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "5S",
+				"typeOfAction": Attack
+			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "5P",
+				"typeOfAction": Attack
+			}
+		],
+		"inputs": [
+			["PDOWN"],
+			["PDOWNRIGHT"],
+			["PDOWNLEFT"]
+
+		]
+	},
+	{
+		"class": com.mygdx.game.model.actions.ActionSequence,
+		"actionKey": {
+			"class": com.mygdx.game.model.actions.ActionSegmentKey,
+			"key": "2K",
+			"typeOfAction": Attack
+		},
+		"chainableActionKeys": [
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "2S",
+				"typeOfAction": Attack
+			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "5K",
+				"typeOfAction": Attack
+			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "5S",
+				"typeOfAction": Attack
+			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "6S",
+				"typeOfAction": Attack
+			}
+		],
+		"inputs": [
+			["KDOWN"],
+			["KDOWNRIGHT"],
+			["KDOWNLEFT"]
+		]
+	},
+	{
+		"class": com.mygdx.game.model.actions.ActionSequence,
+		"actionKey": {
+			"class": com.mygdx.game.model.actions.ActionSegmentKey,
+			"key": "2H",
+			"typeOfAction": Attack
+		},
+		"chainableActionKeys": [
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "6H",
+				"typeOfAction": Attack
+			}
+		],
+		"inputs": [
+			["HDOWN"],
+			["HDOWNRIGHT"],
+			["HDOWNLEFT"]
+		]
+	},
+	{
+		"class": com.mygdx.game.model.actions.ActionSequence,
+		"actionKey": {
+			"class": com.mygdx.game.model.actions.ActionSegmentKey,
+			"key": "2S",
+			"typeOfAction": Attack
+		},
+		"chainableActionKeys": [
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "5S",
+				"typeOfAction": Attack
+			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "6S",
+				"typeOfAction": Attack
+			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "5H",
+				"typeOfAction": Attack
+			}
+		],
+		"inputs": [
+			["SDOWN"],
+			["SDOWNRIGHT"],
+			["SDOWNLEFT"]
+		]
+	},
+	{
+		"class": com.mygdx.game.model.actions.ActionSequence,
+		"actionKey": {
+			"class": com.mygdx.game.model.actions.ActionSegmentKey,
+			"key": "J5S",
+			"typeOfAction": Attack
+		},
+		"chainableActionKeys": [
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "J5K",
+				"typeOfAction": Attack
+			}
+			{
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "J5H",
+				"typeOfAction": Attack
+			}
+		],
+		"inputs": [
+			["S"],
+			["SUP"],
+			["SLEFT"],
+			["SDOWN"],
+			["SDOWNRIGHT"],
+			["SDOWNLEFT"],
+			["SRIGHT"],
+			["SUPLEFT"],
+			["SUPRIGHT"]
+		],
+		"useType": Aerial
+	},
+	{
+		"class": com.mygdx.game.model.actions.ActionSequence,
+		"actionKey": {
+			"class": com.mygdx.game.model.actions.ActionSegmentKey,
+			"key": "J5H",
+			"typeOfAction": Attack
+		},
+		"chainableActionKeys": [
+
+		],
+		"inputs": [
+			["H"],
+			["HUP"],
+			["HLEFT"],
+			["HDOWN"],
+			["HDOWNRIGHT"],
+			["HDOWNLEFT"],
+			["HRIGHT"],
+			["HUPLEFT"],
+			["HUPRIGHT"]
+		],
+		"useType": Aerial
+	},
+	{
+		"class": com.mygdx.game.model.actions.ActionSequence,
+		"actionKey": {
+			"class": com.mygdx.game.model.actions.ActionSegmentKey,
+			"key": "J5K",
+			"typeOfAction": Attack
+		},
+		"chainableActionKeys": [
+
+		],
+		"inputs": [
+			["K"],
+			["KUP"],
+			["KLEFT"],
+			["KDOWN"],
+			["KDOWNRIGHT"],
+			["KDOWNLEFT"],
+			["KRIGHT"],
+			["KUPLEFT"],
+			["KUPRIGHT"]
+		],
+		"useType": Aerial
+	}
+	]
+}

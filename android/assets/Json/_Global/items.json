@@ -1,13 +1,31 @@
 {
-	"HealthPotion": {
-		"class": com.mygdx.game.model.items.Item,
+	"Health Potion": {
+		"class": com.mygdx.game.model.worldObjects.Item,
 		"name": "Health Potion",
 		"desc": "Restores Health",
-		"effects": [
-			{
-				"class": com.mygdx.game.model.effects.HealingEffectSettings,
-				"value": 10
+		"uiModel": {
+			"class": com.mygdx.game.model.worldObjects.ItemUIModel,
+			"itemIconName": "healthPotion"
+		}
+		"itemSequence": {
+			"class": com.mygdx.game.model.actions.ActionSequence,
+			"actionKey": {
+				"class": com.mygdx.game.model.actions.ActionSegmentKey,
+				"key": "Health Potion",
+				"typeOfAction": Ability
 			}
-		]
+			"windUpState": "UseItemWindup"
+			"actingState": "UseItemActive"
+			"cooldownState": "UseItemCooldown"
+		}
+	}
+	"Basement Key": {
+		"class": com.mygdx.game.model.worldObjects.Item,
+		"name": "Basement Key",
+		"desc": "Used to open research lab",
+		"uiModel": {
+			"class": com.mygdx.game.model.worldObjects.ItemUIModel,
+			"itemIconName": "basementKey"
+		}
 	}
 }

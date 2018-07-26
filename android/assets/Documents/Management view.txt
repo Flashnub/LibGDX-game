@@ -1,0 +1,14 @@
+View structure for management
+
+ManagementParentView (includes tabs to switch between views)
+	- Items View Tab
+		- Grid with items, filters on top
+		- Pulls up detailed information view on each square
+	- MovesList View Tab
+		- Grid with moves, filters on top
+		- Pulls up detailed information view on each square
+	- History information Tab
+		- Grid with history information, filters on top.
+		- Pulls up detailed information view on each square
+
+	

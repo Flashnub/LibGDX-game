@@ -3,8 +3,8 @@ package com.mygdx.game.screen;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.mygdx.game.model.world.WorldModel;
-import com.mygdx.game.renderer.HUDRenderer;
-import com.mygdx.game.renderer.WorldRenderer;
+import com.mygdx.game.renderer.HUDViewModel;
+import com.mygdx.game.renderer.WorldViewModel;
 
 
 public class GameScreen implements Screen{
@@ -12,14 +12,14 @@ public class GameScreen implements Screen{
 	WorldModel worldModel;
    	TiledMap tiledMap;
 
-	WorldRenderer renderer;
-	HUDRenderer uiRenderer;
+	WorldViewModel renderer;
+	HUDViewModel uiRenderer;
 	
     public GameScreen(TiledMap tiledMap, WorldModel worldModel) {
     	this.tiledMap = tiledMap;
     	this.worldModel = worldModel;
-    	renderer = new WorldRenderer(tiledMap, worldModel);
-    	uiRenderer = new HUDRenderer(worldModel, renderer);
+    	renderer = new WorldViewModel(tiledMap, worldModel);
+    	uiRenderer = new HUDViewModel(worldModel, renderer);
     }
 
     @Override

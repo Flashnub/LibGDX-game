@@ -19,7 +19,7 @@ import com.mygdx.game.views.DialogueView;
 import com.mygdx.game.views.ResourceBar;
 import com.mygdx.game.views.ResourceBar.ResourceBarType;
 
-public class HUDRenderer implements WorldListener{
+public class HUDViewModel implements WorldListener{
 	
 	Stage stage;
 	WorldModel worldModel;
@@ -29,7 +29,7 @@ public class HUDRenderer implements WorldListener{
 	CoordinatesHelper helper;
 	AdditionalInfoView infoView;
 	
-	public HUDRenderer(WorldModel worldModel, CoordinatesHelper helper) {
+	public HUDViewModel(WorldModel worldModel, CoordinatesHelper helper) {
 		this.worldModel = worldModel;
 		this.enemyHealthBars = new ObjectMap <String, ResourceBar>();
 		this.helper = helper;

@@ -31,7 +31,7 @@ import com.mygdx.game.model.worldObjects.WorldObject;
 import com.mygdx.game.utils.MathUtils;
 import com.mygdx.game.views.ResourceBar.ResourceBarType;
 
-public class WorldRenderer implements CoordinatesHelper, WorldListener{
+public class WorldViewModel implements CoordinatesHelper, WorldListener{
 	
 		//Game world sprite stuff
 		SpriteBatch gameBatch;
@@ -43,7 +43,7 @@ public class WorldRenderer implements CoordinatesHelper, WorldListener{
 	   	ShapeRenderer debugRenderer = new ShapeRenderer();
 	    TiledMapRenderer tiledMapRenderer;
 	
-	    public WorldRenderer(TiledMap tiledMap, WorldModel worldModel) {
+	    public WorldViewModel(TiledMap tiledMap, WorldModel worldModel) {
 	        float w = Gdx.graphics.getWidth();
 	        float h = Gdx.graphics.getHeight();
 

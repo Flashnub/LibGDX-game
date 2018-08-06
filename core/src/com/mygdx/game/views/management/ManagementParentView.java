@@ -1,8 +1,8 @@
-package com.mygdx.game.views;
+package com.mygdx.game.views.management;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 /**
- * Everything will fit in here.
+ * Everything involving the Player Management. will fit in here.
  * @author Xx420TryhardxX
  *
  */

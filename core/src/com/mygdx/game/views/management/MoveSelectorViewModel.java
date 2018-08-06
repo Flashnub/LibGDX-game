@@ -7,5 +7,5 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
  * These moves to different inputs.
  */
 public class MoveSelectorViewModel extends Actor{
-
+	private int k;
 }

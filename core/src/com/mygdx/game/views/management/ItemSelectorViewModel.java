@@ -6,5 +6,6 @@ package com.mygdx.game.views.management;
  *
  */
 public class ItemSelectorViewModel implements SelectorView{
-
+    private ArrayList<Item> inventory;
+    private ItemSelectorViewModelCell selectedItemCell;
 }

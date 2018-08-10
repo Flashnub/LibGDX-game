@@ -5,6 +5,7 @@ package com.mygdx.game.views.management;
  * @author Xx420TryhardxX
  *
  */
-public class ManagementSelectorView {
-
+public class ManagementSelectorView implements SelectorView{
+    private ArrayList <ManagementSelectorViewListener> listeners;
+    private SelectorViewModel selectedModel;
 }

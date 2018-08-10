@@ -6,5 +6,5 @@ package com.mygdx.game.views.management;
  *
  */
 public class ItemSelectorViewModelCell {
-
+    private Item item;
 }

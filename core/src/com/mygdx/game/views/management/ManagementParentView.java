@@ -6,6 +6,9 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
  * @author Xx420TryhardxX
  *
  */
-public class ManagementParentView extends Actor {
+public class ManagementParentView extends Actor implements ManagementSelectorViewListener{
+    private ManagementSelectorView selectorView;
+    private PlayerPoseView playerPoseView;
 
+    private ArrayList <SelectorViewModel> selectorViewModels;
 }

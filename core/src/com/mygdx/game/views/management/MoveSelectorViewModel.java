@@ -6,6 +6,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
  * Table of moves, each cell can be changed to a different move. Will map
  * These moves to different inputs.
  */
-public class MoveSelectorViewModel extends Actor{
-	private int k;
+public class MoveSelectorViewModel extends SelectorViewModel {
+	
 }

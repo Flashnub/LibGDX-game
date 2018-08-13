@@ -315,13 +315,13 @@ public class Player extends Character implements InputProcessor, ControllerListe
 	    		return true;
 	    	}
 	    	//Check weapon next.
-	    	sequence = this.getCurrentWeapon().getSpecificWeaponAction(this.inputs, this);
-	    	if (sequence != null) {
-		    	this.stopHorizontalMovement(true);
-	    		this.addActionSequence(sequence.cloneSequenceWithSourceAndTarget(this, null, getActionListener(), this.getCollisionChecker()));
-	    		return true;
-	    	}
-	    	
+//	    	sequence = this.getCurrentWeapon().getSpecificWeaponAction(this.inputs, this);
+//	    	if (sequence != null) {
+//		    	this.stopHorizontalMovement(true);
+//	    		this.addActionSequence(sequence.cloneSequenceWithSourceAndTarget(this, null, getActionListener(), this.getCollisionChecker()));
+//	    		return true;
+//	    	}
+//	    	
 	    	return false;
 	    }
 	    

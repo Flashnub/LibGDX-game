@@ -1,5 +1,5 @@
 package com.mygdx.game.views.management;
 
-public interface SelectorViewModel {
+public abstract class SelectorViewModel {
 
 }

@@ -368,6 +368,20 @@ public class CharacterProperties implements Serializable {
 		return result;
 	}
 	
+	public ActionSequence getRandomChainableWeaponAction(ActionSequence previousAction, float probabilityToChain) {
+		ActionSequence nextAction = null;
+		if (actions != null && probabilityToChain > Math.random()) {
+			for (ActionSequence action : this.sequencesSortedByInputSize) {
+				if (previousAction.isActionChainableWithThis(action)) {
+					nextAction = action;
+					break;
+				}
+			}
+		}
+
+		return nextAction;
+	}
+	
 	public float getHeightCoefficient() {
 		return collisionHeightCoefficient;
 	}

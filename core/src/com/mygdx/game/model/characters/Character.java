@@ -30,7 +30,6 @@ import com.mygdx.game.model.hitSpark.HitSparkData;
 import com.mygdx.game.model.hitSpark.HitSparkListener;
 import com.mygdx.game.model.projectiles.Explosion;
 import com.mygdx.game.model.projectiles.Projectile;
-import com.mygdx.game.model.weapons.Weapon;
 import com.mygdx.game.wrappers.StringWrapper;
 
 public abstract class Character implements ModelListener {
@@ -115,8 +114,8 @@ public abstract class Character implements ModelListener {
 		CharacterProperties properties;
 		ArrayList <ActionSequence> processingActionSequences;
 		ArrayDeque <ActionSequence> nextActiveActionSequences;
-		Array <Weapon> weapons;
-		Weapon currentWeapon;
+//		Array <Weapon> weapons;
+//		Weapon currentWeapon;
 		
 
 		
@@ -177,13 +176,13 @@ public abstract class Character implements ModelListener {
 			setMaxJumpTokens(properties.getMaxJumpTokens());
 			setCurrentJumpTokens(properties.getMaxJumpTokens());
 			acceleration.y = -properties.getGravity();
-			weapons = new Array <Weapon> ();
-			for (StringWrapper key : this.getCharacterProperties().getWeaponKeys()) {
-				weapons.add(new Weapon(key.value, characterName));
-			}
-			if (weapons.size > 0) {
-				currentWeapon = weapons.get(0);
-			}
+//			weapons = new Array <Weapon> ();
+//			for (StringWrapper key : this.getCharacterProperties().getWeaponKeys()) {
+//				weapons.add(new Weapon(key.value, characterName));
+//			}
+//			if (weapons.size > 0) {
+//				currentWeapon = weapons.get(0);
+//			}
 //			this.fixedHurtBoxProperties = this.getCharacterProperties().defaultHurtboxProperties;
 			this.updateHurtBoxProperties(this.getCharacterProperties().defaultHurtboxProperties);
 					
@@ -1188,9 +1187,9 @@ public abstract class Character implements ModelListener {
 			return properties;
 		}
 
-		public Weapon getCurrentWeapon() {
-			return currentWeapon;
-		}
+//		public Weapon getCurrentWeapon() {
+//			return currentWeapon;
+//		}
 
 		public float getCurrentTension() {
 			return currentTension;

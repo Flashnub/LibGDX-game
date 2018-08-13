@@ -1,5 +1,7 @@
 package com.mygdx.game.views.management;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.scenes.scene2d.Actor;
 /**
  * Everything involving the Player Management. will fit in here.
@@ -7,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
  *
  */
 public class ManagementParentView extends Actor implements ManagementSelectorViewListener{
-    private ManagementSelectorView selectorView;
+    private SelectorViewModel currentSelectorViewModel;
     private PlayerPoseView playerPoseView;
 
     private ArrayList <SelectorViewModel> selectorViewModels;

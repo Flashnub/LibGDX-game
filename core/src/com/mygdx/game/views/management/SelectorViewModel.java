@@ -7,13 +7,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 public abstract class SelectorViewModel {
 	Container<Table> tableContainer;
-	Skin headerSkin;
 	Skin contentSkin;
 	Skin parentSkin;
 	
 	public SelectorViewModel(float width, float height) {
 		tableContainer = new Container<Table>();
-		headerSkin = new Skin(Gdx.files.internal("selectorViewHeaderSkin"));
 		parentSkin = new Skin(Gdx.files.internal("selectorViewParentSkin"));
 		this.create(width, height);
 	}
@@ -23,14 +21,7 @@ public abstract class SelectorViewModel {
 
 		Table parent = new Table(parentSkin);
 		
-		
-		Table header = new Table(headerSkin);
-		header.row();
 		//generate header for different tabs.
-		
-		parent.row();
-		parent.add(header).fillX();
-		
 		Table content = this.createContentTable(width, height);
 		parent.row();
 		parent.add(content).fillX();

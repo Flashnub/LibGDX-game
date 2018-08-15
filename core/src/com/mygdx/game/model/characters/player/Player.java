@@ -59,6 +59,11 @@ public class Player extends Character implements InputProcessor, ControllerListe
 	private void loadSaveFile() {
 		//Do stuff to load in spawn point + player info.
 	}
+	
+	public PlayerModel getCharacterData() 
+	{
+		return (PlayerModel) this.getCharacterData();
+	}
 
 	@Override
 	public boolean keyDown(int keycode) {

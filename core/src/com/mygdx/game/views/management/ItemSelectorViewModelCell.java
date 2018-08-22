@@ -7,6 +7,6 @@ import com.mygdx.game.model.worldObjects.Item;
  * @author Xx420TryhardxX
  *
  */
-public class ItemSelectorViewModelCell {
+public class ItemSelectorViewModelCell extends SelectorViewModelCell {
     private Item item;
 }

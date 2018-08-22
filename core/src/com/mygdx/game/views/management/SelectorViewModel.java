@@ -9,6 +9,8 @@ public abstract class SelectorViewModel {
 	Container<Table> tableContainer;
 	Skin contentSkin;
 	Skin parentSkin;
+
+	Player player;
 	
 	public SelectorViewModel(float width, float height) {
 		tableContainer = new Container<Table>();

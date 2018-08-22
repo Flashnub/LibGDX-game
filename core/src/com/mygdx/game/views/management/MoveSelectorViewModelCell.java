@@ -7,6 +7,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
  * @author Xx420TryhardxX
  *
  */
-public class MoveSelectorViewModelCell extends Actor{
+public class MoveSelectorViewModelCell extends SelectorViewModelCell {
 
 }

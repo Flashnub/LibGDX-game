@@ -5,6 +5,6 @@ package com.mygdx.game.views.management;
  * @author Xx420TryhardxX
  *
  */
-public class MiscSelectorViewModelCell {
+public class MiscSelectorViewModelCell extends SelectorViewModelCell {
 
 }

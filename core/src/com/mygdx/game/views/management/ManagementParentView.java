@@ -13,4 +13,6 @@ public class ManagementParentView extends Actor implements ManagementSelectorVie
     private PlayerPoseView playerPoseView;
 
     private ArrayList <SelectorViewModel> selectorViewModels;
+    
+
 }

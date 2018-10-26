@@ -7,6 +7,17 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
  * @author Xx420TryhardxX
  *
  */
-public class MoveSelectorViewModelCell extends Actor{
+public class MoveSelectorViewModelCell extends SelectorViewCell {
+
+	public MoveSelectorViewModelCell(float width, float height) {
+		super(width, height);
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	public void act(float delta) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

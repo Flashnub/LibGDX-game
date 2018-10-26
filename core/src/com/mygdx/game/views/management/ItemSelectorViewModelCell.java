@@ -7,6 +7,17 @@ import com.mygdx.game.model.worldObjects.Item;
  * @author Xx420TryhardxX
  *
  */
-public class ItemSelectorViewModelCell {
-    private Item item;
+public class ItemSelectorViewModelCell extends SelectorViewCell {
+    public ItemSelectorViewModelCell(float width, float height) {
+		super(width, height);
+		// TODO Auto-generated constructor stub
+	}
+
+	private Item item;
+
+	@Override
+	public void act(float delta) {
+		// TODO Auto-generated method stub
+		
+	}
 }

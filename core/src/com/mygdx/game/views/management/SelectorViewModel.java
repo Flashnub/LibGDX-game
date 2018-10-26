@@ -1,6 +1,7 @@
 package com.mygdx.game.views.management;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.mygdx.game.model.characters.player.Player;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -9,6 +10,8 @@ public abstract class SelectorViewModel {
 	Container<Table> tableContainer;
 	Skin contentSkin;
 	Skin parentSkin;
+
+	Player player;
 	
 	public SelectorViewModel(float width, float height) {
 		tableContainer = new Container<Table>();
